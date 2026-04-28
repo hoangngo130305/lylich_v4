@@ -1,0 +1,2494 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hệ thống Kê khai Lý lịch – Mẫu 2-KNĐ</title>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --red:    #C8102E;
+  --red-d:  #9B0E24;
+  --red-l:  #FFF0F2;
+  --navy:   #0D1B2A;
+  --navy2:  #162539;
+  --navy3:  #1E3250;
+  --gold:   #D4A017;
+  --white:  #FFFFFF;
+  --bg:     #F4F6F9;
+  --card:   #FFFFFF;
+  --border: #DDE3ED;
+  --text:   #1A2940;
+  --muted:  #6B7A99;
+  --hint:   #A0AABF;
+  --success:#1B7A50;
+  --warn:   #C47800;
+  --label-w: 220px;
+  --radius: 10px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Be Vietnam Pro', sans-serif; background: var(--bg); color: var(--text); font-size: 14px; line-height: 1.6; display: flex; min-height: 100vh; }
+
+/* ---- SIDEBAR ---- */
+aside {
+  width: 260px; min-height: 100vh; background: var(--navy);
+  display: flex; flex-direction: column; flex-shrink: 0; position: sticky; top: 0; height: 100vh; overflow-y: auto;
+}
+.brand {
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+}
+.brand-flag { display: flex; gap: 3px; margin-bottom: 10px; }
+.brand-flag span { width: 10px; height: 10px; border-radius: 2px; background: var(--red); }
+.brand-flag span:last-child { background: var(--gold); }
+.brand h1 { font-size: 13px; font-weight: 700; color: #fff; letter-spacing: .5px; line-height: 1.3; }
+.brand p { font-size: 10px; color: rgba(255,255,255,.4); margin-top: 3px; }
+
+.progress-wrap { padding: 14px 20px; border-bottom: 1px solid rgba(255,255,255,.06); }
+.progress-label { font-size: 10px; color: rgba(255,255,255,.4); margin-bottom: 6px; display: flex; justify-content: space-between; }
+.progress-bar { height: 3px; background: rgba(255,255,255,.12); border-radius: 3px; }
+.progress-fill { height: 3px; background: var(--gold); border-radius: 3px; transition: width .4s ease; }
+
+nav { flex: 1; padding: 12px 0; }
+.nav-group { margin-bottom: 4px; }
+.nav-group-label { font-size: 9px; font-weight: 700; letter-spacing: 1.5px; color: rgba(255,255,255,.25); padding: 10px 20px 4px; text-transform: uppercase; }
+.nav-item {
+  display: flex; align-items: center; gap: 10px; padding: 9px 20px; cursor: pointer;
+  font-size: 12.5px; color: rgba(255,255,255,.55); transition: all .18s; border-left: 3px solid transparent;
+  position: relative;
+}
+.nav-item:hover { background: rgba(255,255,255,.05); color: rgba(255,255,255,.9); }
+.nav-item.active { background: rgba(200,16,46,.12); color: #fff; border-left-color: var(--red); }
+.nav-item.done .nav-icon { background: var(--success); }
+.nav-icon {
+  width: 22px; height: 22px; border-radius: 50%; background: rgba(255,255,255,.1);
+  display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: #fff; flex-shrink: 0;
+}
+.nav-item.active .nav-icon { background: var(--red); }
+.nav-badge { margin-left: auto; font-size: 9px; background: var(--red); color: #fff; padding: 1px 5px; border-radius: 8px; }
+
+/* ---- MAIN ---- */
+main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+
+.topbar {
+  background: var(--white); border-bottom: 1px solid var(--border);
+  padding: 12px 32px; display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 10;
+}
+.topbar-title { font-size: 15px; font-weight: 600; color: var(--navy); }
+.topbar-sub { font-size: 11px; color: var(--muted); margin-top: 1px; }
+.topbar-actions { display: flex; gap: 8px; align-items: center; }
+.btn { border: none; border-radius: 8px; padding: 8px 16px; font-size: 12.5px; font-family: inherit; cursor: pointer; font-weight: 600; transition: all .15s; }
+.btn-ghost { background: transparent; border: 1.5px solid var(--border); color: var(--muted); }
+.btn-ghost:hover { border-color: var(--red); color: var(--red); }
+.btn-primary { background: var(--red); color: #fff; }
+.btn-primary:hover { background: var(--red-d); }
+.btn-navy { background: var(--navy); color: #fff; }
+.btn-navy:hover { background: var(--navy2); }
+.ai-btn { background: linear-gradient(135deg, #1E3250, #0D1B2A); color: #fff; display: flex; align-items: center; gap: 6px; font-size: 12px; }
+.ai-btn::before { content: '✦'; font-size: 10px; color: var(--gold); }
+
+.content { padding: 28px 32px; flex: 1; max-width: 960px; }
+
+/* ---- SECTION ---- */
+.section { display: none; }
+.section.active { display: block; animation: fadeIn .2s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+.section-header { margin-bottom: 22px; }
+.section-badge { display: inline-flex; align-items: center; gap: 6px; background: var(--red-l); color: var(--red); padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; margin-bottom: 8px; }
+.section-title { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--navy); margin-bottom: 4px; }
+.section-desc { font-size: 12.5px; color: var(--muted); line-height: 1.5; }
+
+/* ---- CARDS ---- */
+.card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 16px; overflow: hidden; }
+.card-head { padding: 12px 18px 10px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px; }
+.card-head h3 { font-size: 13px; font-weight: 700; color: var(--navy); }
+.card-head-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--red); }
+.card-body { padding: 18px; }
+
+/* ---- FORM ROWS ---- */
+.form-row {
+  display: grid; grid-template-columns: var(--label-w) 1fr;
+  gap: 8px 16px; align-items: start; padding: 10px 0;
+  border-bottom: 1px solid #F0F2F6;
+}
+.form-row:last-child { border-bottom: none; }
+.form-row.full-width { grid-template-columns: 1fr; }
+.form-row.two-col { grid-template-columns: var(--label-w) 1fr var(--label-w) 1fr; }
+
+label { font-size: 12.5px; font-weight: 600; color: var(--text); padding-top: 8px; }
+label span.req { color: var(--red); margin-left: 2px; }
+label .hint-lbl { display: block; font-size: 10.5px; font-weight: 400; color: var(--hint); margin-top: 1px; }
+
+input[type=text], input[type=date], input[type=email], input[type=tel], select, textarea {
+  width: 100%; border: 1.5px solid var(--border); border-radius: 8px; padding: 8px 12px;
+  font-family: inherit; font-size: 13px; color: var(--text); background: #fff; transition: border .15s;
+  outline: none;
+}
+input:focus, select:focus, textarea:focus { border-color: var(--red); box-shadow: 0 0 0 3px rgba(200,16,46,.08); }
+input.error, select.error { border-color: #E53935; }
+input.valid { border-color: #2E7D32; }
+textarea { resize: vertical; min-height: 80px; }
+select { cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%236B7A99' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; }
+.hint { font-size: 11px; color: var(--hint); margin-top: 4px; }
+.error-msg { font-size: 11px; color: var(--red); margin-top: 3px; display: none; }
+.error-msg.show { display: block; }
+
+/* Date row */
+.date-row { display: flex; gap: 8px; }
+.date-row input { flex: 1; }
+
+/* inline radio/checkbox */
+.radio-group, .check-group { display: flex; gap: 12px; padding-top: 8px; flex-wrap: wrap; }
+.radio-opt, .check-opt { display: flex; align-items: center; gap: 6px; font-size: 13px; cursor: pointer; }
+.radio-opt input, .check-opt input { width: auto; border: none; box-shadow: none; }
+
+/* AI HINT BOX */
+.ai-hint {
+  background: linear-gradient(135deg, #F8F6FF, #FFF8EC);
+  border: 1px solid #E8DCFF; border-radius: 8px; padding: 10px 14px;
+  font-size: 12px; color: #5230A8; display: flex; gap: 8px; align-items: flex-start; margin-top: 6px;
+}
+.ai-hint::before { content: '✦'; color: var(--gold); font-size: 13px; flex-shrink: 0; margin-top: 1px; }
+
+/* ALERT */
+.alert { border-radius: 8px; padding: 10px 14px; font-size: 12px; margin-bottom: 14px; display: flex; gap: 8px; }
+.alert-warn { background: #FFF8E6; border: 1px solid #F0C844; color: #7A5800; }
+.alert-info { background: #EEF4FF; border: 1px solid #B0C8FF; color: #1A3880; }
+.alert-success { background: #EDFAF3; border: 1px solid #7FD4A8; color: #145C35; }
+
+/* TIMELINE TABLE */
+.timeline-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+.timeline-table th { background: var(--navy); color: #fff; padding: 9px 12px; font-size: 11.5px; font-weight: 600; text-align: left; }
+.timeline-table td { padding: 0; border-bottom: 1px solid var(--border); vertical-align: top; }
+.timeline-table td input { border: none; border-radius: 0; padding: 9px 10px; background: transparent; width: 100%; }
+.timeline-table td input:focus { background: #FFFEF8; border-bottom: 2px solid var(--red); }
+.timeline-table tr:nth-child(even) td { background: #FAFBFD; }
+.timeline-table tr:last-child td { border-bottom: none; }
+
+/* ── Diễn biến expandable ── */
+.td-dienbien { position: relative; vertical-align: top; }
+.td-dienbien textarea {
+  width: 100%; border: none; border-radius: 0; padding: 9px 10px;
+  font-family: inherit; font-size: 12.5px; line-height: 1.5;
+  resize: none; overflow: hidden; background: #FFFEF8;
+  border-bottom: 2px solid var(--red); outline: none;
+  min-height: 70px; box-sizing: border-box;
+}
+.add-row-btn { font-size: 12px; color: var(--red); background: none; border: 1.5px dashed #F0A0AA; border-radius: 8px; padding: 7px 16px; cursor: pointer; margin-top: 8px; width: 100%; font-weight: 600; font-family: inherit; }
+.add-row-btn:hover { background: var(--red-l); }
+.del-btn { background: none; border: none; color: var(--hint); cursor: pointer; padding: 4px 8px; font-size: 13px; }
+.del-btn:hover { color: var(--red); }
+
+/* FAMILY ACCORDION */
+.family-accordion { margin-bottom: 10px; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+.family-head {
+  background: var(--navy2); color: #fff; padding: 11px 16px; cursor: pointer;
+  display: flex; align-items: center; justify-content: space-between; font-size: 13px; font-weight: 600;
+}
+.family-head:hover { background: var(--navy3); }
+.family-head .fam-num { background: var(--red); color: #fff; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0; }
+.family-head .fam-info { flex: 1; margin-left: 10px; }
+.family-head .fam-name { font-size: 12px; font-weight: 400; color: rgba(255,255,255,.55); display: block; }
+.family-head .chevron { transition: transform .2s; color: rgba(255,255,255,.4); }
+.family-body { display: none; padding: 16px; background: #fff; }
+.family-body.open { display: block; }
+
+/* PHOTO UPLOAD */
+.photo-upload {
+  width: 100px; height: 130px; border: 2px dashed var(--border); border-radius: 8px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  cursor: pointer; background: var(--bg); color: var(--hint); font-size: 11px; text-align: center; gap: 4px;
+}
+.photo-upload:hover { border-color: var(--red); color: var(--red); }
+.photo-icon { font-size: 22px; }
+
+/* BOTTOM NAV */
+.bottom-nav {
+  position: sticky; bottom: 0; background: var(--white); border-top: 1px solid var(--border);
+  padding: 14px 32px; display: flex; align-items: center; justify-content: space-between;
+}
+.step-dots { display: flex; gap: 4px; }
+.step-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--border); transition: all .2s; }
+.step-dot.done { background: var(--success); }
+.step-dot.active { background: var(--red); width: 18px; border-radius: 3px; }
+
+/* STATUS BADGE */
+.status-badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+.status-draft { background: #FFF8E6; color: #7A5800; }
+.status-review { background: #EEF4FF; color: #1A3880; }
+
+/* SCROLLBAR */
+aside::-webkit-scrollbar { width: 4px; }
+aside::-webkit-scrollbar-track { background: transparent; }
+aside::-webkit-scrollbar-thumb { background: rgba(255,255,255,.15); border-radius: 2px; }
+
+/* ===== AI MODAL ===== */
+.modal-backdrop { display:none; position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:200; align-items:center; justify-content:center; }
+.modal-backdrop.open { display:flex; }
+.modal-box { background:#fff; border-radius:16px; width:620px; max-width:95vw; max-height:90vh; overflow:hidden; display:flex; flex-direction:column; box-shadow:0 24px 64px rgba(0,0,0,.2); }
+.modal-head { padding:18px 22px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--border); background:var(--navy); }
+.modal-head h3 { font-size:15px; font-weight:700; color:#fff; }
+.modal-close { background:none; border:none; color:rgba(255,255,255,.5); font-size:20px; cursor:pointer; padding:2px 8px; border-radius:6px; }
+.modal-close:hover { color:#fff; background:rgba(255,255,255,.1); }
+.modal-body { flex:1; overflow-y:auto; padding:22px; }
+.modal-foot { padding:14px 22px; border-top:1px solid var(--border); display:flex; gap:8px; justify-content:flex-end; }
+
+/* AI scanning animation */
+.ai-scan-wrap { text-align:center; padding:28px 0; }
+.ai-spinner { width:56px; height:56px; border:3px solid #F0F3F8; border-top-color:var(--red); border-radius:50%; margin:0 auto 16px; animation:spin .8s linear infinite; }
+@keyframes spin { to { transform:rotate(360deg); } }
+.ai-scan-label { font-size:13px; color:var(--muted); }
+.ai-scan-progress { height:3px; background:#F0F3F8; border-radius:3px; margin:14px 0; overflow:hidden; }
+.ai-scan-bar { height:3px; background:var(--red); border-radius:3px; animation:scanProgress 2.5s ease forwards; }
+@keyframes scanProgress { from{width:0} to{width:100%} }
+
+/* AI result rows */
+.ai-section-result { margin-bottom:12px; border:1px solid var(--border); border-radius:10px; overflow:hidden; }
+.ai-sec-head { padding:10px 14px; display:flex; align-items:center; gap:8px; background:#F9FAFB; cursor:pointer; }
+.ai-sec-head:hover { background:#F0F3F8; }
+.ai-sec-icon { width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; flex-shrink:0; }
+.ai-sec-icon.ok  { background:#EDFAF3; color:var(--success); }
+.ai-sec-icon.err { background:var(--red-l); color:var(--red); }
+.ai-sec-icon.wrn { background:#FFF8E6; color:var(--warn); }
+.ai-sec-name { flex:1; font-size:13px; font-weight:600; color:var(--navy); }
+.ai-sec-badge { font-size:11px; padding:2px 8px; border-radius:12px; font-weight:700; }
+.ai-sec-badge.ok  { background:#EDFAF3; color:var(--success); }
+.ai-sec-badge.err { background:var(--red-l); color:var(--red); }
+.ai-sec-badge.wrn { background:#FFF8E6; color:var(--warn); }
+.ai-sec-body { padding:10px 14px; border-top:1px solid var(--border); display:none; }
+.ai-sec-body.open { display:block; }
+.ai-issue { display:flex; gap:8px; align-items:flex-start; padding:6px 0; border-bottom:1px solid #F5F7FA; font-size:12.5px; }
+.ai-issue:last-child { border-bottom:none; }
+.ai-issue-dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; margin-top:5px; }
+.ai-score-circle { width:72px; height:72px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-direction:column; margin:0 auto 16px; border:4px solid; }
+.ai-score-circle.high { border-color:var(--success); color:var(--success); }
+.ai-score-circle.mid  { border-color:var(--warn);    color:var(--warn); }
+.ai-score-circle.low  { border-color:var(--red);     color:var(--red); }
+.ai-score-num { font-size:22px; font-weight:700; line-height:1; }
+.ai-score-sub { font-size:10px; }
+
+/* ===== NOTIFICATIONS CENTER (admin) ===== */
+.notif-tpl-card { border:1px solid var(--border); border-radius:10px; padding:16px; margin-bottom:12px; cursor:pointer; transition:all .18s; }
+.notif-tpl-card:hover { border-color:var(--red); box-shadow:0 2px 12px rgba(200,16,46,.08); }
+.notif-tpl-card.selected { border-color:var(--red); background:var(--red-l); }
+.notif-channel-tabs { display:flex; gap:8px; margin-bottom:16px; }
+.channel-tab { padding:7px 16px; border-radius:20px; font-size:12.5px; font-weight:600; cursor:pointer; border:1.5px solid var(--border); color:var(--muted); transition:all .18s; }
+.channel-tab.active { background:var(--navy); color:#fff; border-color:var(--navy); }
+.notif-preview { background:#F4F6F9; border-radius:10px; padding:16px; font-size:13px; color:var(--text); line-height:1.7; min-height:120px; border:1.5px solid var(--border); white-space:pre-wrap; }
+.notif-phone-frame { width:260px; border:3px solid var(--navy); border-radius:24px; padding:16px 12px; background:#fff; margin:0 auto; }
+.notif-phone-bar { height:4px; background:#E0E0E0; border-radius:2px; width:60%; margin:0 auto 14px; }
+.zalo-bubble { background:#E8F5E9; border-radius:12px 12px 12px 4px; padding:10px 12px; font-size:12px; color:#1A2940; line-height:1.6; }
+.zalo-time { font-size:10px; color:var(--hint); margin-top:6px; text-align:right; }
+
+/* ===== AUTOSAVE TOAST ===== */
+.toast { position:fixed; bottom:90px; left:50%; transform:translateX(-50%) translateY(20px); background:var(--navy); color:#fff; padding:9px 20px; border-radius:20px; font-size:12.5px; font-weight:600; z-index:300; opacity:0; transition:all .3s; pointer-events:none; }
+.toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+
+/* ===== FIELD VALIDATION INLINE ===== */
+.val-ok  { border-color:#2E7D32 !important; }
+.val-err { border-color:var(--red) !important; box-shadow:0 0 0 3px rgba(200,16,46,.07) !important; }
+.val-warn { border-color:var(--warn) !important; }
+.inline-err { font-size:11px; color:var(--red); margin-top:3px; display:flex; align-items:center; gap:4px; }
+.inline-warn { font-size:11px; color:var(--warn); margin-top:3px; display:flex; align-items:center; gap:4px; }
+.inline-ok { font-size:11px; color:var(--success); margin-top:3px; display:flex; align-items:center; gap:4px; }
+
+/* ===== SECTION PROGRESS DOTS (in nav) ===== */
+.nav-progress { display:flex; gap:3px; margin-left:auto; }
+.npd { width:5px; height:5px; border-radius:50%; background:rgba(255,255,255,.15); }
+.npd.filled { background:var(--gold); }
+
+/* ===== TIMELINE GAP WARNING ===== */
+.gap-warning { background:#FFF8E6; border:1px solid #F0C844; border-radius:6px; padding:7px 12px; font-size:11.5px; color:#7A5800; margin-top:8px; display:none; }
+.gap-warning.show { display:block; }
+
+/* ===== ROLE SWITCHER ===== */
+.role-switcher { display:flex; background:rgba(0,0,0,.25); border-radius:8px; padding:3px; margin:14px 16px 0; gap:2px; }
+.role-btn { flex:1; text-align:center; padding:6px 8px; border-radius:6px; font-size:11px; font-weight:700; cursor:pointer; color:rgba(255,255,255,.5); transition:all .2s; border:none; background:transparent; font-family:inherit; }
+.role-btn.active { background:var(--red); color:#fff; }
+
+/* ===== ADMIN SIDEBAR ===== */
+.admin-nav { display:none; flex:1; padding:12px 0; }
+.admin-nav.visible { display:block; }
+.member-nav { display:block; }
+.member-nav.hidden { display:none; }
+.progress-wrap.hidden { display:none; }
+
+/* ===== ADMIN MAIN ===== */
+#adminMain { display:none; flex:1; flex-direction:column; min-width:0; }
+#adminMain.visible { display:flex; }
+#memberMain { display:flex; flex:1; flex-direction:column; min-width:0; }
+#memberMain.hidden { display:none; }
+
+/* ===== ADMIN TOPBAR ===== */
+.admin-topbar { background:var(--navy); padding:0 28px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:10; height:56px; }
+.admin-topbar-title { font-size:14px; font-weight:700; color:#fff; }
+.admin-topbar-sub { font-size:11px; color:rgba(255,255,255,.4); }
+.admin-tabs { display:flex; gap:0; }
+.admin-tab { padding:18px 20px; font-size:12.5px; font-weight:600; color:rgba(255,255,255,.45); cursor:pointer; border-bottom:3px solid transparent; transition:all .2s; }
+.admin-tab.active { color:#fff; border-bottom-color:var(--gold); }
+.admin-tab:hover { color:rgba(255,255,255,.8); }
+.admin-user { display:flex; align-items:center; gap:8px; font-size:12px; color:rgba(255,255,255,.6); }
+.admin-avatar { width:30px; height:30px; border-radius:50%; background:var(--red); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:#fff; }
+
+/* ===== ADMIN CONTENT ===== */
+.admin-content { flex:1; padding:24px 28px; overflow-y:auto; }
+.admin-page { display:none; }
+.admin-page.active { display:block; animation:fadeIn .2s ease; }
+
+/* ===== KPI CARDS ===== */
+.kpi-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:14px; margin-bottom:24px; }
+.kpi-card { background:#fff; border:1px solid var(--border); border-radius:12px; padding:16px 18px; position:relative; overflow:hidden; }
+.kpi-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; }
+.kpi-card.red::before { background:var(--red); }
+.kpi-card.blue::before { background:#2E75B6; }
+.kpi-card.green::before { background:var(--success); }
+.kpi-card.warn::before { background:var(--warn); }
+.kpi-card.gold::before { background:var(--gold); }
+.kpi-val { font-size:30px; font-weight:700; color:var(--navy); line-height:1.1; }
+.kpi-label { font-size:11.5px; color:var(--muted); margin-top:4px; }
+.kpi-delta { font-size:10.5px; margin-top:6px; font-weight:600; }
+.kpi-delta.up { color:var(--success); }
+.kpi-delta.down { color:var(--red); }
+
+/* ===== PROFILE TABLE ===== */
+.filter-bar { display:flex; gap:10px; margin-bottom:16px; align-items:center; flex-wrap:wrap; }
+.search-box { flex:1; min-width:200px; position:relative; }
+.search-box input { padding-left:34px; }
+.search-icon { position:absolute; left:10px; top:50%; transform:translateY(-50%); color:var(--hint); font-size:14px; pointer-events:none; }
+.filter-select { border:1.5px solid var(--border); border-radius:8px; padding:8px 30px 8px 12px; font-family:inherit; font-size:12.5px; color:var(--text); cursor:pointer; appearance:none; background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%236B7A99' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat right 10px center; outline:none; }
+.filter-select:focus { border-color:var(--red); }
+
+.profile-table { width:100%; border-collapse:collapse; background:#fff; border-radius:12px; overflow:hidden; border:1px solid var(--border); font-size:12.5px; }
+.profile-table thead tr { background:var(--navy); }
+.profile-table th { padding:11px 14px; text-align:left; color:rgba(255,255,255,.8); font-size:11.5px; font-weight:600; white-space:nowrap; }
+.profile-table td { padding:11px 14px; border-bottom:1px solid #F0F3F8; vertical-align:middle; }
+.profile-table tr:last-child td { border-bottom:none; }
+.profile-table tr:hover td { background:#F7F9FC; }
+.profile-table tr.selected td { background:#FFF5F6; }
+.profile-table .name-cell { font-weight:600; color:var(--navy); }
+.profile-table .sub-cell { font-size:11px; color:var(--hint); margin-top:1px; }
+
+/* STATUS PILLS */
+.pill { display:inline-flex; align-items:center; gap:4px; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:700; white-space:nowrap; }
+.pill::before { content:''; width:6px; height:6px; border-radius:50%; background:currentColor; opacity:.7; }
+.pill-draft    { background:#FFF8E6; color:#8A6200; }
+.pill-pending  { background:#EEF4FF; color:#1A3880; }
+.pill-review   { background:#E8F0FE; color:#1557B0; }
+.pill-return   { background:#FFF0F0; color:#C8102E; }
+.pill-verify   { background:#E8F5E9; color:#1B5E20; }
+.pill-done     { background:#EDFAF3; color:#145C35; }
+.pill-new      { background:#F3E8FF; color:#6B21A8; }
+
+/* AI SCORE */
+.ai-score { display:inline-flex; align-items:center; gap:4px; font-size:11.5px; font-weight:700; }
+.ai-score-bar { width:40px; height:5px; background:#E8ECF2; border-radius:3px; overflow:hidden; }
+.ai-score-fill { height:100%; border-radius:3px; }
+
+/* ACTION BTNS */
+.act-btn { border:none; background:none; cursor:pointer; padding:5px 8px; border-radius:6px; font-size:12px; font-family:inherit; font-weight:600; transition:all .15s; }
+.act-approve { color:var(--success); } .act-approve:hover { background:#EDFAF3; }
+.act-return  { color:var(--red); }     .act-return:hover  { background:var(--red-l); }
+.act-view    { color:#1A3880; }        .act-view:hover    { background:#EEF4FF; }
+.act-note    { color:var(--muted); }   .act-note:hover    { background:#F4F6F9; }
+
+/* ===== DETAIL PANEL ===== */
+.detail-panel { position:fixed; right:0; top:0; bottom:0; width:520px; background:#fff; border-left:1px solid var(--border); z-index:100; transform:translateX(100%); transition:transform .3s ease; display:flex; flex-direction:column; }
+.detail-panel.open { transform:translateX(0); box-shadow:-8px 0 40px rgba(0,0,0,.12); }
+.detail-panel-head { padding:18px 22px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; background:var(--navy); }
+.detail-panel-head h3 { font-size:14px; font-weight:700; color:#fff; }
+.close-panel { background:none; border:none; color:rgba(255,255,255,.6); font-size:20px; cursor:pointer; padding:4px 8px; border-radius:6px; }
+.close-panel:hover { color:#fff; background:rgba(255,255,255,.1); }
+.detail-panel-body { flex:1; overflow-y:auto; padding:20px 22px; }
+.detail-panel-footer { padding:14px 22px; border-top:1px solid var(--border); display:flex; gap:8px; }
+
+.detail-info-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:20px; }
+.detail-field { background:#F7F9FC; border-radius:8px; padding:10px 13px; }
+.detail-field-lbl { font-size:10.5px; color:var(--hint); margin-bottom:2px; font-weight:600; text-transform:uppercase; letter-spacing:.3px; }
+.detail-field-val { font-size:13px; color:var(--navy); font-weight:600; }
+.detail-section-title { font-size:12px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; margin:18px 0 10px; padding-bottom:6px; border-bottom:1px solid var(--border); }
+
+/* CHECKLIST */
+.checklist { list-style:none; }
+.checklist li { display:flex; align-items:flex-start; gap:8px; padding:7px 0; border-bottom:1px solid #F0F3F8; font-size:12.5px; }
+.checklist li:last-child { border-bottom:none; }
+.check-ok  { color:var(--success); font-size:14px; flex-shrink:0; }
+.check-err { color:var(--red); font-size:14px; flex-shrink:0; }
+.check-wrn { color:var(--warn); font-size:14px; flex-shrink:0; }
+
+/* TIMELINE MINI */
+.mini-timeline { position:relative; padding-left:20px; }
+.mini-timeline::before { content:''; position:absolute; left:5px; top:6px; bottom:6px; width:1.5px; background:var(--border); }
+.mt-item { position:relative; margin-bottom:14px; }
+.mt-dot { position:absolute; left:-18px; top:4px; width:9px; height:9px; border-radius:50%; background:var(--red); border:2px solid #fff; box-shadow:0 0 0 1px var(--red); }
+.mt-dot.done { background:var(--success); box-shadow:0 0 0 1px var(--success); }
+.mt-dot.pend { background:var(--warn); box-shadow:0 0 0 1px var(--warn); }
+.mt-label { font-size:12px; font-weight:600; color:var(--navy); }
+.mt-date  { font-size:10.5px; color:var(--hint); }
+
+/* TEXTAREA REVIEW */
+.review-textarea { width:100%; border:1.5px solid var(--border); border-radius:8px; padding:10px 12px; font-family:inherit; font-size:12.5px; resize:vertical; min-height:90px; outline:none; }
+.review-textarea:focus { border-color:var(--red); }
+
+/* ===== ACCOUNT CREATION ===== */
+.account-form { background:#fff; border:1px solid var(--border); border-radius:12px; padding:22px; max-width:640px; }
+.account-step { display:flex; align-items:center; gap:12px; margin-bottom:22px; }
+.astep { width:28px; height:28px; border-radius:50%; background:var(--border); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:var(--muted); }
+.astep.done { background:var(--success); color:#fff; }
+.astep.active { background:var(--red); color:#fff; }
+.astep-line { flex:1; height:2px; background:var(--border); }
+.astep-line.done { background:var(--success); }
+
+/* ===== REPORT CHARTS ===== */
+.chart-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:20px; }
+.chart-card { background:#fff; border:1px solid var(--border); border-radius:12px; padding:18px; }
+.chart-title { font-size:13px; font-weight:700; color:var(--navy); margin-bottom:14px; }
+
+/* Horizontal bar chart */
+.bar-chart-row { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+.bar-label { font-size:12px; color:var(--muted); min-width:130px; text-align:right; }
+.bar-track { flex:1; height:10px; background:#F0F3F8; border-radius:5px; overflow:hidden; }
+.bar-fill { height:100%; border-radius:5px; transition:width .6s ease; }
+.bar-val { font-size:12px; font-weight:700; color:var(--navy); min-width:28px; }
+
+/* Donut chart via conic-gradient */
+.donut { width:100px; height:100px; border-radius:50%; margin:0 auto 14px; }
+.legend-row { display:flex; align-items:center; gap:6px; font-size:12px; margin-bottom:5px; }
+.legend-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+
+/* NOTIFICATION LOG */
+.notif-item { display:flex; gap:12px; padding:11px 0; border-bottom:1px solid #F0F3F8; }
+.notif-item:last-child { border-bottom:none; }
+.notif-icon { width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:14px; flex-shrink:0; }
+.notif-text { font-size:12.5px; color:var(--text); }
+.notif-time { font-size:11px; color:var(--hint); margin-top:2px; }
+
+/* VERIFY TABLE */
+.verify-status { display:inline-flex; align-items:center; gap:5px; font-size:11.5px; font-weight:600; }
+</style>
+</head>
+<body>
+
+<!-- ===== SIDEBAR ===== -->
+<aside>
+  <div class="brand">
+    <div class="brand-flag"><span></span><span></span><span></span><span style="background:var(--gold)"></span></div>
+    <h1>HỆ THỐNG KÊ KHAI<br>LÝ LỊCH ĐẢNG</h1>
+    <p>Mẫu 2-KNĐ • Phiên bản số hóa</p>
+  </div>
+
+  <!-- Role switcher -->
+  <div class="role-switcher">
+    <button class="role-btn active" id="btnRoleMember" onclick="switchRole('member')">Quần chúng</button>
+    <button class="role-btn" id="btnRoleAdmin" onclick="switchRole('admin')">Ban XD Đảng</button>
+  </div>
+
+  <div class="progress-wrap" id="memberProgressWrap">
+    <div class="progress-label">
+      <span>Tiến độ hoàn thành</span>
+      <span id="pct">0%</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+  </div>
+
+  <!-- Admin sidebar nav -->
+  <nav class="admin-nav" id="adminSideNav">
+    <div class="nav-group">
+      <div class="nav-group-label">Tổng quan</div>
+      <div class="nav-item active" data-admin-page="pgDashboard" onclick="showAdminPage(this)">
+        <div class="nav-icon">◈</div> Dashboard
+      </div>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">Hồ sơ</div>
+      <div class="nav-item" data-admin-page="pgProfiles" onclick="showAdminPage(this)">
+        <div class="nav-icon">≡</div> Danh sách hồ sơ <div class="nav-badge" id="pendingBadge">5</div>
+      </div>
+      <div class="nav-item" data-admin-page="pgVerify" onclick="showAdminPage(this)">
+        <div class="nav-icon">✓</div> Xác minh lý lịch
+      </div>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">Quản lý</div>
+      <div class="nav-item" data-admin-page="pgNotif" onclick="showAdminPage(this)">
+        <div class="nav-icon">📨</div> Thông báo <div class="nav-badge">3</div>
+      </div>
+      <div class="nav-item" data-admin-page="pgAccount" onclick="showAdminPage(this)">
+        <div class="nav-icon">+</div> Cấp tài khoản
+      </div>
+      <div class="nav-item" data-admin-page="pgReport" onclick="showAdminPage(this)">
+        <div class="nav-icon">↗</div> Báo cáo & Thống kê
+      </div>
+    </div>
+    <div style="padding:20px 16px 10px; border-top:1px solid rgba(255,255,255,.06); margin-top:auto;">
+      <div style="font-size:10.5px; color:rgba(255,255,255,.3); margin-bottom:8px;">Đang đăng nhập</div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <div style="width:28px;height:28px;border-radius:50%;background:var(--red);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0;">TH</div>
+        <div>
+          <div style="font-size:12px;font-weight:600;color:#fff;">Trần Thị Hương</div>
+          <div style="font-size:10px;color:rgba(255,255,255,.4);">Cán bộ Ban XD Đảng</div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <nav class="member-nav" id="memberSideNav">
+    <div class="nav-group">
+      <div class="nav-group-label">Thông tin cá nhân</div>
+      <div class="nav-item active" data-section="secA">
+        <div class="nav-icon">A</div> Sơ lược lý lịch
+      </div>
+      <div class="nav-item" data-section="secB">
+        <div class="nav-icon">B</div> Lịch sử bản thân
+      </div>
+      <div class="nav-item" data-section="secC">
+        <div class="nav-icon">C</div> Công tác, chức vụ
+      </div>
+      <div class="nav-item" data-section="secD">
+        <div class="nav-icon">D</div> Đặc điểm lịch sử
+      </div>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">Học vấn & Thành tích</div>
+      <div class="nav-item" data-section="secE">
+        <div class="nav-icon">E</div> Đào tạo, bồi dưỡng
+      </div>
+      <div class="nav-item" data-section="secF">
+        <div class="nav-icon">F</div> Đi nước ngoài
+      </div>
+      <div class="nav-item" data-section="secG">
+        <div class="nav-icon">G</div> Khen thưởng
+      </div>
+      <div class="nav-item" data-section="secH">
+        <div class="nav-icon">H</div> Kỷ luật
+      </div>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">Gia đình</div>
+      <div class="nav-item" data-section="secI">
+        <div class="nav-icon">I</div> Hoàn cảnh gia đình <div class="nav-badge">17</div>
+      </div>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">Hoàn thiện hồ sơ</div>
+      <div class="nav-item" data-section="secJ">
+        <div class="nav-icon">J</div> Tự nhận xét
+      </div>
+      <div class="nav-item" data-section="secK">
+        <div class="nav-icon">✓</div> Cam đoan & Nộp
+      </div>
+    </div>
+  </nav>
+</aside>
+
+<!-- ===== MEMBER MAIN ===== -->
+<div id="memberMain">
+<main>
+  <!-- Topbar -->
+  <div class="topbar">
+    <div>
+      <div class="topbar-title">Lý lịch của người xin vào Đảng</div>
+      <div class="topbar-sub">NGUYỄN VĂN A &nbsp;|&nbsp; <span class="status-badge status-draft">Đang soạn thảo</span></div>
+    </div>
+    <div class="topbar-actions">
+      <button class="btn btn-ghost" onclick="autoFillDemo()">Điền mẫu demo</button>
+      <button class="btn ai-btn" onclick="openAICheck()">AI Kiểm tra hồ sơ</button>
+      <button class="btn btn-navy" onclick="saveDraft()">Lưu nháp</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- ===== PHẦN A ===== -->
+    <div class="section active" id="secA">
+      <div class="section-header">
+        <div class="section-badge">📋 Phần A</div>
+        <div class="section-title">Sơ lược lý lịch</div>
+        <div class="section-desc">Mục 01–13 · Thông tin cá nhân cơ bản · Điền theo đúng Giấy khai sinh</div>
+      </div>
+
+      <div class="alert alert-info">
+        ✦ Họ và tên khai sinh phải điền bằng <strong>CHỮ IN HOA</strong>, đúng với Giấy khai sinh. Địa danh chọn từ danh mục hành chính.
+      </div>
+
+      <!-- Số lý lịch -->
+      <div class="card">
+        <div class="card-head"><div class="card-head-dot"></div><h3>Số lý lịch</h3></div>
+        <div class="card-body">
+          <div class="form-row">
+            <label>Số lý lịch<span class="hint-lbl">Do cơ quan cấp phát – quần chúng không tự điền</span></label>
+            <input type="text" placeholder="(Cơ quan cấp điền)" disabled style="background:#F4F6F9;color:var(--muted);cursor:not-allowed">
+          </div>
+        </div>
+      </div>
+
+      <!-- Họ tên + Ảnh -->
+      <div class="card">
+        <div class="card-head"><div class="card-head-dot"></div><h3>Thông tin nhận dạng & Ảnh</h3></div>
+        <div class="card-body">
+          <div style="display:grid;grid-template-columns:1fr 110px;gap:20px;align-items:start">
+            <div>
+              <div class="form-row">
+                <label>01. Họ và tên khai sinh <span class="req">*</span><span class="hint-lbl">Bằng CHỮ IN HOA theo Giấy khai sinh</span></label>
+                <div>
+                  <input type="text" id="hoTen" placeholder="VD: NGUYỄN VĂN ANH" oninput="this.value=this.value.toUpperCase()" onblur="validateField(this,'required')">
+                  <div class="error-msg" id="err-hoTen">Vui lòng nhập họ và tên khai sinh</div>
+                </div>
+              </div>
+              <div class="form-row">
+                <label>02. Họ và tên thường dùng<span class="hint-lbl">Nếu khác với tên khai sinh</span></label>
+                <input type="text" placeholder="(Để trống nếu không có)">
+              </div>
+              <div class="form-row">
+                <label>03. Ngày sinh <span class="req">*</span><span class="hint-lbl">Theo Giấy khai sinh</span></label>
+                <div>
+                  <input type="date" id="ngaySinh" onblur="validateDOB(this)">
+                  <div class="error-msg" id="err-ngaySinh"></div>
+                </div>
+              </div>
+              <div class="form-row">
+                <label>04. Giới tính <span class="req">*</span></label>
+                <div class="radio-group">
+                  <label class="radio-opt"><input type="radio" name="gioiTinh" value="nam"> Nam</label>
+                  <label class="radio-opt"><input type="radio" name="gioiTinh" value="nu"> Nữ</label>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div class="photo-upload" onclick="alert('Tính năng upload ảnh 2×3cm')">
+                <div class="photo-icon">📷</div>
+                <div>Ảnh 2×3</div>
+                <div style="font-size:10px;color:var(--hint)">Click để tải lên</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Địa chỉ -->
+      <div class="card">
+        <div class="card-head"><div class="card-head-dot"></div><h3>Địa chỉ & Quê quán (Mục 05–07)</h3></div>
+        <div class="card-body">
+          <div class="form-row">
+            <label>05. Nơi đăng ký khai sinh <span class="req">*</span><span class="hint-lbl">Ghi theo địa danh hành chính mới</span></label>
+            <div>
+              <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:6px">
+                <select><option value="">-- Tỉnh/TP --</option></select>
+                <select><option value="">-- Quận/Huyện --</option></select>
+                <select><option value="">-- Xã/Phường --</option></select>
+              </div>
+              <input type="text" placeholder="Địa danh cũ (nếu đã thay đổi): VD: xã Nhà Bè, huyện Nhà Bè, tỉnh Gia Định cũ">
+            </div>
+          </div>
+          <div class="form-row">
+            <label>06. Quê quán <span class="req">*</span><span class="hint-lbl">Theo ông/bà nội (cha) hoặc ghi chú CCCD</span></label>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+              <select><option value="">-- Tỉnh/TP --</option></select>
+              <select><option value="">-- Quận/Huyện --</option></select>
+              <select><option value="">-- Xã/Phường --</option></select>
+            </div>
+          </div>
+          <div class="form-row">
+            <label>07a. Nơi thường trú <span class="req">*</span></label>
+            <input type="text" placeholder="Số nhà, đường, ấp, xã/phường, tỉnh/TP">
+          </div>
+          <div class="form-row">
+            <label>07b. Nơi tạm trú<span class="hint-lbl">Chỉ điền nếu khác thường trú</span></label>
+            <input type="text" placeholder="(Để trống nếu trùng nơi thường trú)">
+          </div>
+        </div>
+      </div>
+
+      <!-- Dân tộc, tôn giáo, nghề nghiệp -->
+      <div class="card">
+        <div class="card-head"><div class="card-head-dot"></div><h3>Thành phần & Nghề nghiệp (Mục 08–10)</h3></div>
+        <div class="card-body">
+          <div class="form-row">
+            <label>08. Dân tộc <span class="req">*</span></label>
+            <select>
+              <option value="">-- Chọn dân tộc --</option>
+              <option>Kinh</option><option>Tày</option><option>Thái</option><option>Mường</option>
+              <option>Khmer</option><option>Nùng</option><option>HMông</option><option>Dao</option>
+              <option>Gia-rai</option><option>Ngái</option><option>Ê-đê</option><option>Khác</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label>09. Tôn giáo <span class="req">*</span><span class="hint-lbl">Nếu chỉ thờ cúng tổ tiên → chọn Không</span></label>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+              <select id="tonGiao" onchange="toggleChucSac()">
+                <option value="">-- Chọn tôn giáo --</option>
+                <option value="khong">Không</option>
+                <option>Phật giáo</option><option>Công giáo</option><option>Cao Đài</option>
+                <option>Hòa Hảo</option><option>Tin Lành</option><option>Hồi giáo</option>
+              </select>
+              <input type="text" id="chucSac" placeholder="Chức sắc (nếu có)" style="display:none">
+            </div>
+          </div>
+          <div class="form-row">
+            <label>10. Nghề nghiệp hiện nay <span class="req">*</span></label>
+            <input type="text" placeholder="Công nhân / Viên chức / Giáo viên / Sinh viên …">
+          </div>
+        </div>
+      </div>
+
+      <!-- Trình độ -->
+      <div class="card">
+        <div class="card-head"><div class="card-head-dot"></div><h3>Trình độ (Mục 11)</h3></div>
+        <div class="card-body">
+          <div class="form-row">
+            <label>Giáo dục phổ thông <span class="req">*</span></label>
+            <select>
+              <option value="">-- Chọn trình độ --</option>
+              <option>Tốt nghiệp THPT hệ 12 năm</option>
+              <option>Tốt nghiệp THPT hệ 10 năm</option>
+              <option>Tốt nghiệp bổ túc văn hóa</option>
+              <option>Trung học cơ sở</option>
+              <option>Tiểu học</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label>Chuyên môn nghiệp vụ</label>
+            <input type="text" placeholder="VD: Kỹ sư cơ khí / Cử nhân luật / Trung cấp …">
+          </div>
+          <div class="form-row">
+            <label>11c. Khoa học công nghệ<span class="hint-lbl">Văn bằng/chứng chỉ về KHCN, đổi mới sáng tạo, chuyển đổi số</span></label>
+            <input type="text" placeholder="VD: Chứng chỉ chuyển đổi số, AI/ML, …">
+          </div>
+          <div class="form-row">
+            <label>Học vị cao nhất</label>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+              <select>
+                <option value="">-- Học vị --</option>
+                <option>Tiến sĩ</option><option>Thạc sĩ</option><option>Cử nhân / Kỹ sư</option><option>Cao đẳng</option>
+              </select>
+              <input type="text" placeholder="Chuyên ngành">
+            </div>
+          </div>
+          <div class="form-row">
+            <label>Học hàm cao nhất<span class="hint-lbl">Bỏ trống nếu không có</span></label>
+            <select>
+              <option value="">-- Học hàm --</option>
+              <option>Giáo sư</option>
+              <option>Phó Giáo sư</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label>Lý luận chính trị</label>
+            <select>
+              <option value="">-- Trình độ --</option>
+              <option>Sơ cấp (tập trung)</option><option>Sơ cấp (không tập trung)</option>
+              <option>Trung cấp (tập trung)</option><option>Trung cấp (không tập trung)</option>
+              <option>Cao cấp (tập trung)</option><option>Cử nhân</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label>Ngoại ngữ</label>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+              <input type="text" placeholder="Tên tiếng: Tiếng Anh / Tiếng Trung …">
+              <select>
+                <option value="">-- Trình độ --</option>
+                <option>A1</option><option>A2</option><option>B1</option><option>B2</option>
+                <option>C1</option><option>C2</option><option>Đại học</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <label>Tin học</label>
+            <select>
+              <option value="">-- Trình độ --</option>
+              <option>Tin học văn phòng</option><option>Chứng chỉ IC3</option>
+              <option>Trình độ A</option><option>Trình độ B</option><option>Trình độ C</option>
+              <option>Đại học chuyên ngành CNTT</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label>Tiếng dân tộc thiểu số</label>
+            <input type="text" placeholder="Tên dân tộc (để trống nếu không có)">
+          </div>
+        </div>
+      </div>
+
+      <!-- Đoàn thể (Mục 12) -->
+      <div class="card">
+        <div class="card-head"><div class="card-head-dot"></div><h3>Đoàn thể (Mục 12)</h3></div>
+        <div class="card-body">
+          <div class="form-row">
+            <label>12. Ngày vào Đoàn TNCS HCM <span class="req">*</span></label>
+            <div style="display:grid;grid-template-columns:180px 1fr;gap:8px">
+              <input type="date">
+              <input type="text" placeholder="Tại Chi đoàn / Đoàn cơ sở … xã …, tỉnh …">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Kết nạp lại — Mục 13 -->
+      <div class="card" id="cardKetNapLai" style="border-color:#F0C844">
+        <div class="card-head" style="background:#FFF8E6">
+          <div class="card-head-dot" style="background:var(--warn)"></div>
+          <h3 style="color:var(--warn)">Mục 13 – Chỉ điền nếu xin KẾT NẠP LẠI vào Đảng (đã từng vào Đảng trước đây)</h3>
+        </div>
+        <div class="card-body">
+          <div class="alert alert-info" style="margin-bottom:14px;font-size:12px">
+            ℹ Nếu đây là lần <strong>đầu tiên xin vào Đảng</strong> → bỏ trống toàn bộ mục này. Thông tin 2 đảng viên giới thiệu vào Đảng được khai trong <strong>Mẫu 1-KNĐ (Phiếu đề nghị kết nạp)</strong>, không phải lý lịch này.
+          </div>
+          <div class="form-row">
+            <label>Ngày vào Đảng lần thứ nhất<span class="hint-lbl">DD/MM/YYYY và nơi kết nạp</span></label>
+            <div style="display:grid;grid-template-columns:180px 1fr;gap:8px">
+              <input type="date">
+              <input type="text" placeholder="Tại Chi bộ …, Đảng bộ …">
+            </div>
+          </div>
+          <div class="form-row">
+            <label>Ngày công nhận chính thức lần 1<span class="hint-lbl">DD/MM/YYYY</span></label>
+            <input type="date" style="max-width:220px">
+          </div>
+          <div class="form-row">
+            <label>Người giới thiệu lần đầu – Người (1)<span class="hint-lbl">Nếu có</span></label>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+              <input type="text" placeholder="Họ và tên">
+              <input type="text" placeholder="Chức vụ – Chi bộ …">
+            </div>
+          </div>
+          <div class="form-row">
+            <label>Người giới thiệu lần đầu – Người (2)<span class="hint-lbl">Nếu có</span></label>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+              <input type="text" placeholder="Họ và tên">
+              <input type="text" placeholder="Chức vụ – Chi bộ …">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ai-hint">
+        Sau khi điền xong Phần A, nhấn <strong>AI Kiểm tra hồ sơ</strong> để hệ thống tự động phát hiện thông tin còn thiếu hoặc không hợp lệ trước khi chuyển sang phần tiếp theo.
+      </div>
+    </div>
+
+    <!-- ===== PHẦN B ===== -->
+    <div class="section" id="secB">
+      <div class="section-header">
+        <div class="section-badge">📅 Phần B</div>
+        <div class="section-title">Lịch sử bản thân</div>
+        <div class="section-desc">Kê khai liên tục từ khi sinh đến nay · Không được để khoảng trắng &gt; 3 tháng · Mỗi giai đoạn phải có nơi sinh sống</div>
+      </div>
+      <div class="alert alert-warn">
+        ⚠ Cấp 1: 5 năm · Cấp 2: 4 năm · Cấp 3: 3 năm. Nếu học thêm năm → ghi rõ lý do (ở lại lớp / nghỉ học).
+      </div>
+      <div class="card">
+        <div class="card-head"><div class="card-head-dot"></div><h3>Timeline lịch sử bản thân</h3></div>
+        <div class="card-body" style="padding:0">
+          <table class="timeline-table" id="tbB">
+            <thead>
+              <tr>
+                <th style="width:120px">Từ (MM/YYYY)</th>
+                <th style="width:120px">Đến (MM/YYYY)</th>
+                <th>Diễn biến: Học gì / Làm gì / Ở đâu + Nơi sinh sống</th>
+                <th style="width:40px"></th>
+              </tr>
+            </thead>
+            <tbody id="tbB-body">
+              <tr>
+                <td><input type="month" placeholder="MM/YYYY"></td>
+                <td><input type="month" placeholder="MM/YYYY"></td>
+                <td class="td-dienbien">
+                  <input type="text" placeholder="VD: Còn nhỏ, sống cùng cha mẹ tại số nhà …, đường …, ấp …, xã …, tỉnh …">
+                </td>
+                <td><button class="del-btn" onclick="delRow(this)">✕</button></td>
+              </tr>
+              <tr>
+                <td><input type="month"></td>
+                <td><input type="month"></td>
+                <td class="td-dienbien">
+                  <input type="text" placeholder="VD: Học trường Tiểu học …, xã …, tỉnh …">
+                </td>
+                <td><button class="del-btn" onclick="delRow(this)">✕</button></td>
+              </tr>
+              <tr>
+                <td><input type="month"></td>
+                <td><input type="month"></td>
+                <td class="td-dienbien">
+                  <input type="text" placeholder="VD: Học trường THCS …, xã …, tỉnh … Được kết nạp vào Đoàn TNCS HCM ngày … tháng … năm … (nếu kết nạp Đoàn khi học THCS). Nếu thay đổi nơi cư trú thì bổ sung nơi cư trú mới.">
+                </td>
+                <td><button class="del-btn" onclick="delRow(this)">✕</button></td>
+              </tr>
+              <tr>
+                <td><input type="month"></td>
+                <td><input type="month"></td>
+                <td class="td-dienbien">
+                  <input type="text" placeholder="VD: Học trường THPT …, xã …, tỉnh … Được kết nạp vào Đoàn TNCS HCM ngày … tháng … năm … (nếu kết nạp Đoàn khi học THPT). Nếu thay đổi nơi cư trú thì bổ sung nơi cư trú mới.">
+                </td>
+                <td><button class="del-btn" onclick="delRow(this)">✕</button></td>
+              </tr>
+            </tbody>
+          </table>
+          <div style="padding:10px 14px">
+            <button class="add-row-btn" onclick="addRow('tbB-body','Tiếp theo …')">+ Thêm giai đoạn</button>
+          </div>
+        </div>
+      </div>
+      <div class="ai-hint">AI sẽ tự động phát hiện khoảng trắng thời gian và kiểm tra độ dài cấp học có hợp lệ không.</div>
+    </div>
+
+    <!-- ===== PHẦN C ===== -->
+    <div class="section" id="secC">
+      <div class="section-header">
+        <div class="section-badge">💼 Phần C</div>
+        <div class="section-title">Những công tác, chức vụ đã qua</div>
+        <div class="section-desc">Bắt buộc ghi tháng/năm · Liên tiếp với lịch sử bản thân · Giai đoạn chuyển việc phải có kê khai</div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div class="card-head-dot"></div><h3>Bảng công tác</h3></div>
+        <div class="card-body" style="padding:0">
+          <table class="timeline-table" id="tbC">
+            <thead>
+              <tr>
+                <th style="width:180px">Từ – Đến (tháng/năm)</th>
+                <th>Làm việc gì, ở đâu (tên đơn vị, địa chỉ + nơi sinh sống)</th>
+                <th style="width:160px">Chức vụ</th>
+                <th style="width:40px"></th>
+              </tr>
+            </thead>
+            <tbody id="tbC-body">
+              <tr>
+                <td><input type="text" placeholder="9/2003 – 6/2007"></td>
+                <td class="td-dienbien">
+                  <input type="text" placeholder="Học ngành … tại ĐH …, sinh sống tại số nhà …, xã …, tỉnh …">
+                </td>
+                <td><input type="text" placeholder="Sinh viên"></td>
+                <td><button class="del-btn" onclick="delRow(this)">✕</button></td>
+              </tr>
+              <tr>
+                <td><input type="text" placeholder="7/2007 – 9/2007"></td>
+                <td class="td-dienbien">
+                  <input type="text" placeholder="Ở nhà phụ giúp gia đình, sinh sống tại …">
+                </td>
+                <td><input type="text"></td>
+                <td><button class="del-btn" onclick="delRow(this)">✕</button></td>
+              </tr>
+              <tr>
+                <td><input type="text" placeholder="VD: …/…. đến nay"></td>
+                <td class="td-dienbien">
+                  <input type="text" placeholder="VD: Tham gia sinh hoạt Đoàn tại chi đoàn … (hay Hội viên Hội LHPN xã Nhà Bè …), sinh sống tại số nhà …, đường …, ấp …, xã …, tỉnh … (điền nếu hiện đang là đoàn viên/hội viên)">
+                </td>
+                <td><input type="text"></td>
+                <td><button class="del-btn" onclick="delRow(this)">✕</button></td>
+              </tr>
+            </tbody>
+          </table>
+          <div style="padding:10px 14px">
+            <button class="add-row-btn" onclick="addRow('tbC-body','Tiếp theo …')">+ Thêm công tác</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== PHẦN D ===== -->
+    <div class="section" id="secD">
+      <div class="section-header">
+        <div class="section-badge">🔍 Phần D</div>
+        <div class="section-title">Đặc điểm lịch sử chính trị</div>
+        <div class="section-desc">Kê khai đầy đủ, trung thực các đặc điểm lịch sử chính trị bản thân</div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div class="card-head-dot"></div><h3>Nội dung kê khai</h3></div>
+        <div class="card-body">
+          <textarea rows="8" placeholder="Kê khai các đặc điểm lịch sử chính trị liên quan đến bản thân (nếu có). Ghi rõ, đầy đủ, trung thực. Nếu không có: ghi 'Không có đặc điểm cần khai báo'."></textarea>
+          <div class="ai-hint" style="margin-top:10px">AI sẽ phân tích và cảnh báo nếu phát hiện từ khóa nhạy cảm cần làm rõ.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== PHẦN E ===== -->
+    <div class="section" id="secE">
+      <div class="section-header">
+        <div class="section-badge">🎓 Phần E</div>
+        <div class="section-title">Những lớp đào tạo, bồi dưỡng đã qua</div>
+        <div class="section-desc">Bắt buộc ghi rõ THÁNG/NĂM · Tối đa 13 dòng theo biểu mẫu</div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div class="card-head-dot"></div><h3>Bảng đào tạo</h3></div>
+        <div class="card-body" style="padding:0">
+          <table class="timeline-table">
+            <thead>
+              <tr>
+                <th style="width:22%">Tên trường</th>
+                <th style="width:30%">Ngành học / Tên lớp / Hình thức học</th>
+                <th style="width:22%">Từ tháng/năm – Đến tháng/năm</th>
+                <th>Văn bằng / Chứng chỉ</th>
+                <th style="width:40px"></th>
+              </tr>
+            </thead>
+            <tbody id="tbE-body">
+              <tr>
+                <td><input type="text" placeholder="ĐH Luật TP.HCM"></td>
+                <td><input type="text" placeholder="Cử nhân Luật – Chính quy"></td>
+                <td><input type="text" placeholder="9/2003 – 6/2007"></td>
+                <td><input type="text" placeholder="Bằng cử nhân Luật"></td>
+                <td><button class="del-btn" onclick="delRow(this)">✕</button></td>
+              </tr>
+            </tbody>
+          </table>
+          <div style="padding:10px 14px">
+            <button class="add-row-btn" onclick="addRowE()">+ Thêm lớp đào tạo</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== PHẦN F ===== -->
+    <div class="section" id="secF">
+      <div class="section-header">
+        <div class="section-badge">✈️ Phần F</div>
+        <div class="section-title">Đi nước ngoài</div>
+        <div class="section-desc">Chỉ kê khai chuyến đi từ 3 tháng trở lên · Không khai du lịch ngắn ngày</div>
+      </div>
+      <div class="card">
+        <div class="card-body" style="padding:0">
+          <table class="timeline-table">
+            <thead>
+              <tr>
+                <th style="width:26%">Từ tháng/năm – Đến tháng/năm</th>
+                <th>Nội dung đi (học tập / lao động / công tác …)</th>
+                <th style="width:20%">Nước nào</th>
+                <th style="width:40px"></th>
+              </tr>
+            </thead>
+            <tbody id="tbF-body">
+              <tr>
+                <td><input type="text" placeholder="(Nếu không có → để trống)"></td>
+                <td><input type="text"></td>
+                <td><input type="text"></td>
+                <td><button class="del-btn" onclick="delRow(this)">✕</button></td>
+              </tr>
+            </tbody>
+          </table>
+          <div style="padding:10px 14px">
+            <button class="add-row-btn" onclick="addRowF()">+ Thêm chuyến đi</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== PHẦN G ===== -->
+    <div class="section" id="secG">
+      <div class="section-header">
+        <div class="section-badge">🏆 Phần G</div>
+        <div class="section-title">Khen thưởng</div>
+        <div class="section-desc">Ghi từ bằng khen trở lên · Bắt buộc ghi THÁNG/NĂM ký trên giấy khen</div>
+      </div>
+      <div class="card">
+        <div class="card-body" style="padding:0">
+          <table class="timeline-table">
+            <thead>
+              <tr>
+                <th style="width:18%">Tháng/Năm</th>
+                <th>Lý do và hình thức khen thưởng</th>
+                <th style="width:24%">Cấp quyết định</th>
+                <th style="width:40px"></th>
+              </tr>
+            </thead>
+            <tbody id="tbG-body">
+              <tr>
+                <td><input type="text" placeholder="VD: 3/2022"></td>
+                <td><input type="text" placeholder="Chiến sĩ thi đua cơ sở …"></td>
+                <td><input type="text" placeholder="UBND xã / Phòng / Sở …"></td>
+                <td><button class="del-btn" onclick="delRow(this)">✕</button></td>
+              </tr>
+            </tbody>
+          </table>
+          <div style="padding:10px 14px">
+            <button class="add-row-btn" onclick="addRowG()">+ Thêm khen thưởng</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== PHẦN H ===== -->
+    <div class="section" id="secH">
+      <div class="section-header">
+        <div class="section-badge">⚠️ Phần H</div>
+        <div class="section-title">Kỷ luật</div>
+        <div class="section-desc">Kê khai từ khiển trách trở lên · Kê khai CẢ trường hợp bị xem xét nhưng không bị xử lý</div>
+      </div>
+      <div class="alert alert-warn">
+        ⚠ Kê khai cả trường hợp bị xem xét kỷ luật nhưng không bị xử lý, hoặc không bị xử lý do hết thời hiệu.
+      </div>
+      <div class="card">
+        <div class="card-body" style="padding:0">
+          <table class="timeline-table">
+            <thead>
+              <tr>
+                <th style="width:18%">Tháng/Năm</th>
+                <th>Lý do sai phạm và hình thức kỷ luật</th>
+                <th style="width:24%">Cấp quyết định</th>
+                <th style="width:40px"></th>
+              </tr>
+            </thead>
+            <tbody id="tbH-body">
+              <tr>
+                <td><input type="text" placeholder="(Nếu không có → để trống)"></td>
+                <td><input type="text"></td>
+                <td><input type="text"></td>
+                <td><button class="del-btn" onclick="delRow(this)">✕</button></td>
+              </tr>
+            </tbody>
+          </table>
+          <div style="padding:10px 14px">
+            <button class="add-row-btn" onclick="addRowH()">+ Thêm kỷ luật</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== PHẦN I ===== -->
+    <div class="section" id="secI">
+      <div class="section-header">
+        <div class="section-badge">👨‍👩‍👧‍👦 Phần I</div>
+        <div class="section-title">Hoàn cảnh gia đình</div>
+        <div class="section-desc">17 thành viên · Năm lập gia đình cha/mẹ phải khớp · Địa danh theo mới · Đã mất: bỏ trống Nơi cư trú &amp; Nghề nghiệp</div>
+      </div>
+      <div class="alert alert-warn">
+        ⚠ Quê quán phải đối chiếu theo ông/bà nội (cha) và ông/bà ngoại (mẹ). Năm lập gia đình cha và mẹ phải khớp nhau.
+      </div>
+      <div class="alert alert-info" style="font-size:12.5px">
+        ℹ <strong>Đối với cha mẹ ruột, chồng (hoặc vợ):</strong> Cần xác định được các giai đoạn học tập, thời gian lập gia đình, thay đổi công việc, thay đổi nơi cư trú để khai cho đúng, đảm bảo khai <strong>liên tục theo năm. Năm cuối giai đoạn trước = Năm đầu giai đoạn sau.</strong>
+      </div>
+
+      <!-- Gia đình ruột -->
+      <div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">Gia đình ruột</div>
+      <div class="alert alert-warn" style="margin-bottom:12px;font-size:12px">⚠ Mục 8–17: <strong>Chỉ kê khai nếu đã lập gia đình.</strong> Nếu đã ly hôn: chỉ khai các thông tin cơ bản của người chồng/vợ cũ; thông tin ngày lập gia đình và ly hôn ghi trong <strong>Phần C</strong>. Không cần khai cha mẹ và ông bà bên chồng/vợ khi đã ly hôn.</div>
+      <div id="famBlocks"></div>
+      <div style="margin-top:8px;margin-bottom:16px">
+        <button class="add-row-btn" style="width:auto;padding:7px 20px" onclick="addFamSibling()">+ Thêm Anh/Chị/Em ruột</button>
+      </div>
+
+      <div style="font-size:12px;font-weight:700;color:var(--muted);margin:18px 0 8px;text-transform:uppercase;letter-spacing:.5px">Ông bà bên mình</div>
+      <div id="famBlocks2"></div>
+
+      <div style="font-size:12px;font-weight:700;color:var(--muted);margin:18px 0 8px;text-transform:uppercase;letter-spacing:.5px">Gia đình chồng / vợ</div>
+      <div id="famBlocks3"></div>
+      <div style="margin-top:8px;margin-bottom:16px">
+        <button class="add-row-btn" style="width:auto;padding:7px 20px" onclick="addFamSiblingSpouse()">+ Thêm Anh/Chị/Em chồng/vợ</button>
+      </div>
+
+      <div style="font-size:12px;font-weight:700;color:var(--muted);margin:18px 0 8px;text-transform:uppercase;letter-spacing:.5px">Ông bà bên chồng / vợ</div>
+      <div id="famBlocks4"></div>
+    </div>
+
+    <!-- ===== PHẦN J ===== -->
+    <div class="section" id="secJ">
+      <div class="section-header">
+        <div class="section-badge">📝 Phần J</div>
+        <div class="section-title">Tự nhận xét</div>
+        <div class="section-desc">Ghi ưu/khuyết điểm về: Phẩm chất chính trị · Đạo đức lối sống · Năng lực công tác · Quan hệ quần chúng · Tối thiểu 200 từ</div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div class="card-head-dot"></div><h3>Nội dung tự nhận xét</h3></div>
+        <div class="card-body">
+          <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px">
+            <div style="font-size:11.5px;background:#EBF3FB;color:#185FA5;padding:5px 12px;border-radius:20px;font-weight:600">① Phẩm chất chính trị</div>
+            <div style="font-size:11.5px;background:#EDFAF3;color:#145C35;padding:5px 12px;border-radius:20px;font-weight:600">② Đạo đức lối sống</div>
+            <div style="font-size:11.5px;background:#FFF8E6;color:#7A5800;padding:5px 12px;border-radius:20px;font-weight:600">③ Năng lực công tác</div>
+            <div style="font-size:11.5px;background:var(--red-l);color:var(--red);padding:5px 12px;border-radius:20px;font-weight:600">④ Quan hệ quần chúng</div>
+          </div>
+          <textarea id="tuNhanXet" rows="12" placeholder="Kính gửi Chi bộ …&#10;&#10;Tôi tự nhận xét về bản thân như sau:&#10;&#10;1. Về phẩm chất chính trị: …&#10;&#10;2. Về đạo đức lối sống: …&#10;&#10;3. Về năng lực công tác: …&#10;&#10;4. Về quan hệ với quần chúng và sự tín nhiệm: …" oninput="countWords()"></textarea>
+          <div style="display:flex;justify-content:flex-end;margin-top:6px">
+            <span id="wordCount" style="font-size:11px;color:var(--hint)">0 / tối thiểu 200 từ</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== PHẦN K: CAM ĐOAN ===== -->
+    <div class="section" id="secK">
+      <div class="section-header">
+        <div class="section-badge">✅ Cam đoan & Nộp</div>
+        <div class="section-title">Cam đoan, Ký tên & Nộp hồ sơ</div>
+        <div class="section-desc">Kiểm tra lần cuối trước khi nộp · Ngày ký phải trước ngày gửi xác minh</div>
+      </div>
+
+      <!-- Tổng kết AI -->
+      <div class="card" style="border-color:#7FD4A8">
+        <div class="card-head" style="background:#EDFAF3">
+          <div class="card-head-dot" style="background:var(--success)"></div>
+          <h3 style="color:var(--success)">Kết quả kiểm tra tự động (AI)</h3>
+        </div>
+        <div class="card-body">
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px">
+            <div style="text-align:center;padding:14px;background:#F4F6F9;border-radius:10px">
+              <div style="font-size:28px;font-weight:700;color:var(--success)">0</div>
+              <div style="font-size:11px;color:var(--muted)">Lỗi cứng</div>
+            </div>
+            <div style="text-align:center;padding:14px;background:#FFF8E6;border-radius:10px">
+              <div style="font-size:28px;font-weight:700;color:var(--warn)">3</div>
+              <div style="font-size:11px;color:var(--muted)">Cảnh báo</div>
+            </div>
+            <div style="text-align:center;padding:14px;background:#EEF4FF;border-radius:10px">
+              <div style="font-size:28px;font-weight:700;color:#1A3880">2</div>
+              <div style="font-size:11px;color:var(--muted)">Gợi ý</div>
+            </div>
+          </div>
+          <div style="font-size:12.5px;color:var(--warn);background:#FFF8E6;border:1px solid #F0C844;border-radius:8px;padding:10px 14px;margin-bottom:8px">
+            ⚠ Phần I.4 – Mẫu lịch sử của Cha chồng còn thiếu 2 giai đoạn (có khoảng trắng 8 tháng từ 7/1998 – 2/1999)
+          </div>
+          <div style="font-size:12.5px;color:var(--warn);background:#FFF8E6;border:1px solid #F0C844;border-radius:8px;padding:10px 14px;margin-bottom:8px">
+            ⚠ Phần E – Cột "Tháng/Năm" dòng 2 chỉ có năm, chưa có tháng
+          </div>
+          <div style="font-size:12.5px;color:#1A3880;background:#EEF4FF;border:1px solid #B0C8FF;border-radius:8px;padding:10px 14px">
+            💡 Phần J – Tự nhận xét chưa đủ 200 từ (hiện tại: 143 từ)
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><div class="card-head-dot"></div><h3>Cam đoan & Ký tên</h3></div>
+        <div class="card-body">
+          <div style="background:#F4F6F9;border-radius:8px;padding:14px 16px;margin-bottom:16px;font-style:italic;font-size:13px;border-left:3px solid var(--red)">
+            Tôi cam đoan đã khai đầy đủ, rõ ràng, trung thực và chịu trách nhiệm trước Đảng về những nội dung đã khai trong lý lịch.
+          </div>
+          <div class="form-row">
+            <label>Ngày ký lý lịch <span class="req">*</span><span class="hint-lbl">Phải trước ngày gửi đi xác minh</span></label>
+            <input type="date" style="max-width:220px">
+          </div>
+          <div class="form-row">
+            <label>Xác nhận cam đoan <span class="req">*</span></label>
+            <label class="check-opt">
+              <input type="checkbox" id="camDoan">
+              <span style="font-size:13px">Tôi xác nhận đã đọc và cam đoan toàn bộ nội dung lý lịch là đúng sự thật</span>
+            </label>
+          </div>
+          <div class="form-row">
+            <label>Ghi họ và tên <span class="req">*</span><span class="hint-lbl">Điền lại đầy đủ họ và tên bên dưới chữ ký</span></label>
+            <input type="text" placeholder="VD: NGUYỄN VĂN A" style="max-width:320px" oninput="this.value=this.value.toUpperCase()">
+          </div>
+        </div>
+      </div>
+
+      <!-- Nhận xét Chi bộ (xem trước) -->
+      <div class="card" style="opacity:.7">
+        <div class="card-head" style="background:#F4F6F9">
+          <div class="card-head-dot" style="background:var(--hint)"></div>
+          <h3 style="color:var(--muted)">Nhận xét của Chi ủy / Chi bộ <small>(Điền SAU khi thẩm tra xác minh xong)</small></h3>
+        </div>
+        <div class="card-body">
+          <textarea rows="5" placeholder="Chỉ cán bộ Ban XD Đảng mới có quyền điền vào phần này sau khi hoàn tất xác minh…" disabled style="cursor:not-allowed;background:#F9FAFB"></textarea>
+        </div>
+      </div>
+
+      <!-- Chứng nhận Cấp ủy -->
+      <div class="card" style="opacity:.7">
+        <div class="card-head" style="background:#F4F6F9">
+          <div class="card-head-dot" style="background:var(--hint)"></div>
+          <h3 style="color:var(--muted)">Chứng nhận của Cấp ủy cơ sở <small>(Điền SAU khi thẩm tra xác minh xong)</small></h3>
+        </div>
+        <div class="card-body">
+          <textarea rows="5" placeholder="Chỉ Cấp ủy cơ sở mới có quyền điền vào phần này sau khi hoàn tất xác minh…" disabled style="cursor:not-allowed;background:#F9FAFB"></textarea>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:20px">
+        <button class="btn btn-ghost">Lưu nháp</button>
+        <button class="btn btn-primary" style="padding:10px 28px;font-size:14px" onclick="submitForm()">📤 Nộp hồ sơ</button>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+
+  <!-- Bottom Nav -->
+  <div class="bottom-nav">
+    <button class="btn btn-ghost" id="btnPrev" onclick="navigate(-1)">← Quay lại</button>
+    <div class="step-dots" id="stepDots"></div>
+    <button class="btn btn-primary" id="btnNext" onclick="navigate(1)">Tiếp theo →</button>
+  </div>
+</main>
+
+<!-- ===== AI CHECK MODAL ===== -->
+<div class="modal-backdrop" id="aiModal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3>✦ AI Kiểm tra hồ sơ lý lịch</h3>
+      <button class="modal-close" onclick="closeAIModal()">✕</button>
+    </div>
+    <div class="modal-body" id="aiModalBody">
+      <div class="ai-scan-wrap" id="aiScanWrap">
+        <div class="ai-spinner"></div>
+        <div style="font-size:14px;font-weight:700;color:var(--navy);margin-bottom:6px;">Đang phân tích hồ sơ…</div>
+        <div class="ai-scan-label" id="aiScanLabel">Đọc dữ liệu phần A – Sơ lược lý lịch…</div>
+        <div class="ai-scan-progress"><div class="ai-scan-bar" id="aiScanBar"></div></div>
+        <div style="font-size:11px;color:var(--hint);margin-top:8px;">Kiểm tra 14 nhóm ràng buộc dữ liệu</div>
+      </div>
+      <div id="aiResults" style="display:none"></div>
+    </div>
+    <div class="modal-foot" id="aiModalFoot" style="display:none">
+      <button class="btn btn-ghost" onclick="closeAIModal()">Đóng</button>
+      <button class="btn btn-primary" onclick="goToFirstError()">Sửa lỗi đầu tiên →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SEND NOTIFICATION MODAL ===== -->
+<div class="modal-backdrop" id="notifModal">
+  <div class="modal-box" style="width:700px">
+    <div class="modal-head">
+      <h3>📨 Gửi thông báo cho quần chúng</h3>
+      <button class="modal-close" onclick="document.getElementById('notifModal').classList.remove('open')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+        <div>
+          <div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px">Kênh gửi</div>
+          <div class="notif-channel-tabs" id="channelTabs">
+            <div class="channel-tab active" onclick="switchChannel('zalo',this)">Zalo OA</div>
+            <div class="channel-tab" onclick="switchChannel('sms',this)">SMS</div>
+            <div class="channel-tab" onclick="switchChannel('email',this)">Email</div>
+          </div>
+          <div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px">Mẫu thông báo</div>
+          <div class="notif-tpl-card selected" onclick="selectTpl(this,'tplReturn')">
+            <div style="font-size:12.5px;font-weight:700;color:var(--navy)">↩ Trả hồ sơ – Yêu cầu bổ sung</div>
+            <div style="font-size:11px;color:var(--hint);margin-top:3px">Thông báo quần chúng chỉnh sửa và nộp lại</div>
+          </div>
+          <div class="notif-tpl-card" onclick="selectTpl(this,'tplApprove')">
+            <div style="font-size:12.5px;font-weight:700;color:var(--navy)">✅ Phê duyệt hồ sơ</div>
+            <div style="font-size:11px;color:var(--hint);margin-top:3px">Chuyển sang bước xác minh</div>
+          </div>
+          <div class="notif-tpl-card" onclick="selectTpl(this,'tplRemind')">
+            <div style="font-size:12.5px;font-weight:700;color:var(--navy)">⏰ Nhắc nhở nộp hồ sơ</div>
+            <div style="font-size:11px;color:var(--hint);margin-top:3px">Quần chúng chưa nộp sau 7 ngày</div>
+          </div>
+          <div class="notif-tpl-card" onclick="selectTpl(this,'tplNew')">
+            <div style="font-size:12.5px;font-weight:700;color:var(--navy)">🔑 Thông báo tài khoản mới</div>
+            <div style="font-size:11px;color:var(--hint);margin-top:3px">Hướng dẫn đăng nhập lần đầu</div>
+          </div>
+          <div style="margin-top:14px">
+            <label style="font-size:12px;font-weight:700;color:var(--muted)">Ghi chú thêm (tuỳ chọn)</label>
+            <textarea id="notifExtra" style="width:100%;margin-top:6px;border:1.5px solid var(--border);border-radius:8px;padding:8px;font-family:inherit;font-size:12.5px;resize:none;outline:none;" rows="3" placeholder="Nội dung bổ sung thêm vào tin nhắn…"></textarea>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px">Xem trước</div>
+          <div id="notifPreviewWrap">
+            <div class="notif-phone-frame">
+              <div class="notif-phone-bar"></div>
+              <div class="zalo-bubble" id="notifPreviewText">Kính gửi <strong>Lê Thị Mai</strong>,<br><br>Hồ sơ lý lịch của bạn đã được Ban Xây dựng Đảng xem xét và cần bổ sung thêm thông tin.<br><br>Vui lòng đăng nhập hệ thống và cập nhật theo hướng dẫn.<br><br>Hạn bổ sung: <strong>27/04/2026</strong></div>
+              <div class="zalo-time">Ban XD Đảng • Vừa xong</div>
+            </div>
+          </div>
+          <div style="margin-top:14px;padding:12px;background:#F4F6F9;border-radius:8px;">
+            <div style="font-size:12px;font-weight:600;color:var(--navy);margin-bottom:8px;">Gửi đến</div>
+            <div style="display:flex;align-items:center;gap:8px;font-size:12.5px;"><input type="checkbox" checked style="width:auto"> <strong>Lê Thị Mai</strong> – 0912 xxx xxx</div>
+            <div style="margin-top:8px;font-size:11px;color:var(--hint)">Sẽ gửi qua Zalo OA (nếu đã liên kết) hoặc SMS</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="document.getElementById('notifModal').classList.remove('open')">Hủy</button>
+      <button class="btn btn-primary" onclick="sendNotification()">📨 Gửi thông báo</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+</div><!-- /memberMain -->
+
+<!-- Admin main placeholder - filled by JS -->
+<div id="adminMain" style="display:none;flex:1;flex-direction:column;min-width:0;"></div>
+
+<script>
+// ===== SECTIONS =====
+const sections = ['secA','secB','secC','secD','secE','secF','secG','secH','secI','secJ','secK'];
+const sectionLabels = ['Phần A','Phần B','Phần C','Phần D','Phần E','Phần F','Phần G','Phần H','Phần I','Phần J','Cam đoan'];
+let current = 0;
+const done = new Set();
+
+function buildDots() {
+  const wrap = document.getElementById('stepDots');
+  wrap.innerHTML = sections.map((_, i) => `<div class="step-dot ${i===current?'active':done.has(i)?'done':''}" id="dot${i}"></div>`).join('');
+}
+
+function navigate(dir) {
+  done.add(current);
+  const nav = document.querySelectorAll('#memberSideNav .nav-item')[current];
+  if (nav) nav.classList.add('done');
+  current = Math.max(0, Math.min(sections.length - 1, current + dir));
+  showSection(current);
+}
+
+function showSection(idx) {
+  document.querySelectorAll('.section').forEach((s,i) => s.classList.toggle('active', i === idx));
+  document.querySelectorAll('#memberSideNav .nav-item').forEach((n,i) => n.classList.toggle('active', i === idx));
+  current = idx;
+  buildDots();
+  updateProgress();
+  document.querySelector('.topbar-title').textContent = sectionLabels[idx] + ' – ' + getTitleForSection(idx);
+  document.getElementById('btnPrev').disabled = idx === 0;
+  document.getElementById('btnNext').textContent = idx === sections.length - 1 ? '📤 Nộp hồ sơ' : 'Tiếp theo →';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function getTitleForSection(i) {
+  return ['Sơ lược lý lịch','Lịch sử bản thân','Công tác chức vụ','Đặc điểm lịch sử','Đào tạo bồi dưỡng','Đi nước ngoài','Khen thưởng','Kỷ luật','Hoàn cảnh gia đình','Tự nhận xét','Cam đoan & Nộp'][i] || '';
+}
+
+function updateProgress() {
+  const pct = Math.round((done.size / sections.length) * 100);
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('pct').textContent = pct + '%';
+}
+
+document.querySelectorAll('#memberSideNav .nav-item').forEach((n, i) => {
+  n.addEventListener('click', () => { done.add(current); showSection(i); });
+});
+
+// ===== VALIDATION =====
+function validateField(el, type) {
+  const err = document.getElementById('err-' + el.id);
+  if (type === 'required' && !el.value.trim()) {
+    el.classList.add('error'); el.classList.remove('valid');
+    if (err) { err.textContent = 'Trường này bắt buộc'; err.classList.add('show'); }
+  } else {
+    el.classList.remove('error'); el.classList.add('valid');
+    if (err) err.classList.remove('show');
+  }
+}
+
+function validateDOB(el) {
+  const err = document.getElementById('err-ngaySinh');
+  if (!el.value) { err.textContent = 'Vui lòng nhập ngày sinh'; err.classList.add('show'); return; }
+  const d = new Date(el.value), now = new Date();
+  const age = (now - d) / (365.25 * 24 * 3600 * 1000);
+  if (age < 18) { el.classList.add('error'); err.textContent = '⚠ Tuổi < 18 – kiểm tra lại'; err.classList.add('show'); }
+  else { el.classList.remove('error'); el.classList.add('valid'); err.classList.remove('show'); }
+}
+
+function toggleChucSac() {
+  const v = document.getElementById('tonGiao').value;
+  document.getElementById('chucSac').style.display = (v && v !== 'khong') ? 'block' : 'none';
+}
+
+// ===== TABLE ROWS =====
+function addRow(tbodyId, ph) {
+  const tb = document.getElementById(tbodyId);
+  const row = tb.insertRow();
+  const cols = tb.rows[0].cells.length;
+  const isB = tbodyId === 'tbB-body';
+  for (let i = 0; i < cols; i++) {
+    const td = row.insertCell();
+    if (i === cols - 1) {
+      td.innerHTML = `<button class="del-btn" onclick="delRow(this)">✕</button>`;
+    } else {
+      td.innerHTML = isB ? `<input type="month">` : `<input type="text" placeholder="">`;
+    }
+  }
+  refreshDienBien(tb.closest('.timeline-table'));
+}
+
+function addRowE() {
+  const tb = document.getElementById('tbE-body');
+  tb.insertRow().innerHTML = `<td><input type="text"></td><td><input type="text"></td><td><input type="text" placeholder="MM/YYYY – MM/YYYY"></td><td><input type="text"></td><td><button class="del-btn" onclick="delRow(this)">✕</button></td>`;
+  refreshDienBien(tb.closest('.timeline-table'));
+}
+function addRowF() {
+  const tb = document.getElementById('tbF-body');
+  tb.insertRow().innerHTML = `<td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><button class="del-btn" onclick="delRow(this)">✕</button></td>`;
+  refreshDienBien(tb.closest('.timeline-table'));
+}
+function addRowG() {
+  const tb = document.getElementById('tbG-body');
+  tb.insertRow().innerHTML = `<td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><button class="del-btn" onclick="delRow(this)">✕</button></td>`;
+  refreshDienBien(tb.closest('.timeline-table'));
+}
+function addRowH() {
+  const tb = document.getElementById('tbH-body');
+  tb.insertRow().innerHTML = `<td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><button class="del-btn" onclick="delRow(this)">✕</button></td>`;
+  refreshDienBien(tb.closest('.timeline-table'));
+}
+
+function delRow(btn) {
+  const row = btn.closest('tr');
+  if (row.parentElement.rows.length > 1) row.remove();
+}
+
+// ===== WORD COUNT =====
+function countWords() {
+  const text = document.getElementById('tuNhanXet').value;
+  const count = text.trim() ? text.trim().split(/\s+/).length : 0;
+  const el = document.getElementById('wordCount');
+  el.textContent = count + ' / tối thiểu 200 từ';
+  el.style.color = count >= 200 ? 'var(--success)' : 'var(--hint)';
+}
+
+// ===== FAMILY BLOCKS =====
+function buildFamilyBlock(container, members) {
+  container.innerHTML = members.map((m, i) => `
+    <div class="family-accordion">
+      <div class="family-head" onclick="toggleFamily(this)">
+        <div class="fam-num">${m.num}</div>
+        <div class="fam-info">
+          ${m.title}
+          <span class="fam-name" id="famName_${m.num}">Chưa điền thông tin</span>
+        </div>
+        <span class="chevron">▾</span>
+      </div>
+      <div class="family-body ${i === 0 ? 'open' : ''}">
+        ${buildFamilyForm(m)}
+      </div>
+    </div>
+  `).join('');
+}
+
+function buildFamilyForm(m) {
+  const histBlock = `
+    <div style="margin-top:12px;margin-bottom:6px;font-size:12px;font-weight:700;color:var(--muted)">Quá trình lịch sử</div>
+    <table class="timeline-table">
+      <thead><tr><th style="width:18%">Từ</th><th style="width:18%">Đến</th><th>Diễn biến + Nơi sinh sống</th><th style="width:36px"></th></tr></thead>
+      <tbody>
+        <tr><td><input type="text" placeholder="YYYY"></td><td><input type="text" placeholder="YYYY"></td><td><input type="text" placeholder="Sống với cha mẹ, đi học, làm việc tại …"></td><td><button class="del-btn" onclick="delRow(this)">✕</button></td></tr>
+        <tr><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><button class="del-btn" onclick="delRow(this)">✕</button></td></tr>
+        <tr><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><button class="del-btn" onclick="delRow(this)">✕</button></td></tr>
+      </tbody>
+    </table>
+    <button class="add-row-btn" style="margin-top:8px" onclick="addRowToNearestTable(this)">+ Thêm giai đoạn</button>
+  `;
+
+  if (m.sibling) return `
+    <div class="form-row"><label>Họ và tên</label><input type="text" oninput="updateFamName('${m.num}',this.value)" placeholder=""></div>
+    <div class="form-row"><label>Năm sinh</label><input type="text" placeholder="YYYY"></div>
+    <div class="form-row"><label>Nơi cư trú</label><input type="text" placeholder="Số nhà, đường, ấp, xã, tỉnh …"></div>
+    <div class="form-row"><label>Nghề nghiệp</label><input type="text"></div>
+    <div class="form-row"><label>Là Đảng viên?</label><input type="text" placeholder="Vào Đảng năm …, Chi bộ …, Đảng bộ …"></div>
+  `;
+
+  if (m.child) return `
+    <div class="form-row"><label>Họ và tên</label><input type="text" oninput="updateFamName('${m.num}',this.value)"></div>
+    <div class="form-row"><label>Năm sinh</label><input type="text" placeholder="YYYY" id="childYear_${m.num}" oninput="checkChildAge('${m.num}',this.value)"></div>
+    <div class="form-row"><label>Nơi ở hiện nay</label><input type="text" placeholder="Số nhà, đường, ấp, xã, tỉnh …"></div>
+    <div id="childUnder18_${m.num}">
+      <div class="form-row">
+        <label>Đang học trường<span class="hint-lbl">Nếu &lt;6 tuổi: ghi "Còn nhỏ" · Nếu &lt;18 tuổi: ghi tên trường</span></label>
+        <input type="text" placeholder="VD: Còn nhỏ / Học sinh trường THCS Nhà Bè / …">
+      </div>
+    </div>
+    <div id="childOver18_${m.num}" style="display:none">
+      <div class="alert alert-info" style="font-size:12px;margin:6px 0 10px">ℹ Con từ 18 tuổi trở lên: khai đầy đủ như bản thân theo quy định Mẫu 2-KNĐ</div>
+      <div class="form-row"><label>Nơi sinh</label><input type="text" placeholder="Xã/Phường …, Tỉnh/TP … (KHÔNG ghi bệnh viện)"></div>
+      <div class="form-row"><label>Quê quán</label><input type="text" placeholder="Xã/Phường …, Tỉnh/TP … (địa danh mới)"></div>
+      <div class="form-row"><label>Dân tộc</label><input type="text"></div>
+      <div class="form-row"><label>Tôn giáo</label><input type="text" placeholder="Không / Tên tôn giáo + chức sắc nếu có"></div>
+      <div class="form-row"><label>Nghề nghiệp</label><input type="text"></div>
+      <div style="margin-top:12px;margin-bottom:6px;font-size:12px;font-weight:700;color:var(--muted)">Quá trình lịch sử (từ khi sinh đến nay)</div>
+      <table class="timeline-table">
+        <thead><tr><th style="width:18%">Từ</th><th style="width:18%">Đến</th><th>Diễn biến + Nơi sinh sống</th><th style="width:36px"></th></tr></thead>
+        <tbody>
+          <tr><td><input type="text" placeholder="YYYY"></td><td><input type="text" placeholder="YYYY"></td><td><input type="text" placeholder="Còn nhỏ, sống với cha mẹ tại …"></td><td><button class="del-btn" onclick="delRow(this)">✕</button></td></tr>
+          <tr><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><button class="del-btn" onclick="delRow(this)">✕</button></td></tr>
+        </tbody>
+      </table>
+      <button class="add-row-btn" style="margin-top:8px" onclick="addRowToNearestTable(this)">+ Thêm giai đoạn</button>
+    </div>
+  `;
+
+  if (m.spouse) return `
+    <div class="alert alert-warn" style="margin-bottom:8px;font-size:12px">⚠ Đã ly hôn: chỉ cần khai Họ tên + Năm sinh, các thông tin khác (lập gia đình, ly hôn) ghi trong <strong>Phần C – Lịch sử công tác</strong>. Không cần khai cha mẹ và ông bà bên chồng/vợ khi đã ly hôn.</div>
+    <div class="alert alert-info" style="margin-bottom:10px;font-size:12px">ℹ <strong>Lưu ý:</strong> Thông tin ngày lập gia đình và ly hôn (nếu có) <strong>không khai ở đây</strong> — chỉ ghi trong <strong>Phần C</strong> dạng: "Tháng …/…. – Lập gia đình với … chuyển đến sinh sống tại …" và "Tháng …/…. – Ly hôn với … theo Quyết định số … của cấp …"</div>
+    <div class="form-row"><label>Họ và tên</label><input type="text" oninput="updateFamName('${m.num}',this.value)"></div>
+    <div class="form-row"><label>Năm sinh</label><input type="text" placeholder="YYYY"></div>
+    <div class="form-row"><label>Nơi sinh</label><input type="text" placeholder="Xã/Phường …, Tỉnh/TP … (KHÔNG ghi bệnh viện)"></div>
+    <div class="form-row"><label>Quê quán<span class="hint-lbl">Phải đối chiếu với cha mẹ chồng/vợ</span></label><input type="text" placeholder="Xã/Phường …, Tỉnh/TP … (địa danh mới)"></div>
+    <div class="form-row"><label>Dân tộc</label><input type="text"></div>
+    <div class="form-row"><label>Tôn giáo</label><input type="text" placeholder="Không / Tên tôn giáo + chức sắc nếu có"></div>
+    <div class="form-row"><label>Nơi cư trú</label><input type="text" placeholder="Số nhà, đường, ấp, xã, tỉnh …"></div>
+    <div class="form-row"><label>Nghề nghiệp</label><input type="text"></div>
+    <div style="margin-top:12px;margin-bottom:6px;font-size:12px;font-weight:700;color:var(--muted)">Quá trình lịch sử của chồng/vợ (liên tục từ nhỏ đến nay) <span style="font-weight:400;color:var(--red)">*Bắt buộc</span></div>
+    <table class="timeline-table">
+      <thead><tr><th style="width:14%">Từ</th><th style="width:14%">Đến</th><th>Làm gì, ở đâu + Nơi sinh sống</th><th style="width:14%">Chức vụ</th><th style="width:36px"></th></tr></thead>
+      <tbody>
+        <tr><td><input type="text" placeholder="YYYY"></td><td><input type="text" placeholder="YYYY"></td><td><input type="text" placeholder="Còn nhỏ, sống với cha mẹ tại …"></td><td><input type="text"></td><td><button class="del-btn" onclick="delRow(this)">✕</button></td></tr>
+        <tr><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><button class="del-btn" onclick="delRow(this)">✕</button></td></tr>
+        <tr><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><button class="del-btn" onclick="delRow(this)">✕</button></td></tr>
+        <tr><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><button class="del-btn" onclick="delRow(this)">✕</button></td></tr>
+      </tbody>
+    </table>
+    <button class="add-row-btn" style="margin-top:8px" onclick="addRowSpouse(this)">+ Thêm giai đoạn</button>
+  `;
+
+  // grandparent type: Quê quán · Dân tộc · Tôn giáo · Nơi cư trú · Nghề nghiệp (NO Nơi sinh per Mẫu 2-KNĐ)
+  if (m.grandparent) return `
+    <div class="alert alert-info" style="font-size:12px;margin-bottom:10px">ℹ <strong>Hướng dẫn khai quá trình:</strong> Nếu tính đến năm 1975 ông/bà đã trên 18 tuổi → khai theo 2 giai đoạn: (1) từ khi sinh ra đến 1975, (2) từ 1975 đến nay. Nếu dưới 18 tuổi tính đến 1975 → chọn mốc thời gian phù hợp (lập gia đình, đi làm …) để tách giai đoạn.</div>
+    <div class="form-row"><label>Họ và tên</label><input type="text" oninput="updateFamName('${m.num}',this.value)"></div>
+    <div class="form-row"><label>Năm sinh</label><input type="text" placeholder="YYYY"></div>
+    <div class="form-row"><label>Quê quán<span class="hint-lbl">Ghi rõ xã, tỉnh theo địa danh mới</span></label><input type="text" placeholder="Xã/Phường …, Tỉnh/TP … (địa danh mới)"></div>
+    <div class="form-row"><label>Dân tộc</label><input type="text"></div>
+    <div class="form-row"><label>Tôn giáo</label><input type="text" placeholder="Không / Tên tôn giáo + chức sắc nếu có"></div>
+    <div class="form-row"><label>Nơi cư trú (nếu còn sống)</label><input type="text" placeholder="Bỏ trống nếu đã mất"></div>
+    <div class="form-row"><label>Nghề nghiệp (nếu còn sống)</label><input type="text" placeholder="Bỏ trống nếu đã mất"></div>
+    ${histBlock}
+  `;
+
+  // default: Cha/Mẹ ruột, Cha/Mẹ chồng/vợ — có Nơi sinh
+  return `
+    <div class="form-row"><label>Họ và tên</label><input type="text" oninput="updateFamName('${m.num}',this.value)"></div>
+    <div class="form-row"><label>Năm sinh</label><input type="text" placeholder="YYYY"></div>
+    <div class="form-row"><label>Nơi sinh</label><input type="text" placeholder="Xã/Phường …, Tỉnh/TP … (KHÔNG ghi bệnh viện)"></div>
+    <div class="form-row"><label>Quê quán</label><input type="text" placeholder="Xã/Phường …, Tỉnh/TP … (địa danh mới)"></div>
+    <div class="form-row"><label>Dân tộc</label><input type="text"></div>
+    <div class="form-row"><label>Tôn giáo</label><input type="text" placeholder="Không / Tên tôn giáo + chức sắc nếu có"></div>
+    <div class="form-row"><label>Nơi cư trú (nếu còn sống)</label><input type="text" placeholder="Bỏ trống nếu đã mất"></div>
+    <div class="form-row"><label>Nghề nghiệp (nếu còn sống)</label><input type="text" placeholder="Bỏ trống nếu đã mất"></div>
+    ${m.history !== false ? histBlock : ''}
+  `;
+}
+
+function updateFamName(num, val) {
+  const el = document.getElementById('famName_' + num);
+  if (el) el.textContent = val || 'Chưa điền thông tin';
+}
+
+function checkChildAge(num, yearVal) {
+  const year = parseInt(yearVal);
+  if (!year || year < 1900) return;
+  const age = new Date().getFullYear() - year;
+  const under18 = document.getElementById('childUnder18_' + num);
+  const over18  = document.getElementById('childOver18_'  + num);
+  if (!under18 || !over18) return;
+  if (age >= 18) {
+    under18.style.display = 'none';
+    over18.style.display  = 'block';
+  } else {
+    under18.style.display = 'block';
+    over18.style.display  = 'none';
+  }
+}
+
+function toggleFamily(head) {
+  const body = head.nextElementSibling;
+  const chevron = head.querySelector('.chevron');
+  body.classList.toggle('open');
+  chevron.style.transform = body.classList.contains('open') ? 'rotate(180deg)' : '';
+}
+
+function addRowToNearestTable(btn) {
+  const tbl = btn.previousElementSibling.querySelector('tbody');
+  if (!tbl) return;
+  tbl.insertRow().innerHTML = `<td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><button class="del-btn" onclick="delRow(this)">✕</button></td>`;
+  refreshDienBien(tbl.closest('.timeline-table'));
+}
+
+function addRowSpouse(btn) {
+  const tbl = btn.previousElementSibling.querySelector('tbody');
+  if (!tbl) return;
+  tbl.insertRow().innerHTML = `<td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><button class="del-btn" onclick="delRow(this)">✕</button></td>`;
+  refreshDienBien(tbl.closest('.timeline-table'));
+}
+
+// Thêm anh/chị/em ruột động
+let sibCount = 4;
+function addFamSibling() {
+  const cont = document.getElementById('famBlocks');
+  const num = '3.' + sibCount;
+  sibCount++;
+  const div = document.createElement('div');
+  div.innerHTML = buildFamilyBlockItem({ num, title: `Anh/Chị/Em ruột thứ ${sibCount-1}`, sibling: true }, false);
+  cont.insertAdjacentElement('beforebegin', div.firstElementChild);
+  showToast('✓ Đã thêm thành viên mới');
+}
+
+// Thêm anh/chị/em chồng/vợ động
+let sibSpouseCount = 3;
+function addFamSiblingSpouse() {
+  const cont = document.getElementById('famBlocks3');
+  const num = '13.' + sibSpouseCount;
+  sibSpouseCount++;
+  const div = document.createElement('div');
+  div.innerHTML = buildFamilyBlockItem({ num, title: `Anh/Chị/Em chồng (vợ) thứ ${sibSpouseCount-1}`, sibling: true }, false);
+  cont.insertAdjacentElement('beforebegin', div.firstElementChild);
+  showToast('✓ Đã thêm thành viên mới');
+}
+
+function buildFamilyBlockItem(m, isFirst) {
+  return `<div class="family-accordion">
+    <div class="family-head" onclick="toggleFamily(this)">
+      <div class="fam-num">${m.num}</div>
+      <div class="fam-info">${m.title}<span class="fam-name" id="famName_${m.num}">Chưa điền thông tin</span></div>
+      <span class="chevron">▾</span>
+    </div>
+    <div class="family-body ${isFirst ? 'open' : ''}">
+      ${buildFamilyForm(m)}
+    </div>
+  </div>`;
+}
+
+// Build family sections
+buildFamilyBlock(document.getElementById('famBlocks'), [
+  { num: '1', title: 'Cha ruột' },
+  { num: '2', title: 'Mẹ ruột' },
+  { num: '3.1', title: 'Anh/Chị/Em ruột thứ 1', sibling: true },
+  { num: '3.2', title: 'Anh/Chị/Em ruột thứ 2', sibling: true },
+  { num: '3.3', title: 'Anh/Chị/Em ruột thứ 3', sibling: true },
+  { num: '10', title: 'Chồng / Vợ', spouse: true },
+  { num: '11', title: 'Con ruột (1)', child: true },
+  { num: '12', title: 'Con ruột (2)', child: true },
+]);
+
+buildFamilyBlock(document.getElementById('famBlocks2'), [
+  { num: '4', title: 'Ông nội', grandparent: true },
+  { num: '5', title: 'Bà nội', grandparent: true },
+  { num: '6', title: 'Ông ngoại', grandparent: true },
+  { num: '7', title: 'Bà ngoại', grandparent: true },
+]);
+
+buildFamilyBlock(document.getElementById('famBlocks3'), [
+  { num: '8', title: 'Cha chồng (vợ)' },
+  { num: '9', title: 'Mẹ chồng (vợ)' },
+  { num: '13.1', title: 'Anh/Chị/Em chồng (vợ) thứ 1', sibling: true },
+  { num: '13.2', title: 'Anh/Chị/Em chồng (vợ) thứ 2', sibling: true },
+]);
+
+buildFamilyBlock(document.getElementById('famBlocks4'), [
+  { num: '14', title: 'Ông nội chồng (vợ)', grandparent: true },
+  { num: '15', title: 'Bà nội chồng (vợ)', grandparent: true },
+  { num: '16', title: 'Ông ngoại chồng (vợ)', grandparent: true },
+  { num: '17', title: 'Bà ngoại chồng (vợ)', grandparent: true },
+]);
+
+// ===== SUBMIT =====
+function submitForm() {
+  if (!document.getElementById('camDoan').checked) {
+    alert('Vui lòng xác nhận cam đoan trước khi nộp hồ sơ.');
+    return;
+  }
+  const msg = `✅ Hồ sơ đã được nộp thành công!\n\nTrạng thái: Chờ thẩm định\nCán bộ Ban XD Đảng sẽ kiểm tra và phản hồi trong 3–5 ngày làm việc.\nThông báo sẽ được gửi qua Email / SMS / Zalo.`;
+  alert(msg);
+}
+
+// ===== DEMO FILL =====
+function autoFillDemo() {
+  const f = document.getElementById('hoTen');
+  if (f) { f.value = 'NGUYỄN THỊ BÌNH AN'; f.classList.add('valid'); }
+  const d = document.getElementById('ngaySinh');
+  if (d) { d.value = '1995-03-15'; d.classList.add('valid'); }
+  document.querySelectorAll('input[name=gioiTinh]')[1]?.click();
+  alert('Đã điền dữ liệu mẫu vào Phần A để demo giao diện.');
+}
+
+// ===== DIỄN BIẾN EXPAND ON FOCUS =====
+// ═══════════════════════════════════════════════════════════════
+// EXPAND-ON-FOCUS — áp dụng cho mọi ô "description" trong
+// tất cả .timeline-table (không cần thêm class hay sửa HTML)
+// ═══════════════════════════════════════════════════════════════
+
+function autoResize(ta) {
+  ta.style.height = 'auto';
+  ta.style.height = Math.max(70, ta.scrollHeight) + 'px';
+}
+
+// Gắn expand behavior vào 1 td (gọi được nhiều lần, idempotent)
+function initDienBien(td) {
+  if (!td || td.dataset.db) return;          // đã init rồi → bỏ qua
+  const inp = td.querySelector('input[type=text], input:not([type])');
+  if (!inp) return;
+  td.dataset.db = '1';
+
+  // Tạo textarea ẩn ngay trong td (1 lần duy nhất)
+  const ta = document.createElement('textarea');
+  ta.rows = 3;
+  ta.placeholder = inp.placeholder;
+  ta.style.display = 'none';
+  td.appendChild(ta);
+  td.classList.add('td-dienbien');
+
+  inp.addEventListener('focus', () => {
+    ta.value = inp.value;
+    ta.placeholder = inp.placeholder;
+    inp.style.display = 'none';
+    ta.style.display  = 'block';
+    autoResize(ta);
+    ta.focus();
+    const len = ta.value.length;
+    ta.setSelectionRange(len, len);
+  });
+
+  ta.addEventListener('blur', () => {
+    inp.value = ta.value;
+    ta.style.display  = 'none';
+    inp.style.display = '';
+    ta.style.height   = '';
+  });
+
+  ta.addEventListener('input', () => autoResize(ta));
+
+  ta.addEventListener('keydown', e => {
+    if (e.key === 'Escape') { ta.blur(); }
+    if (e.key === 'Tab')    { inp.value = ta.value; ta.blur(); }
+  });
+}
+
+// Xác định cột "mô tả" (wide) của một timeline-table:
+// cột không có style="width:..." trên <th> → đó là cột cần expand
+function getWideColIndex(table) {
+  const ths = table.querySelectorAll('thead th');
+  for (let i = 0; i < ths.length; i++) {
+    const w = ths[i].getAttribute('style') || '';
+    if (!w.includes('width')) return i;
+  }
+  return -1;
+}
+
+// Áp dụng cho tất cả hàng hiện có trong table
+function applyTableDienBien(table) {
+  const col = getWideColIndex(table);
+  if (col < 0) return;
+  table.querySelectorAll('tbody tr').forEach(row => {
+    const td = row.cells[col];
+    if (td) initDienBien(td);
+  });
+}
+
+// Gọi 1 lần khi load xong + sau mỗi lần thêm hàng
+function initAllDienBien() {
+  document.querySelectorAll('.timeline-table').forEach(applyTableDienBien);
+}
+
+// Wrapper tiện lợi để gọi sau khi thêm hàng vào 1 table cụ thể
+function refreshDienBien(table) {
+  if (table) applyTableDienBien(table);
+}
+
+// ===== INIT =====
+buildDots();
+updateProgress();
+// initAllDienBien chạy sau khi toàn bộ DOM (kể cả family blocks) đã render
+requestAnimationFrame(() => initAllDienBien());
+
+// Gọi lại sau mỗi accordion mở để cover các table mới inject vào DOM
+document.addEventListener('click', e => {
+  const head = e.target.closest('.family-head');
+  if (head) {
+    // Đợi DOM cập nhật rồi scan
+    setTimeout(() => initAllDienBien(), 50);
+  }
+});
+
+// ===== ROLE SWITCH =====
+function switchRole(role) {
+  const isAdmin = role === 'admin';
+  document.getElementById('btnRoleMember').classList.toggle('active', !isAdmin);
+  document.getElementById('btnRoleAdmin').classList.toggle('active', isAdmin);
+  document.getElementById('adminSideNav').classList.toggle('visible', isAdmin);
+  document.getElementById('memberSideNav').classList.toggle('hidden', isAdmin);
+  document.getElementById('memberProgressWrap').classList.toggle('hidden', isAdmin);
+  document.getElementById('memberMain').style.display = isAdmin ? 'none' : 'flex';
+  document.getElementById('adminMain').style.display = isAdmin ? 'flex' : 'none';
+  if (isAdmin && !document.getElementById('pgDashboard')) buildAdminUI();
+}
+
+function buildAdminUI() {
+  document.getElementById('adminMain').innerHTML = `
+  <div class="admin-topbar">
+    <div>
+      <div class="admin-topbar-title">Ban Xây dựng Đảng – Quản lý Hồ sơ Lý lịch</div>
+      <div class="admin-topbar-sub">Xã Nhà Bè • Hệ thống số hóa Mẫu 2-KNĐ</div>
+    </div>
+    <div class="admin-tabs">
+      <div class="admin-tab active" onclick="showAdminPageByName('pgDashboard')">Dashboard</div>
+      <div class="admin-tab" onclick="showAdminPageByName('pgProfiles')">Hồ sơ <span style="background:var(--red);color:#fff;font-size:10px;padding:1px 5px;border-radius:8px;margin-left:4px;">5</span></div>
+      <div class="admin-tab" onclick="showAdminPageByName('pgVerify')">Xác minh</div>
+      <div class="admin-tab" onclick="showAdminPageByName('pgNotif')">Thông báo</div>
+      <div class="admin-tab" onclick="showAdminPageByName('pgAccount')">Cấp tài khoản</div>
+      <div class="admin-tab" onclick="showAdminPageByName('pgReport')">Báo cáo</div>
+    </div>
+    <div class="admin-user">
+      <div class="admin-avatar">TH</div>
+      <div><div style="font-size:12px;color:#fff;font-weight:600;">Trần Thị Hương</div><div style="font-size:10px;color:rgba(255,255,255,.4);">Cán bộ BXD Đảng</div></div>
+    </div>
+  </div>
+  <div class="admin-content">
+
+    <!-- DASHBOARD -->
+    <div class="admin-page active" id="pgDashboard">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+        <div><div style="font-family:'Playfair Display',serif;font-size:20px;color:var(--navy);">Tổng quan hồ sơ quần chúng</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:2px;">Cập nhật: 20/04/2026 • 200 quần chúng đang được theo dõi</div></div>
+        <button class="btn btn-primary" onclick="showAdminPageByName('pgAccount')">+ Cấp tài khoản mới</button>
+      </div>
+      <div class="kpi-grid">
+        <div class="kpi-card red"><div class="kpi-val">5</div><div class="kpi-label">Chờ thẩm định</div><div class="kpi-delta down">↑ +2 tuần này</div></div>
+        <div class="kpi-card blue"><div class="kpi-val">38</div><div class="kpi-label">Đang kê khai</div><div class="kpi-delta up">→ Ổn định</div></div>
+        <div class="kpi-card warn"><div class="kpi-val">4</div><div class="kpi-label">Yêu cầu bổ sung</div><div class="kpi-delta down">⚠ Cần xử lý</div></div>
+        <div class="kpi-card green"><div class="kpi-val">12</div><div class="kpi-label">Hoàn thiện tháng này</div><div class="kpi-delta up">↑ +4 so tháng trước</div></div>
+        <div class="kpi-card gold"><div class="kpi-val">200</div><div class="kpi-label">Tổng quần chúng</div><div class="kpi-delta up">→ Đang theo dõi</div></div>
+      </div>
+      <div style="display:grid;grid-template-columns:2fr 1fr;gap:16px;">
+        <div class="card" style="margin-bottom:0">
+          <div class="card-head"><div class="card-head-dot"></div><h3>Hoạt động gần đây</h3></div>
+          <div class="card-body" style="padding:0"><div id="activityLog">
+            <div class="notif-item" style="padding:11px 18px"><div class="notif-icon" style="background:#EDFAF3;">✅</div><div><div class="notif-text"><strong>Lê Thị Mai</strong> đã nộp hồ sơ – Chờ thẩm định</div><div class="notif-time">Hôm nay, 14:32</div></div></div>
+            <div class="notif-item" style="padding:11px 18px"><div class="notif-icon" style="background:var(--red-l);">↩</div><div><div class="notif-text">Trả hồ sơ <strong>Nguyễn Văn Bình</strong> – Yêu cầu bổ sung lịch sử cha</div><div class="notif-time">Hôm nay, 10:15</div></div></div>
+            <div class="notif-item" style="padding:11px 18px"><div class="notif-icon" style="background:#EEF4FF;">📨</div><div><div class="notif-text">Gửi yêu cầu xác minh tới <strong>UBND xã Phước Kiển</strong> – Trần Thị Cúc</div><div class="notif-time">Hôm qua, 16:08</div></div></div>
+            <div class="notif-item" style="padding:11px 18px"><div class="notif-icon" style="background:#F3E8FF;">🔑</div><div><div class="notif-text">Cấp tài khoản mới cho <strong>Hoàng Văn Đức</strong></div><div class="notif-time">Hôm qua, 09:45</div></div></div>
+            <div class="notif-item" style="padding:11px 18px"><div class="notif-icon" style="background:#FFF8E6;">⚠</div><div><div class="notif-text">AI phát hiện khoảng trắng 8 tháng – hồ sơ <strong>Phạm Thị Dung</strong></div><div class="notif-time">20/04/2026, 08:22</div></div></div>
+          </div></div>
+        </div>
+        <div class="card" style="margin-bottom:0">
+          <div class="card-head"><div class="card-head-dot"></div><h3>Phân bổ trạng thái</h3></div>
+          <div class="card-body">
+            <div class="donut" style="background:conic-gradient(#C8102E 0% 19%,#2E75B6 19% 38%,#C47800 38% 50%,#1B7A50 50% 56%,#6B21A8 56% 100%)"></div>
+            <div>
+              <div class="legend-row"><div class="legend-dot" style="background:#2E75B6"></div><span style="flex:1;font-size:12px">Đang kê khai</span><strong>38</strong></div>
+              <div class="legend-row"><div class="legend-dot" style="background:#C8102E"></div><span style="flex:1;font-size:12px">Chờ thẩm định</span><strong>5</strong></div>
+              <div class="legend-row"><div class="legend-dot" style="background:#C47800"></div><span style="flex:1;font-size:12px">Yêu cầu bổ sung</span><strong>4</strong></div>
+              <div class="legend-row"><div class="legend-dot" style="background:#1B7A50"></div><span style="flex:1;font-size:12px">Hoàn thiện</span><strong>153</strong></div>
+              <div class="legend-row"><div class="legend-dot" style="background:#6B21A8"></div><span style="flex:1;font-size:12px">Chờ kê khai</span><strong>88</strong></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:16px;"><div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:10px;">🔴 Cần xử lý ngay (5 hồ sơ)</div>
+        <div class="card" style="margin-bottom:0"><div class="card-body" style="padding:0">
+          <table class="profile-table"><thead><tr><th>Họ và tên</th><th>Trạng thái</th><th>AI Score</th><th>Ngày nộp</th><th>Thao tác</th></tr></thead><tbody>
+            <tr><td><div class="name-cell">Lê Thị Mai</div><div class="sub-cell">1990 · Ấp 1, xã Nhà Bè</div></td><td><span class="pill pill-pending">Chờ thẩm định</span></td><td><div class="ai-score">94% <div class="ai-score-bar"><div class="ai-score-fill" style="width:94%;background:var(--success)"></div></div></div></td><td style="font-size:12px">20/04/2026</td><td><button class="act-btn act-view" onclick="openDetail('Lê Thị Mai','1990','Ấp 1, xã Nhà Bè','pending')">Xem ▸</button> <button class="act-btn act-approve" onclick="approveProfile('Lê Thị Mai')">Duyệt</button></td></tr>
+            <tr><td><div class="name-cell">Trần Minh Tuấn</div><div class="sub-cell">1993 · Ấp 3, xã Phước Kiển</div></td><td><span class="pill pill-pending">Chờ thẩm định</span></td><td><div class="ai-score">87% <div class="ai-score-bar"><div class="ai-score-fill" style="width:87%;background:#2E75B6"></div></div></div></td><td style="font-size:12px">19/04/2026</td><td><button class="act-btn act-view" onclick="openDetail('Trần Minh Tuấn','1993','Ấp 3, xã Phước Kiển','pending')">Xem ▸</button> <button class="act-btn act-return" onclick="returnProfile('Trần Minh Tuấn')">Trả lại</button></td></tr>
+            <tr><td><div class="name-cell">Phạm Thị Dung</div><div class="sub-cell">1997 · Ấp 2, xã Long Thới</div></td><td><span class="pill pill-return">Yêu cầu bổ sung</span></td><td><div class="ai-score">61% <div class="ai-score-bar"><div class="ai-score-fill" style="width:61%;background:var(--warn)"></div></div></div></td><td style="font-size:12px">17/04/2026</td><td><button class="act-btn act-view" onclick="openDetail('Phạm Thị Dung','1997','Ấp 2, xã Long Thới','return')">Xem ▸</button></td></tr>
+            <tr><td><div class="name-cell">Nguyễn Văn Bình</div><div class="sub-cell">1995 · Ấp 1, xã Nhà Bè</div></td><td><span class="pill pill-return">Yêu cầu bổ sung</span></td><td><div class="ai-score">72% <div class="ai-score-bar"><div class="ai-score-fill" style="width:72%;background:#2E75B6"></div></div></div></td><td style="font-size:12px">16/04/2026</td><td><button class="act-btn act-view" onclick="openDetail('Nguyễn Văn Bình','1995','Ấp 1, xã Nhà Bè','return')">Xem ▸</button></td></tr>
+            <tr><td><div class="name-cell">Đinh Thị Nhung</div><div class="sub-cell">1991 · Ấp 1, xã Nhà Bè</div></td><td><span class="pill pill-pending">Chờ thẩm định</span></td><td><div class="ai-score">91% <div class="ai-score-bar"><div class="ai-score-fill" style="width:91%;background:var(--success)"></div></div></div></td><td style="font-size:12px">15/04/2026</td><td><button class="act-btn act-view" onclick="openDetail('Đinh Thị Nhung','1991','Ấp 1, xã Nhà Bè','pending')">Xem ▸</button> <button class="act-btn act-approve" onclick="approveProfile('Đinh Thị Nhung')">Duyệt</button></td></tr>
+          </tbody></table>
+        </div></div>
+      </div>
+    </div>
+
+    <!-- PROFILES -->
+    <div class="admin-page" id="pgProfiles">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+        <div style="font-family:'Playfair Display',serif;font-size:20px;color:var(--navy);">Danh sách hồ sơ quần chúng</div>
+        <div style="display:flex;gap:8px;"><button class="btn btn-ghost" onclick="exportProfiles()">↓ Xuất Excel</button><button class="btn btn-primary" onclick="showAdminPageByName('pgAccount')">+ Cấp tài khoản</button></div>
+      </div>
+      <div class="filter-bar">
+        <div class="search-box"><span class="search-icon">🔍</span><input type="text" placeholder="Tìm theo họ tên, CCCD…" oninput="filterProfiles(this.value)"></div>
+        <select class="filter-select" onchange="filterByStatus(this.value)">
+          <option value="">Tất cả trạng thái</option>
+          <option value="new">Chờ kê khai</option><option value="draft">Đang kê khai</option>
+          <option value="pending">Chờ thẩm định</option><option value="return">Yêu cầu bổ sung</option>
+          <option value="verify">Đang xác minh</option><option value="done">Hoàn thiện</option>
+        </select>
+        <select class="filter-select"><option>Tất cả ấp/khu</option><option>Ấp 1 – Nhà Bè</option><option>Ấp 2 – Long Thới</option><option>Ấp 3 – Phước Kiển</option><option>Ấp 4 – Hiệp Phước</option></select>
+        <select class="filter-select"><option>Đảng viên phụ trách: Tất cả</option><option>Nguyễn Văn Khoa</option><option>Trần Thị Hoa</option><option>Lê Minh Đức</option></select>
+      </div>
+      <div class="card" style="margin-bottom:0"><div class="card-body" style="padding:0">
+        <table class="profile-table"><thead><tr>
+          <th style="width:32px"><input type="checkbox" onclick="toggleAll(this)"></th>
+          <th>Họ và tên</th><th>CCCD</th><th>Năm sinh</th><th>Địa chỉ</th>
+          <th>Trạng thái</th><th>AI Score</th><th>Cập nhật</th><th>ĐV phụ trách</th><th style="width:140px">Thao tác</th>
+        </tr></thead><tbody id="profileTbody"></tbody></table>
+        <div style="padding:12px 16px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border);font-size:12px;color:var(--muted);">
+          <span id="profileCount">Hiển thị 12 / 200 hồ sơ</span>
+          <div style="display:flex;gap:6px;">
+            <button class="btn btn-ghost" style="padding:5px 10px;font-size:11px;">← Trước</button>
+            <button class="btn btn-ghost" style="padding:5px 10px;font-size:11px;background:var(--navy);color:#fff;border-color:var(--navy);">1</button>
+            <button class="btn btn-ghost" style="padding:5px 10px;font-size:11px;">2</button>
+            <button class="btn btn-ghost" style="padding:5px 10px;font-size:11px;">Sau →</button>
+          </div>
+        </div>
+      </div></div>
+    </div>
+
+    <!-- VERIFY -->
+    <div class="admin-page" id="pgVerify">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+        <div style="font-family:'Playfair Display',serif;font-size:20px;color:var(--navy);">Theo dõi xác minh lý lịch</div>
+        <button class="btn btn-primary">+ Tạo yêu cầu xác minh</button>
+      </div>
+      <div class="card"><div class="card-body" style="padding:0"><table class="profile-table">
+        <thead><tr><th>Quần chúng</th><th>Đơn vị xác minh</th><th>Nội dung xác minh</th><th>Ngày gửi</th><th>Hạn PH</th><th>Trạng thái</th><th>Thao tác</th></tr></thead>
+        <tbody>
+          <tr><td><div class="name-cell">Lê Thị Mai</div></td><td style="font-size:12px">UBND xã Nhà Bè</td><td style="font-size:12px">Xác minh nơi cư trú & lịch sử công tác</td><td style="font-size:12px">15/04/2026</td><td style="font-size:12px;color:var(--warn)">22/04/2026</td><td><span class="pill pill-draft">Chờ phản hồi</span></td><td><button class="act-btn act-view">Nhắc lại</button> <button class="act-btn act-approve" onclick="receiveVerify('Lê Thị Mai')">Nhận KQ</button></td></tr>
+          <tr><td><div class="name-cell">Trần Minh Tuấn</div></td><td style="font-size:12px">Công an xã Phước Kiển</td><td style="font-size:12px">Xác minh nhân thân, không tiền án</td><td style="font-size:12px">10/04/2026</td><td style="font-size:12px">20/04/2026</td><td><span class="pill pill-verify">Đã nhận KQ</span></td><td><button class="act-btn act-view" onclick="viewVerifyResult('Trần Minh Tuấn')">Xem KQ</button></td></tr>
+          <tr><td><div class="name-cell">Nguyễn Thị Bình An</div></td><td style="font-size:12px">UBND xã Long Thới</td><td style="font-size:12px">Xác minh hộ khẩu, khai sinh</td><td style="font-size:12px">08/04/2026</td><td style="font-size:12px">18/04/2026</td><td><span class="pill pill-done">Hoàn tất</span></td><td><button class="act-btn act-view">Xem</button></td></tr>
+          <tr><td><div class="name-cell">Hoàng Văn Đức</div></td><td style="font-size:12px">Cty CP ABC</td><td style="font-size:12px">Xác nhận quá trình công tác 2019–2024</td><td style="font-size:12px">17/04/2026</td><td style="font-size:12px;color:var(--red)">17/04/2026 ⚠</td><td><span class="pill pill-return">Quá hạn</span></td><td><button class="act-btn act-return">Nhắc khẩn</button></td></tr>
+        </tbody>
+      </table></div></div>
+    </div>
+
+    <!-- NOTIFICATIONS -->
+    <div class="admin-page" id="pgNotif">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+        <div style="font-family:'Playfair Display',serif;font-size:20px;color:var(--navy);">Trung tâm thông báo</div>
+        <button class="btn btn-primary" onclick="document.getElementById('notifModal').classList.add('open')">+ Gửi thông báo mới</button>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start">
+
+        <!-- Sent log -->
+        <div>
+          <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:12px;">Lịch sử gửi gần đây</div>
+          <div class="card"><div class="card-body" style="padding:0">
+            <div class="notif-item" style="padding:12px 16px">
+              <div class="notif-icon" style="background:#EDFAF3;font-size:16px">✅</div>
+              <div style="flex:1"><div class="notif-text"><strong>Lê Thị Mai</strong> – Phê duyệt hồ sơ</div><div style="display:flex;gap:8px;margin-top:3px"><span style="font-size:10.5px;background:#E8F5E9;color:#1B5E20;padding:1px 6px;border-radius:8px;font-weight:600">Zalo OA</span><span class="notif-time">20/04/2026 14:35</span></div></div>
+              <span class="pill pill-done" style="font-size:10px">Đã gửi</span>
+            </div>
+            <div class="notif-item" style="padding:12px 16px">
+              <div class="notif-icon" style="background:var(--red-l);font-size:16px">↩</div>
+              <div style="flex:1"><div class="notif-text"><strong>Nguyễn Văn Bình</strong> – Trả hồ sơ, bổ sung lịch sử cha</div><div style="display:flex;gap:8px;margin-top:3px"><span style="font-size:10.5px;background:#E8F5E9;color:#1B5E20;padding:1px 6px;border-radius:8px;font-weight:600">Zalo OA</span><span class="notif-time">20/04/2026 10:18</span></div></div>
+              <span class="pill pill-done" style="font-size:10px">Đã gửi</span>
+            </div>
+            <div class="notif-item" style="padding:12px 16px">
+              <div class="notif-icon" style="background:#EEF4FF;font-size:16px">⏰</div>
+              <div style="flex:1"><div class="notif-text"><strong>Trương Thị Hằng</strong> – Nhắc nộp hồ sơ (quá 14 ngày)</div><div style="display:flex;gap:8px;margin-top:3px"><span style="font-size:10.5px;background:#EEF4FF;color:#1A3880;padding:1px 6px;border-radius:8px;font-weight:600">SMS</span><span class="notif-time">19/04/2026 09:00</span></div></div>
+              <span class="pill pill-done" style="font-size:10px">Đã gửi</span>
+            </div>
+            <div class="notif-item" style="padding:12px 16px">
+              <div class="notif-icon" style="background:#FFF8E6;font-size:16px">⚠</div>
+              <div style="flex:1"><div class="notif-text"><strong>Phạm Thị Dung</strong> – Thông báo AI phát hiện lỗi hồ sơ</div><div style="display:flex;gap:8px;margin-top:3px"><span style="font-size:10.5px;background:#E8F5E9;color:#1B5E20;padding:1px 6px;border-radius:8px;font-weight:600">Zalo OA</span><span class="notif-time">19/04/2026 08:25</span></div></div>
+              <span class="pill pill-done" style="font-size:10px">Đã gửi</span>
+            </div>
+            <div class="notif-item" style="padding:12px 16px">
+              <div class="notif-icon" style="background:#F3E8FF;font-size:16px">🔑</div>
+              <div style="flex:1"><div class="notif-text"><strong>Hoàng Văn Đức</strong> – Cấp tài khoản, hướng dẫn đăng nhập</div><div style="display:flex;gap:8px;margin-top:3px"><span style="font-size:10.5px;background:#EEF4FF;color:#1A3880;padding:1px 6px;border-radius:8px;font-weight:600">SMS</span><span class="notif-time">19/04/2026 09:47</span></div></div>
+              <span class="pill pill-done" style="font-size:10px">Đã gửi</span>
+            </div>
+          </div></div>
+        </div>
+
+        <!-- Stats + quick actions -->
+        <div>
+          <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:12px;">Thống kê thông báo tháng này</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px;">
+            <div style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center">
+              <div style="font-size:24px;font-weight:700;color:var(--navy)">42</div>
+              <div style="font-size:11px;color:var(--muted)">Tổng đã gửi</div>
+            </div>
+            <div style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center">
+              <div style="font-size:24px;font-weight:700;color:var(--success)">38</div>
+              <div style="font-size:11px;color:var(--muted)">Giao thành công</div>
+            </div>
+            <div style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center">
+              <div style="font-size:24px;font-weight:700;color:var(--warn)">4</div>
+              <div style="font-size:11px;color:var(--muted)">Chờ gửi lại</div>
+            </div>
+          </div>
+
+          <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:10px;">Gửi hàng loạt nhanh</div>
+          <div class="card">
+            <div class="card-body">
+              <div style="font-size:12.5px;color:var(--muted);margin-bottom:14px;">Chọn nhóm nhận thông báo nhắc nhở</div>
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <label style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:13px" onclick="this.style.borderColor='var(--red)'">
+                  <input type="checkbox" style="width:auto">
+                  <span style="flex:1">Quần chúng <strong>chưa nộp &gt; 7 ngày</strong> <span style="color:var(--red)">(8 người)</span></span>
+                </label>
+                <label style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:13px">
+                  <input type="checkbox" style="width:auto">
+                  <span style="flex:1">Hồ sơ bị trả lại <strong>chưa cập nhật &gt; 3 ngày</strong> <span style="color:var(--warn)">(4 người)</span></span>
+                </label>
+                <label style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:13px">
+                  <input type="checkbox" style="width:auto">
+                  <span style="flex:1">Tài khoản mới <strong>chưa đăng nhập lần đầu</strong> <span style="color:#6B21A8">(2 người)</span></span>
+                </label>
+              </div>
+              <button class="btn btn-primary" style="width:100%;margin-top:14px" onclick="sendBulkNotif()">📨 Gửi nhắc nhở hàng loạt</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACCOUNT -->
+    <div class="admin-page" id="pgAccount">
+      <div style="font-family:'Playfair Display',serif;font-size:20px;color:var(--navy);margin-bottom:20px;">Cấp tài khoản cho quần chúng</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start">
+        <div class="account-form">
+          <div class="account-step"><div class="astep active">1</div><div class="astep-line"></div><div class="astep">2</div><div class="astep-line"></div><div class="astep">3</div></div>
+          <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:14px;">Bước 1 – Nhập thông tin định danh</div>
+          <div class="form-row"><label>Họ và tên <span class="req">*</span></label><input type="text" id="accName" placeholder="Nguyễn Văn A"></div>
+          <div class="form-row"><label>Số CCCD <span class="req">*</span></label><input type="text" id="accCCCD" placeholder="0XX XXX XXXXXX" maxlength="12"></div>
+          <div class="form-row"><label>Ngày sinh <span class="req">*</span></label><input type="date" id="accDOB"></div>
+          <div class="form-row"><label>Số điện thoại <span class="req">*</span><span class="hint-lbl">Nhận OTP đăng nhập</span></label><input type="tel" id="accPhone" placeholder="09x xxxx xxxx"></div>
+          <div class="form-row"><label>Email</label><input type="email" id="accEmail" placeholder="example@gmail.com"></div>
+          <div class="form-row"><label>Đảng viên phụ trách</label><select><option>-- Chọn --</option><option>Nguyễn Văn Khoa</option><option>Trần Thị Hoa</option><option>Lê Minh Đức</option></select></div>
+          <div class="form-row"><label>Kênh thông báo</label><div class="check-group"><label class="check-opt"><input type="checkbox" checked> SMS</label><label class="check-opt"><input type="checkbox" checked> Email</label><label class="check-opt"><input type="checkbox"> Zalo OA</label></div></div>
+          <div style="display:flex;gap:8px;margin-top:16px;"><button class="btn btn-ghost" style="flex:1">Hủy</button><button class="btn btn-primary" style="flex:2" onclick="createAccount()">Cấp tài khoản →</button></div>
+        </div>
+        <div><div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:12px;">Tài khoản cấp gần đây</div>
+          <div class="card"><div class="card-body" style="padding:0"><table class="profile-table"><thead><tr><th>Họ tên</th><th>CCCD</th><th>Ngày cấp</th><th>Trạng thái</th></tr></thead><tbody>
+            <tr><td><div class="name-cell">Hoàng Văn Đức</div></td><td style="font-size:11px">079095012345</td><td style="font-size:11px">19/04</td><td><span class="pill pill-draft">Đang kê khai</span></td></tr>
+            <tr><td><div class="name-cell">Võ Thị Lan</div></td><td style="font-size:11px">079096054321</td><td style="font-size:11px">18/04</td><td><span class="pill pill-new">Chờ kê khai</span></td></tr>
+            <tr><td><div class="name-cell">Bùi Quang Huy</div></td><td style="font-size:11px">079091087654</td><td style="font-size:11px">15/04</td><td><span class="pill pill-draft">Đang kê khai</span></td></tr>
+            <tr><td><div class="name-cell">Đinh Thị Nhung</div></td><td style="font-size:11px">079093065432</td><td style="font-size:11px">12/04</td><td><span class="pill pill-pending">Chờ thẩm định</span></td></tr>
+          </tbody></table></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- REPORT -->
+    <div class="admin-page" id="pgReport">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+        <div style="font-family:'Playfair Display',serif;font-size:20px;color:var(--navy);">Báo cáo & Thống kê</div>
+        <div style="display:flex;gap:8px;"><select class="filter-select"><option>Tháng 4/2026</option><option>Tháng 3/2026</option><option>Q1/2026</option></select><button class="btn btn-ghost">↓ Xuất báo cáo</button></div>
+      </div>
+      <div class="chart-grid">
+        <div class="chart-card"><div class="chart-title">Tiến độ xử lý hồ sơ (tháng 4/2026)</div>
+          <div class="bar-chart-row"><div class="bar-label">Hồ sơ tiếp nhận</div><div class="bar-track"><div class="bar-fill" style="width:72%;background:#2E75B6"></div></div><div class="bar-val">18</div></div>
+          <div class="bar-chart-row"><div class="bar-label">Đã thẩm định</div><div class="bar-track"><div class="bar-fill" style="width:52%;background:var(--success)"></div></div><div class="bar-val">13</div></div>
+          <div class="bar-chart-row"><div class="bar-label">Yêu cầu bổ sung</div><div class="bar-track"><div class="bar-fill" style="width:16%;background:var(--warn)"></div></div><div class="bar-val">4</div></div>
+          <div class="bar-chart-row"><div class="bar-label">Gửi xác minh</div><div class="bar-track"><div class="bar-fill" style="width:28%;background:#6B21A8"></div></div><div class="bar-val">7</div></div>
+          <div class="bar-chart-row"><div class="bar-label">Hoàn thiện</div><div class="bar-track"><div class="bar-fill" style="width:48%;background:var(--success)"></div></div><div class="bar-val">12</div></div>
+        </div>
+        <div class="chart-card"><div class="chart-title">Phân bổ quần chúng theo ấp/khu</div>
+          <div class="bar-chart-row"><div class="bar-label">Ấp 1 – Nhà Bè</div><div class="bar-track"><div class="bar-fill" style="width:55%;background:#C8102E"></div></div><div class="bar-val">54</div></div>
+          <div class="bar-chart-row"><div class="bar-label">Ấp 2 – Long Thới</div><div class="bar-track"><div class="bar-fill" style="width:48%;background:#2E75B6"></div></div><div class="bar-val">48</div></div>
+          <div class="bar-chart-row"><div class="bar-label">Ấp 3 – Phước Kiển</div><div class="bar-track"><div class="bar-fill" style="width:42%;background:var(--gold)"></div></div><div class="bar-val">42</div></div>
+          <div class="bar-chart-row"><div class="bar-label">Ấp 4 – Hiệp Phước</div><div class="bar-track"><div class="bar-fill" style="width:36%;background:var(--success)"></div></div><div class="bar-val">36</div></div>
+          <div class="bar-chart-row"><div class="bar-label">Khu TĐC khác</div><div class="bar-track"><div class="bar-fill" style="width:20%;background:var(--muted)"></div></div><div class="bar-val">20</div></div>
+        </div>
+        <div class="chart-card"><div class="chart-title">Thời gian xử lý trung bình (ngày)</div>
+          <div class="bar-chart-row"><div class="bar-label">Kê khai → Nộp</div><div class="bar-track"><div class="bar-fill" style="width:80%;background:#2E75B6"></div></div><div class="bar-val">24</div></div>
+          <div class="bar-chart-row"><div class="bar-label">Thẩm định</div><div class="bar-track"><div class="bar-fill" style="width:20%;background:var(--success)"></div></div><div class="bar-val">6</div></div>
+          <div class="bar-chart-row"><div class="bar-label">Xác minh lý lịch</div><div class="bar-track"><div class="bar-fill" style="width:40%;background:var(--warn)"></div></div><div class="bar-val">12</div></div>
+          <div class="bar-chart-row"><div class="bar-label">Chi bộ nhận xét</div><div class="bar-track"><div class="bar-fill" style="width:30%;background:#6B21A8"></div></div><div class="bar-val">9</div></div>
+          <div class="bar-chart-row"><div class="bar-label">Tổng trung bình</div><div class="bar-track"><div class="bar-fill" style="width:100%;background:var(--navy)"></div></div><div class="bar-val">51</div></div>
+        </div>
+        <div class="chart-card"><div class="chart-title">Tỷ lệ hoàn thiện hồ sơ</div>
+          <div style="position:relative;width:90px;height:90px;border-radius:50%;background:conic-gradient(var(--success) 0% 76%,var(--border) 76% 100%);margin:0 auto 12px;display:flex;align-items:center;justify-content:center;">
+            <div style="width:60px;height:60px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:var(--navy);">76%</div>
+          </div>
+          <div style="text-align:center;font-size:12px;color:var(--muted);margin-bottom:12px;">153 / 200 hồ sơ đã hoàn thiện</div>
+          <div class="legend-row"><div class="legend-dot" style="background:var(--success)"></div><span style="flex:1;font-size:12px">Đã hoàn thiện</span><strong>153</strong></div>
+          <div class="legend-row"><div class="legend-dot" style="background:#2E75B6"></div><span style="flex:1;font-size:12px">Đang xử lý</span><strong>38</strong></div>
+          <div class="legend-row"><div class="legend-dot" style="background:var(--border)"></div><span style="flex:1;font-size:12px">Chưa bắt đầu</span><strong>9</strong></div>
+        </div>
+      </div>
+      <div class="card"><div class="card-head"><div class="card-head-dot"></div><h3>Bảng tổng hợp theo tháng</h3></div>
+        <div class="card-body" style="padding:0"><table class="profile-table"><thead><tr><th>Tháng</th><th>Tiếp nhận</th><th>Thẩm định</th><th>Xác minh</th><th>Hoàn thiện</th><th>Tỷ lệ HT</th></tr></thead><tbody>
+          <tr><td>4/2026</td><td>18</td><td>13</td><td>7</td><td>12</td><td><span style="color:var(--success);font-weight:700">67%</span></td></tr>
+          <tr><td>3/2026</td><td>22</td><td>20</td><td>15</td><td>18</td><td><span style="color:var(--success);font-weight:700">82%</span></td></tr>
+          <tr><td>2/2026</td><td>15</td><td>14</td><td>10</td><td>13</td><td><span style="color:var(--success);font-weight:700">87%</span></td></tr>
+          <tr><td>1/2026</td><td>11</td><td>11</td><td>8</td><td>11</td><td><span style="color:var(--success);font-weight:700">100%</span></td></tr>
+        </tbody></table></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Detail panel -->
+  <div class="detail-panel" id="detailPanel">
+    <div class="detail-panel-head">
+      <div><h3 id="detailName">Lê Thị Mai</h3><div style="font-size:11px;color:rgba(255,255,255,.45);margin-top:2px" id="detailSub"></div></div>
+      <button class="close-panel" onclick="closeDetail()">✕</button>
+    </div>
+    <div class="detail-panel-body">
+      <div class="detail-info-grid">
+        <div class="detail-field"><div class="detail-field-lbl">Trạng thái</div><div id="dpStatus"></div></div>
+        <div class="detail-field"><div class="detail-field-lbl">AI Score</div><div class="detail-field-val" style="color:var(--success)" id="dpScore">94%</div></div>
+        <div class="detail-field"><div class="detail-field-lbl">Ngày nộp</div><div class="detail-field-val">20/04/2026</div></div>
+        <div class="detail-field"><div class="detail-field-lbl">ĐV phụ trách</div><div class="detail-field-val">Nguyễn Văn Khoa</div></div>
+      </div>
+      <div class="detail-section-title">Kết quả kiểm tra AI</div>
+      <ul class="checklist">
+        <li><span class="check-ok">✓</span> Phần A: Đầy đủ, không lỗi cứng</li>
+        <li><span class="check-ok">✓</span> Phần B: Lịch sử bản thân liên tục</li>
+        <li><span class="check-ok">✓</span> Phần C: Công tác khớp lịch sử</li>
+        <li><span class="check-wrn">⚠</span> Phần E: Dòng 2 thiếu tháng (chỉ có năm 2018)</li>
+        <li><span class="check-ok">✓</span> Phần I: 17 thành viên đã điền đủ</li>
+        <li><span class="check-wrn">⚠</span> Phần J: Tự nhận xét 180 từ (chưa đủ 200 từ)</li>
+        <li><span class="check-ok">✓</span> Năm lập gia đình cha/mẹ khớp (2015)</li>
+      </ul>
+      <div class="detail-section-title">Quy trình xử lý</div>
+      <div class="mini-timeline">
+        <div class="mt-item"><div class="mt-dot done"></div><div class="mt-label">Cấp tài khoản</div><div class="mt-date">01/03/2026</div></div>
+        <div class="mt-item"><div class="mt-dot done"></div><div class="mt-label">Kê khai e-form hoàn tất</div><div class="mt-date">18/04/2026</div></div>
+        <div class="mt-item"><div class="mt-dot"></div><div class="mt-label">Thẩm định Ban XD Đảng</div><div class="mt-date">Đang chờ</div></div>
+        <div class="mt-item"><div class="mt-dot pend"></div><div class="mt-label">Xác minh lý lịch</div><div class="mt-date">Chưa tới</div></div>
+        <div class="mt-item"><div class="mt-dot pend"></div><div class="mt-label">Chi bộ nhận xét</div><div class="mt-date">Chưa tới</div></div>
+        <div class="mt-item"><div class="mt-dot pend"></div><div class="mt-label">Cấp ủy chứng nhận</div><div class="mt-date">Chưa tới</div></div>
+      </div>
+      <div class="detail-section-title">Ghi chú thẩm định</div>
+      <textarea class="review-textarea" placeholder="Ghi chú nội bộ (chỉ cán bộ BXD Đảng xem)…"></textarea>
+      <div class="detail-section-title">Lý do trả lại (nếu có)</div>
+      <textarea class="review-textarea" id="returnReason" placeholder="Mô tả nội dung cần quần chúng bổ sung hoặc làm rõ…" rows="3"></textarea>
+    </div>
+    <div class="detail-panel-footer">
+      <button class="btn btn-ghost" style="flex:1" onclick="returnFromPanel()">↩ Trả lại</button>
+      <button class="btn btn-primary" style="flex:2" onclick="approveFromPanel()">✓ Duyệt hồ sơ này</button>
+    </div>
+  </div>
+  <div id="overlay" onclick="closeDetail()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:99;"></div>
+  `;
+  renderProfiles(profiles);
+}
+
+// ===== ADMIN PAGES =====
+function showAdminPage(navEl) {
+  document.querySelectorAll('.admin-nav .nav-item').forEach(n => n.classList.remove('active'));
+  navEl.classList.add('active');
+  const pid = navEl.dataset.adminPage;
+  showAdminPageById(pid);
+}
+
+function showAdminPageByName(pid) {
+  document.querySelectorAll('.admin-nav .nav-item').forEach(n => {
+    n.classList.toggle('active', n.dataset.adminPage === pid);
+  });
+  showAdminPageById(pid);
+  // sync top tabs
+  const tabMap = { pgDashboard:0, pgProfiles:1, pgVerify:2, pgAccount:3, pgReport:4 };
+  document.querySelectorAll('.admin-tab').forEach((t,i) => t.classList.toggle('active', i === (tabMap[pid]??-1)));
+}
+
+function showAdminPageById(pid) {
+  document.querySelectorAll('.admin-page').forEach(p => p.classList.toggle('active', p.id === pid));
+}
+
+// ===== PROFILE TABLE DATA =====
+const profiles = [
+  { name:'Lê Thị Mai',       dob:'1990', addr:'Ấp 1, xã Nhà Bè',      cccd:'079090123456', status:'pending', score:94, updated:'20/04/2026', officer:'Nguyễn Văn Khoa' },
+  { name:'Trần Minh Tuấn',   dob:'1993', addr:'Ấp 3, xã Phước Kiển',  cccd:'079093456789', status:'pending', score:87, updated:'19/04/2026', officer:'Trần Thị Hoa' },
+  { name:'Phạm Thị Dung',    dob:'1997', addr:'Ấp 2, xã Long Thới',   cccd:'079097654321', status:'return',  score:61, updated:'17/04/2026', officer:'Lê Minh Đức' },
+  { name:'Nguyễn Văn Bình',  dob:'1995', addr:'Ấp 1, xã Nhà Bè',      cccd:'079095012345', status:'return',  score:72, updated:'16/04/2026', officer:'Nguyễn Văn Khoa' },
+  { name:'Hoàng Văn Đức',    dob:'1998', addr:'Ấp 4, xã Hiệp Phước',  cccd:'079098111222', status:'draft',   score:45, updated:'19/04/2026', officer:'Trần Thị Hoa' },
+  { name:'Võ Thị Lan',       dob:'1996', addr:'Ấp 2, xã Long Thới',   cccd:'079096222333', status:'new',     score:0,  updated:'18/04/2026', officer:'Lê Minh Đức' },
+  { name:'Bùi Quang Huy',    dob:'1994', addr:'Ấp 3, xã Phước Kiển',  cccd:'079094333444', status:'draft',   score:58, updated:'17/04/2026', officer:'Nguyễn Văn Khoa' },
+  { name:'Đinh Thị Nhung',   dob:'1991', addr:'Ấp 1, xã Nhà Bè',      cccd:'079091444555', status:'pending', score:91, updated:'15/04/2026', officer:'Trần Thị Hoa' },
+  { name:'Lý Minh Châu',     dob:'1992', addr:'Ấp 4, xã Hiệp Phước',  cccd:'079092555666', status:'verify',  score:96, updated:'10/04/2026', officer:'Lê Minh Đức' },
+  { name:'Ngô Thị Phương',   dob:'1989', addr:'Ấp 2, xã Long Thới',   cccd:'079089666777', status:'done',    score:98, updated:'05/04/2026', officer:'Nguyễn Văn Khoa' },
+  { name:'Đặng Văn Long',    dob:'1993', addr:'Ấp 3, xã Phước Kiển',  cccd:'079093777888', status:'done',    score:95, updated:'28/03/2026', officer:'Trần Thị Hoa' },
+  { name:'Trương Thị Hằng',  dob:'1996', addr:'Ấp 1, xã Nhà Bè',      cccd:'079096888999', status:'draft',   score:33, updated:'20/04/2026', officer:'Lê Minh Đức' },
+];
+
+const statusMap = {
+  new:     { cls:'pill-new',    label:'Chờ kê khai' },
+  draft:   { cls:'pill-draft',  label:'Đang kê khai' },
+  pending: { cls:'pill-pending',label:'Chờ thẩm định' },
+  return:  { cls:'pill-return', label:'Yêu cầu bổ sung' },
+  verify:  { cls:'pill-verify', label:'Đang xác minh' },
+  done:    { cls:'pill-done',   label:'Hoàn thiện' },
+};
+const scoreColor = s => s>=90?'var(--success)':s>=70?'#2E75B6':s>=50?'var(--warn)':'var(--red)';
+
+function renderProfiles(data) {
+  const tb = document.getElementById('profileTbody');
+  if (!tb) return;
+  tb.innerHTML = data.map(p => {
+    const st = statusMap[p.status] || statusMap.new;
+    const sc = p.score > 0 ? `<div class="ai-score">${p.score}% <div class="ai-score-bar"><div class="ai-score-fill" style="width:${p.score}%;background:${scoreColor(p.score)}"></div></div></div>` : '<span style="font-size:11px;color:var(--hint)">—</span>';
+    return `<tr>
+      <td><input type="checkbox"></td>
+      <td><div class="name-cell">${p.name}</div><div class="sub-cell">${p.dob} · ${p.addr}</div></td>
+      <td style="font-size:11.5px;">${p.cccd}</td>
+      <td style="font-size:12px;">${p.dob}</td>
+      <td style="font-size:12px;">${p.addr}</td>
+      <td><span class="pill ${st.cls}">${st.label}</span></td>
+      <td>${sc}</td>
+      <td style="font-size:12px;">${p.updated}</td>
+      <td style="font-size:12px;">${p.officer}</td>
+      <td>
+        <button class="act-btn act-view" onclick="openDetail('${p.name}','${p.dob}','${p.addr}','${p.status}')">Xem</button>
+        ${p.status==='pending'?`<button class="act-btn act-approve" onclick="approveProfile('${p.name}')">✓</button><button class="act-btn act-return" onclick="returnProfile('${p.name}')">↩</button>`:''}
+      </td>
+    </tr>`;
+  }).join('');
+  document.getElementById('profileCount').textContent = `Hiển thị ${data.length} / 200 hồ sơ`;
+}
+
+function filterProfiles(q) {
+  const filtered = q ? profiles.filter(p => p.name.toLowerCase().includes(q.toLowerCase()) || p.cccd.includes(q)) : profiles;
+  renderProfiles(filtered);
+}
+
+function filterByStatus(s) {
+  renderProfiles(s ? profiles.filter(p => p.status === s) : profiles);
+}
+
+function toggleAll(cb) {
+  document.querySelectorAll('#profileTbody input[type=checkbox]').forEach(c => c.checked = cb.checked);
+}
+
+// ===== DETAIL PANEL =====
+function openDetail(name, dob, addr, status) {
+  document.getElementById('detailName').textContent = name;
+  document.getElementById('detailSub').textContent = dob + ' · ' + addr;
+  const st = statusMap[status] || statusMap.new;
+  document.getElementById('dpStatus').innerHTML = `<span class="pill ${st.cls}">${st.label}</span>`;
+  document.getElementById('detailPanel').classList.add('open');
+  document.getElementById('overlay').style.display = 'block';
+}
+
+function closeDetail() {
+  document.getElementById('detailPanel').classList.remove('open');
+  document.getElementById('overlay').style.display = 'none';
+}
+
+function approveFromPanel() {
+  const name = document.getElementById('detailName').textContent;
+  if (confirm(`Xác nhận DUYỆT hồ sơ của ${name}?\nHệ thống sẽ gửi thông báo và chuyển sang bước Xác minh.`)) {
+    document.getElementById('dpStatus').innerHTML = `<span class="pill pill-verify">Đang xác minh</span>`;
+    addActivity(`✅ Đã duyệt hồ sơ <strong>${name}</strong> – chuyển sang Xác minh`);
+    closeDetail();
+  }
+}
+
+function returnFromPanel() {
+  const reason = document.getElementById('returnReason').value;
+  const name = document.getElementById('detailName').textContent;
+  if (!reason.trim()) { alert('Vui lòng nhập lý do trả hồ sơ.'); return; }
+  if (confirm(`Trả hồ sơ ${name} với lý do:\n"${reason}"\n\nHệ thống sẽ thông báo cho quần chúng.`)) {
+    addActivity(`↩ Trả hồ sơ <strong>${name}</strong> – ${reason.substring(0,60)}...`);
+    closeDetail();
+  }
+}
+
+function approveProfile(name) {
+  if (confirm(`Duyệt nhanh hồ sơ của ${name}?`)) addActivity(`✅ Đã duyệt <strong>${name}</strong>`);
+}
+
+function returnProfile(name) {
+  const r = prompt(`Lý do trả lại hồ sơ ${name}:`);
+  if (r) addActivity(`↩ Trả hồ sơ <strong>${name}</strong> – ${r}`);
+}
+
+function receiveVerify(name) {
+  alert(`Đã ghi nhận kết quả xác minh cho ${name}. Hồ sơ chuyển sang trạng thái "Chờ Chi bộ nhận xét".`);
+  addActivity(`📋 Nhận kết quả xác minh – hồ sơ <strong>${name}</strong>`);
+}
+
+function viewVerifyResult(name) {
+  alert(`Kết quả xác minh ${name}:\n✓ Nhân thân rõ ràng\n✓ Không có tiền án tiền sự\n✓ Lý lịch đúng sự thật\n\nCông an xã Phước Kiển – 18/04/2026`);
+}
+
+function addActivity(html) {
+  const log = document.getElementById('activityLog');
+  if (!log) return;
+  const item = document.createElement('div');
+  item.className = 'notif-item';
+  item.style.padding = '11px 18px';
+  item.innerHTML = `<div class="notif-icon" style="background:#EDFAF3;">◈</div><div><div class="notif-text">${html}</div><div class="notif-time">Vừa xong</div></div>`;
+  log.prepend(item);
+}
+
+function createAccount() {
+  const name = document.getElementById('accName').value;
+  const cccd = document.getElementById('accCCCD').value;
+  const phone = document.getElementById('accPhone').value;
+  if (!name || !cccd || !phone) { alert('Vui lòng điền đủ Họ tên, CCCD và Số điện thoại.'); return; }
+  alert(`✅ Đã cấp tài khoản thành công!\n\nHọ tên: ${name}\nCCCD: ${cccd}\nMật khẩu tạm: Sẽ gửi OTP qua SMS ${phone}\n\nQuần chúng có thể đăng nhập ngay để bắt đầu kê khai.`);
+  addActivity(`🔑 Cấp tài khoản mới cho <strong>${name}</strong> – CCCD ${cccd}`);
+  document.getElementById('accName').value = '';
+  document.getElementById('accCCCD').value = '';
+  document.getElementById('accPhone').value = '';
+  document.getElementById('accEmail').value = '';
+}
+
+function exportProfiles() {
+  alert('Tính năng xuất Excel:\n• Danh sách đầy đủ 200 quần chúng\n• Lọc theo trạng thái, ấp, đảng viên phụ trách\n• Format chuẩn báo cáo Ban XD Đảng');
+}
+
+// Init admin
+renderProfiles(profiles);
+
+// ===== TOAST =====
+function showToast(msg, dur=2200) {
+  const t = document.getElementById('toast');
+  if (!t) return;
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), dur);
+}
+function saveDraft() { showToast('✓ Đã lưu nháp – ' + new Date().toLocaleTimeString('vi-VN')); }
+let autoSaveTimer;
+document.addEventListener('input', e => {
+  if (e.target.closest('#memberMain')) {
+    clearTimeout(autoSaveTimer);
+    autoSaveTimer = setTimeout(() => showToast('↑ Tự động lưu…'), 4000);
+  }
+});
+
+// ===== AI CHECK =====
+const aiCheckData = [
+  { part:'Phần A – Sơ lược lý lịch', status:'wrn', badge:'1 cảnh báo', issues:[{color:'#C47800',text:'Trường Tôn giáo chưa được chọn từ danh mục'}]},
+  { part:'Phần B – Lịch sử bản thân', status:'err', badge:'2 lỗi', issues:[
+    {color:'#C8102E',text:'Khoảng trắng 6 tháng: 7/2007 – 1/2008 chưa được kê khai'},
+    {color:'#C8102E',text:'Giai đoạn Tiểu học (1991–1998) = 7 năm, vượt chuẩn – cần ghi chú'}]},
+  { part:'Phần C – Công tác, chức vụ', status:'ok', badge:'Hợp lệ', issues:[] },
+  { part:'Phần D – Đặc điểm lịch sử', status:'ok', badge:'Hợp lệ', issues:[] },
+  { part:'Phần E – Đào tạo, bồi dưỡng', status:'wrn', badge:'1 cảnh báo', issues:[{color:'#C47800',text:'Dòng 2: Cột Tháng/Năm chỉ ghi năm 2018, chưa có tháng'}]},
+  { part:'Phần F – Đi nước ngoài', status:'ok', badge:'Hợp lệ', issues:[] },
+  { part:'Phần G – Khen thưởng',   status:'ok', badge:'Hợp lệ', issues:[] },
+  { part:'Phần H – Kỷ luật',       status:'ok', badge:'Hợp lệ', issues:[] },
+  { part:'Phần I – Hoàn cảnh gia đình', status:'wrn', badge:'1 cảnh báo', issues:[{color:'#C47800',text:'Cha ruột: giai đoạn 1978–1985 thiếu nơi sinh sống cụ thể'}]},
+  { part:'Phần J – Tự nhận xét', status:'wrn', badge:'1 gợi ý', issues:[{color:'#6B21A8',text:'Hiện 143 từ – chưa đạt tối thiểu 200 từ'}]},
+];
+function openAICheck() {
+  document.getElementById('aiModal').classList.add('open');
+  document.getElementById('aiScanWrap').style.display='block';
+  document.getElementById('aiResults').style.display='none';
+  document.getElementById('aiModalFoot').style.display='none';
+  const bar=document.getElementById('aiScanBar');
+  bar.style.animation='none'; void bar.offsetWidth; bar.style.animation='scanProgress 2.5s ease forwards';
+  const labels=['Đọc dữ liệu phần A…','Kiểm tra tính liên tiếp thời gian…','Đối chiếu công tác…','Xác thực dữ liệu gia đình…','Kiểm tra đào tạo…','Tổng hợp kết quả…'];
+  let i=0; const lbl=document.getElementById('aiScanLabel');
+  const iv=setInterval(()=>{lbl.textContent=labels[i++];if(i>=labels.length)clearInterval(iv);},420);
+  setTimeout(()=>{
+    document.getElementById('aiScanWrap').style.display='none';
+    renderAIResults();
+    document.getElementById('aiResults').style.display='block';
+    document.getElementById('aiModalFoot').style.display='flex';
+  },2600);
+}
+function renderAIResults() {
+  const totalErr=aiCheckData.reduce((a,r)=>a+(r.status==='err'?r.issues.length:0),0);
+  const totalWrn=aiCheckData.reduce((a,r)=>a+(r.status==='wrn'?r.issues.length:0),0);
+  const okCount=aiCheckData.filter(r=>r.status==='ok').length;
+  const score=totalErr===0?(totalWrn<=1?94:80):62;
+  const sc=score>=85?'high':score>=70?'mid':'low';
+  let html=`<div style="text-align:center;margin-bottom:20px">
+    <div class="ai-score-circle ${sc}"><div class="ai-score-num">${score}%</div><div class="ai-score-sub">Điểm hồ sơ</div></div>
+    <div style="display:flex;gap:16px;justify-content:center;font-size:13px">
+      <span style="color:#C8102E;font-weight:700">● ${totalErr} lỗi cứng</span>
+      <span style="color:#C47800;font-weight:700">● ${totalWrn} cảnh báo</span>
+      <span style="color:#1B7A50;font-weight:700">● ${okCount} phần hợp lệ</span>
+    </div></div>`;
+  aiCheckData.forEach((r,i)=>{
+    const ic=r.status==='ok'?'ok':r.status==='err'?'err':'wrn';
+    const icon=r.status==='ok'?'✓':r.status==='err'?'✕':'⚠';
+    html+=`<div class="ai-section-result">
+      <div class="ai-sec-head" onclick="toggleAISec(${i})">
+        <div class="ai-sec-icon ${ic}">${icon}</div>
+        <div class="ai-sec-name">${r.part}</div>
+        <span class="ai-sec-badge ${ic}">${r.badge}</span>
+        <span style="color:#A0AABF;margin-left:8px;font-size:12px" id="ai-chev-${i}">▾</span>
+      </div>
+      <div class="ai-sec-body ${r.issues.length?'open':''}" id="ai-body-${i}">
+        ${r.issues.length===0
+          ?'<div style="font-size:12.5px;color:#1B7A50;">✓ Không có vấn đề nào</div>'
+          :r.issues.map(iss=>`<div class="ai-issue"><div class="ai-issue-dot" style="background:${iss.color}"></div><span>${iss.text}</span></div>`).join('')}
+      </div></div>`;
+  });
+  document.getElementById('aiResults').innerHTML=html;
+}
+function toggleAISec(i){const b=document.getElementById('ai-body-'+i);const c=document.getElementById('ai-chev-'+i);b.classList.toggle('open');if(c)c.textContent=b.classList.contains('open')?'▴':'▾';}
+function closeAIModal(){document.getElementById('aiModal').classList.remove('open');}
+function goToFirstError(){closeAIModal();showSection(1);showToast('→ Phần B – có lỗi cần sửa');}
+
+// ===== NOTIFICATIONS =====
+const notifTpls={
+  tplReturn:'Kính gửi [HỌ TÊN],\n\nHồ sơ lý lịch của bạn cần bổ sung thêm thông tin.\n\nVui lòng đăng nhập và cập nhật theo hướng dẫn.\n\nHạn bổ sung: [HẠN CHÓT]',
+  tplApprove:'Kính gửi [HỌ TÊN],\n\nHồ sơ lý lịch đã được phê duyệt bước đầu.\n\nHồ sơ đang chuyển sang bước Xác minh lý lịch.',
+  tplRemind:'Kính gửi [HỌ TÊN],\n\nBạn chưa nộp hồ sơ lý lịch sau 7 ngày kể từ khi được cấp tài khoản.\n\nVui lòng đăng nhập và hoàn thiện hồ sơ.',
+  tplNew:'Kính gửi [HỌ TÊN],\n\nTài khoản kê khai lý lịch Mẫu 2-KNĐ đã được tạo.\n\nLink: https://lylich.xanhanbe.gov.vn\nCCCD: [CCCD]\nMật khẩu: Nhập OTP khi đăng nhập lần đầu.',
+};
+let currentTpl='tplReturn';
+function selectTpl(card,key){document.querySelectorAll('.notif-tpl-card').forEach(c=>c.classList.remove('selected'));card.classList.add('selected');currentTpl=key;updateNotifPreview();}
+function switchChannel(ch,tab){document.querySelectorAll('.channel-tab').forEach(t=>t.classList.remove('active'));tab.classList.add('active');updateNotifPreview();}
+function updateNotifPreview(){
+  const txt=notifTpls[currentTpl]||'';
+  const el=document.getElementById('notifPreviewText');
+  if(el)el.innerHTML=txt.replace('[HỌ TÊN]','<strong>Lê Thị Mai</strong>').replace('[HẠN CHÓT]','<strong>27/04/2026</strong>').replace('[CCCD]','079090123456').replace(/\n/g,'<br>');
+}
+function sendNotification(){document.getElementById('notifModal').classList.remove('open');showToast('📨 Đã gửi thông báo thành công');addActivity('📨 Gửi thông báo cho <strong>Lê Thị Mai</strong> – thành công');}
+function sendBulkNotif(){const c=document.querySelectorAll('#pgNotif input[type=checkbox]:checked').length;if(!c){alert('Chọn ít nhất một nhóm.');return;}showToast('📨 Đã gửi hàng loạt cho '+c+' nhóm');addActivity('📨 Gửi nhắc nhở hàng loạt – '+c+' nhóm');}
+
+</script>
+</body>
+</html>
+
