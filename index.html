@@ -13027,6 +13027,12 @@
           btnRoleAdmin.style.display =
             roleCode === "quan_chung" ? "none" : "inline-block";
         }
+        // Hide "Quần chúng" tab for officer/admin users
+        const btnRoleMember = document.getElementById("btnRoleMember");
+        if (btnRoleMember) {
+          btnRoleMember.style.display =
+            roleCode === "quan_chung" ? "inline-block" : "none";
+        }
 
         // Route by role (only quần chúng uses /profiles/my/)
         if (roleCode === "quan_chung") {
