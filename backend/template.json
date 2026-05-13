@@ -1,0 +1,678 @@
+{
+  "template_name": "ly_lich_mau2_knd",
+  "version": "2.0",
+  "description": "Lý lịch của người xin vào Đảng – Mẫu 2-KNĐ (phiên bản kê khai điện tử)",
+  "django_models": {
+    "profile":            "apps.profiles.models.Profile",
+    "user":               "apps.accounts.models.User",
+    "family_members":     "apps.family.models.FamilyMember",
+    "history_entries":    "apps.timelines.models.HistoryEntry",
+    "work_history":       "apps.timelines.models.WorkHistory",
+    "education_history":  "apps.timelines.models.EducationHistory",
+    "awards":             "apps.timelines.models.Award",
+    "overseas_travels":   "apps.timelines.models.OverseasTravel",
+    "org_participations": "apps.timelines.models.OrgParticipation"
+  },
+  "placeholders": {
+    "profile.full_name":                    "Họ và tên khai sinh",
+    "profile.full_name_other":              "Họ và tên thường dùng",
+    "profile.dob":                          "Ngày sinh (DD/MM/YYYY)",
+    "profile.get_gender_display":           "Giới tính",
+    "profile.birth_place_detail":           "Nơi đăng ký khai sinh",
+    "profile.hometown_detail":              "Quê quán",
+    "profile.current_address":              "Nơi thường trú",
+    "profile.temporary_address":            "Nơi tạm trú",
+    "profile.ethnic_group.name":            "Dân tộc",
+    "profile.religion.name":               "Tôn giáo",
+    "profile.occupation":                   "Nghề nghiệp hiện nay",
+    "profile.general_edu_level":            "Giáo dục phổ thông",
+    "profile.edu_level.name":              "Chuyên môn nghiệp vụ",
+    "profile.science_tech_qualifications":  "Khoa học công nghệ",
+    "profile.highest_degree":              "Học vị cao nhất",
+    "profile.academic_title":              "Học hàm cao nhất",
+    "profile.political_level.name":        "Lý luận chính trị",
+    "profile.foreign_languages":           "Ngoại ngữ",
+    "profile.it_level":                    "Tin học",
+    "profile.ethnic_language":             "Tiếng dân tộc thiểu số",
+    "profile.youth_union_date":            "Ngày vào Đoàn TNCS HCM",
+    "profile.youth_union_place":           "Nơi vào Đoàn",
+    "profile.rejoin_introducer1_name":     "Người giới thiệu vào Đảng (1)",
+    "profile.rejoin_introducer2_name":     "Người giới thiệu vào Đảng (2)",
+    "profile.political_history_text":      "Đặc điểm lịch sử chính trị",
+    "profile.self_assessment_text":        "Tự nhận xét đánh giá bản thân",
+    "profile.user.cccd":                   "CCCD/CMND",
+    "profile.user.phone":                  "Số điện thoại",
+    "profile.user.email":                  "Email"
+  },
+  "structure": [
+
+    {
+      "id": "header",
+      "type": "title_block",
+      "paragraphs": [
+        { "text": "ĐẢNG CỘNG SẢN VIỆT NAM",              "style": "BOLD_CENTER" },
+        { "text": "Mẫu 2-KNĐ",                            "style": "BOLD_CENTER" },
+        { "text": "LÝ LỊCH CỦA NGƯỜI XIN VÀO ĐẢNG",      "style": "BOLD_CENTER" },
+        { "text": "(Phiên bản kê khai điện tử)",           "style": "ITALIC_CENTER" }
+      ]
+    },
+
+    {
+      "id": "phan_a",
+      "type": "section_heading",
+      "text": "PHẦN A – THÔNG TIN CÁ NHÂN"
+    },
+    {
+      "id": "phan_a_basic",
+      "type": "table_static",
+      "label": "Thông tin cá nhân (mục 01–10)",
+      "rows": [
+        {
+          "field_no": "01",
+          "label":    "Họ và tên khai sinh (IN HOA)",
+          "field":    "profile.full_name",
+          "note":     "Ghi đúng theo giấy khai sinh, bằng chữ IN HOA"
+        },
+        {
+          "field_no": "02",
+          "label":    "Họ và tên thường dùng",
+          "field":    "profile.full_name_other",
+          "note":     ""
+        },
+        {
+          "field_no": "03",
+          "label":    "Ngày sinh",
+          "field":    "profile.dob",
+          "format":   "DD/MM/YYYY",
+          "note":     ""
+        },
+        {
+          "field_no": "04",
+          "label":    "Giới tính",
+          "field":    "profile.get_gender_display",
+          "note":     "Nam / Nữ"
+        },
+        {
+          "field_no": "05",
+          "label":    "Nơi đăng ký khai sinh",
+          "field":    "profile.birth_place_detail",
+          "note":     "Xã/phường, tỉnh/thành phố (địa danh mới + cũ nếu đã thay đổi)"
+        },
+        {
+          "field_no": "06",
+          "label":    "Quê quán",
+          "field":    "profile.hometown_detail",
+          "note":     "Xã/phường, tỉnh/thành phố theo giấy khai sinh"
+        },
+        {
+          "field_no": "07a",
+          "label":    "Nơi thường trú",
+          "field":    "profile.current_address",
+          "note":     "Số nhà, đường, ấp/khu phố, xã/phường, tỉnh/thành phố"
+        },
+        {
+          "field_no": "07b",
+          "label":    "Nơi tạm trú",
+          "field":    "profile.temporary_address",
+          "note":     "Điền nếu khác nơi thường trú; bỏ trống nếu không có"
+        },
+        {
+          "field_no": "08",
+          "label":    "Dân tộc",
+          "field":    "profile.ethnic_group.name",
+          "fallback": "profile.ethnic_group_other",
+          "note":     "VD: Kinh, Tày, Nùng..."
+        },
+        {
+          "field_no": "09",
+          "label":    "Tôn giáo",
+          "field":    "profile.religion.name",
+          "fallback": "profile.religion_other",
+          "note":     "Nếu không theo đạo: Không"
+        },
+        {
+          "field_no": "10",
+          "label":    "Nghề nghiệp hiện nay",
+          "field":    "profile.occupation",
+          "note":     "Ghi rõ công việc chính theo hợp đồng / quyết định"
+        }
+      ]
+    },
+    {
+      "id": "phan_a_edu",
+      "type": "table_static",
+      "label": "Trình độ học vấn và chuyên môn (mục 11)",
+      "rows": [
+        {
+          "field_no": "11a",
+          "label":    "Giáo dục phổ thông",
+          "field":    "profile.general_edu_level",
+          "note":     "VD: Tốt nghiệp THPT hệ 12 năm"
+        },
+        {
+          "field_no": "11b",
+          "label":    "Chuyên môn nghiệp vụ",
+          "field":    "profile.edu_level.name",
+          "fallback": "profile.edu_specialization",
+          "note":     "VD: Kỹ sư cơ khí, Cử nhân luật..."
+        },
+        {
+          "field_no": "11c",
+          "label":    "Khoa học công nghệ",
+          "field":    "profile.science_tech_qualifications",
+          "note":     "Văn bằng, chứng chỉ về KHCN, đổi mới sáng tạo"
+        },
+        {
+          "field_no": "11d",
+          "label":    "Học vị cao nhất",
+          "field":    "profile.highest_degree",
+          "note":     "VD: Thạc sĩ, Tiến sĩ"
+        },
+        {
+          "field_no": "11e",
+          "label":    "Học hàm cao nhất",
+          "field":    "profile.academic_title",
+          "note":     "VD: Phó Giáo sư, Giáo sư"
+        },
+        {
+          "field_no": "11f",
+          "label":    "Lý luận chính trị",
+          "field":    "profile.political_level.name",
+          "fallback": "profile.political_level_detail",
+          "note":     "VD: Sơ cấp / Trung cấp / Cao cấp / Cử nhân"
+        },
+        {
+          "field_no": "11g",
+          "label":    "Ngoại ngữ",
+          "field":    "profile.foreign_languages",
+          "fallback": "profile.foreign_language_name",
+          "note":     "VD: Tiếng Anh B1, IELTS..."
+        },
+        {
+          "field_no": "11h",
+          "label":    "Tin học",
+          "field":    "profile.it_level",
+          "note":     "VD: Tin học văn phòng, chứng chỉ A/B/C"
+        },
+        {
+          "field_no": "11i",
+          "label":    "Tiếng dân tộc thiểu số",
+          "field":    "profile.ethnic_language",
+          "note":     "Ghi tên tiếng dân tộc đã được cấp chứng chỉ hoặc nói thành thạo"
+        }
+      ]
+    },
+    {
+      "id": "phan_a_doan",
+      "type": "table_static",
+      "label": "Đoàn TNCS HCM (mục 12)",
+      "rows": [
+        {
+          "field_no": "12",
+          "label":    "Ngày và nơi vào Đoàn TNCS HCM",
+          "field":    "profile.youth_union_date",
+          "field2":   "profile.youth_union_place",
+          "format":   "Ngày DD/MM/YYYY, tại {youth_union_place}"
+        }
+      ]
+    },
+    {
+      "id": "phan_a_gioi_thieu",
+      "type": "table_static",
+      "label": "Người giới thiệu vào Đảng (mục 13)",
+      "rows": [
+        {
+          "field_no": "13a",
+          "label":    "Người giới thiệu thứ nhất",
+          "field":    "profile.rejoin_introducer1_name",
+          "field2":   "profile.rejoin_introducer1_position",
+          "note":     "Họ tên, chức vụ Đảng, đơn vị công tác"
+        },
+        {
+          "field_no": "13b",
+          "label":    "Người giới thiệu thứ hai",
+          "field":    "profile.rejoin_introducer2_name",
+          "field2":   "profile.rejoin_introducer2_position",
+          "note":     "Họ tên, chức vụ Đảng, đơn vị công tác"
+        }
+      ]
+    },
+
+    {
+      "id": "phan_b_heading",
+      "type": "section_heading",
+      "text": "PHẦN B – LỊCH SỬ BẢN THÂN (từ khi sinh đến nay)"
+    },
+    {
+      "id": "phan_b_note",
+      "type": "instruction",
+      "text": "Ghi rõ TỪ tháng/năm – ĐẾN tháng/năm: làm gì, ở đâu, nơi sinh sống. Giai đoạn phải LIÊN TỤC, không bỏ trống."
+    },
+    {
+      "id": "phan_b_history",
+      "type": "table_dynamic",
+      "source": "history_entries",
+      "filter": { "entry_type": "self" },
+      "order_by": ["from_year", "from_month", "sort_order"],
+      "empty_rows": 10,
+      "columns": [
+        { "header": "Từ tháng/năm\nđến tháng/năm", "field": "period_text",  "width_cm": 3.5 },
+        { "header": "Làm gì, ở đâu (ghi rõ nơi sinh sống)", "field": "description",  "width_cm": 10.5 },
+        { "header": "Chức vụ", "field": "location", "width_cm": 3.0 }
+      ]
+    },
+
+    {
+      "id": "phan_c_heading",
+      "type": "section_heading",
+      "text": "PHẦN C – NHỮNG CÔNG TÁC, CHỨC VỤ ĐÃ QUA"
+    },
+    {
+      "id": "phan_c_note",
+      "type": "instruction",
+      "text": "Ghi rõ từng đơn vị công tác, địa chỉ nơi công tác, chức vụ công tác, nơi sinh sống. Quá trình phải LIÊN TỤC với Phần B."
+    },
+    {
+      "id": "phan_c_work",
+      "type": "table_dynamic",
+      "source": "work_history",
+      "filter": {},
+      "order_by": ["from_year", "from_month", "sort_order"],
+      "empty_rows": 8,
+      "columns": [
+        { "header": "Từ tháng/năm\nđến tháng/năm", "field": "period_text",  "width_cm": 3.5 },
+        { "header": "Làm gì, ở đâu (ghi rõ nơi sinh sống)", "field": "employer",     "width_cm": 7.5 },
+        { "header": "Chức vụ", "field": "job_title",    "width_cm": 3.0 },
+        { "header": "Ghi chú", "field": "notes",        "width_cm": 3.0 }
+      ]
+    },
+
+    {
+      "id": "phan_d_heading",
+      "type": "section_heading",
+      "text": "PHẦN D – ĐẶC ĐIỂM LỊCH SỬ CHÍNH TRỊ"
+    },
+    {
+      "id": "phan_d_political",
+      "type": "text_area",
+      "label": "Đặc điểm lịch sử chính trị",
+      "field": "profile.political_history_text",
+      "empty_lines": 5
+    },
+
+    {
+      "id": "phan_e_heading",
+      "type": "section_heading",
+      "text": "PHẦN E – NHỮNG LỚP ĐÀO TẠO, BỒI DƯỠNG ĐÃ QUA"
+    },
+    {
+      "id": "phan_e_note",
+      "type": "instruction",
+      "text": "Ghi rõ tháng (không chỉ ghi năm). Cột 4: bằng cử nhân ĐH, cao đẳng, chứng chỉ..."
+    },
+    {
+      "id": "phan_e_education",
+      "type": "table_dynamic",
+      "source": "education_history",
+      "filter": {},
+      "order_by": ["from_year", "from_month"],
+      "empty_rows": 8,
+      "columns": [
+        { "header": "Tên trường",                           "field": "school",       "width_cm": 5.0 },
+        { "header": "Ngành học / Tên lớp / Hình thức",      "field": "major",        "width_cm": 5.5 },
+        { "header": "Từ tháng/năm – đến tháng/năm",         "field": "period_text",  "width_cm": 4.0 },
+        { "header": "Văn bằng, chứng chỉ",                  "field": "certificate",  "width_cm": 3.0 }
+      ]
+    },
+
+    {
+      "id": "phan_f_heading",
+      "type": "section_heading",
+      "text": "PHẦN F – ĐI NƯỚC NGOÀI"
+    },
+    {
+      "id": "phan_f_note",
+      "type": "instruction",
+      "text": "Chỉ kê khai các chuyến đi học tập, lao động, công tác từ 3 tháng trở lên. Không kê khai du lịch ngắn ngày."
+    },
+    {
+      "id": "phan_f_overseas",
+      "type": "table_dynamic",
+      "source": "overseas_travels",
+      "filter": {},
+      "order_by": ["from_year", "from_month"],
+      "empty_rows": 5,
+      "columns": [
+        { "header": "Từ tháng/năm – đến", "field": "period_text",    "width_cm": 4.0 },
+        { "header": "Nội dung đi",         "field": "purpose",        "width_cm": 7.0 },
+        { "header": "Nước nào",            "field": "country",        "width_cm": 3.5 },
+        { "header": "Cơ quan bảo lãnh",   "field": "sponsoring_org", "width_cm": 3.5 }
+      ]
+    },
+
+    {
+      "id": "phan_g_heading",
+      "type": "section_heading",
+      "text": "PHẦN G – KHEN THƯỞNG"
+    },
+    {
+      "id": "phan_g_note",
+      "type": "instruction",
+      "text": "Ghi rõ tháng + năm ký giấy khen. Kê khai bằng khen trở lên hoặc hình thức cao nhất. Ghi rõ cấp quyết định."
+    },
+    {
+      "id": "phan_g_awards",
+      "type": "table_dynamic",
+      "source": "awards",
+      "filter": { "type": "award" },
+      "order_by": ["issued_year", "issued_month"],
+      "empty_rows": 8,
+      "columns": [
+        { "header": "Tháng năm",         "field": "issued_year_month", "width_cm": 3.0 },
+        { "header": "Lý do, hình thức",  "field": "content",           "width_cm": 8.0 },
+        { "header": "Cấp quyết định",    "field": "level",             "width_cm": 3.5 }
+      ]
+    },
+
+    {
+      "id": "phan_h_heading",
+      "type": "section_heading",
+      "text": "PHẦN H – KỶ LUẬT"
+    },
+    {
+      "id": "phan_h_note",
+      "type": "instruction",
+      "text": "Kê khai cả trường hợp bị xem xét kỷ luật nhưng không bị xử lý, hoặc không bị kỷ luật do hết thời hiệu."
+    },
+    {
+      "id": "phan_h_disciplines",
+      "type": "table_dynamic",
+      "source": "awards",
+      "filter": { "type": "discipline" },
+      "order_by": ["issued_year", "issued_month"],
+      "empty_rows": 6,
+      "columns": [
+        { "header": "Tháng năm",         "field": "issued_year_month", "width_cm": 3.0 },
+        { "header": "Lý do, hình thức",  "field": "content",           "width_cm": 8.0 },
+        { "header": "Cấp quyết định",    "field": "level",             "width_cm": 3.5 }
+      ]
+    },
+
+    {
+      "id": "phan_giadinh_heading",
+      "type": "section_heading",
+      "text": "PHẦN I – THÀNH PHẦN GIA ĐÌNH"
+    },
+    {
+      "id": "phan_giadinh_note",
+      "type": "instruction",
+      "text": "Khai đầy đủ thông tin về cha mẹ ruột, vợ/chồng, con, anh chị em ruột, cha mẹ chồng/vợ, ông bà nội ngoại."
+    },
+
+    {
+      "id": "cha_ruot",
+      "type": "family_member_block",
+      "title": "1. Cha ruột",
+      "relationship": "cha_ruot",
+      "fields": [
+        { "label": "Họ và tên",   "field": "full_name",       "note": "Ghi theo giấy khai sinh" },
+        { "label": "Năm sinh",    "field": "birth_year",      "note": "VD: 1960" },
+        { "label": "Nơi sinh",    "field": "birth_place",     "note": "Xã/phường, tỉnh/thành phố" },
+        { "label": "Quê quán",    "field": "hometown",        "note": "Xã/phường, tỉnh/thành phố" },
+        { "label": "Dân tộc",     "field": "ethnic_group_text", "note": "" },
+        { "label": "Tôn giáo",    "field": "religion_text",   "note": "Ghi rõ tên tôn giáo; không theo đạo: Không" },
+        { "label": "Nơi cư trú",  "field": "current_address", "note": "Số nhà, đường, ấp, xã, tỉnh" },
+        { "label": "Nghề nghiệp", "field": "occupation",      "note": "Ghi nghề hiện tại; nếu đã mất – bỏ trống" },
+        { "label": "Là Đảng viên ĐCS Việt Nam", "field": "is_party_member", "note": "Vào Đảng năm ..., hiện sinh hoạt tại chi bộ ..." }
+      ],
+      "history_source": "history_entries",
+      "history_filter": { "entry_type": "family" },
+      "history_columns": [
+        { "header": "Từ tháng/năm\nđến tháng/năm", "field": "period_text",  "width_cm": 3.5 },
+        { "header": "Làm gì, ở đâu (ghi rõ nơi sinh sống)", "field": "description",  "width_cm": 10.5 },
+        { "header": "Chức vụ",  "field": "location", "width_cm": 3.0 }
+      ]
+    },
+    {
+      "id": "me_ruot",
+      "type": "family_member_block",
+      "title": "2. Mẹ ruột",
+      "relationship": "me_ruot",
+      "fields": [
+        { "label": "Họ và tên",   "field": "full_name",         "note": "Ghi theo giấy khai sinh" },
+        { "label": "Năm sinh",    "field": "birth_year",        "note": "VD: 1960" },
+        { "label": "Nơi sinh",    "field": "birth_place",       "note": "Xã/phường, tỉnh/thành phố" },
+        { "label": "Quê quán",    "field": "hometown",          "note": "Xã/phường, tỉnh/thành phố" },
+        { "label": "Dân tộc",     "field": "ethnic_group_text", "note": "" },
+        { "label": "Tôn giáo",    "field": "religion_text",     "note": "" },
+        { "label": "Nơi cư trú",  "field": "current_address",   "note": "" },
+        { "label": "Nghề nghiệp", "field": "occupation",        "note": "" },
+        { "label": "Là Đảng viên ĐCS Việt Nam", "field": "is_party_member", "note": "" }
+      ],
+      "history_source": "history_entries",
+      "history_filter": { "entry_type": "family" },
+      "history_columns": [
+        { "header": "Từ tháng/năm\nđến tháng/năm", "field": "period_text",  "width_cm": 3.5 },
+        { "header": "Làm gì, ở đâu (ghi rõ nơi sinh sống)", "field": "description",  "width_cm": 10.5 },
+        { "header": "Chức vụ", "field": "location", "width_cm": 3.0 }
+      ]
+    },
+    {
+      "id": "anh_chi_em_ruot",
+      "type": "family_member_list_block",
+      "title": "3. Anh, chị, em ruột",
+      "relationship": "anh_chi_em_ruot",
+      "fields": [
+        { "label": "Họ và tên",   "field": "full_name" },
+        { "label": "Năm sinh",    "field": "birth_year" },
+        { "label": "Nơi cư trú",  "field": "current_address" },
+        { "label": "Nghề nghiệp", "field": "occupation" },
+        { "label": "Là Đảng viên ĐCS Việt Nam", "field": "is_party_member" }
+      ]
+    },
+    {
+      "id": "vo_chong",
+      "type": "family_member_block",
+      "title": "4. Vợ/Chồng",
+      "relationship": "vo_chong",
+      "fields": [
+        { "label": "Họ và tên",   "field": "full_name" },
+        { "label": "Năm sinh",    "field": "birth_year" },
+        { "label": "Dân tộc",     "field": "ethnic_group_text" },
+        { "label": "Tôn giáo",    "field": "religion_text" },
+        { "label": "Nơi cư trú",  "field": "current_address" },
+        { "label": "Nghề nghiệp", "field": "occupation" },
+        { "label": "Là Đảng viên ĐCS Việt Nam", "field": "is_party_member" }
+      ],
+      "history_source": "history_entries",
+      "history_filter": { "entry_type": "family" },
+      "history_columns": [
+        { "header": "Từ tháng/năm\nđến tháng/năm", "field": "period_text",  "width_cm": 3.5 },
+        { "header": "Làm gì, ở đâu (ghi rõ nơi sinh sống)", "field": "description",  "width_cm": 10.5 },
+        { "header": "Chức vụ", "field": "location", "width_cm": 3.0 }
+      ]
+    },
+    {
+      "id": "con",
+      "type": "family_member_list_block",
+      "title": "5. Con",
+      "relationship": "con",
+      "fields": [
+        { "label": "Họ và tên",   "field": "full_name" },
+        { "label": "Năm sinh",    "field": "birth_year" },
+        { "label": "Nơi ở hiện nay", "field": "current_address" },
+        { "label": "Hiện là",     "field": "occupation",   "note": "Còn nhỏ / Học sinh / Sinh viên / Nghề nghiệp..." }
+      ]
+    },
+    {
+      "id": "cha_chong_vo",
+      "type": "family_member_block",
+      "title": "6. Cha chồng/vợ",
+      "relationship": "cha_chong_vo",
+      "fields": [
+        { "label": "Họ và tên",   "field": "full_name" },
+        { "label": "Năm sinh",    "field": "birth_year" },
+        { "label": "Quê quán",    "field": "hometown" },
+        { "label": "Dân tộc",     "field": "ethnic_group_text" },
+        { "label": "Tôn giáo",    "field": "religion_text" },
+        { "label": "Nơi cư trú",  "field": "current_address" },
+        { "label": "Nghề nghiệp", "field": "occupation" }
+      ],
+      "history_source": "history_entries",
+      "history_filter": { "entry_type": "family" },
+      "history_columns": [
+        { "header": "Từ tháng/năm\nđến tháng/năm", "field": "period_text",  "width_cm": 3.5 },
+        { "header": "Làm gì, ở đâu (ghi rõ nơi sinh sống)", "field": "description",  "width_cm": 10.5 },
+        { "header": "Chức vụ", "field": "location", "width_cm": 3.0 }
+      ]
+    },
+    {
+      "id": "me_chong_vo",
+      "type": "family_member_block",
+      "title": "7. Mẹ chồng/vợ",
+      "relationship": "me_chong_vo",
+      "fields": [
+        { "label": "Họ và tên",   "field": "full_name" },
+        { "label": "Năm sinh",    "field": "birth_year" },
+        { "label": "Quê quán",    "field": "hometown" },
+        { "label": "Dân tộc",     "field": "ethnic_group_text" },
+        { "label": "Tôn giáo",    "field": "religion_text" },
+        { "label": "Nơi cư trú",  "field": "current_address" },
+        { "label": "Nghề nghiệp", "field": "occupation" }
+      ],
+      "history_source": "history_entries",
+      "history_filter": { "entry_type": "family" },
+      "history_columns": [
+        { "header": "Từ tháng/năm\nđến tháng/năm", "field": "period_text",  "width_cm": 3.5 },
+        { "header": "Làm gì, ở đâu (ghi rõ nơi sinh sống)", "field": "description",  "width_cm": 10.5 },
+        { "header": "Chức vụ", "field": "location", "width_cm": 3.0 }
+      ]
+    },
+    {
+      "id": "anh_chi_em_chong_vo",
+      "type": "family_member_list_block",
+      "title": "8. Anh, chị, em chồng/vợ",
+      "relationship": "anh_chi_em_chong_vo",
+      "fields": [
+        { "label": "Họ và tên",   "field": "full_name" },
+        { "label": "Năm sinh",    "field": "birth_year" },
+        { "label": "Nơi cư trú",  "field": "current_address" },
+        { "label": "Nghề nghiệp", "field": "occupation" },
+        { "label": "Là Đảng viên ĐCS Việt Nam", "field": "is_party_member" }
+      ]
+    },
+    {
+      "id": "ong_noi",
+      "type": "family_member_block",
+      "title": "9. Ông nội",
+      "relationship": "ong_noi",
+      "fields": [
+        { "label": "Họ và tên",   "field": "full_name" },
+        { "label": "Năm sinh",    "field": "birth_year" },
+        { "label": "Quê quán",    "field": "hometown" },
+        { "label": "Dân tộc",     "field": "ethnic_group_text" },
+        { "label": "Tôn giáo",    "field": "religion_text" },
+        { "label": "Nơi cư trú",  "field": "current_address" },
+        { "label": "Nghề nghiệp", "field": "occupation" }
+      ],
+      "history_source": null
+    },
+    {
+      "id": "ba_noi",
+      "type": "family_member_block",
+      "title": "10. Bà nội",
+      "relationship": "ba_noi",
+      "fields": [
+        { "label": "Họ và tên",   "field": "full_name" },
+        { "label": "Năm sinh",    "field": "birth_year" },
+        { "label": "Quê quán",    "field": "hometown" },
+        { "label": "Tôn giáo",    "field": "religion_text" },
+        { "label": "Nơi cư trú",  "field": "current_address" },
+        { "label": "Nghề nghiệp", "field": "occupation" }
+      ],
+      "history_source": null
+    },
+    {
+      "id": "ong_ngoai",
+      "type": "family_member_block",
+      "title": "11. Ông ngoại",
+      "relationship": "ong_ngoai",
+      "fields": [
+        { "label": "Họ và tên",   "field": "full_name" },
+        { "label": "Năm sinh",    "field": "birth_year" },
+        { "label": "Quê quán",    "field": "hometown" },
+        { "label": "Dân tộc",     "field": "ethnic_group_text" },
+        { "label": "Tôn giáo",    "field": "religion_text" },
+        { "label": "Nơi cư trú",  "field": "current_address" },
+        { "label": "Nghề nghiệp", "field": "occupation" }
+      ],
+      "history_source": null
+    },
+    {
+      "id": "ba_ngoai",
+      "type": "family_member_block",
+      "title": "12. Bà ngoại",
+      "relationship": "ba_ngoai",
+      "fields": [
+        { "label": "Họ và tên",   "field": "full_name" },
+        { "label": "Năm sinh",    "field": "birth_year" },
+        { "label": "Quê quán",    "field": "hometown" },
+        { "label": "Tôn giáo",    "field": "religion_text" },
+        { "label": "Nơi cư trú",  "field": "current_address" },
+        { "label": "Nghề nghiệp", "field": "occupation" }
+      ],
+      "history_source": null
+    },
+
+    {
+      "id": "phan_j_heading",
+      "type": "section_heading",
+      "text": "PHẦN J – TỰ NHẬN XÉT, ĐÁNH GIÁ BẢN THÂN"
+    },
+    {
+      "id": "phan_j_note",
+      "type": "instruction",
+      "text": "Ghi những ưu điểm, khuyết điểm chính về: phẩm chất chính trị, đạo đức lối sống, năng lực công tác và quan hệ quần chúng. Tối thiểu 200 từ."
+    },
+    {
+      "id": "phan_j_self_assessment",
+      "type": "text_area",
+      "label": "Tự nhận xét, đánh giá bản thân",
+      "field": "profile.self_assessment_text",
+      "empty_lines": 12
+    },
+
+    {
+      "id": "phan_k_heading",
+      "type": "section_heading",
+      "text": "CAM ĐOAN VÀ KÝ TÊN"
+    },
+    {
+      "id": "phan_k_cam_doan",
+      "type": "declaration",
+      "text": "Tôi cam đoan đã khai đầy đủ, rõ ràng, trung thực và chịu trách nhiệm trước Đảng về những nội dung đã khai trong lý lịch.",
+      "signature_fields": [
+        { "label": "Người khai",  "field": "profile.full_name",       "date_field": "profile.declaration_date" }
+      ]
+    },
+
+    {
+      "id": "nhan_xet_chi_bo",
+      "type": "committee_comment",
+      "title": "NHẬN XÉT CỦA CHI ỦY HOẶC CHI BỘ",
+      "comment_type": "chi_uy",
+      "field": "chi_uy_comment.content",
+      "signed_by": "chi_uy_comment.signed_by",
+      "signed_date": "chi_uy_comment.signed_date"
+    },
+    {
+      "id": "chung_nhan_cap_uy",
+      "type": "committee_comment",
+      "title": "CHỨNG NHẬN CỦA CẤP ỦY CƠ SỞ",
+      "comment_type": "cap_uy_co_so",
+      "field": "cap_uy_comment.content",
+      "signed_by": "cap_uy_comment.signed_by",
+      "signed_date": "cap_uy_comment.signed_date"
+    }
+  ]
+}

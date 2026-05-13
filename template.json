@@ -1,0 +1,3615 @@
+{
+  "template_name": "ly_lich_mau2_knd",
+  "version": "1.0",
+  "description": "Sơ yếu lý lịch Đảng viên – Mẫu 2-KNĐ",
+  "structure": [
+    {
+      "type": "paragraph",
+      "style": "BOLD",
+      "text": "ĐẢNG CỘNG SẢN VIỆT NAM"
+    },
+    {
+      "type": "paragraph",
+      "style": "BOLD",
+      "text": "Mẫu 2-KNĐ"
+    },
+    {
+      "type": "paragraph",
+      "style": "BOLD",
+      "text": "LÝ LỊCH CỦA NGƯỜI XIN VÀO ĐẢNG"
+    },
+    {
+      "type": "paragraph",
+      "style": "NORMAL",
+      "text": "(Prototype – Phiên bản kê khai điện tử)"
+    },
+    {
+      "type": "table_static",
+      "rows": [
+        [
+          {
+            "text": "PHẦN A – SƠ LƯỢC LÝ LỊCH",
+            "placeholder": null
+          }
+        ]
+      ]
+    },
+    {
+      "type": "table_static",
+      "rows": [
+        [
+          {
+            "text": "Ghi đúng họ, chữ đệm và tên theo giấy khai sinh, bằng chữ IN HOA. Ví dụ: NGUYỄN VĂN HÙNG",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "01. Họ và tên khai sinh (IN HOA):",
+            "placeholder": "{{profile.full_name}}"
+          },
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "02. Họ và tên thường dùng:",
+            "placeholder": "{{profile.full_name}}"
+          },
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "03. Ngày sinh:",
+            "placeholder": "{{profile.dob}}"
+          },
+          {
+            "text": "DD / MM / YYYY",
+            "placeholder": null
+          },
+          {
+            "text": "04. Giới tính:",
+            "placeholder": null
+          },
+          {
+            "text": "Nam  /  Nữ  (gạch chân 1)",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "05. Nơi đăng ký khai sinh:",
+            "placeholder": null
+          },
+          {
+            "text": "Xã/phường..., tỉnh/thành phố... (ghi địa danh mới, thêm địa danh cũ nếu đã thay đổi)  => bổ sung ghi chú nơi cấp giấy khai sinh, không phải địa chỉ của bệnh viện hay cơ sở y tế",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "06. Quê quán:",
+            "placeholder": "{{profile.hometown_detail}}"
+          },
+          {
+            "text": "Xã/phường..., tỉnh/thành phố... (ghi theo giấy khai sinh), => bổ sung trường hợp giấy khai sinh không có quê quán thì ghi theo căn cước ",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "07a. Nơi thường trú:",
+            "placeholder": null
+          },
+          {
+            "text": "Số nhà, đường, ấp/khu phố, xã/phường, tỉnh/thành phố",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "07b. Nơi tạm trú:",
+            "placeholder": null
+          },
+          {
+            "text": "Điền nếu khác nơi thường trú; bỏ trống nếu không có => ghi rõ Số nhà, đường, ấp/khu phố, xã/phường, tỉnh/thành phố (nếu có tạm trú còn thời hạn ở nơi khác)",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "08. Dân tộc:",
+            "placeholder": "{{profile.ethnic_group.name}}"
+          },
+          {
+            "text": "VD: Kinh, Tày, Nùng...",
+            "placeholder": null
+          },
+          {
+            "text": "09. Tôn giáo:",
+            "placeholder": null
+          },
+          {
+            "text": "Nếu không theo đạo: Không",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "10. Nghề nghiệp hiện nay:",
+            "placeholder": "{{profile.occupation}}"
+          },
+          {
+            "text": "Ghi rõ công việc chính theo hợp đồng / quyết định. VD: công nhân, giáo viên, nông dân...",
+            "placeholder": null
+          }
+        ]
+      ]
+    },
+    {
+      "type": "table_static",
+      "rows": [
+        [
+          {
+            "text": "11. Trình độ học vấn và chuyên môn",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "11a. Giáo dục phổ thông:",
+            "placeholder": null
+          },
+          {
+            "text": "VD: Tốt nghiệp THPT hệ 12 năm / 8/10, 9/12 phổ thông,…..",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "11b. Chuyên môn nghiệp vụ:",
+            "placeholder": null
+          },
+          {
+            "text": "VD: Kỹ sư cơ khí, Cử nhân luật, Trung cấp thú y, bác sỹ ngoại khoa...",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "11c. Khoa học công nghệ:",
+            "placeholder": null
+          },
+          {
+            "text": "Văn bằng, chứng chỉ về KHCN, đổi mới sáng tạo, chuyển đổi số",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "11d. Học vị cao nhất:",
+            "placeholder": null
+          },
+          {
+            "text": "VD: Thạc sĩ, Tiến sĩ (nếu không có – bỏ trống) => Thạc  sĩ và chuyên ngành đào tạo",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "11e. Học hàm cao nhất:",
+            "placeholder": null
+          },
+          {
+            "text": "VD: Phó Giáo sư, Giáo sư (nếu không có – bỏ trống)",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "11f. Lý luận chính trị:",
+            "placeholder": null
+          },
+          {
+            "text": "VD: Sơ cấp / Trung cấp / Cao cấp / Cử nhân; tập trung hay không tập trung => nếu đang học thì bỏ trống",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "11g. Ngoại ngữ:",
+            "placeholder": "{{profile.foreign_languages}}"
+          },
+          {
+            "text": "VD: Tiếng Anh B1, tiếng Anh ĐH, tiếng Pháp A2... => IELTS, TOELF, TOEIC…",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "11h. Tin học:",
+            "placeholder": "{{profile.it_level}}"
+          },
+          {
+            "text": "VD: Tin học văn phòng, chứng chỉ A/B/C, ĐH ngành tin học... ",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "11i. Tiếng dân tộc thiểu số:",
+            "placeholder": "{{profile.ethnic_group.name}}"
+          },
+          {
+            "text": "Ghi tên tiếng dân tộc đã được cấp chứng chỉ hoặc nói thành thạo",
+            "placeholder": null
+          }
+        ]
+      ]
+    },
+    {
+      "type": "table_static",
+      "rows": [
+        [
+          {
+            "text": "12. Ngày và nơi vào Đoàn TNCS HCM:",
+            "placeholder": null
+          },
+          {
+            "text": "Ngày DD/MM/YYYY, tại chi đoàn/đoàn cơ sở... ",
+            "placeholder": null
+          }
+        ]
+      ]
+    },
+    {
+      "type": "table_static",
+      "rows": [
+        [
+          {
+            "text": "13. Người giới thiệu vào Đảng",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Người giới thiệu thứ nhất (1):",
+            "placeholder": null
+          },
+          {
+            "text": "Họ tên, chức vụ Đảng, đơn vị công tác => không khai nội dung này",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Người giới thiệu thứ hai (2):",
+            "placeholder": null
+          },
+          {
+            "text": "Họ tên, chức vụ Đảng, đơn vị công tác=> không khai nội dung này",
+            "placeholder": null
+          }
+        ]
+      ]
+    },
+    {
+      "type": "table_static",
+      "rows": [
+        [
+          {
+            "text": "(Mục 13 bỏ trống nếu không xin kết nạp lại): Ngày vào Đảng lần thứ nhất – Ngày công nhận chính thức lần 1",
+            "placeholder": null
+          }
+        ]
+      ]
+    },
+    {
+      "type": "table_static",
+      "rows": [
+        [
+          {
+            "text": "PHẦN B – LỊCH SỬ BẢN THÂN (từ khi sinh đến nay)",
+            "placeholder": null
+          }
+        ]
+      ]
+    },
+    {
+      "type": "table_static",
+      "rows": [
+        [
+          {
+            "text": "Ghi rõ TỪ tháng/năm – ĐẾN tháng/năm: làm gì, ở đâu, nơi sinh sống. Giai đoạn phải LIÊN TỤC, không bỏ trống. Tiểu học: 5 năm; THCS: 4 năm; THPT: 3 năm.\nGhi rõ TỪ tháng/năm – ĐẾN tháng/năm: học trường nào, địa chỉ ở đâu, nơi sinh sống (số nhà, đường, ấp, xã, tỉnh). Giai đoạn phải LIÊN TỤC, không bỏ trống. Tiểu học: 5 năm; THCS: 4 năm; THPT: 3 năm.",
+            "placeholder": null
+          }
+        ]
+      ]
+    },
+    {
+      "type": "table_static",
+      "rows": [
+        [
+          {
+            "text": "Từ tháng/năm đến tháng/năm",
+            "placeholder": null
+          },
+          {
+            "text": "Làm gì, ở đâu (ghi rõ nơi sinh sống)",
+            "placeholder": null
+          },
+          {
+            "text": "Chức vụ => bỏ cột chức vụ",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "…. đến …..",
+            "placeholder": null
+          },
+          {
+            "text": "=>Bổ sung Còn nhỏ, sống với cha mẹ tại số nhà, đường, ấp, xã, tỉnh",
+            "placeholder": null
+          },
+          {
+            "text": "Bỏ cột chức vụ",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "9/…. đến 8/…",
+            "placeholder": null
+          },
+          {
+            "text": "=>Bổ sung học Tiểu học……, xã….., tỉnh….. (nếu có thay đổi nơi cư trú so với giai đoạn trên thì bổ sung nơi cư trú mới)",
+            "placeholder": null
+          },
+          {
+            "text": "Bỏ cột chức vụ",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "9/…. đến 8/…",
+            "placeholder": null
+          },
+          {
+            "text": "=>Bổ sung học Trung học  cơ sở……, xã….., tỉnh….. Được kết nạp vào Đoàn TNCS Hồ Chí Minh ngày…….tháng … năm ….. (nếu kết nạp đoàn khi học THCS) (nếu có thay đổi nơi cư trú so với giai đoạn trên thì bổ sung nơi cư trú mới). ",
+            "placeholder": null
+          },
+          {
+            "text": "Bỏ cột chức vụ",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "9/…. đến 6/…",
+            "placeholder": null
+          },
+          {
+            "text": "=>Bổ sung học Trung học phổ thông……, xã….., tỉnh….. Được kết nạp vào Đoàn TNCS Hồ Chí Minh ngày…….tháng … năm ….. (nếu kết nạp đoàn khi học THPT)  (nếu có thay đổi nơi cư trú so với giai đoạn trên thì bổ sung nơi cư trú mới)",
+            "placeholder": null
+          },
+          {
+            "text": "Bỏ cột chức vụ",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "7/…. đến 9/…",
+            "placeholder": null
+          },
+          {
+            "text": "=>Bổ sung ở nhà phụ giúp gia đình tại số nhà, đường, ấp, xã, tỉnh\n(giai đoạn này là sau khi xọng cho cấp 3, chờ kết quả và nhập học các trường đại học, cao đẳng, trung cấp)",
+            "placeholder": null
+          },
+          {
+            "text": "Bỏ cột chức vụ",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ]
+      ]
+    },
+    {
+      "type": "table_static",
+      "rows": [
+        [
+          {
+            "text": "PHẦN C – NHỮNG CÔNG TÁC, CHỨC VỤ ĐÃ QUA",
+            "placeholder": null
+          }
+        ]
+      ]
+    },
+    {
+      "type": "table_static",
+      "rows": [
+        [
+          {
+            "text": "Ghi rõ từng đơn vị công tác, địa chỉ nơi công tác, chức vụ công tác, nơi sinh sống trong giai đoạn đó. Quá trình phải LIÊN TỤC tháng, năm  với Phần B. Khai bắt đầu từ khi vào học các trường đại học, cao đẳng trung cấp, nếu không đi học mà đi làm thì khai từ khi bắt đầu đi làm ",
+            "placeholder": null
+          }
+        ]
+      ]
+    },
+    {
+      "type": "table_static",
+      "rows": [
+        [
+          {
+            "text": "Từ tháng/năm đến tháng/năm",
+            "placeholder": null
+          },
+          {
+            "text": "Làm gì, ở đâu (ghi rõ nơi sinh sống)",
+            "placeholder": null
+          },
+          {
+            "text": "Chức vụ",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "…/.. đến …/…",
+            "placeholder": null
+          },
+          {
+            "text": "=>Bổ sung Học ngành….. tại trường Đại học……., hệ đại học (hay hệ cao đẳng, trung cấp), hình thức chính quy (hoặc vừa học vừa làm), sinh sống tại số nhà….., đường…… ấp….., xã….., tỉnh…..",
+            "placeholder": null
+          },
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "…/.. đến …/…",
+            "placeholder": null
+          },
+          {
+            "text": "=>Bổ sung Làm việc tại…………., địa chỉ ………….., sinh sống tại số nhà, đường, ấp, xã, tỉnh. Lập gia đình năm …. chuyển đến sinh sống tại số nhà, đường, ấp, xã, tỉnh",
+            "placeholder": null
+          },
+          {
+            "text": "Bổ sung chức vụ",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "…/.. đến …/…",
+            "placeholder": null
+          },
+          {
+            "text": "=>Bổ sung Làm việc tại…………., địa chỉ ………….., sinh sống tại số nhà, đường, ấp, xã, tỉnh. ",
+            "placeholder": null
+          },
+          {
+            "text": "Bổ sung chức vụ",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "…/.. đến …/…",
+            "placeholder": null
+          },
+          {
+            "text": "=>Bổ sung Làm việc tại…………., địa chỉ ………….., sinh sống tại số nhà, đường, ấp, xã, tỉnh. ",
+            "placeholder": null
+          },
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "…/.. đến …/…",
+            "placeholder": null
+          },
+          {
+            "text": "=>Bổ sung  Tham gia sinh hoạt Đoàn tại chi đoàn……. (hay Hội viên Hội LHPN xã Nhà Bè…….), sinh sống tại số nhà….., đường…… ấp….., xã….., tỉnh…..  (nếu hiện đang là đoàn viên, hội viên,….)",
+            "placeholder": null
+          },
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": "{{profile.full_name}}"
+          },
+          {
+            "text": "=>Bổ sung  Nếu quần chúng có lập gia đình sau đó ly hôn và có lập gia đình mới thì khai tiếp theo như sau:",
+            "placeholder": null
+          },
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Tháng…./….",
+            "placeholder": null
+          },
+          {
+            "text": "-Ly hôn với ông (bà)………………….theo Quyết định…………………………, chuyển đến sinh sống tại………… (Trường hợp này sau khi ly hôn sẽ thay đổi nơi cư trú không còn sống ở nhà chồng, vợ)",
+            "placeholder": null
+          },
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Tháng…./….",
+            "placeholder": null
+          },
+          {
+            "text": "- Lập gia đình với ông (bà)……………………………, sinh sống tại…………………",
+            "placeholder": null
+          },
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ]
+      ]
+    },
+    {
+      "type": "table_static",
+      "rows": [
+        [
+          {
+            "text": "PHẦN D – ĐẶC ĐIỂM LỊCH SỬ CHÍNH TRỊ",
+            "placeholder": null
+          }
+        ]
+      ]
+    },
+    {
+      "type": "table_static",
+      "rows": [
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ]
+      ]
+    },
+    {
+      "type": "table_static",
+      "rows": [
+        [
+          {
+            "text": "PHẦN E – NHỮNG LỚP ĐÀO TẠO, BỒI DƯỠNG ĐÃ QUA",
+            "placeholder": null
+          }
+        ]
+      ]
+    },
+    {
+      "type": "table_static",
+      "rows": [
+        [
+          {
+            "text": "Ghi rõ tháng (không chỉ ghi năm). Tối đa 13 dòng. Cột 4: Bằng cử nhân ĐH, cao đẳng, chứng chỉ A/B/C...",
+            "placeholder": null
+          }
+        ]
+      ]
+    },
+    {
+      "type": "table_static",
+      "rows": [
+        [
+          {
+            "text": "Tên trường",
+            "placeholder": "{{profile.edu_school}}"
+          },
+          {
+            "text": "Ngành học / Tên lớp / Hình thức",
+            "placeholder": null
+          },
+          {
+            "text": "Từ tháng/năm – đến tháng/năm",
+            "placeholder": null
+          },
+          {
+            "text": "Văn bằng, chứng chỉ",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ]
+      ]
+    },
+    {
+      "type": "table_static",
+      "rows": [
+        [
+          {
+            "text": "PHẦN F – ĐI NƯỚC NGOÀI",
+            "placeholder": null
+          }
+        ]
+      ]
+    },
+    {
+      "type": "table_static",
+      "rows": [
+        [
+          {
+            "text": "Chỉ kê khai các chuyến đi học tập, lao động, công tác từ 3 tháng trở lên. Không kê khai du lịch ngắn ngày.",
+            "placeholder": null
+          }
+        ]
+      ]
+    },
+    {
+      "type": "table_static",
+      "rows": [
+        [
+          {
+            "text": "Từ tháng/năm – đến",
+            "placeholder": null
+          },
+          {
+            "text": "Nội dung đi",
+            "placeholder": null
+          },
+          {
+            "text": "Nước nào",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ]
+      ]
+    },
+    {
+      "type": "table_dynamic",
+      "source": "awards",
+      "header": [
+        "PHẦN G – KHEN THƯỞNG"
+      ],
+      "mapping": [
+        [
+          "PHẦN G – KHEN THƯỞNG",
+          "phần_g_–_khen_thưởng"
+        ]
+      ]
+    },
+    {
+      "type": "table_static",
+      "rows": [
+        [
+          {
+            "text": "Ghi rõ tháng + năm ký giấy khen. Kê khai bằng khen trở lên hoặc hình thức cao nhất. Ghi rõ cấp quyết định.",
+            "placeholder": null
+          }
+        ]
+      ]
+    },
+    {
+      "type": "table_static",
+      "rows": [
+        [
+          {
+            "text": "Tháng năm",
+            "placeholder": null
+          },
+          {
+            "text": "Lý do, hình thức",
+            "placeholder": null
+          },
+          {
+            "text": "Cấp quyết định",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ]
+      ]
+    },
+    {
+      "type": "table_dynamic",
+      "source": "awards",
+      "header": [
+        "PHẦN H – KỶ LUẬT"
+      ],
+      "mapping": [
+        [
+          "PHẦN H – KỶ LUẬT",
+          "phần_h_–_kỷ_luật"
+        ]
+      ]
+    },
+    {
+      "type": "table_dynamic",
+      "source": "awards",
+      "header": [
+        "Kê khai cả trường hợp bị xem xét kỷ luật nhưng không bị xử lý, hoặc không bị kỷ luật do hết thời hiệu."
+      ],
+      "mapping": [
+        [
+          "Kê khai cả trường hợp bị xem xét kỷ luật nhưng không bị xử lý, hoặc không bị kỷ luật do hết thời hiệu.",
+          "kê_khai_cả_trường_hợp_bị_xem_xét_kỷ_luật_nhưng_không_bị_xử_lý,_hoặc_không_bị_kỷ_luật_do_hết_thời_hiệu."
+        ]
+      ]
+    },
+    {
+      "type": "table_static",
+      "rows": [
+        [
+          {
+            "text": "Tháng năm",
+            "placeholder": null
+          },
+          {
+            "text": "Lý do, hình thức",
+            "placeholder": null
+          },
+          {
+            "text": "Cấp quyết định",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ]
+      ]
+    },
+    {
+      "type": "table_static",
+      "rows": [
+        [
+          {
+            "text": "PHẦN I – HOÀN CẢNH GIA ĐÌNH",
+            "placeholder": null
+          }
+        ]
+      ]
+    },
+    {
+      "type": "paragraph",
+      "style": "BOLD",
+      "text": "=> bổ sung ghi chú:"
+    },
+    {
+      "type": "paragraph",
+      "style": "BOLD",
+      "text": "- Đối với cha mẹ ruột, chồng (hoặc vợ): cần xác định được các giai đoạn học tập của cha mẹ, thời gian lập gia đình, thay đổi công việc, thay đổi nơi cư trú để khai cho đúng, đảm bảo khai liên tục theo năm (Năm cuối giai đoạn trước = năm đầu giai đoạn sau)"
+    },
+    {
+      "type": "table_static",
+      "rows": [
+        [
+          {
+            "text": "1. Cha ruột",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Họ và tên:",
+            "placeholder": "{{profile.full_name}}"
+          },
+          {
+            "text": "=> Bổ sung ghi theo giấy khai sinh ",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Năm sinh:",
+            "placeholder": null
+          },
+          {
+            "text": "VD: 1960",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Nơi sinh:",
+            "placeholder": "{{profile.birth_place_detail}}"
+          },
+          {
+            "text": "(nơi đăng ký khai sinh, không ghi bệnh viện) => Bổ sung Xã/phường..., tỉnh/thành phố... (địa danh mới)",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Quê quán:",
+            "placeholder": "{{profile.hometown_detail}}"
+          },
+          {
+            "text": "Xã/phường..., tỉnh/thành phố... (địa danh mới)",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Dân tộc:",
+            "placeholder": "{{profile.ethnic_group.name}}"
+          },
+          {
+            "text": "=>Bổ sung Ghi tên dân tộc gốc của bản thân",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Tôn giáo:",
+            "placeholder": "{{profile.religion.name}}"
+          },
+          {
+            "text": "Ghi rõ tên tôn giáo và chức sắc (nếu có); không theo đạo ghi: Không",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Nơi cư trú:",
+            "placeholder": null
+          },
+          {
+            "text": "Số nhà, đường, ấp, xã, tỉnh (nếu đã mất – bỏ trống)",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Nghề nghiệp:",
+            "placeholder": "{{profile.occupation}}"
+          },
+          {
+            "text": "Ghi nghề hiện tại; nếu đã mất – bỏ trống",
+            "placeholder": null
+          }
+        ]
+      ]
+    },
+    {
+      "type": "paragraph",
+      "style": "BOLD",
+      "text": "Quá trình lịch sử bản thân:"
+    },
+    {
+      "type": "table_static",
+      "rows": [
+        [
+          {
+            "text": "Từ tháng/năm đến tháng/năm",
+            "placeholder": null
+          },
+          {
+            "text": "Làm gì, ở đâu (ghi rõ nơi sinh sống)",
+            "placeholder": null
+          },
+          {
+            "text": "Chức vụ",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "…/.. đến …/…",
+            "placeholder": null
+          },
+          {
+            "text": "=>Bổ sung còn nhỏ, sống với cha mẹ tại số nhà….., đường …..ấp…. xã…… tỉnh…  (ghi theo địa chỉ hiện nay)",
+            "placeholder": null
+          },
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "…/.. đến …/…",
+            "placeholder": null
+          },
+          {
+            "text": "=>Bổ sung Đi học cấp 1, 2, 3 tại xã……………, tỉnh.……….……….…….  (nếu cha mẹ còn trẻ thì nên tách ra từng giai đoạn học tập và khai rõ tên trường TH A, THCS B, THPT C)",
+            "placeholder": null
+          },
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "…/.. đến …/…",
+            "placeholder": null
+          },
+          {
+            "text": "=>Bổ sung Làm việc tại…………., địa chỉ ………….., sinh sống tại số nhà, đường, ấp, xã, tỉnh.",
+            "placeholder": null
+          },
+          {
+            "text": "=> Bổ sung ghi chức vụ nếu có",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "…/.. đến …/…",
+            "placeholder": null
+          },
+          {
+            "text": "=>Bổ sung Làm việc tại…………., địa chỉ ………….., sinh sống tại số nhà, đường, ấp, xã, tỉnh. Lập gia đình năm …. chuyển đến sinh sống tại số nhà, đường, ấp, xã, tỉnh",
+            "placeholder": null
+          },
+          {
+            "text": "=> Bổ sung ghi chức vụ nếu có",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "…/.. đến nay",
+            "placeholder": null
+          },
+          {
+            "text": "=>Bổ sung Làm việc tại…………., địa chỉ ………….., sinh sống tại số nhà, đường, ấp, xã, tỉnh.",
+            "placeholder": null
+          },
+          {
+            "text": "=> Bổ sung ghi chức vụ nếu có",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ]
+      ]
+    },
+    {
+      "type": "table_static",
+      "rows": [
+        [
+          {
+            "text": "2. Mẹ ruột",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Họ và tên:",
+            "placeholder": "{{profile.full_name}}"
+          },
+          {
+            "text": "=> Bổ sung ghi theo giấy khai sinh",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Năm sinh:",
+            "placeholder": null
+          },
+          {
+            "text": "VD: 1960",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Nơi sinh:",
+            "placeholder": "{{profile.birth_place_detail}}"
+          },
+          {
+            "text": "(nơi đăng ký khai sinh, không ghi bệnh viện) => Bổ sung Xã/phường..., tỉnh/thành phố... (địa danh mới)",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Quê quán:",
+            "placeholder": "{{profile.hometown_detail}}"
+          },
+          {
+            "text": "Xã/phường..., tỉnh/thành phố... (địa danh mới)",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Dân tộc:",
+            "placeholder": "{{profile.ethnic_group.name}}"
+          },
+          {
+            "text": "=>Bổ sung Ghi tên dân tộc gốc của bản thân",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Tôn giáo:",
+            "placeholder": "{{profile.religion.name}}"
+          },
+          {
+            "text": "Ghi rõ tên tôn giáo và chức sắc (nếu có); không theo đạo ghi: Không",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Nơi cư trú:",
+            "placeholder": null
+          },
+          {
+            "text": "Số nhà, đường, ấp, xã, tỉnh (nếu đã mất – bỏ trống)",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Nghề nghiệp:",
+            "placeholder": "{{profile.occupation}}"
+          },
+          {
+            "text": "Ghi nghề hiện tại; nếu đã mất – bỏ trống",
+            "placeholder": null
+          }
+        ]
+      ]
+    },
+    {
+      "type": "paragraph",
+      "style": "BOLD",
+      "text": "Quá trình lịch sử bản thân:"
+    },
+    {
+      "type": "table_static",
+      "rows": [
+        [
+          {
+            "text": "Từ tháng/năm đến tháng/năm",
+            "placeholder": null
+          },
+          {
+            "text": "Làm gì, ở đâu (ghi rõ nơi sinh sống)",
+            "placeholder": null
+          },
+          {
+            "text": "Chức vụ",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ]
+      ]
+    },
+    {
+      "type": "table_static",
+      "rows": [
+        [
+          {
+            "text": "3. Anh, chị, em ruột (kê khai từng người)",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Kê khai tất cả anh/chị/em ruột. Mỗi người ghi đủ các trường dưới đây (thêm dòng nếu cần).",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "3.1. Anh/Chị/Em ruột thứ 1",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Họ và tên:",
+            "placeholder": "{{profile.full_name}}"
+          },
+          {
+            "text": "=> Bổ sung ghi theo giấy khai sinh",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Năm sinh:",
+            "placeholder": null
+          },
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Nơi cư trú:",
+            "placeholder": null
+          },
+          {
+            "text": "Số nhà, đường, ấp, xã, tỉnh",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Nghề nghiệp hiện nay:",
+            "placeholder": "{{profile.occupation}}"
+          },
+          {
+            "text": "=>Bổ sung ghi rõ công việc đang làm: công nhân công ty, nhân viên công ty, giáo viên trường…..",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Là Đảng viên ĐCS Việt Nam:",
+            "placeholder": null
+          },
+          {
+            "text": "Vào Đảng năm .... , hiện sinh hoạt tại chi bộ ... , Đảng bộ ... (nếu có) => Bổ sung ghi rõ hiện đang sinh hoạt tại chi bộ … thuộc Đảng bộ…….",
+            "placeholder": null
+          }
+        ]
+      ]
+    },
+    {
+      "type": "table_static",
+      "rows": [
+        [
+          {
+            "text": "3.2. Anh/Chị/Em ruột thứ 2",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Họ và tên:",
+            "placeholder": "{{profile.full_name}}"
+          },
+          {
+            "text": "=> Bổ sung ghi theo giấy khai sinh",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Năm sinh:",
+            "placeholder": null
+          },
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Nơi cư trú:",
+            "placeholder": null
+          },
+          {
+            "text": "Số nhà, đường, ấp, xã, tỉnh",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Nghề nghiệp hiện nay:",
+            "placeholder": "{{profile.occupation}}"
+          },
+          {
+            "text": "=>Bổ sung ghi rõ công việc đang làm: công nhân công ty, nhân viên công ty, giáo viên trường…..",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Là Đảng viên ĐCS Việt Nam:",
+            "placeholder": null
+          },
+          {
+            "text": "Vào Đảng năm .... , hiện sinh hoạt tại chi bộ ... , Đảng bộ ... (nếu có) => Bổ sung ghi rõ hiện đang sinh hoạt tại chi bộ … thuộc Đảng bộ…….",
+            "placeholder": null
+          }
+        ]
+      ]
+    },
+    {
+      "type": "table_static",
+      "rows": [
+        [
+          {
+            "text": "3.3. Anh/Chị/Em ruột thứ 3",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Họ và tên:",
+            "placeholder": "{{profile.full_name}}"
+          },
+          {
+            "text": "=> Bổ sung ghi theo giấy khai sinh",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Năm sinh:",
+            "placeholder": null
+          },
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Nơi cư trú:",
+            "placeholder": null
+          },
+          {
+            "text": "Số nhà, đường, ấp, xã, tỉnh",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Nghề nghiệp hiện nay:",
+            "placeholder": "{{profile.occupation}}"
+          },
+          {
+            "text": "=>Bổ sung ghi rõ công việc đang làm: công nhân công ty, nhân viên công ty, giáo viên trường…..",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Là Đảng viên ĐCS Việt Nam:",
+            "placeholder": null
+          },
+          {
+            "text": "Vào Đảng năm .... , hiện sinh hoạt tại chi bộ ... , Đảng bộ ... (nếu có) => Bổ sung ghi rõ hiện đang sinh hoạt tại chi bộ … thuộc Đảng bộ…….",
+            "placeholder": null
+          }
+        ]
+      ]
+    },
+    {
+      "type": "paragraph",
+      "style": "BOLD",
+      "text": "=> bổ sung ghi chú:"
+    },
+    {
+      "type": "paragraph",
+      "style": "BOLD",
+      "text": "- Đối với ông bà nội, ngoại 2 bên: nếu tính đến năm 1975 ông bà đã trên 18 tuổi thì khai theo 2 giai đoạn từ khi sinh ra đến 1975 và từ 1975 đến nay: làm những công việc gì, sinh sống tại đâu (nếu quá trình đơn giản, còn nếu ông bà có quá trình công tác cụ thể hơn thì khai cụ thể); nếu ông bà tính đến năm 1975 dưới 18 tuổi thì xem chọn mốc thời gian phù hợp để khai ví dụ như lấy mốc thời gian lập gia đình,….."
+    },
+    {
+      "type": "table_dynamic",
+      "source": "work_history",
+      "header": [
+        "4. Ông nội"
+      ],
+      "mapping": [
+        [
+          "4. Ông nội",
+          "4._ông_nội"
+        ]
+      ]
+    },
+    {
+      "type": "paragraph",
+      "style": "BOLD",
+      "text": "Quá trình lịch sử bản thân:"
+    },
+    {
+      "type": "table_static",
+      "rows": [
+        [
+          {
+            "text": "Từ tháng/năm đến tháng/năm",
+            "placeholder": null
+          },
+          {
+            "text": "Làm gì, ở đâu (ghi rõ nơi sinh sống)",
+            "placeholder": null
+          },
+          {
+            "text": "Chức vụ",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ]
+      ]
+    },
+    {
+      "type": "table_static",
+      "rows": [
+        [
+          {
+            "text": "5. Bà nội",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Họ và tên:",
+            "placeholder": "{{profile.full_name}}"
+          },
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Năm sinh:",
+            "placeholder": null
+          },
+          {
+            "text": "VD: 1960",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Quê quán:",
+            "placeholder": "{{profile.hometown_detail}}"
+          },
+          {
+            "text": "Xã/phường..., tỉnh/thành phố... (địa danh mới)",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Dân tộc:",
+            "placeholder": "{{profile.ethnic_group.name}}"
+          },
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Tôn giáo:",
+            "placeholder": "{{profile.religion.name}}"
+          },
+          {
+            "text": "Ghi rõ tên tôn giáo và chức sắc (nếu có); không theo đạo ghi: Không",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Nơi cư trú:",
+            "placeholder": null
+          },
+          {
+            "text": "Số nhà, đường, ấp, xã, tỉnh (nếu đã mất – bỏ trống)",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Nghề nghiệp:",
+            "placeholder": "{{profile.occupation}}"
+          },
+          {
+            "text": "Ghi nghề hiện tại; nếu đã mất – bỏ trống",
+            "placeholder": null
+          }
+        ]
+      ]
+    },
+    {
+      "type": "paragraph",
+      "style": "BOLD",
+      "text": "Quá trình lịch sử bản thân:"
+    },
+    {
+      "type": "table_static",
+      "rows": [
+        [
+          {
+            "text": "Từ tháng/năm đến tháng/năm",
+            "placeholder": null
+          },
+          {
+            "text": "Làm gì, ở đâu (ghi rõ nơi sinh sống)",
+            "placeholder": null
+          },
+          {
+            "text": "Chức vụ",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ]
+      ]
+    },
+    {
+      "type": "table_static",
+      "rows": [
+        [
+          {
+            "text": "6. Ông ngoại",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Họ và tên:",
+            "placeholder": "{{profile.full_name}}"
+          },
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Năm sinh:",
+            "placeholder": null
+          },
+          {
+            "text": "VD: 1960",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Quê quán:",
+            "placeholder": "{{profile.hometown_detail}}"
+          },
+          {
+            "text": "Xã/phường..., tỉnh/thành phố... (địa danh mới)",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Dân tộc:",
+            "placeholder": "{{profile.ethnic_group.name}}"
+          },
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Tôn giáo:",
+            "placeholder": "{{profile.religion.name}}"
+          },
+          {
+            "text": "Ghi rõ tên tôn giáo và chức sắc (nếu có); không theo đạo ghi: Không",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Nơi cư trú:",
+            "placeholder": null
+          },
+          {
+            "text": "Số nhà, đường, ấp, xã, tỉnh (nếu đã mất – bỏ trống)",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Nghề nghiệp:",
+            "placeholder": "{{profile.occupation}}"
+          },
+          {
+            "text": "Ghi nghề hiện tại; nếu đã mất – bỏ trống",
+            "placeholder": null
+          }
+        ]
+      ]
+    },
+    {
+      "type": "paragraph",
+      "style": "BOLD",
+      "text": "Quá trình lịch sử bản thân:"
+    },
+    {
+      "type": "table_static",
+      "rows": [
+        [
+          {
+            "text": "Từ tháng/năm đến tháng/năm",
+            "placeholder": null
+          },
+          {
+            "text": "Làm gì, ở đâu (ghi rõ nơi sinh sống)",
+            "placeholder": null
+          },
+          {
+            "text": "Chức vụ",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ]
+      ]
+    },
+    {
+      "type": "table_static",
+      "rows": [
+        [
+          {
+            "text": "7. Bà ngoại",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Họ và tên:",
+            "placeholder": "{{profile.full_name}}"
+          },
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Năm sinh:",
+            "placeholder": null
+          },
+          {
+            "text": "VD: 1960",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Quê quán:",
+            "placeholder": "{{profile.hometown_detail}}"
+          },
+          {
+            "text": "Xã/phường..., tỉnh/thành phố... (địa danh mới)",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Dân tộc:",
+            "placeholder": "{{profile.ethnic_group.name}}"
+          },
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Tôn giáo:",
+            "placeholder": "{{profile.religion.name}}"
+          },
+          {
+            "text": "Ghi rõ tên tôn giáo và chức sắc (nếu có); không theo đạo ghi: Không",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Nơi cư trú:",
+            "placeholder": null
+          },
+          {
+            "text": "Số nhà, đường, ấp, xã, tỉnh (nếu đã mất – bỏ trống)",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Nghề nghiệp:",
+            "placeholder": "{{profile.occupation}}"
+          },
+          {
+            "text": "Ghi nghề hiện tại; nếu đã mất – bỏ trống",
+            "placeholder": null
+          }
+        ]
+      ]
+    },
+    {
+      "type": "paragraph",
+      "style": "BOLD",
+      "text": "Quá trình lịch sử bản thân:"
+    },
+    {
+      "type": "table_static",
+      "rows": [
+        [
+          {
+            "text": "Từ tháng/năm đến tháng/năm",
+            "placeholder": null
+          },
+          {
+            "text": "Làm gì, ở đâu (ghi rõ nơi sinh sống)",
+            "placeholder": null
+          },
+          {
+            "text": "Chức vụ",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ]
+      ]
+    },
+    {
+      "type": "table_static",
+      "rows": [
+        [
+          {
+            "text": "Mục 8–10: Chỉ kê khai nếu đã lập gia đình. Nếu đã ly hôn: chỉ khai họ tên, năm sinh, năm lập gia đình, năm ly hôn + quyết định; không cần khai cha mẹ và ông bà bên chồng/vợ.",
+            "placeholder": null
+          }
+        ]
+      ]
+    },
+    {
+      "type": "table_static",
+      "rows": [
+        [
+          {
+            "text": "8. Cha chồng (vợ)",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Họ và tên:",
+            "placeholder": "{{profile.full_name}}"
+          },
+          {
+            "text": "=> Bổ sung ghi theo giấy khai sinh",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Năm sinh:",
+            "placeholder": null
+          },
+          {
+            "text": "VD: 1960",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Nơi sinh:",
+            "placeholder": "{{profile.birth_place_detail}}"
+          },
+          {
+            "text": "(nơi đăng ký khai sinh, không ghi bệnh viện) => Bổ sung Xã/phường..., tỉnh/thành phố... (địa danh mới)",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Quê quán:",
+            "placeholder": "{{profile.hometown_detail}}"
+          },
+          {
+            "text": "Xã/phường..., tỉnh/thành phố... (địa danh mới)",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Dân tộc:",
+            "placeholder": "{{profile.ethnic_group.name}}"
+          },
+          {
+            "text": "=>Bổ sung Ghi tên dân tộc gốc của bản thân",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Tôn giáo:",
+            "placeholder": "{{profile.religion.name}}"
+          },
+          {
+            "text": "Ghi rõ tên tôn giáo và chức sắc (nếu có); không theo đạo ghi: Không",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Nơi cư trú:",
+            "placeholder": null
+          },
+          {
+            "text": "Số nhà, đường, ấp, xã, tỉnh (nếu đã mất – bỏ trống)",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Nghề nghiệp:",
+            "placeholder": "{{profile.occupation}}"
+          },
+          {
+            "text": "=> Bổ sung ghi theo giấy khai sinh",
+            "placeholder": null
+          }
+        ]
+      ]
+    },
+    {
+      "type": "paragraph",
+      "style": "BOLD",
+      "text": "Quá trình lịch sử bản thân:"
+    },
+    {
+      "type": "table_static",
+      "rows": [
+        [
+          {
+            "text": "Từ tháng/năm đến tháng/năm",
+            "placeholder": null
+          },
+          {
+            "text": "Làm gì, ở đâu (ghi rõ nơi sinh sống)",
+            "placeholder": null
+          },
+          {
+            "text": "Chức vụ",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ]
+      ]
+    },
+    {
+      "type": "table_static",
+      "rows": [
+        [
+          {
+            "text": "9. Mẹ chồng (vợ)",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Họ và tên:",
+            "placeholder": "{{profile.full_name}}"
+          },
+          {
+            "text": "=> Bổ sung ghi theo giấy khai sinh",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Năm sinh:",
+            "placeholder": null
+          },
+          {
+            "text": "VD: 1960",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Nơi sinh:",
+            "placeholder": "{{profile.birth_place_detail}}"
+          },
+          {
+            "text": "(nơi đăng ký khai sinh, không ghi bệnh viện) => Bổ sung Xã/phường..., tỉnh/thành phố... (địa danh mới)",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Quê quán:",
+            "placeholder": "{{profile.hometown_detail}}"
+          },
+          {
+            "text": "Xã/phường..., tỉnh/thành phố... (địa danh mới)",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Dân tộc:",
+            "placeholder": "{{profile.ethnic_group.name}}"
+          },
+          {
+            "text": "=>Bổ sung Ghi tên dân tộc gốc của bản thân",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Tôn giáo:",
+            "placeholder": "{{profile.religion.name}}"
+          },
+          {
+            "text": "Ghi rõ tên tôn giáo và chức sắc (nếu có); không theo đạo ghi: Không",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Nơi cư trú:",
+            "placeholder": null
+          },
+          {
+            "text": "Số nhà, đường, ấp, xã, tỉnh (nếu đã mất – bỏ trống)",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Nghề nghiệp:",
+            "placeholder": "{{profile.occupation}}"
+          },
+          {
+            "text": "=> Bổ sung ghi theo giấy khai sinh",
+            "placeholder": null
+          }
+        ]
+      ]
+    },
+    {
+      "type": "paragraph",
+      "style": "BOLD",
+      "text": "Quá trình lịch sử bản thân:"
+    },
+    {
+      "type": "table_static",
+      "rows": [
+        [
+          {
+            "text": "Từ tháng/năm đến tháng/năm",
+            "placeholder": null
+          },
+          {
+            "text": "Làm gì, ở đâu (ghi rõ nơi sinh sống)",
+            "placeholder": null
+          },
+          {
+            "text": "Chức vụ",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ]
+      ]
+    },
+    {
+      "type": "table_static",
+      "rows": [
+        [
+          {
+            "text": "10. Chồng / Vợ",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Họ và tên:",
+            "placeholder": "{{profile.full_name}}"
+          },
+          {
+            "text": "=> Bổ sung ghi theo giấy khai sinh",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Năm sinh:",
+            "placeholder": null
+          },
+          {
+            "text": "VD: 1960",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Nơi sinh:",
+            "placeholder": "{{profile.birth_place_detail}}"
+          },
+          {
+            "text": "(nơi đăng ký khai sinh, không ghi bệnh viện) => Bổ sung Xã/phường..., tỉnh/thành phố... (địa danh mới)",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Quê quán:",
+            "placeholder": "{{profile.hometown_detail}}"
+          },
+          {
+            "text": "Xã/phường..., tỉnh/thành phố... (địa danh mới)",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Dân tộc:",
+            "placeholder": "{{profile.ethnic_group.name}}"
+          },
+          {
+            "text": "=>Bổ sung Ghi tên dân tộc gốc của bản thân",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Tôn giáo:",
+            "placeholder": "{{profile.religion.name}}"
+          },
+          {
+            "text": "Ghi rõ tên tôn giáo và chức sắc (nếu có); không theo đạo ghi: Không",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Nơi cư trú:",
+            "placeholder": null
+          },
+          {
+            "text": "Số nhà, đường, ấp, xã, tỉnh (nếu đã mất – bỏ trống)",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Nghề nghiệp:",
+            "placeholder": "{{profile.occupation}}"
+          },
+          {
+            "text": "=> Bổ sung ghi theo giấy khai sinh",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Ngày lập gia đình:",
+            "placeholder": null
+          },
+          {
+            "text": "DD/MM/YYYY – Phải khớp với kê khai trong lịch sử bản thân => Bỏ dòng ngày không khai ở đây ",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Ly hôn (nếu có):",
+            "placeholder": null
+          },
+          {
+            "text": "Năm ly hôn – theo Quyết định số ... của cấp ... => Bỏ dòng ngày không khai ở đây",
+            "placeholder": null
+          }
+        ]
+      ]
+    },
+    {
+      "type": "paragraph",
+      "style": "BOLD",
+      "text": "Quá trình lịch sử của chồng/vợ (đảm bảo liên tục): => cách khai như cách khai của chồng (vợ)"
+    },
+    {
+      "type": "table_static",
+      "rows": [
+        [
+          {
+            "text": "Từ tháng/năm đến tháng/năm",
+            "placeholder": null
+          },
+          {
+            "text": "Làm gì, ở đâu (ghi rõ nơi sinh sống)",
+            "placeholder": null
+          },
+          {
+            "text": "Chức vụ",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ]
+      ]
+    },
+    {
+      "type": "table_static",
+      "rows": [
+        [
+          {
+            "text": "11–12. Con ruột (kê khai từng con)",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Con dưới 6 tuổi: ghi 'Hiện nay còn nhỏ'. Con đang đi học: ghi tên trường. Con trên 18 tuổi: kê khai đầy đủ như bản thân (thêm lịch sử bản thân).",
+            "placeholder": null
+          }
+        ]
+      ]
+    },
+    {
+      "type": "paragraph",
+      "style": "BOLD",
+      "text": "Con thứ 1:"
+    },
+    {
+      "type": "table_static",
+      "rows": [
+        [
+          {
+            "text": "Họ và tên:",
+            "placeholder": "{{profile.full_name}}"
+          },
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Năm sinh:",
+            "placeholder": null
+          },
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Nơi ở hiện nay:",
+            "placeholder": "{{profile.current_address}}"
+          },
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Hiện là:",
+            "placeholder": null
+          },
+          {
+            "text": "Còn nhỏ / Học sinh trường ... / Sinh viên ... / Nghề nghiệp ...",
+            "placeholder": null
+          }
+        ]
+      ]
+    },
+    {
+      "type": "paragraph",
+      "style": "BOLD",
+      "text": "Con thứ 2:"
+    },
+    {
+      "type": "table_static",
+      "rows": [
+        [
+          {
+            "text": "Họ và tên:",
+            "placeholder": "{{profile.full_name}}"
+          },
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Năm sinh:",
+            "placeholder": null
+          },
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Nơi ở hiện nay:",
+            "placeholder": "{{profile.current_address}}"
+          },
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Hiện là:",
+            "placeholder": null
+          },
+          {
+            "text": "Còn nhỏ / Học sinh trường ... / Sinh viên ... / Nghề nghiệp ...",
+            "placeholder": null
+          }
+        ]
+      ]
+    },
+    {
+      "type": "table_static",
+      "rows": [
+        [
+          {
+            "text": "13. Anh, chị, em chồng (vợ)",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "13.1. Anh/Chị/Em chồng (vợ) thứ 1",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Họ và tên:",
+            "placeholder": "{{profile.full_name}}"
+          },
+          {
+            "text": "=> Bổ sung ghi theo giấy khai sinh",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Năm sinh:",
+            "placeholder": null
+          },
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Nơi cư trú:",
+            "placeholder": null
+          },
+          {
+            "text": "Số nhà, đường, ấp, xã, tỉnh",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Nghề nghiệp hiện nay:",
+            "placeholder": "{{profile.occupation}}"
+          },
+          {
+            "text": "=>Bổ sung ghi rõ công việc đang làm: công nhân công ty, nhân viên công ty, giáo viên trường…..",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Là Đảng viên ĐCS Việt Nam:",
+            "placeholder": null
+          },
+          {
+            "text": "Vào Đảng năm .... , hiện sinh hoạt tại chi bộ ... , Đảng bộ ... (nếu có) => Bổ sung ghi rõ hiện đang sinh hoạt tại chi bộ … thuộc Đảng bộ…….",
+            "placeholder": null
+          }
+        ]
+      ]
+    },
+    {
+      "type": "table_static",
+      "rows": [
+        [
+          {
+            "text": "13.2. Anh/Chị/Em chồng (vợ) thứ 2",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Họ và tên:",
+            "placeholder": "{{profile.full_name}}"
+          },
+          {
+            "text": "=> Bổ sung ghi theo giấy khai sinh",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Năm sinh:",
+            "placeholder": null
+          },
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Nơi cư trú:",
+            "placeholder": null
+          },
+          {
+            "text": "Số nhà, đường, ấp, xã, tỉnh",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Nghề nghiệp hiện nay:",
+            "placeholder": "{{profile.occupation}}"
+          },
+          {
+            "text": "=>Bổ sung ghi rõ công việc đang làm: công nhân công ty, nhân viên công ty, giáo viên trường…..",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Là Đảng viên ĐCS Việt Nam:",
+            "placeholder": null
+          },
+          {
+            "text": "Vào Đảng năm .... , hiện sinh hoạt tại chi bộ ... , Đảng bộ ... (nếu có) => Bổ sung ghi rõ hiện đang sinh hoạt tại chi bộ … thuộc Đảng bộ…….",
+            "placeholder": null
+          }
+        ]
+      ]
+    },
+    {
+      "type": "table_static",
+      "rows": [
+        [
+          {
+            "text": "14. Ông nội chồng (vợ)",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Họ và tên:",
+            "placeholder": "{{profile.full_name}}"
+          },
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Năm sinh:",
+            "placeholder": null
+          },
+          {
+            "text": "VD: 1960",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Quê quán:",
+            "placeholder": "{{profile.hometown_detail}}"
+          },
+          {
+            "text": "Xã/phường..., tỉnh/thành phố... (địa danh mới)",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Dân tộc:",
+            "placeholder": "{{profile.ethnic_group.name}}"
+          },
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Tôn giáo:",
+            "placeholder": "{{profile.religion.name}}"
+          },
+          {
+            "text": "Ghi rõ tên tôn giáo và chức sắc (nếu có); không theo đạo ghi: Không",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Nơi cư trú:",
+            "placeholder": null
+          },
+          {
+            "text": "Số nhà, đường, ấp, xã, tỉnh (nếu đã mất – bỏ trống)",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Nghề nghiệp:",
+            "placeholder": "{{profile.occupation}}"
+          },
+          {
+            "text": "Ghi nghề hiện tại; nếu đã mất – bỏ trống",
+            "placeholder": null
+          }
+        ]
+      ]
+    },
+    {
+      "type": "paragraph",
+      "style": "BOLD",
+      "text": "Quá trình lịch sử bản thân:"
+    },
+    {
+      "type": "table_static",
+      "rows": [
+        [
+          {
+            "text": "Từ tháng/năm đến tháng/năm",
+            "placeholder": null
+          },
+          {
+            "text": "Làm gì, ở đâu (ghi rõ nơi sinh sống)",
+            "placeholder": null
+          },
+          {
+            "text": "Chức vụ",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ]
+      ]
+    },
+    {
+      "type": "table_static",
+      "rows": [
+        [
+          {
+            "text": "15. Bà nội chồng (vợ)",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Họ và tên:",
+            "placeholder": "{{profile.full_name}}"
+          },
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Năm sinh:",
+            "placeholder": null
+          },
+          {
+            "text": "VD: 1960",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Quê quán:",
+            "placeholder": "{{profile.hometown_detail}}"
+          },
+          {
+            "text": "Xã/phường..., tỉnh/thành phố... (địa danh mới)",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Dân tộc:",
+            "placeholder": "{{profile.ethnic_group.name}}"
+          },
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Tôn giáo:",
+            "placeholder": "{{profile.religion.name}}"
+          },
+          {
+            "text": "Ghi rõ tên tôn giáo và chức sắc (nếu có); không theo đạo ghi: Không",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Nơi cư trú:",
+            "placeholder": null
+          },
+          {
+            "text": "Số nhà, đường, ấp, xã, tỉnh (nếu đã mất – bỏ trống)",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Nghề nghiệp:",
+            "placeholder": "{{profile.occupation}}"
+          },
+          {
+            "text": "Ghi nghề hiện tại; nếu đã mất – bỏ trống",
+            "placeholder": null
+          }
+        ]
+      ]
+    },
+    {
+      "type": "paragraph",
+      "style": "BOLD",
+      "text": "Quá trình lịch sử bản thân:"
+    },
+    {
+      "type": "table_static",
+      "rows": [
+        [
+          {
+            "text": "Từ tháng/năm đến tháng/năm",
+            "placeholder": null
+          },
+          {
+            "text": "Làm gì, ở đâu (ghi rõ nơi sinh sống)",
+            "placeholder": null
+          },
+          {
+            "text": "Chức vụ",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ]
+      ]
+    },
+    {
+      "type": "table_static",
+      "rows": [
+        [
+          {
+            "text": "16. Ông ngoại chồng (vợ)",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Họ và tên:",
+            "placeholder": "{{profile.full_name}}"
+          },
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Năm sinh:",
+            "placeholder": null
+          },
+          {
+            "text": "VD: 1960",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Quê quán:",
+            "placeholder": "{{profile.hometown_detail}}"
+          },
+          {
+            "text": "Xã/phường..., tỉnh/thành phố... (địa danh mới)",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Dân tộc:",
+            "placeholder": "{{profile.ethnic_group.name}}"
+          },
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Tôn giáo:",
+            "placeholder": "{{profile.religion.name}}"
+          },
+          {
+            "text": "Ghi rõ tên tôn giáo và chức sắc (nếu có); không theo đạo ghi: Không",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Nơi cư trú:",
+            "placeholder": null
+          },
+          {
+            "text": "Số nhà, đường, ấp, xã, tỉnh (nếu đã mất – bỏ trống)",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Nghề nghiệp:",
+            "placeholder": "{{profile.occupation}}"
+          },
+          {
+            "text": "Ghi nghề hiện tại; nếu đã mất – bỏ trống",
+            "placeholder": null
+          }
+        ]
+      ]
+    },
+    {
+      "type": "paragraph",
+      "style": "BOLD",
+      "text": "Quá trình lịch sử bản thân:"
+    },
+    {
+      "type": "table_static",
+      "rows": [
+        [
+          {
+            "text": "Từ tháng/năm đến tháng/năm",
+            "placeholder": null
+          },
+          {
+            "text": "Làm gì, ở đâu (ghi rõ nơi sinh sống)",
+            "placeholder": null
+          },
+          {
+            "text": "Chức vụ",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ]
+      ]
+    },
+    {
+      "type": "table_static",
+      "rows": [
+        [
+          {
+            "text": "17. Bà ngoại chồng (vợ)",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Họ và tên:",
+            "placeholder": "{{profile.full_name}}"
+          },
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Năm sinh:",
+            "placeholder": null
+          },
+          {
+            "text": "VD: 1960",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Quê quán:",
+            "placeholder": "{{profile.hometown_detail}}"
+          },
+          {
+            "text": "Xã/phường..., tỉnh/thành phố... (địa danh mới)",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Dân tộc:",
+            "placeholder": "{{profile.ethnic_group.name}}"
+          },
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Tôn giáo:",
+            "placeholder": "{{profile.religion.name}}"
+          },
+          {
+            "text": "Ghi rõ tên tôn giáo và chức sắc (nếu có); không theo đạo ghi: Không",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Nơi cư trú:",
+            "placeholder": null
+          },
+          {
+            "text": "Số nhà, đường, ấp, xã, tỉnh (nếu đã mất – bỏ trống)",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "Nghề nghiệp:",
+            "placeholder": "{{profile.occupation}}"
+          },
+          {
+            "text": "Ghi nghề hiện tại; nếu đã mất – bỏ trống",
+            "placeholder": null
+          }
+        ]
+      ]
+    },
+    {
+      "type": "paragraph",
+      "style": "BOLD",
+      "text": "Quá trình lịch sử bản thân:"
+    },
+    {
+      "type": "table_static",
+      "rows": [
+        [
+          {
+            "text": "Từ tháng/năm đến tháng/năm",
+            "placeholder": null
+          },
+          {
+            "text": "Làm gì, ở đâu (ghi rõ nơi sinh sống)",
+            "placeholder": null
+          },
+          {
+            "text": "Chức vụ",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ]
+      ]
+    },
+    {
+      "type": "table_static",
+      "rows": [
+        [
+          {
+            "text": "PHẦN J – TỰ NHẬN XÉT",
+            "placeholder": null
+          }
+        ]
+      ]
+    },
+    {
+      "type": "table_static",
+      "rows": [
+        [
+          {
+            "text": "Ghi những ưu điểm, khuyết điểm chính về: phẩm chất chính trị, đạo đức lối sống, năng lực công tác và quan hệ quần chúng. Tối thiểu 200 từ.",
+            "placeholder": null
+          }
+        ]
+      ]
+    },
+    {
+      "type": "table_static",
+      "rows": [
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ]
+      ]
+    },
+    {
+      "type": "table_static",
+      "rows": [
+        [
+          {
+            "text": "CAM ĐOAN VÀ KÝ TÊN",
+            "placeholder": null
+          }
+        ]
+      ]
+    },
+    {
+      "type": "table_static",
+      "rows": [
+        [
+          {
+            "text": "Tôi cam đoan đã khai đầy đủ, rõ ràng, trung thực và chịu trách nhiệm trước Đảng về những nội dung đã khai trong lý lịch.",
+            "placeholder": null
+          }
+        ]
+      ]
+    },
+    {
+      "type": "table_static",
+      "rows": [
+        [
+          {
+            "text": "",
+            "placeholder": "{{profile.full_name}}"
+          },
+          {
+            "text": "......., ngày .... tháng .... năm 20.....\nKý tên\n(Ghi họ và tên)",
+            "placeholder": null
+          }
+        ]
+      ]
+    },
+    {
+      "type": "table_static",
+      "rows": [
+        [
+          {
+            "text": "NHẬN XÉT CỦA CHI ỦY HOẶC CHI BỘ",
+            "placeholder": null
+          }
+        ]
+      ]
+    },
+    {
+      "type": "table_static",
+      "rows": [
+        [
+          {
+            "text": "Chi bộ chỉ ghi sau khi thẩm tra xác minh xong. KHÔNG ghi trước khi gửi đi xác minh. Chi bộ cơ sở trực thuộc Huyện ủy: KHÔNG ghi ở đây.",
+            "placeholder": null
+          }
+        ]
+      ]
+    },
+    {
+      "type": "table_static",
+      "rows": [
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ]
+      ]
+    },
+    {
+      "type": "table_static",
+      "rows": [
+        [
+          {
+            "text": "",
+            "placeholder": "{{profile.full_name}}"
+          },
+          {
+            "text": "......., ngày .... tháng .... năm 20.....\nBí thư Chi bộ\n(Ký, ghi họ và tên)",
+            "placeholder": null
+          }
+        ]
+      ]
+    },
+    {
+      "type": "table_static",
+      "rows": [
+        [
+          {
+            "text": "CHỨNG NHẬN CỦA CẤP ỦY CƠ SỞ",
+            "placeholder": null
+          }
+        ]
+      ]
+    },
+    {
+      "type": "table_static",
+      "rows": [
+        [
+          {
+            "text": "Đảng ủy/chi ủy cơ sở ghi sau khi thẩm tra xác minh xong. Chi bộ cơ sở trực thuộc Huyện ủy: GHI VÀO ĐÂY (không ghi phần Chi bộ nhận xét ở trên).",
+            "placeholder": null
+          }
+        ]
+      ]
+    },
+    {
+      "type": "table_static",
+      "rows": [
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ],
+        [
+          {
+            "text": "",
+            "placeholder": null
+          }
+        ]
+      ]
+    },
+    {
+      "type": "table_static",
+      "rows": [
+        [
+          {
+            "text": "",
+            "placeholder": "{{profile.full_name}}"
+          },
+          {
+            "text": "......., ngày .... tháng .... năm 20.....\nTM. Cấp ủy cơ sở / Bí thư\n(Ký, ghi họ và tên, đóng dấu)",
+            "placeholder": null
+          }
+        ]
+      ]
+    }
+  ],
+  "placeholders": {
+    "01. Họ và tên khai sinh (IN HOA)": "{{profile.full_name}}",
+    "02. Họ và tên thường dùng": "{{profile.full_name}}",
+    "03. Ngày sinh": "{{profile.dob}}",
+    "06. Quê quán": "{{profile.hometown_detail}}",
+    "08. Dân tộc": "{{profile.ethnic_group.name}}",
+    "10. Nghề nghiệp hiện nay": "{{profile.occupation}}",
+    "11g. Ngoại ngữ": "{{profile.foreign_languages}}",
+    "11h. Tin học": "{{profile.it_level}}",
+    "11i. Tiếng dân tộc thiểu số": "{{profile.ethnic_group.name}}",
+    "": "{{profile.full_name}}",
+    "Tên trường": "{{profile.edu_school}}",
+    "Họ và tên": "{{profile.full_name}}",
+    "Nơi sinh": "{{profile.birth_place_detail}}",
+    "Quê quán": "{{profile.hometown_detail}}",
+    "Dân tộc": "{{profile.ethnic_group.name}}",
+    "Tôn giáo": "{{profile.religion.name}}",
+    "Nghề nghiệp": "{{profile.occupation}}",
+    "Nghề nghiệp hiện nay": "{{profile.occupation}}",
+    "Nơi ở hiện nay": "{{profile.current_address}}"
+  },
+  "django_models": {
+    "profile": "apps.profiles.models.Profile",
+    "user": "apps.accounts.models.User",
+    "family_members": "apps.family.models.FamilyMember",
+    "work_history": "apps.timelines.models.WorkHistory",
+    "education_history": "apps.timelines.models.EducationHistory",
+    "awards": "apps.timelines.models.Award",
+    "overseas_travels": "apps.timelines.models.OverseasTravel",
+    "org_participations": "apps.timelines.models.OrgParticipation"
+  }
+}
