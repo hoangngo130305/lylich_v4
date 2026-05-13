@@ -167,14 +167,24 @@ class AccountRequestSerializer(serializers.ModelSerializer):
 
 class AccountRequestCreateSerializer(serializers.ModelSerializer):
     """Used by officers to create accounts for applicants."""
+
     class Meta:
         model = AccountRequest
         fields = ['full_name', 'cccd', 'dob', 'phone', 'email',
-                  'officer_in_charge', 'notify_sms', 'notify_email', 'notify_zalo', 'notes']
+                  'officer_in_charge', 'notes']
+
+    def validate_email(self, value):
+        if not value:
+            raise serializers.ValidationError('Email Gmail là bắt buộc để gửi thông tin đăng nhập.')
+        return value
 
     def create(self, validated_data):
         validated_data['requested_by'] = self.context['request'].user
-        return super().create(validated_data)
+        validated_data['notify_email'] = True
+        validated_data['notify_sms'] = False
+        validated_data['notify_zalo'] = False
+        req = super().create(validated_data)
+        return req
 
 
 class LoginHistorySerializer(serializers.ModelSerializer):

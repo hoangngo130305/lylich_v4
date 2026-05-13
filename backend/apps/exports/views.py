@@ -39,7 +39,10 @@ class EditHistoryListView(generics.ListAPIView):
 # ── Correction Requests ───────────────────────────────────────────────────────
 
 class CorrectionRequestListCreateView(generics.ListCreateAPIView):
-    permission_classes = [IsOfficer]
+    def get_permissions(self):
+        if self.request.method == 'POST':
+            return [IsOfficer()]
+        return [IsOfficerOrApplicant()]
 
     def get_serializer_class(self):
         if self.request.method == 'POST':
@@ -48,6 +51,9 @@ class CorrectionRequestListCreateView(generics.ListCreateAPIView):
 
     def get_queryset(self):
         qs = ProfileCorrectionRequest.objects.prefetch_related('items').select_related('created_by', 'resolved_by')
+        role_code = getattr(self.request.user, 'role_code', None)
+        if role_code not in ('admin', 'can_bo_bxd'):
+            qs = qs.filter(profile__user=self.request.user)
         profile_id = self.request.query_params.get('profile_id')
         if profile_id:
             qs = qs.filter(profile_id=profile_id)

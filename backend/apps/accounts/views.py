@@ -1,7 +1,11 @@
 import secrets
+import string
+from django.conf import settings
+from django.core.mail import send_mail
 from django.utils import timezone
 from django.db import transaction
 from rest_framework import generics, status, permissions
+from rest_framework.exceptions import ValidationError
 from rest_framework.decorators import api_view, permission_classes, throttle_classes
 from rest_framework.response import Response
 from rest_framework.throttling import AnonRateThrottle
@@ -165,7 +169,7 @@ class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
     def destroy(self, request, *args, **kwargs):
         user = self.get_object()
         user.soft_delete()
-        log_activity(request.user, 'user_delete', target_type='User', target_id=user.id)
+        log_activity(request.user, 'user_delete', target_model='User', target_id=user.id)
         return Response({'success': True, 'message': 'Tài khoản đã bị vô hiệu hóa.'})
 
 
@@ -184,43 +188,74 @@ class AccountRequestListView(generics.ListCreateAPIView):
             'requested_by', 'officer_in_charge', 'created_user'
         ).order_by('-created_at')
 
+    def _generate_initial_password(self, length=12):
+        alphabet = string.ascii_letters + string.digits + '@#$%'
+        return ''.join(secrets.choice(alphabet) for _ in range(length))
+
+    def _send_account_email(self, request_obj, raw_password):
+        if not request_obj.email:
+            raise ValueError('Thiếu email người nhận để gửi thông tin tài khoản.')
+        if not settings.EMAIL_HOST_USER or not settings.EMAIL_HOST_PASSWORD:
+            raise ValueError('SMTP chưa được cấu hình đầy đủ (thiếu EMAIL_HOST_USER/EMAIL_HOST_PASSWORD).')
+
+        subject = 'Tài khoản kê khai lý lịch đã được cấp'
+        body = (
+            f"Kính gửi {request_obj.full_name},\n\n"
+            "Tài khoản kê khai lý lịch của bạn đã được tạo thành công.\n"
+            f"Số điện thoại đăng nhập: {request_obj.phone}\n"
+            f"Mật khẩu khởi tạo: {raw_password}\n\n"
+            "Vui lòng đăng nhập và đổi mật khẩu ngay sau lần đăng nhập đầu tiên.\n"
+            "Trân trọng."
+        )
+        from_email = settings.DEFAULT_FROM_EMAIL or settings.EMAIL_HOST_USER
+        send_mail(
+            subject,
+            body,
+            from_email,
+            [request_obj.email],
+            fail_silently=False,
+        )
+
     @transaction.atomic
     def perform_create(self, serializer):
         req = serializer.save()
-        # Auto-create user account
-        with transaction.atomic():
-            try:
-                role, _ = Role.objects.get_or_create(
-                    code='quan_chung',
-                    defaults={'name': 'Quần chúng xin vào Đảng'}
-                )
-                import random
-                temp_password = f'LyLich@{random.randint(100000,999999)}'
-                user = User.objects.create_user(
-                    phone=req.phone,
-                    password=temp_password,
-                    full_name=req.full_name,
-                    cccd=req.cccd,
-                    email=req.email,
-                    role=role,
-                    status=User.Status.ACTIVE,
-                    phone_verified=True,
-                    created_by=self.request.user,
-                )
-                req.created_user = user
-                req.status = AccountRequest.Status.CREATED
-                req.processed_at = timezone.now()
-                req.save(update_fields=['created_user', 'status', 'processed_at'])
+        try:
+            role, _ = Role.objects.get_or_create(
+                code='quan_chung',
+                defaults={'name': 'Quần chúng xin vào Đảng'}
+            )
+            initial_password = self._generate_initial_password()
+            user = User.objects.create_user(
+                phone=req.phone,
+                password=initial_password,
+                full_name=req.full_name,
+                cccd=req.cccd,
+                email=req.email,
+                role=role,
+                status=User.Status.ACTIVE,
+                phone_verified=True,
+                created_by=self.request.user,
+            )
 
-                log_activity(
-                    self.request.user, 'account_create',
-                    target_type='User', target_id=user.id,
-                    description=f'Tạo tài khoản cho {req.full_name}'
-                )
-            except Exception as e:
-                req.status = AccountRequest.Status.FAILED
-                req.fail_reason = str(e)
-                req.save(update_fields=['status', 'fail_reason'])
+            self._send_account_email(req, initial_password)
+
+            req.created_user = user
+            req.status = AccountRequest.Status.CREATED
+            req.fail_reason = None
+            req.processed_at = timezone.now()
+            req.save(update_fields=['created_user', 'status', 'fail_reason', 'processed_at'])
+
+            log_activity(
+                self.request.user, 'account_create',
+                target_model='User', target_id=user.id,
+                description=f'Tạo tài khoản cho {req.full_name}'
+            )
+        except Exception as e:
+            req.status = AccountRequest.Status.FAILED
+            req.fail_reason = str(e)
+            req.processed_at = timezone.now()
+            req.save(update_fields=['status', 'fail_reason', 'processed_at'])
+            raise ValidationError({'detail': f'Tạo tài khoản thất bại: {e}'})
 
 
 class AccountRequestDetailView(generics.RetrieveUpdateAPIView):
@@ -255,7 +290,7 @@ def toggle_user_status(request, pk):
     user.save(update_fields=['status'])
     log_activity(
         request.user, 'user_status_change',
-        target_type='User', target_id=user.id,
+        target_model='User', target_id=user.id,
         description=f'Đổi trạng thái → {new_status}'
     )
     return Response({'success': True, 'data': UserDetailSerializer(user).data})

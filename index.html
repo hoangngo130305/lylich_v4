@@ -1449,6 +1449,345 @@
       }
 
       /* ══════════════════════════════
+   PROFILE VIEW PANEL (read-only)
+══════════════════════════════ */
+      #profileViewPanel {
+        display: none;
+        flex: 1;
+        flex-direction: column;
+        overflow-y: auto;
+      }
+      #profileViewPanel.active {
+        display: flex;
+      }
+      #memberMain main {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        min-height: 0;
+      }
+      .pv-status-banner {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 16px 28px;
+        border-bottom: 2px solid var(--border);
+        background: #fff;
+        flex-shrink: 0;
+      }
+      .pv-status-banner.s-submitted {
+        background: #eef4ff;
+        border-color: #93b4ff;
+      }
+      .pv-status-banner.s-pending {
+        background: #eef4ff;
+        border-color: #93b4ff;
+      }
+      .pv-status-banner.s-under_review {
+        background: #f3eeff;
+        border-color: #b98eff;
+      }
+      .pv-status-banner.s-returned {
+        background: #fef2f2;
+        border-color: #fca5a5;
+      }
+      .pv-status-banner.s-verifying {
+        background: #fffbeb;
+        border-color: #fcd34d;
+      }
+      .pv-status-banner.s-approved {
+        background: #ecfdf5;
+        border-color: #6ee7b7;
+      }
+      .pv-status-banner.s-completed {
+        background: #ecfdf5;
+        border-color: #059669;
+      }
+      .pv-status-banner.s-rejected {
+        background: #fef2f2;
+        border-color: #fca5a5;
+      }
+      .pv-status-icon {
+        font-size: 28px;
+        flex-shrink: 0;
+      }
+      .pv-status-text {
+        flex: 1;
+      }
+      .pv-status-title {
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--navy);
+      }
+      .pv-status-desc {
+        font-size: 12.5px;
+        color: var(--muted);
+        margin-top: 3px;
+      }
+      .pv-status-actions {
+        display: flex;
+        gap: 10px;
+        flex-shrink: 0;
+      }
+
+      .pv-body {
+        flex: 1;
+        overflow-y: auto;
+        padding: 24px 28px;
+        display: grid;
+        grid-template-columns: 1fr 340px;
+        gap: 22px;
+        align-items: start;
+      }
+      @media (max-width: 900px) {
+        .pv-body {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .pv-card {
+        background: #fff;
+        border: 1.5px solid var(--border);
+        border-radius: 12px;
+        overflow: hidden;
+        margin-bottom: 16px;
+      }
+      .pv-card-head {
+        padding: 12px 18px;
+        background: #f4f6f9;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .pv-card-title {
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--navy);
+      }
+      .pv-card-body {
+        padding: 16px 18px;
+      }
+
+      .pv-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px 20px;
+      }
+      .pv-field {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+      }
+      .pv-label {
+        font-size: 10.5px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+        color: var(--muted);
+      }
+      .pv-value {
+        font-size: 13px;
+        color: var(--text);
+        font-weight: 500;
+      }
+      .pv-value.empty {
+        color: var(--hint);
+        font-style: italic;
+        font-weight: 400;
+      }
+      .pv-full {
+        grid-column: 1/-1;
+      }
+
+      .pv-section-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 9px 0;
+        border-bottom: 1px solid var(--border);
+      }
+      .pv-section-row:last-child {
+        border-bottom: none;
+      }
+      .pv-sec-icon {
+        width: 28px;
+        height: 28px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: 700;
+        background: var(--navy);
+        color: #fff;
+        flex-shrink: 0;
+      }
+      .pv-sec-icon.ok {
+        background: #059669;
+      }
+      .pv-sec-icon.empty {
+        background: #cbd5e1;
+      }
+      .pv-sec-name {
+        flex: 1;
+        font-size: 12.5px;
+        font-weight: 600;
+        color: var(--navy);
+      }
+      .pv-sec-count {
+        font-size: 11px;
+        color: var(--muted);
+      }
+      .pv-sec-block {
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 10px 12px;
+        margin-bottom: 10px;
+        background: #fff;
+      }
+      .pv-sec-head {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 8px;
+      }
+      .pv-sec-badge {
+        width: 24px;
+        height: 24px;
+        border-radius: 7px;
+        background: var(--navy);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+        font-weight: 700;
+      }
+      .pv-sec-title {
+        font-size: 12.5px;
+        font-weight: 700;
+        color: var(--navy);
+      }
+      .pv-sec-list {
+        margin: 0;
+        padding-left: 18px;
+      }
+      .pv-sec-list li {
+        margin: 0 0 6px;
+        font-size: 12.5px;
+        color: var(--text);
+        line-height: 1.45;
+      }
+      .pv-sec-empty {
+        font-size: 12px;
+        color: var(--hint);
+        font-style: italic;
+      }
+
+      .pv-timeline {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+      }
+      .pv-tl-item {
+        display: flex;
+        gap: 12px;
+        padding-bottom: 18px;
+        position: relative;
+      }
+      .pv-tl-item:last-child {
+        padding-bottom: 0;
+      }
+      .pv-tl-item:not(:last-child)::before {
+        content: "";
+        position: absolute;
+        left: 14px;
+        top: 28px;
+        bottom: 0;
+        width: 2px;
+        background: var(--border);
+      }
+      .pv-tl-dot {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+        z-index: 1;
+      }
+      .pv-tl-dot.submit {
+        background: #dbeafe;
+      }
+      .pv-tl-dot.review {
+        background: #ede9fe;
+      }
+      .pv-tl-dot.approve {
+        background: #d1fae5;
+      }
+      .pv-tl-dot.return {
+        background: #fee2e2;
+      }
+      .pv-tl-dot.verify {
+        background: #fef9c3;
+      }
+      .pv-tl-dot.complete {
+        background: #d1fae5;
+      }
+      .pv-tl-dot.reject {
+        background: #fee2e2;
+      }
+      .pv-tl-dot.current {
+        background: var(--navy);
+        color: #fff;
+      }
+      .pv-tl-content {
+        flex: 1;
+      }
+      .pv-tl-action {
+        font-size: 12.5px;
+        font-weight: 700;
+        color: var(--navy);
+      }
+      .pv-tl-by {
+        font-size: 11.5px;
+        color: var(--muted);
+      }
+      .pv-tl-time {
+        font-size: 11px;
+        color: var(--hint);
+      }
+      .pv-tl-note {
+        font-size: 12px;
+        color: #7f1d1d;
+        background: #fef2f2;
+        padding: 6px 10px;
+        border-radius: 6px;
+        margin-top: 5px;
+      }
+
+      /* View mode sidebar */
+      .nav-group-form {
+        display: block;
+      }
+      .nav-group-view {
+        display: none;
+      }
+      #memberSideNav.viewmode .nav-group-form {
+        display: none;
+      }
+      #memberSideNav.viewmode .nav-group-view {
+        display: block;
+      }
+      .nav-item-view-active {
+        background: rgba(26, 56, 128, 0.06);
+        border-left: 3px solid var(--navy);
+      }
+
+      /* ══════════════════════════════
    GAP WARNING
 ══════════════════════════════ */
       .gap-warning {
@@ -4131,6 +4470,67 @@
         font-size: 12px;
         flex-shrink: 0;
       }
+      .section.has-correction {
+        border: 1.5px solid rgba(139, 0, 0, 0.22);
+        box-shadow: inset 0 0 0 1px rgba(139, 0, 0, 0.08);
+      }
+      .return-hero {
+        margin: 12px 0 14px;
+        border-radius: 12px;
+        border: 1px solid rgba(139, 0, 0, 0.2);
+        background: linear-gradient(135deg, #fff5f5 0%, #ffe8e8 100%);
+        box-shadow: 0 6px 16px rgba(139, 0, 0, 0.08);
+        overflow: hidden;
+      }
+      .return-hero-head {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 14px 10px;
+        background: rgba(139, 0, 0, 0.06);
+        border-bottom: 1px solid rgba(139, 0, 0, 0.1);
+      }
+      .return-hero-icon {
+        width: 28px;
+        height: 28px;
+        border-radius: 8px;
+        background: #fff;
+        border: 1px solid rgba(139, 0, 0, 0.15);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        color: var(--crimson);
+        flex-shrink: 0;
+      }
+      .return-hero-title {
+        font-size: 13.5px;
+        font-weight: 800;
+        color: #7a1515;
+      }
+      .return-hero-body {
+        padding: 12px 14px;
+      }
+      .return-hero-note {
+        font-size: 12.8px;
+        line-height: 1.55;
+        color: #7a1515;
+      }
+      .return-hero-sections {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-top: 10px;
+      }
+      .return-hero-chip {
+        font-size: 11px;
+        font-weight: 700;
+        padding: 3px 8px;
+        border-radius: 999px;
+        border: 1px solid rgba(139, 0, 0, 0.2);
+        background: #fff;
+        color: #8b0000;
+      }
 
       /* ── Correction request panel ── */
       .correction-request-panel {
@@ -4446,9 +4846,9 @@
         <div class="sidebar-user">
           <div class="sidebar-user-label">Đang đăng nhập</div>
           <div class="sidebar-user-info">
-            <div class="sidebar-avatar">TH</div>
+            <div class="sidebar-avatar">CB</div>
             <div>
-              <div class="sidebar-user-name">Trần Thị Hương</div>
+              <div class="sidebar-user-name">Cán bộ hệ thống</div>
               <div class="sidebar-user-role">Cán bộ Ban XD Đảng</div>
             </div>
           </div>
@@ -4461,7 +4861,8 @@
       </nav>
 
       <nav class="member-nav" id="memberSideNav">
-        <div class="nav-group">
+        <!-- ===== FORM MODE NAV (A–K) ===== -->
+        <div class="nav-group nav-group-form">
           <div class="nav-group-label">Thông tin cá nhân</div>
           <div class="nav-item active" data-section="secA">
             <div class="nav-icon">A</div>
@@ -4480,7 +4881,7 @@
             Đặc điểm lịch sử
           </div>
         </div>
-        <div class="nav-group">
+        <div class="nav-group nav-group-form">
           <div class="nav-group-label">Học vấn & Thành tích</div>
           <div class="nav-item" data-section="secE">
             <div class="nav-icon">E</div>
@@ -4499,7 +4900,7 @@
             Kỷ luật
           </div>
         </div>
-        <div class="nav-group">
+        <div class="nav-group nav-group-form">
           <div class="nav-group-label">Gia đình</div>
           <div class="nav-item" data-section="secI">
             <div class="nav-icon">I</div>
@@ -4507,7 +4908,7 @@
             <div class="nav-badge">17</div>
           </div>
         </div>
-        <div class="nav-group">
+        <div class="nav-group nav-group-form">
           <div class="nav-group-label">Hoàn thiện hồ sơ</div>
           <div class="nav-item" data-section="secJ">
             <div class="nav-icon">J</div>
@@ -4516,6 +4917,51 @@
           <div class="nav-item" data-section="secK">
             <div class="nav-icon">✓</div>
             Cam đoan & Nộp
+          </div>
+        </div>
+        <!-- ===== VIEW MODE NAV ===== -->
+        <div class="nav-group nav-group-view">
+          <div class="nav-group-label">Hồ sơ của tôi</div>
+          <div
+            class="nav-item nav-item-view-active"
+            onclick="
+              document
+                .getElementById('profileViewPanel')
+                .scrollTo({ top: 0, behavior: 'smooth' })
+            "
+          >
+            <div class="nav-icon">📄</div>
+            Thông tin hồ sơ
+          </div>
+          <div
+            class="nav-item"
+            onclick="
+              document
+                .getElementById('pvTimelineCard')
+                ?.scrollIntoView({ behavior: 'smooth' })
+            "
+          >
+            <div class="nav-icon">🕐</div>
+            Lịch sử xét duyệt
+          </div>
+        </div>
+        <div
+          class="sidebar-user"
+          id="memberSidebarUser"
+          style="margin-top: auto"
+        >
+          <div class="sidebar-user-label">Đang đăng nhập</div>
+          <div class="sidebar-user-info">
+            <div class="sidebar-avatar">TH</div>
+            <div>
+              <div class="sidebar-user-name">Người dùng</div>
+              <div class="sidebar-user-role">Quần chúng</div>
+            </div>
+          </div>
+          <div class="sidebar-user-actions">
+            <button class="sidebar-logout-btn" onclick="apiLogout()">
+              Đăng xuất
+            </button>
           </div>
         </div>
       </nav>
@@ -4579,6 +5025,74 @@
               AI Kiểm tra hồ sơ
             </button>
             <button class="btn btn-navy" onclick="saveDraft()">Lưu nháp</button>
+            <button
+              class="btn btn-ghost"
+              id="memberNotifBtn"
+              onclick="_toggleMemberNotif()"
+              style="position: relative; padding: 6px 10px; font-size: 16px"
+              title="Thông báo"
+            >
+              🔔<span
+                id="memberNotifBadge"
+                style="
+                  display: none;
+                  position: absolute;
+                  top: 2px;
+                  right: 2px;
+                  min-width: 16px;
+                  height: 16px;
+                  border-radius: 8px;
+                  background: var(--crimson);
+                  color: #fff;
+                  font-size: 9px;
+                  font-weight: 700;
+                  line-height: 16px;
+                  text-align: center;
+                  padding: 0 3px;
+                "
+              ></span>
+            </button>
+          </div>
+          <!-- Member notifications dropdown -->
+          <div
+            id="memberNotifDropdown"
+            style="
+              display: none;
+              position: fixed;
+              top: 56px;
+              right: 12px;
+              z-index: 1200;
+              width: 320px;
+              background: #fff;
+              border: 1px solid var(--border-l);
+              border-radius: var(--r-sm);
+              box-shadow: var(--s-md);
+              max-height: 400px;
+              overflow-y: auto;
+            "
+          >
+            <div
+              style="
+                padding: 10px 14px;
+                border-bottom: 1px solid var(--border-xl);
+                font-size: 12.5px;
+                font-weight: 700;
+                color: var(--navy);
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+              "
+            >
+              Thông báo của tôi
+              <button
+                class="btn btn-ghost"
+                style="font-size: 10.5px; padding: 2px 8px"
+                onclick="_markAllMemberNotifRead()"
+              >
+                Đọc tất cả
+              </button>
+            </div>
+            <div id="memberNotifList" style="font-size: 12.5px"></div>
           </div>
         </div>
 
@@ -6232,6 +6746,157 @@
       </main>
 
       <!-- ===== AI CHECK MODAL ===== -->
+      <!-- ===== PROFILE VIEW PANEL ===== -->
+      <div id="profileViewPanel">
+        <!-- Status banner -->
+        <div id="pvStatusBanner" class="pv-status-banner">
+          <div class="pv-status-icon" id="pvStatusIcon">📄</div>
+          <div class="pv-status-text">
+            <div class="pv-status-title" id="pvStatusTitle">Đang tải…</div>
+            <div class="pv-status-desc" id="pvStatusDesc"></div>
+          </div>
+          <div class="pv-status-actions" id="pvStatusActions"></div>
+        </div>
+
+        <div class="pv-body">
+          <!-- LEFT COLUMN: profile info -->
+          <div>
+            <!-- Returned reason card -->
+            <div
+              class="pv-card"
+              id="pvReturnCard"
+              style="display: none; border-color: #fca5a5"
+            >
+              <div class="pv-card-head" style="background: #fef2f2">
+                <span style="font-size: 16px">↩</span>
+                <span class="pv-card-title" style="color: #b91c1c"
+                  >Hồ sơ bị trả lại — cần bổ sung</span
+                >
+              </div>
+              <div class="pv-card-body">
+                <div
+                  id="pvReturnReason"
+                  style="font-size: 13px; color: #7f1d1d; margin-bottom: 14px"
+                ></div>
+                <button class="btn btn-primary" onclick="_switchToFormMode()">
+                  ✏ Chỉnh sửa và nộp lại
+                </button>
+              </div>
+            </div>
+
+            <!-- Section A: Basic info -->
+            <div class="pv-card">
+              <div class="pv-card-head">
+                <span style="font-size: 16px">👤</span>
+                <span class="pv-card-title">Phần A – Sơ lược lý lịch</span>
+              </div>
+              <div class="pv-card-body pv-grid">
+                <div class="pv-field pv-full">
+                  <div class="pv-label">Họ và tên</div>
+                  <div
+                    class="pv-value"
+                    id="pv-full_name"
+                    style="font-size: 16px; font-weight: 700"
+                  ></div>
+                </div>
+                <div class="pv-field">
+                  <div class="pv-label">Ngày sinh</div>
+                  <div class="pv-value" id="pv-dob"></div>
+                </div>
+                <div class="pv-field">
+                  <div class="pv-label">Giới tính</div>
+                  <div class="pv-value" id="pv-gender"></div>
+                </div>
+                <div class="pv-field pv-full">
+                  <div class="pv-label">Quê quán</div>
+                  <div class="pv-value" id="pv-hometown_detail"></div>
+                </div>
+                <div class="pv-field pv-full">
+                  <div class="pv-label">Nơi ở hiện nay</div>
+                  <div class="pv-value" id="pv-current_address"></div>
+                </div>
+                <div class="pv-field">
+                  <div class="pv-label">Nghề nghiệp</div>
+                  <div class="pv-value" id="pv-occupation"></div>
+                </div>
+                <div class="pv-field">
+                  <div class="pv-label">Chức vụ</div>
+                  <div class="pv-value" id="pv-job_title"></div>
+                </div>
+                <div class="pv-field pv-full">
+                  <div class="pv-label">Nơi công tác</div>
+                  <div class="pv-value" id="pv-workplace"></div>
+                </div>
+                <div class="pv-field">
+                  <div class="pv-label">Trình độ văn hoá</div>
+                  <div class="pv-value" id="pv-general_edu_level"></div>
+                </div>
+                <div class="pv-field">
+                  <div class="pv-label">Trình độ chuyên môn</div>
+                  <div class="pv-value" id="pv-edu_specialization"></div>
+                </div>
+                <div class="pv-field">
+                  <div class="pv-label">Trình độ lý luận</div>
+                  <div class="pv-value" id="pv-political_level_detail"></div>
+                </div>
+                <div class="pv-field">
+                  <div class="pv-label">Ngoại ngữ</div>
+                  <div class="pv-value" id="pv-foreign_languages"></div>
+                </div>
+                <div class="pv-field">
+                  <div class="pv-label">Ngày vào Đoàn</div>
+                  <div class="pv-value" id="pv-youth_union_date"></div>
+                </div>
+                <div class="pv-field">
+                  <div class="pv-label">Nơi vào Đoàn</div>
+                  <div class="pv-value" id="pv-youth_union_place"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Sections summary -->
+            <div class="pv-card">
+              <div class="pv-card-head">
+                <span style="font-size: 16px">📋</span>
+                <span class="pv-card-title">Tổng hợp các phần đã khai</span>
+              </div>
+              <div class="pv-card-body" id="pvSectionsSummary"></div>
+            </div>
+          </div>
+
+          <!-- RIGHT COLUMN: status & timeline -->
+          <div>
+            <!-- Workflow progress -->
+            <div
+              class="pv-card"
+              id="pvWorkflowCard"
+              style="margin-bottom: 16px; display: none"
+            >
+              <div class="pv-card-head">
+                <span style="font-size: 16px">🎯</span>
+                <span class="pv-card-title">Tiến trình xét duyệt</span>
+              </div>
+              <div class="pv-card-body" id="pvWorkflowProgress"></div>
+            </div>
+
+            <!-- Review timeline -->
+            <div class="pv-card" id="pvTimelineCard">
+              <div class="pv-card-head">
+                <span style="font-size: 16px">🕐</span>
+                <span class="pv-card-title">Lịch sử xét duyệt</span>
+              </div>
+              <div class="pv-card-body" id="pvTimeline">
+                <div style="color: var(--hint); font-size: 12.5px">
+                  Chưa có lịch sử.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- /profileViewPanel -->
+
+      <!-- ===== AI CHECK MODAL ===== -->
       <div class="modal-backdrop" id="aiModal">
         <div class="modal-box">
           <div class="modal-head">
@@ -6514,9 +7179,6 @@
           </div>
         </div>
       </div>
-
-      <!-- TOAST -->
-      <div class="toast" id="toast"></div>
     </div>
     <!-- /memberMain -->
 
@@ -6525,6 +7187,236 @@
       id="adminMain"
       style="display: none; flex: 1; flex-direction: column; min-width: 0"
     ></div>
+
+    <!-- VERIFY CREATE MODAL -->
+    <div class="modal-backdrop" id="verifyCreateModal">
+      <div class="modal-box" style="width: 600px">
+        <div class="modal-head">
+          <h3>✅ Tạo yêu cầu xác minh hồ sơ</h3>
+          <button
+            class="modal-close"
+            onclick="
+              document
+                .getElementById('verifyCreateModal')
+                .classList.remove('open')
+            "
+          >
+            ✕
+          </button>
+        </div>
+        <div class="modal-body">
+          <div style="display: flex; flex-direction: column; gap: 16px">
+            <div>
+              <label
+                style="
+                  display: block;
+                  font-size: 12px;
+                  font-weight: 700;
+                  color: var(--muted);
+                  margin-bottom: 8px;
+                  text-transform: uppercase;
+                  letter-spacing: 0.5px;
+                "
+                >Chọn quần chúng cần xác minh</label
+              >
+              <select
+                id="verifyProfileSelect"
+                style="
+                  width: 100%;
+                  padding: 10px 12px;
+                  border: 1.5px solid var(--border);
+                  border-radius: 8px;
+                  font-size: 13px;
+                  outline: none;
+                "
+              >
+                <option value="">⏳ Đang tải danh sách...</option>
+              </select>
+            </div>
+            <div>
+              <label
+                style="
+                  display: block;
+                  font-size: 12px;
+                  font-weight: 700;
+                  color: var(--muted);
+                  margin-bottom: 8px;
+                  text-transform: uppercase;
+                  letter-spacing: 0.5px;
+                "
+                >Nội dung xác minh</label
+              >
+              <textarea
+                id="verifyContent"
+                style="
+                  width: 100%;
+                  border: 1.5px solid var(--border);
+                  border-radius: 8px;
+                  padding: 10px 12px;
+                  font-family: inherit;
+                  font-size: 13px;
+                  resize: none;
+                  outline: none;
+                "
+                rows="4"
+                placeholder="Mô tả nội dung cần xác minh (tư cách Đảng viên, tiểu sử, ...)"
+              ></textarea>
+            </div>
+            <div>
+              <label
+                style="
+                  display: block;
+                  font-size: 12px;
+                  font-weight: 700;
+                  color: var(--muted);
+                  margin-bottom: 8px;
+                  text-transform: uppercase;
+                  letter-spacing: 0.5px;
+                "
+                >Hạn xác minh</label
+              >
+              <input
+                id="verifyDeadline"
+                type="date"
+                style="
+                  width: 100%;
+                  padding: 10px 12px;
+                  border: 1.5px solid var(--border);
+                  border-radius: 8px;
+                  font-size: 13px;
+                  outline: none;
+                "
+              />
+            </div>
+            <div>
+              <label
+                style="
+                  display: block;
+                  font-size: 12px;
+                  font-weight: 700;
+                  color: var(--muted);
+                  margin-bottom: 8px;
+                  text-transform: uppercase;
+                  letter-spacing: 0.5px;
+                "
+                >Độ ưu tiên</label
+              >
+              <select
+                id="verifyUrgency"
+                style="
+                  width: 100%;
+                  padding: 10px 12px;
+                  border: 1.5px solid var(--border);
+                  border-radius: 8px;
+                  font-size: 13px;
+                  outline: none;
+                "
+              >
+                <option value="normal">Thường</option>
+                <option value="urgent">Khẩn</option>
+                <option value="critical">Rất khẩn</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="modal-foot">
+          <button
+            class="btn btn-ghost"
+            onclick="
+              document
+                .getElementById('verifyCreateModal')
+                .classList.remove('open')
+            "
+          >
+            Hủy
+          </button>
+          <button class="btn btn-primary" onclick="submitCreateVerify()">
+            ✅ Tạo yêu cầu
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- USER INFO MODAL -->
+    <div class="modal-backdrop" id="userInfoModal">
+      <div
+        class="modal-box"
+        style="width: 600px; max-width: calc(100vw - 24px)"
+      >
+        <div class="modal-head">
+          <h3>👤 Thông tin quần chúng</h3>
+          <button
+            class="modal-close"
+            onclick="
+              document.getElementById('userInfoModal').classList.remove('open')
+            "
+          >
+            ✕
+          </button>
+        </div>
+        <div
+          class="modal-body"
+          id="userInfoBody"
+          style="font-size: 13px; line-height: 1.6; color: var(--ink)"
+        >
+          ⏳ Đang tải...
+        </div>
+        <div class="modal-foot">
+          <button
+            class="btn btn-ghost"
+            onclick="
+              document.getElementById('userInfoModal').classList.remove('open')
+            "
+          >
+            Đóng
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- VERIFY DETAIL / RESULT MODAL -->
+    <div class="modal-backdrop" id="verifyDetailModal">
+      <div
+        class="modal-box"
+        style="width: 680px; max-width: calc(100vw - 24px)"
+      >
+        <div class="modal-head">
+          <h3>📄 Chi tiết yêu cầu xác minh</h3>
+          <button
+            class="modal-close"
+            onclick="
+              document
+                .getElementById('verifyDetailModal')
+                .classList.remove('open')
+            "
+          >
+            ✕
+          </button>
+        </div>
+        <div
+          class="modal-body"
+          id="verifyDetailBody"
+          style="font-size: 13px; line-height: 1.55; color: var(--ink)"
+        >
+          ⏳ Đang tải...
+        </div>
+        <div class="modal-foot">
+          <button
+            class="btn btn-ghost"
+            onclick="
+              document
+                .getElementById('verifyDetailModal')
+                .classList.remove('open')
+            "
+          >
+            Đóng
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TOAST -->
+    <div class="toast" id="toast"></div>
 
     <script>
       // ===== SECTIONS =====
@@ -7017,6 +7909,8 @@
 
       window.addEventListener("DOMContentLoaded", async () => {
         provinceList = await fetchProvinces();
+
+        // Setup standard location pairs (sections 05-08)
         locationPairs.forEach((pair) => {
           const provinceSelect = document.getElementById(pair.provinceSelectId);
           const wardSelect = document.getElementById(pair.wardSelectId);
@@ -7026,8 +7920,19 @@
           wardSelect.disabled = true;
           setupLocationPair(pair);
         });
-
         setupInlineLocationSearchForAllPairs();
+
+        // Setup family member location searches (Phần I - Hoàn cảnh gia đình)
+        ["1", "2", "3.1", "3.2", "3.3", "10", "11", "12"].forEach((num) =>
+          attachFamilyLocationSearch(num),
+        );
+        ["4", "5", "6", "7"].forEach((num) => attachFamilyLocationSearch(num));
+        ["8", "9", "13.1", "13.2"].forEach((num) =>
+          attachFamilyLocationSearch(num),
+        );
+        ["14", "15", "16", "17"].forEach((num) =>
+          attachFamilyLocationSearch(num),
+        );
       });
       function validateField(el, type) {
         const err = document.getElementById("err-" + el.id);
@@ -7527,19 +8432,12 @@
         { num: "12", title: "Con ruột (2)", child: true },
       ]);
 
-      // Attach family location search for static members
-      ["1", "2", "3.1", "3.2", "3.3", "10", "11", "12"].forEach((num) =>
-        attachFamilyLocationSearch(num),
-      );
-
       buildFamilyBlock(document.getElementById("famBlocks2"), [
         { num: "4", title: "Ông nội", grandparent: true },
         { num: "5", title: "Bà nội", grandparent: true },
         { num: "6", title: "Ông ngoại", grandparent: true },
         { num: "7", title: "Bà ngoại", grandparent: true },
       ]);
-
-      ["4", "5", "6", "7"].forEach((num) => attachFamilyLocationSearch(num));
 
       buildFamilyBlock(document.getElementById("famBlocks3"), [
         { num: "8", title: "Cha chồng (vợ)" },
@@ -7548,20 +8446,12 @@
         { num: "13.2", title: "Anh/Chị/Em chồng (vợ) thứ 2", sibling: true },
       ]);
 
-      ["8", "9", "13.1", "13.2"].forEach((num) =>
-        attachFamilyLocationSearch(num),
-      );
-
       buildFamilyBlock(document.getElementById("famBlocks4"), [
         { num: "14", title: "Ông nội chồng (vợ)", grandparent: true },
         { num: "15", title: "Bà nội chồng (vợ)", grandparent: true },
         { num: "16", title: "Ông ngoại chồng (vợ)", grandparent: true },
         { num: "17", title: "Bà ngoại chồng (vợ)", grandparent: true },
       ]);
-
-      ["14", "15", "16", "17"].forEach((num) =>
-        attachFamilyLocationSearch(num),
-      );
 
       // ===== SUBMIT =====
       function submitForm() {
@@ -8201,6 +9091,14 @@
           // Đợi DOM cập nhật rồi scan
           setTimeout(() => initAllDienBien(), 50);
         }
+        // Close member notif dropdown when clicking outside
+        if (
+          !e.target.closest("#memberNotifBtn") &&
+          !e.target.closest("#memberNotifDropdown")
+        ) {
+          const drop = document.getElementById("memberNotifDropdown");
+          if (drop) drop.style.display = "none";
+        }
       });
 
       // ===== ROLE SWITCH =====
@@ -8234,6 +9132,22 @@
       }
 
       function buildAdminUI() {
+        const adminUser = API.currentUser?.() || {};
+        const adminName = _esc(
+          adminUser.full_name || adminUser.username || "Cán bộ hệ thống",
+        );
+        const adminRole = _esc(
+          adminUser.role_display || adminUser.role_name || "Cán bộ BXD Đảng",
+        );
+        const adminInitials = _esc(
+          (adminUser.full_name || adminUser.username || "CB")
+            .split(" ")
+            .map((w) => (w || "").trim()[0] || "")
+            .filter(Boolean)
+            .slice(-2)
+            .join("")
+            .toUpperCase() || "CB",
+        );
         document.getElementById("adminMain").innerHTML = `
 
   <!-- ADMIN HEADER: single row on desktop, two-row on mobile -->
@@ -8247,7 +9161,7 @@
       <!-- Desktop tabs (hidden on mobile, shown in tab strip) -->
       <div class="admin-tabs" id="adminTabsDesktop">
       <div class="admin-tab active" onclick="showAdminPageByName('pgDashboard')" data-page="pgDashboard">Dashboard</div>
-      <div class="admin-tab" onclick="showAdminPageByName('pgProfiles')" data-page="pgProfiles">Hồ sơ <span style="background:var(--crimson);color:#fff;font-size:8.5px;padding:0 4px;border-radius:5px;margin-left:4px;vertical-align:middle;line-height:15px;display:inline-block;font-weight:800;">5</span></div>
+      <div class="admin-tab" onclick="showAdminPageByName('pgProfiles')" data-page="pgProfiles">Hồ sơ <span id="profilesTabBadgeDesktop" style="background:var(--crimson);color:#fff;font-size:8.5px;padding:0 4px;border-radius:5px;margin-left:4px;vertical-align:middle;line-height:15px;display:inline-block;font-weight:800;">—</span></div>
       <div class="admin-tab" onclick="showAdminPageByName('pgVerify')" data-page="pgVerify">Xác minh</div>
       <div class="admin-tab" onclick="showAdminPageByName('pgNotif')" data-page="pgNotif">Thông báo</div>
       <div class="admin-tab" onclick="showAdminPageByName('pgAccount')" data-page="pgAccount">Cấp tài khoản</div>
@@ -8256,16 +9170,16 @@
       </div>
       <div class="admin-user">
         <div class="admin-user-info">
-          <div class="admin-user-name">Trần Thị Hương</div>
-          <div class="admin-user-role">Cán bộ BXD Đảng</div>
+          <div class="admin-user-name">${adminName}</div>
+          <div class="admin-user-role">${adminRole}</div>
         </div>
-        <div class="admin-avatar">TH</div>
+        <div class="admin-avatar">${adminInitials}</div>
       </div>
     </div>
     <!-- Row 2: Scrollable tab strip (shown on mobile/tablet) -->
     <div class="admin-tabs-row" id="adminTabsMobile" style="display:none">
       <div class="admin-tab active" onclick="showAdminPageByName('pgDashboard')" data-page="pgDashboard">Dashboard</div>
-      <div class="admin-tab" onclick="showAdminPageByName('pgProfiles')" data-page="pgProfiles">Hồ sơ <span style="background:var(--crimson);color:#fff;font-size:8.5px;padding:0 4px;border-radius:5px;margin-left:4px;vertical-align:middle;line-height:15px;display:inline-block;font-weight:800;">5</span></div>
+      <div class="admin-tab" onclick="showAdminPageByName('pgProfiles')" data-page="pgProfiles">Hồ sơ <span id="profilesTabBadgeMobile" style="background:var(--crimson);color:#fff;font-size:8.5px;padding:0 4px;border-radius:5px;margin-left:4px;vertical-align:middle;line-height:15px;display:inline-block;font-weight:800;">—</span></div>
       <div class="admin-tab" onclick="showAdminPageByName('pgVerify')" data-page="pgVerify">Xác minh</div>
       <div class="admin-tab" onclick="showAdminPageByName('pgNotif')" data-page="pgNotif">Thông báo</div>
       <div class="admin-tab" onclick="showAdminPageByName('pgAccount')" data-page="pgAccount">Cấp tài khoản</div>
@@ -8374,39 +9288,33 @@
     <div class="admin-page" id="pgProfiles">
       <div class="admin-page-header">
         <div>
-          <div class="admin-page-title">Danh sách hồ sơ quần chúng</div>
+          <div class="admin-page-title">Danh sách quần chúng</div>
           <div class="admin-page-sub" id="profilesSubtitle">Đang tải…</div>
         </div>
         <div class="admin-page-actions">
           <button class="btn btn-ghost" onclick="exportProfiles()"><span style="font-size:11px">↓</span> Xuất Excel</button>
-          <button class="btn btn-primary" onclick="showAdminPageByName('pgAccount')">+ Cấp tài khoản</button>
         </div>
       </div>
       <div class="filter-bar">
-        <div class="search-box"><span class="search-icon">🔍</span><input type="text" placeholder="Tìm theo họ tên, CCCD…" oninput="filterProfiles(this.value)"></div>
+        <div class="search-box"><span class="search-icon">🔍</span><input type="text" placeholder="Tìm theo họ tên, SĐT, CCCD…" oninput="filterProfiles(this.value)"></div>
         <select class="filter-select" onchange="filterByStatus(this.value)">
-          <option value="">Tất cả trạng thái</option>
-          <option value="draft">Đang kê khai</option>
-          <option value="submitted">Đã nộp</option><option value="pending">Đang xem xét</option>
-          <option value="under_review">Đang thẩm định</option><option value="returned">Trả lại</option>
-          <option value="verifying">Đang xác minh</option><option value="completed">Hoàn thiện</option>
+          <option value="">Tất cả trạng thái TK</option>
+          <option value="active">Hoạt động</option>
+          <option value="inactive">Bị khoá</option>
         </select>
-        <select class="filter-select"><option>Tất cả ấp/khu</option><option>Ấp 1 – Nhà Bè</option><option>Ấp 2 – Long Thới</option><option>Ấp 3 – Phước Kiển</option><option>Ấp 4 – Hiệp Phước</option></select>
-        <select class="filter-select"><option>Đảng viên phụ trách: Tất cả</option><option>Nguyễn Văn Khoa</option><option>Trần Thị Hoa</option><option>Lê Minh Đức</option></select>
       </div>
       <div class="card" style="margin-bottom:0">
         <div class="profile-table-wrap">
           <table class="profile-table">
             <thead><tr>
-              <th style="width:32px"><input type="checkbox" onclick="toggleAll(this)"></th>
-              <th>Họ và tên</th><th>CCCD</th><th>Năm sinh</th><th>Địa chỉ</th>
-              <th>Trạng thái</th><th>AI Score</th><th>Cập nhật</th><th>ĐV phụ trách</th><th style="width:140px">Thao tác</th>
+              <th>Họ và tên</th><th>Số điện thoại</th><th>CCCD</th>
+              <th>Trạng thái TK</th><th>Hồ sơ</th><th>Ngày tạo</th><th style="width:120px">Thao tác</th>
             </tr></thead>
             <tbody id="profileTbody"></tbody>
           </table>
         </div>
         <div class="table-footer">
-          <span id="profileCount">Hiển thị 12 / 200 hồ sơ</span>
+          <span id="profileCount">Hiển thị 0 / 0 quần chúng</span>
           <div class="pagination">
             <button class="page-btn">← Trước</button>
             <button class="page-btn active">1</button>
@@ -8422,10 +9330,7 @@
       <div class="admin-page-header">
         <div>
           <div class="admin-page-title">Theo dõi xác minh lý lịch</div>
-          <div class="admin-page-sub">Quản lý yêu cầu gửi xác minh đến các đơn vị liên quan</div>
-        </div>
-        <div class="admin-page-actions">
-          <button class="btn btn-primary">+ Tạo yêu cầu xác minh</button>
+          <div class="admin-page-sub">Quản lý quy trình xét duyệt và xác minh hồ sơ quần chúng</div>
         </div>
       </div>
       <div class="verify-stats-bar">
@@ -8449,22 +9354,29 @@
       <div class="card">
         <div class="card-head">
           <div class="card-head-dot"></div>
-          <h3>Danh sách yêu cầu xác minh</h3>
+          <h3>Danh sách hồ sơ theo dõi xác minh</h3>
           <div style="margin-left:auto">
-            <select class="filter-select" style="font-size:11.5px;padding:5px 26px 5px 10px;">
-              <option>Tất cả trạng thái</option>
-              <option>Chờ phản hồi</option><option>Đã nhận KQ</option><option>Hoàn tất</option>
+            <select class="filter-select" id="verifyStatusFilter" style="font-size:11.5px;padding:5px 26px 5px 10px;" onchange="_loadVerificationList()">
+              <option value="">Tất cả trạng thái</option>
+              <option value="draft">Đang kê khai</option>
+              <option value="submitted">Đã nộp</option>
+              <option value="pending">Đang xem xét</option>
+              <option value="under_review">Đang thẩm định</option>
+              <option value="approved">Đã phê duyệt</option>
+              <option value="verifying">Đang xác minh</option>
+              <option value="returned">Trả lại</option>
+              <option value="completed">Hoàn thiện</option>
             </select>
           </div>
         </div>
         <div class="profile-table-wrap">
           <table class="profile-table">
             <thead><tr>
-              <th>Quần chúng</th><th>Đơn vị xác minh</th><th>Nội dung</th>
-              <th>Ngày gửi</th><th>Hạn PH</th><th>Trạng thái</th><th>Thao tác</th>
+              <th>Quần chúng</th><th>Trạng thái hồ sơ</th>
+              <th>Ngày nộp</th><th>Cập nhật</th><th style="width:240px">Thao tác</th><th style="width:120px">Xuất Word</th>
             </tr></thead>
             <tbody id="verifyTbody">
-              <tr><td colspan="7" style="text-align:center;padding:24px;color:var(--muted)">⏳ Đang tải…</td></tr>
+              <tr><td colspan="6" style="text-align:center;padding:24px;color:var(--muted)">⏳ Đang tải…</td></tr>
             </tbody>
           </table>
         </div>
@@ -8511,9 +9423,9 @@
             <div class="card-head"><div class="card-head-dot"></div><h3>Chọn nhóm nhận nhắc nhở</h3></div>
             <div class="card-body">
               <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px">
-                <label class="bulk-group-label"><input type="checkbox" style="width:auto;accent-color:var(--crimson)"><span style="flex:1">Chưa nộp <strong>&gt; 7 ngày</strong></span><span class="bulk-group-count" style="background:var(--crimson-xl);color:var(--crimson)">8 người</span></label>
-                <label class="bulk-group-label"><input type="checkbox" style="width:auto;accent-color:var(--crimson)"><span style="flex:1">Hồ sơ trả lại <strong>chưa cập nhật &gt; 3 ngày</strong></span><span class="bulk-group-count" style="background:var(--warn-l);color:var(--warn)">4 người</span></label>
-                <label class="bulk-group-label"><input type="checkbox" style="width:auto;accent-color:var(--crimson)"><span style="flex:1">Tài khoản mới <strong>chưa đăng nhập</strong></span><span class="bulk-group-count" style="background:#F5F3FF;color:#6D28D9">2 người</span></label>
+                <label class="bulk-group-label"><input type="checkbox" style="width:auto;accent-color:var(--crimson)"><span style="flex:1">Chưa nộp <strong>&gt; 7 ngày</strong></span><span id="bulkCountLateSubmit" class="bulk-group-count" style="background:var(--crimson-xl);color:var(--crimson)">—</span></label>
+                <label class="bulk-group-label"><input type="checkbox" style="width:auto;accent-color:var(--crimson)"><span style="flex:1">Hồ sơ trả lại <strong>chưa cập nhật &gt; 3 ngày</strong></span><span id="bulkCountReturnedStale" class="bulk-group-count" style="background:var(--warn-l);color:var(--warn)">—</span></label>
+                <label class="bulk-group-label"><input type="checkbox" style="width:auto;accent-color:var(--crimson)"><span style="flex:1">Tài khoản mới <strong>chưa đăng nhập</strong></span><span id="bulkCountNewNoLogin" class="bulk-group-count" style="background:#F5F3FF;color:#6D28D9">—</span></label>
               </div>
               <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="sendBulkNotif()">📨 Gửi nhắc nhở hàng loạt</button>
             </div>
@@ -8532,23 +9444,58 @@
       </div>
       <div class="account-two-col" style="display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start">
         <div class="card">
-          <div class="card-head"><div class="card-head-dot"></div><h3>Bước 1 – Thông tin định danh</h3></div>
+          <div class="card-head"><div class="card-head-dot"></div><h3 id="accStepTitle">Bước 1 – Thông tin định danh</h3></div>
           <div class="card-body">
             <div class="account-steps">
-              <div class="acc-step-item active"><div class="acc-step-circle">1</div><div class="acc-step-label">Định danh</div></div>
-              <div class="acc-step-item"><div class="acc-step-circle">2</div><div class="acc-step-label">Liên lạc</div></div>
-              <div class="acc-step-item"><div class="acc-step-circle">3</div><div class="acc-step-label">Xác nhận</div></div>
+              <div class="acc-step-item active" id="step1Indicator"><div class="acc-step-circle">1</div><div class="acc-step-label">Định danh</div></div>
+              <div class="acc-step-item" id="step2Indicator"><div class="acc-step-circle">2</div><div class="acc-step-label">Liên lạc</div></div>
+              <div class="acc-step-item" id="step3Indicator"><div class="acc-step-circle">3</div><div class="acc-step-label">Xác nhận</div></div>
             </div>
-            <div class="form-row"><label>Họ và tên <span class="req">*</span></label><input type="text" id="accName" placeholder="Nguyễn Văn A"></div>
-            <div class="form-row"><label>Số CCCD <span class="req">*</span></label><input type="text" id="accCCCD" placeholder="0XX XXX XXXXXX" maxlength="12"></div>
-            <div class="form-row"><label>Ngày sinh <span class="req">*</span></label><input type="date" id="accDOB"></div>
-            <div class="form-row"><label>Số điện thoại <span class="req">*</span><span class="hint-lbl">Nhận OTP đăng nhập lần đầu</span></label><input type="tel" id="accPhone" placeholder="09x xxxx xxxx"></div>
-            <div class="form-row"><label>Email</label><input type="email" id="accEmail" placeholder="example@gmail.com"></div>
-            <div class="form-row"><label>Đảng viên phụ trách</label><select><option>-- Chọn --</option><option>Nguyễn Văn Khoa</option><option>Trần Thị Hoa</option><option>Lê Minh Đức</option></select></div>
-            <div class="form-row"><label>Kênh thông báo</label><div class="check-group"><label class="check-opt"><input type="checkbox" checked> SMS</label><label class="check-opt"><input type="checkbox" checked> Email</label><label class="check-opt"><input type="checkbox"> Zalo OA</label></div></div>
-            <div style="display:flex;gap:8px;padding-top:16px;border-top:1px solid var(--border-xl);margin-top:4px">
-              <button class="btn btn-ghost" style="flex:1;justify-content:center">Hủy</button>
-              <button class="btn btn-primary" style="flex:2;justify-content:center" onclick="createAccount()">Cấp tài khoản →</button>
+
+            <!-- STEP 1 -->
+            <div id="accStep1" class="acc-step-form">
+              <div class="form-row"><label>Họ và tên <span class="req">*</span></label><input type="text" id="accName" placeholder="Nguyễn Văn A"></div>
+              <div class="form-row"><label>Số CCCD <span class="req">*</span></label><input type="text" id="accCCCD" placeholder="0XX XXX XXXXXX" maxlength="12"></div>
+              <div class="form-row"><label>Ngày sinh <span class="req">*</span></label><input type="date" id="accDOB"></div>
+              <div class="form-row"><label>Số điện thoại <span class="req">*</span></label><input type="tel" id="accPhone" placeholder="Nhập số điện thoại"></div>
+              <div style="display:flex;gap:8px;padding-top:16px;border-top:1px solid var(--border-xl);margin-top:4px">
+                <button class="btn btn-ghost" style="flex:1;justify-content:center" onclick="resetAccForm()">Hủy</button>
+                <button class="btn btn-primary" style="flex:2;justify-content:center" onclick="goToAccStep(2)">Tiếp theo →</button>
+              </div>
+            </div>
+
+            <!-- STEP 2 -->
+            <div id="accStep2" class="acc-step-form" style="display:none">
+              <div class="form-row"><label>Email Gmail <span class="req">*</span></label><input type="email" id="accEmail" placeholder="example@gmail.com"></div>
+              <div class="form-row"><label>Mật khẩu khởi tạo</label><input type="text" value="Hệ thống tự tạo ngẫu nhiên và gửi qua Gmail" disabled></div>
+              <div class="form-row"><label>Kênh thông báo</label><div class="check-group"><label class="check-opt"><input type="checkbox" id="chkEmail" checked disabled> Gmail</label></div></div>
+              <div style="display:flex;gap:8px;padding-top:16px;border-top:1px solid var(--border-xl);margin-top:4px">
+                <button class="btn btn-ghost" style="flex:1;justify-content:center" onclick="goToAccStep(1)">← Quay lại</button>
+                <button class="btn btn-primary" style="flex:2;justify-content:center" onclick="goToAccStep(3)">Tiếp theo →</button>
+              </div>
+            </div>
+
+            <!-- STEP 3 -->
+            <div id="accStep3" class="acc-step-form" style="display:none">
+              <div style="background:#F4F6F9;border-radius:10px;padding:14px;margin-bottom:16px">
+                <div style="font-size:12px;font-weight:600;color:var(--muted);margin-bottom:10px;text-transform:uppercase">Thông tin xác nhận</div>
+                <div style="font-size:13px;line-height:1.6;color:var(--navy)">
+                  <div><strong>Họ tên:</strong> <span id="reviewName">—</span></div>
+                  <div><strong>CCCD:</strong> <span id="reviewCCCD">—</span></div>
+                  <div><strong>Ngày sinh:</strong> <span id="reviewDOB">—</span></div>
+                  <div><strong>Số điện thoại:</strong> <span id="reviewPhone">—</span></div>
+                  <div style="margin-top:8px"><strong>Email:</strong> <span id="reviewEmail">—</span></div>
+                  <div><strong>Mật khẩu khởi tạo:</strong> Hệ thống tạo ngẫu nhiên và gửi qua Gmail</div>
+                  <div><strong>Kênh thông báo:</strong> <span id="reviewChannels">—</span></div>
+                </div>
+              </div>
+              <div class="alert alert-info" style="font-size:12px;margin-bottom:14px">
+                ℹ Sau khi xác nhận, hệ thống sẽ tạo tài khoản và gửi thông tin đăng nhập qua Gmail.
+              </div>
+              <div style="display:flex;gap:8px;padding-top:16px;border-top:1px solid var(--border-xl);margin-top:4px">
+                <button class="btn btn-ghost" style="flex:1;justify-content:center" onclick="goToAccStep(2)">← Quay lại</button>
+                <button class="btn btn-primary" style="flex:2;justify-content:center" onclick="submitCreateAccount()">✓ Xác nhận & Cấp tài khoản</button>
+              </div>
             </div>
           </div>
         </div>
@@ -8577,51 +9524,13 @@
         </div>
       </div>
 
-      <!-- Word Export — Real DOCX -->
-      <div class="dash-section-label">Xuất Văn bản Word (Mẫu 2-KNĐ)</div>
+      <!-- Word Export has been moved to Verify page action column -->
+      <div class="dash-section-label">Xuất Văn bản Word</div>
       <div class="card" style="margin-bottom:20px">
-        <div class="card-head">
-          <div class="card-head-dot"></div>
-          <h3>Xuất hồ sơ ra file .docx theo Mẫu 2-KNĐ chính thức</h3>
-          <span class="pill pill-done" style="margin-left:auto;font-size:10px">Real DOCX</span>
-        </div>
         <div class="card-body">
-          <div class="alert alert-info" style="margin-bottom:14px">
-            ℹ Hệ thống tạo file <strong>.docx Microsoft Word thực sự</strong> — không phải HTML hay PDF. 
-            Định dạng theo đúng Mẫu 2-KNĐ của Ban Tổ chức Trung ương: đầy đủ các Phần A đến J, 
-            hỗ trợ tiếng Việt UTF-8, in ấn trực tiếp.
-          </div>
-
-          <!-- Export progress bar (hidden by default) -->
-          <div id="exportProgressBar" style="display:none;margin-bottom:14px;background:var(--off-white);border:1px solid var(--border-l);border-radius:var(--r-sm);padding:14px">
-            <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
-              <div id="exportSpinner" style="width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--crimson);border-radius:50%;animation:spin .8s linear infinite;flex-shrink:0"></div>
-              <div style="font-size:12.5px;font-weight:600;color:var(--navy)" id="exportProgressLabel">Đang tạo file DOCX…</div>
-            </div>
-            <div style="height:4px;background:var(--border-l);border-radius:3px;overflow:hidden">
-              <div id="exportProgressFill" style="height:100%;background:var(--crimson);border-radius:3px;transition:width .4s;width:0%"></div>
-            </div>
-          </div>
-
-          <!-- Filter + bulk export -->
-          <div class="filter-bar" style="flex-wrap:wrap;gap:10px;margin-bottom:14px">
-            <div class="search-box"><span class="search-icon">🔍</span><input type="text" placeholder="Tìm theo họ tên quần chúng…" id="wordExportSearch" oninput="filterWordExportList(this.value)"></div>
-            <select class="filter-select" id="wordExportStatus" onchange="filterWordExportList()">
-              <option value="">Tất cả trạng thái</option>
-              <option value="draft">Đang kê khai</option>
-              <option value="submitted">Đã nộp</option>
-              <option value="verifying">Đang xác minh</option>
-              <option value="approved">Đã phê duyệt</option>
-              <option value="completed">Hoàn thiện</option>
-            </select>
-            <button class="btn btn-primary" id="bulkExportBtn" onclick="exportWordBatch()">
-              <span>📦</span> Xuất tất cả (ZIP)
-            </button>
-          </div>
-
-          <!-- Profile export list -->
-          <div id="wordExportList" style="display:flex;flex-direction:column;gap:8px">
-            <!-- Populated by JS -->
+          <div class="alert alert-info" style="margin:0">
+            ℹ Chức năng xuất Word đã được chuyển sang trang <strong>Theo dõi xác minh lý lịch</strong>.
+            Chỉ các hồ sơ ở trạng thái <strong>Hoàn thiện</strong> mới có nút xuất.
           </div>
         </div>
       </div>
@@ -8688,7 +9597,7 @@
       <!-- Sticky action bar -->
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
         <div>
-          <button class="btn btn-ghost" style="font-size:12px;padding:6px 12px" onclick="showAdminPageByName('pgProfiles')">← Về danh sách</button>
+          <button class="btn btn-ghost" style="font-size:12px;padding:6px 12px" onclick="showAdminPageByName('pgVerify')">← Về danh sách</button>
         </div>
         <div id="editProfileBreadcrumb" style="font-size:12.5px;color:var(--muted)">
           Chỉnh sửa hồ sơ: <strong id="editProfileTitle" style="color:var(--navy)">—</strong>
@@ -8709,9 +9618,7 @@
               <option value="withdrawn">Rút hồ sơ</option>
             </select>
           </div>
-          <button class="btn btn-ghost" style="font-size:12px" onclick="exportSingleWord(currentEditProfile.name)">📄 Xuất Word</button>
           <button class="btn btn-primary" style="font-size:12px" onclick="saveAllEdits()">💾 Lưu tất cả</button>
-          <button class="btn" style="background:var(--crimson);color:#fff;font-size:12px" onclick="openReturnModal()">↩ Trả lại hồ sơ</button>
         </div>
       </div>
 
@@ -9184,9 +10091,9 @@
       <textarea class="review-textarea" id="returnReason" placeholder="Mô tả nội dung cần quần chúng bổ sung hoặc làm rõ…" rows="3"></textarea>
     </div>
     <div class="detail-panel-footer" style="flex-wrap:wrap;gap:6px;">
-      <button class="btn btn-ghost" style="flex:1;min-width:80px" onclick="returnFromPanel()">↩ Trả lại</button>
+      <button id="detailBtnReturn" class="btn btn-ghost" style="flex:1;min-width:80px" onclick="returnFromPanel()">↩ Trả lại</button>
       <button class="btn" style="flex:1;min-width:80px;background:#2563EB;color:#fff" onclick="closeDetail();openProfileEdit(_currentDetailProfileId||document.getElementById('detailName').textContent)">✏ Chỉnh sửa</button>
-      <button class="btn btn-primary" style="flex:2;min-width:100px" onclick="approveFromPanel()">✓ Duyệt</button>
+      <button id="detailBtnApprove" class="btn btn-primary" style="flex:2;min-width:100px" onclick="approveFromPanel()">✓ Duyệt</button>
     </div>
   </div>
   <div id="overlay" onclick="closeDetail()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:99;"></div>
@@ -9261,9 +10168,6 @@
         if (pid === "pgReport") {
           _loadReportPage();
         }
-        if (pid === "pgSettings") {
-          _loadWordExportProfiles().then(() => filterWordExportList());
-        }
       }
 
       // ===== GLOBAL APP STATE — mirrors API data, replaces all mock arrays =====
@@ -9275,6 +10179,7 @@
 
       // ===== PROFILE TABLE DATA — API-backed =====
       let _profilesCache = [];
+      let _usersCache = [];
       let _profilesTotal = 0;
       let _profilesFilters = {
         search: "",
@@ -9309,75 +10214,71 @@
       async function _loadProfileList() {
         const tb = document.getElementById("profileTbody");
         if (!tb) return;
-        tb.innerHTML = `<tr><td colspan="10" style="text-align:center;padding:28px;color:var(--muted)">⏳ Đang tải dữ liệu…</td></tr>`;
+        tb.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:28px;color:var(--muted)">⏳ Đang tải dữ liệu…</td></tr>`;
         try {
           const params = new URLSearchParams();
+          params.set("role__code", "quan_chung");
           if (_profilesFilters.search)
             params.set("search", _profilesFilters.search);
           if (_profilesFilters.status)
             params.set("status", _profilesFilters.status);
-          if (_profilesFilters.ordering)
-            params.set("ordering", _profilesFilters.ordering);
-          const data = await API.get(`/profiles/?${params}`);
-          _profilesCache = data.results || [];
+          params.set("ordering", _profilesFilters.ordering || "-created_at");
+          const data = await API.get(`/auth/users/?${params}`);
+          _usersCache = data.results || [];
           _profilesTotal = data.count || 0;
-          window.appState.profiles = _profilesCache;
-          console.log("[API] profiles loaded", _profilesCache.length);
-          renderProfiles(_profilesCache);
+          console.log("[API] users loaded", _usersCache.length);
+          renderProfiles(_usersCache);
         } catch (e) {
-          tb.innerHTML = `<tr><td colspan="10" style="text-align:center;padding:28px;color:var(--red)">✗ Lỗi tải dữ liệu: ${_esc(e.message)}</td></tr>`;
-          console.error("[API] Profile list failed:", e);
+          tb.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:28px;color:var(--red)">✗ Lỗi tải dữ liệu: ${_esc(e.message)}</td></tr>`;
+          console.error("[API] User list failed:", e);
         }
       }
 
       function renderProfiles(data) {
         const tb = document.getElementById("profileTbody");
         if (!tb) return;
+        const badgeDesktop = document.getElementById("profilesTabBadgeDesktop");
+        const badgeMobile = document.getElementById("profilesTabBadgeMobile");
+        if (badgeDesktop)
+          badgeDesktop.textContent = String(_profilesTotal || 0);
+        if (badgeMobile) badgeMobile.textContent = String(_profilesTotal || 0);
         if (!data.length) {
-          tb.innerHTML = `<tr><td colspan="10" style="text-align:center;padding:28px;color:var(--muted)">Không có hồ sơ nào.</td></tr>`;
+          tb.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:28px;color:var(--muted)">Không có quần chúng nào.</td></tr>`;
           document.getElementById("profileCount").textContent =
-            "Hiển thị 0 / 0 hồ sơ";
+            "Hiển thị 0 / 0 quần chúng";
           return;
         }
         tb.innerHTML = data
-          .map((p) => {
-            // Always use statusMap for consistency; if not found, fallback to API's status_display
-            const st = statusMap[p.status] || {
-              cls: "pill-new",
-              label: p.status_display || p.status,
-            };
-            const score =
-              p.ai_score > 0
-                ? `<div class="ai-score">${p.ai_score}% <div class="ai-score-bar"><div class="ai-score-fill" style="width:${p.ai_score}%;background:${scoreColor(p.ai_score)}"></div></div></div>`
-                : '<span style="font-size:11px;color:var(--hint)">—</span>';
-            const dob = p.dob ? p.dob.split("-").reverse().join("/") : "—";
-            const updated = p.updated_at ? _fmtDate(p.updated_at) : "—";
-            const canAct = ["submitted", "pending", "under_review"].includes(
-              p.status,
-            );
-            const safeName = _esc(p.full_name);
+          .map((u) => {
+            const accSt =
+              u.status === "active"
+                ? { cls: "pill-done", label: "Hoạt động" }
+                : { cls: "pill-draft", label: "Bị khoá" };
+            const profileSt = u.profile_status
+              ? statusMap[u.profile_status] || {
+                  cls: "pill-new",
+                  label: u.profile_status,
+                }
+              : null;
+            const created = u.created_at ? _fmtDate(u.created_at) : "—";
             return `<tr>
-      <td><input type="checkbox"></td>
-      <td><div class="name-cell">${safeName}</div><div class="sub-cell">${dob} · ${_esc(p.user_phone || "")}</div></td>
-      <td style="font-size:11.5px;">${_esc(p.profile_number || "—")}</td>
-      <td style="font-size:12px;">${dob}</td>
-      <td style="font-size:12px;">${_esc(p.user_phone || "—")}</td>
-      <td><span class="pill ${st.cls}">${st.label}</span></td>
-      <td>${score}</td>
-      <td style="font-size:12px;">${updated}</td>
-      <td style="font-size:12px;">${_esc(p.officer_in_charge_name || "—")}</td>
+      <td><div class="name-cell">${_esc(u.full_name || "—")}</div><div class="sub-cell">${_esc(u.email || "")}</div></td>
+      <td style="font-size:12px;">${_esc(u.phone || "—")}</td>
+      <td style="font-size:12px;">${_esc(u.cccd || "—")}</td>
+      <td><span class="pill ${accSt.cls}">${accSt.label}</span></td>
+      <td>${profileSt ? `<span class="pill ${profileSt.cls}">${profileSt.label}</span>` : '<span style="font-size:11px;color:var(--hint)">—</span>'}</td>
+      <td style="font-size:12px;">${created}</td>
       <td>
-        <button class="act-btn act-view" onclick="openDetailById(${p.id})">Xem</button>
-        ${canAct ? `<button class="act-btn act-approve" onclick="apiApproveProfile(${p.id},'${safeName}')">✓</button><button class="act-btn act-return" onclick="apiReturnProfile(${p.id},'${safeName}')">↩</button>` : ""}
+        <button class="act-btn act-view" onclick="_openUserInfo(${u.id})">Xem thông tin</button>
       </td>
     </tr>`;
           })
           .join("");
         document.getElementById("profileCount").textContent =
-          `Hiển thị ${data.length} / ${_profilesTotal} hồ sơ`;
+          `Hiển thị ${data.length} / ${_profilesTotal} quần chúng`;
         const sub = document.getElementById("profilesSubtitle");
         if (sub)
-          sub.textContent = `${_profilesTotal} quần chúng đang được theo dõi trong hệ thống`;
+          sub.textContent = `${_profilesTotal} quần chúng đang được quản lý trong hệ thống`;
       }
 
       function filterProfiles(q) {
@@ -9418,8 +10319,10 @@
             cls: "pill-new",
             label: p.status_display || p.status,
           };
+          window._currentDetailStatus = p.status;
           document.getElementById("dpStatus").innerHTML =
             `<span class="pill ${st.cls}">${st.label}</span>`;
+          _syncDetailWorkflowButtons(p.status);
           const dpScore = document.getElementById("dpScore");
           if (dpScore) {
             dpScore.textContent = p.ai_score > 0 ? p.ai_score + "%" : "—";
@@ -9488,8 +10391,10 @@
         document.getElementById("detailName").textContent = name;
         document.getElementById("detailSub").textContent = dob + " · " + addr;
         const st = statusMap[status] || { cls: "pill-new", label: status };
+        window._currentDetailStatus = status;
         document.getElementById("dpStatus").innerHTML =
           `<span class="pill ${st.cls}">${st.label}</span>`;
+        _syncDetailWorkflowButtons(status);
         document.getElementById("detailPanel").classList.add("open");
         document.getElementById("overlay").style.display = "block";
       }
@@ -9499,6 +10404,33 @@
         document.getElementById("overlay").style.display = "none";
         _currentDetailProfileId = null;
         _currentDetailUserId = null;
+        window._currentDetailStatus = null;
+      }
+
+      function _syncDetailWorkflowButtons(status) {
+        const btnApprove = document.getElementById("detailBtnApprove");
+        const btnReturn = document.getElementById("detailBtnReturn");
+        if (!btnApprove || !btnReturn) return;
+
+        const canApprove = ["submitted", "pending", "under_review"].includes(
+          status,
+        );
+        const canReturn = [
+          "submitted",
+          "pending",
+          "under_review",
+          "verifying",
+        ].includes(status);
+
+        btnApprove.style.display = canApprove ? "" : "none";
+        btnReturn.style.display = canReturn ? "" : "none";
+
+        if (status === "submitted") btnApprove.textContent = "✓ Duyệt bước 1";
+        else if (status === "pending")
+          btnApprove.textContent = "✓ Duyệt bước 2";
+        else if (status === "under_review")
+          btnApprove.textContent = "✓ Duyệt bước 3";
+        else btnApprove.textContent = "✓ Duyệt";
       }
 
       async function approveFromPanel() {
@@ -9508,24 +10440,43 @@
           return;
         }
         if (
+          !["submitted", "pending", "under_review"].includes(
+            window._currentDetailStatus,
+          )
+        ) {
+          showToast("✗ Trạng thái hiện tại không thể duyệt");
+          return;
+        }
+        if (
           !confirm(
-            `Xác nhận DUYỆT hồ sơ của ${name}?\nHệ thống sẽ gửi thông báo và chuyển sang bước Xác minh.`,
+            `Xác nhận DUYỆT hồ sơ của ${name}?\nHồ sơ sẽ chuyển theo từng bước thẩm định theo quy trình.`,
           )
         )
           return;
         try {
-          await API.post(`/profiles/${_currentDetailProfileId}/workflow/`, {
-            action: "approve",
-            comment: "",
-          });
+          const resp = await API.post(
+            `/profiles/${_currentDetailProfileId}/workflow/`,
+            {
+              action: "approve",
+              comment: "",
+            },
+          );
+          const profile = resp?.data || resp || {};
+          const nextStatus = profile.status || window._currentDetailStatus;
+          const st = statusMap[nextStatus] || {
+            cls: "pill-new",
+            label: profile.status_display || nextStatus || "—",
+          };
+          window._currentDetailStatus = nextStatus;
           document.getElementById("dpStatus").innerHTML =
-            `<span class="pill pill-verify">Đang xác minh</span>`;
+            `<span class="pill ${st.cls}">${st.label}</span>`;
+          _syncDetailWorkflowButtons(nextStatus);
           addActivity(
-            `✅ Đã duyệt hồ sơ <strong>${name}</strong> – chuyển sang Xác minh`,
+            `✅ Đã duyệt hồ sơ <strong>${name}</strong> – trạng thái: ${st.label}`,
           );
           showToast(`✅ Đã duyệt ${name}`);
           closeDetail();
-          _loadProfileList();
+          _loadVerificationList();
           _loadDashboard();
         } catch (e) {
           showToast("✗ " + e.message);
@@ -9537,6 +10488,14 @@
         const name = document.getElementById("detailName").textContent;
         if (!_currentDetailProfileId) {
           showToast("✗ Chưa xác định hồ sơ");
+          return;
+        }
+        if (
+          !["submitted", "pending", "under_review", "verifying"].includes(
+            window._currentDetailStatus,
+          )
+        ) {
+          showToast("✗ Trạng thái hiện tại không thể trả lại");
           return;
         }
         if (!reason.trim()) {
@@ -9555,12 +10514,31 @@
             comment: reason,
             return_reason: reason,
           });
+          await _postCorrectionRequestIfAny(_currentDetailProfileId, reason);
+          // Send in-app notification to the user
+          if (_currentDetailUserId) {
+            try {
+              await API.post("/notifications/send/", {
+                recipient_id: _currentDetailUserId,
+                profile_id: _currentDetailProfileId,
+                channel: "in_app",
+                type: "profile_returned",
+                subject: "Hồ sơ bị trả lại",
+                body: `Hồ sơ của bạn đã bị trả lại với lý do: ${reason}`,
+              });
+            } catch (ne) {
+              console.warn(
+                "[notify] Failed to send return notification:",
+                ne.message,
+              );
+            }
+          }
           addActivity(
             `↩ Trả hồ sơ <strong>${name}</strong> – ${reason.substring(0, 60)}…`,
           );
           showToast(`↩ Đã trả hồ sơ ${name}`);
           closeDetail();
-          _loadProfileList();
+          _loadVerificationList();
           _loadDashboard();
         } catch (e) {
           showToast("✗ " + e.message);
@@ -9570,13 +10548,20 @@
       async function apiApproveProfile(id, name) {
         if (!confirm(`Duyệt nhanh hồ sơ của ${name}?`)) return;
         try {
-          await API.post(`/profiles/${id}/workflow/`, {
+          const resp = await API.post(`/profiles/${id}/workflow/`, {
             action: "approve",
             comment: "",
           });
+          const profile = resp?.data || resp || {};
+          const st = statusMap[profile.status] || {
+            cls: "pill-new",
+            label: profile.status_display || profile.status || "—",
+          };
           showToast(`✅ Đã duyệt ${name}`);
-          addActivity(`✅ Đã duyệt <strong>${name}</strong>`);
-          _loadProfileList();
+          addActivity(
+            `✅ Đã duyệt <strong>${name}</strong> – trạng thái: ${st.label}`,
+          );
+          _loadVerificationList();
           _loadDashboard();
         } catch (e) {
           showToast("✗ " + e.message);
@@ -9587,14 +10572,35 @@
         const r = prompt(`Lý do trả lại hồ sơ ${name}:`);
         if (!r) return;
         try {
-          await API.post(`/profiles/${id}/workflow/`, {
+          const resp = await API.post(`/profiles/${id}/workflow/`, {
             action: "return",
             comment: r,
             return_reason: r,
           });
+          await _postCorrectionRequestIfAny(id, r);
+          // Send in-app notification to profile owner
+          const profileData = resp?.data || resp;
+          const userId = profileData?.user?.id;
+          if (userId) {
+            try {
+              await API.post("/notifications/send/", {
+                recipient_id: userId,
+                profile_id: id,
+                channel: "in_app",
+                type: "profile_returned",
+                subject: "Hồ sơ bị trả lại",
+                body: `Hồ sơ của bạn đã bị trả lại với lý do: ${r}`,
+              });
+            } catch (ne) {
+              console.warn(
+                "[notify] Failed to send return notification:",
+                ne.message,
+              );
+            }
+          }
           showToast(`↩ Đã trả hồ sơ ${name}`);
           addActivity(`↩ Trả hồ sơ <strong>${name}</strong> – ${r}`);
-          _loadProfileList();
+          _loadVerificationList();
           _loadDashboard();
         } catch (e) {
           showToast("✗ " + e.message);
@@ -9647,36 +10653,129 @@
         log.prepend(item);
       }
 
-      async function createAccount() {
+      function goToAccStep(step) {
+        // Validate current step before moving forward
+        if (step > 1) {
+          const name = document.getElementById("accName").value.trim();
+          const cccd = document.getElementById("accCCCD").value.trim();
+          const dob = document.getElementById("accDOB").value;
+          const phone = document.getElementById("accPhone").value.trim();
+
+          if (!name || !cccd || !dob || !phone) {
+            alert("Vui lòng điền đủ Họ tên, CCCD, Ngày sinh và Số điện thoại.");
+            return;
+          }
+          if (cccd.length !== 12) {
+            alert("CCCD phải có 12 ký tự");
+            return;
+          }
+        }
+        if (step > 2) {
+          const email = document.getElementById("accEmail").value.trim();
+          if (!email) {
+            alert("Vui lòng nhập email Gmail để nhận tài khoản.");
+            return;
+          }
+          if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            alert("Email không hợp lệ.");
+            return;
+          }
+        }
+
+        // Hide all steps
+        document.getElementById("accStep1").style.display = "none";
+        document.getElementById("accStep2").style.display = "none";
+        document.getElementById("accStep3").style.display = "none";
+
+        // Remove active class from all indicators
+        document.getElementById("step1Indicator").classList.remove("active");
+        document.getElementById("step2Indicator").classList.remove("active");
+        document.getElementById("step3Indicator").classList.remove("active");
+
+        // Show current step
+        if (step === 1) {
+          document.getElementById("accStep1").style.display = "block";
+          document.getElementById("step1Indicator").classList.add("active");
+          document.getElementById("accStepTitle").textContent =
+            "Bước 1 – Thông tin định danh";
+        } else if (step === 2) {
+          document.getElementById("accStep2").style.display = "block";
+          document.getElementById("step2Indicator").classList.add("active");
+          document.getElementById("accStepTitle").textContent =
+            "Bước 2 – Gmail nhận tài khoản";
+        } else if (step === 3) {
+          document.getElementById("accStep3").style.display = "block";
+          document.getElementById("step3Indicator").classList.add("active");
+          document.getElementById("accStepTitle").textContent =
+            "Bước 3 – Xác nhận thông tin";
+          updateAccReview();
+        }
+      }
+
+      function resetAccForm() {
+        if (!confirm("Hủy điền mẫu? Tất cả dữ liệu sẽ bị xóa.")) return;
+        document.getElementById("accName").value = "";
+        document.getElementById("accCCCD").value = "";
+        document.getElementById("accDOB").value = "";
+        document.getElementById("accPhone").value = "";
+        document.getElementById("accEmail").value = "";
+        document.getElementById("chkEmail").checked = true;
+        goToAccStep(1);
+      }
+
+      function updateAccReview() {
         const name = document.getElementById("accName").value.trim();
         const cccd = document.getElementById("accCCCD").value.trim();
+        const dob = document.getElementById("accDOB").value;
         const phone = document.getElementById("accPhone").value.trim();
-        const email = document.getElementById("accEmail")?.value.trim() || "";
-        if (!name || !cccd || !phone) {
-          alert("Vui lòng điền đủ Họ tên, CCCD và Số điện thoại.");
+        const email = document.getElementById("accEmail").value.trim();
+        const channels = [];
+        if (document.getElementById("chkEmail").checked) channels.push("Gmail");
+
+        document.getElementById("reviewName").textContent = name || "—";
+        document.getElementById("reviewCCCD").textContent = cccd || "—";
+        document.getElementById("reviewDOB").textContent = dob
+          ? new Date(dob).toLocaleDateString("vi-VN")
+          : "—";
+        document.getElementById("reviewPhone").textContent = phone || "—";
+        document.getElementById("reviewEmail").textContent = email || "—";
+        document.getElementById("reviewChannels").textContent = channels.length
+          ? channels.join(", ")
+          : "Không chọn";
+      }
+
+      async function submitCreateAccount() {
+        const name = document.getElementById("accName").value.trim();
+        const cccd = document.getElementById("accCCCD").value.trim();
+        const dob = document.getElementById("accDOB").value;
+        const phone = document.getElementById("accPhone").value.trim();
+        const email = document.getElementById("accEmail").value.trim();
+        const notify_email = document.getElementById("chkEmail").checked;
+
+        if (!email) {
+          showToast("✗ Vui lòng nhập Gmail để gửi thông tin đăng nhập");
           return;
         }
+
         try {
           showToast("⏳ Đang cấp tài khoản…");
           await API.post("/auth/account-requests/", {
             full_name: name,
             cccd,
             phone,
-            dob: "2000-01-01",
+            dob: dob,
             email: email || undefined,
-            notify_sms: true,
+            notify_email,
           });
+          console.log("[DEBUG] account request created successfully");
           showToast(`✅ Đã cấp tài khoản cho ${name}`);
           addActivity(
             `🔑 Cấp tài khoản mới cho <strong>${name}</strong> – CCCD ${cccd}`,
           );
-          document.getElementById("accName").value = "";
-          document.getElementById("accCCCD").value = "";
-          document.getElementById("accPhone").value = "";
-          if (document.getElementById("accEmail"))
-            document.getElementById("accEmail").value = "";
+          resetAccForm();
           _loadRecentAccounts();
         } catch (e) {
+          console.error("[DEBUG] account creation error:", e);
           showToast(`✗ Tạo tài khoản thất bại: ${e.message}`);
         }
       }
@@ -9908,7 +11007,20 @@
       let currentEditProfile = { name: "", score: 94 };
       let editHistoryLog = []; // [{field, oldVal, newVal, by, ts}]
       let flaggedSections = new Set();
+      let _flagSectionNotes = {};
       let _adminTlSrvIds = new Set();
+      const _EDIT_SECTION_LABEL = {
+        esA: "A. Sơ lược lý lịch",
+        esB: "B. Lịch sử bản thân",
+        esC: "C. Trình độ",
+        esD: "D. Gia đình",
+        esE: "E. Khen thưởng/Kỷ luật",
+        esF: "F. Tài liệu",
+        esH: "H. Kỷ luật",
+        esI: "I. Hoàn cảnh gia đình",
+        esJ: "J. Tự nhận xét",
+        esK: "K. Cam đoan",
+      };
 
       // Open the edit page for a given profile (by ID preferred)
       async function openProfileEdit(nameOrId, score, status) {
@@ -9938,6 +11050,7 @@
               score: p.ai_score || 0,
               status: p.status || "draft",
             };
+            _restoreFlagDraftForProfile(p.id);
 
             if (t) t.textContent = p.full_name || "—";
             const sc = document.getElementById("editAIScore");
@@ -10335,6 +11448,9 @@
             _syncSec(`/timelines/${id}/history/`, _adminTlSrvIds, tlRows),
           ]);
 
+          // Sync correction flags to backend right on Save so applicant can see them immediately.
+          await _syncCorrectionsFromCurrentFlags(id);
+
           document
             .querySelectorAll(".editable-section.editing")
             .forEach((sec) => {
@@ -10351,10 +11467,42 @@
         }
       }
 
+      async function _syncCorrectionsFromCurrentFlags(profileId, overallNote) {
+        if (!profileId) return;
+        const items = [...flaggedSections].map((sectionLabel) => ({
+          section: sectionLabel,
+          field_name: null,
+          description:
+            _flagSectionNotes[sectionLabel] ||
+            `Yêu cầu bổ sung ${sectionLabel}`,
+        }));
+        if (!items.length) return;
+        try {
+          await API.post("/exports/corrections/", {
+            profile: profileId,
+            overall_note: overallNote || "Yêu cầu bổ sung hồ sơ",
+            items,
+          });
+          console.log(
+            "[CORRECTION DEBUG] Synced correction flags on save. profile:",
+            profileId,
+            "items:",
+            items.length,
+          );
+        } catch (e) {
+          console.warn(
+            "[CORRECTION DEBUG] Sync correction on save failed:",
+            e.message,
+          );
+        }
+      }
+
       // Toggle flag on a section
       function toggleSectionFlag(secId, label) {
         const sec = document.getElementById(secId);
         if (!sec) return;
+        sec.dataset.correctionLabel =
+          label || _EDIT_SECTION_LABEL[secId] || secId;
         const btn = sec.querySelector(".flag-btn");
         const note = document.getElementById("note-" + secId);
 
@@ -10369,6 +11517,7 @@
             note.classList.remove("visible");
           }
           flaggedSections.delete(label);
+          delete _flagSectionNotes[label];
         } else {
           // Flag — prompt for note
           const noteText =
@@ -10383,12 +11532,199 @@
             note.classList.add("visible");
           }
           flaggedSections.add(label);
+          _flagSectionNotes[label] =
+            noteText || "Phần này cần xem lại / bổ sung.";
         }
         // Update sidenav badge
         document.querySelectorAll(".edit-nav-item").forEach((n) => {
           if (n.textContent.includes(label.split(".")[0]))
             n.classList.toggle("has-issue", flaggedSections.has(label));
         });
+        _persistFlagDraftForCurrentProfile();
+      }
+
+      function _persistFlagDraftForCurrentProfile() {
+        const pid = currentEditProfile?.id;
+        console.log("[CORRECTION DEBUG] Persisting flags for profile:", pid);
+        if (!pid) {
+          console.log(
+            "[CORRECTION DEBUG] No current profile ID, skipping persist",
+          );
+          return;
+        }
+        const items = [...flaggedSections].map((s) => ({
+          section: s,
+          description: _flagSectionNotes[s] || `Yêu cầu bổ sung ${s}`,
+        }));
+        const key = `profile_flag_draft_${pid}`;
+        console.log("[CORRECTION DEBUG] Flagged sections:", [
+          ...flaggedSections,
+        ]);
+        console.log("[CORRECTION DEBUG] Draft items to persist:", items);
+
+        if (!items.length) {
+          localStorage.removeItem(key);
+          console.log(
+            "[CORRECTION DEBUG] No items, cleared localStorage key:",
+            key,
+          );
+          return;
+        }
+        localStorage.setItem(key, JSON.stringify(items));
+        console.log(
+          "[CORRECTION DEBUG] ✓ Saved to localStorage:",
+          key,
+          "with",
+          items.length,
+          "items",
+        );
+      }
+
+      function _consumeFlagDraft(profileId) {
+        const key = `profile_flag_draft_${profileId}`;
+        console.log("[CORRECTION DEBUG] Consuming draft from key:", key);
+        let items = [];
+        try {
+          const stored = localStorage.getItem(key);
+          console.log("[CORRECTION DEBUG] localStorage value:", stored);
+          items = JSON.parse(stored || "[]");
+          if (!Array.isArray(items)) items = [];
+        } catch (e) {
+          console.error(
+            "[CORRECTION DEBUG] Failed to parse draft JSON:",
+            e.message,
+          );
+          items = [];
+        }
+        console.log("[CORRECTION DEBUG] Parsed items:", items);
+        localStorage.removeItem(key);
+        console.log(
+          "[CORRECTION DEBUG] ✓ Consumed and deleted draft from localStorage:",
+          key,
+        );
+        return items;
+      }
+
+      function _getFlagDraft(profileId) {
+        const key = `profile_flag_draft_${profileId}`;
+        try {
+          const items = JSON.parse(localStorage.getItem(key) || "[]");
+          return Array.isArray(items) ? items : [];
+        } catch {
+          return [];
+        }
+      }
+
+      function _restoreFlagDraftForProfile(profileId) {
+        flaggedSections = new Set();
+        _flagSectionNotes = {};
+
+        // Reset all UI state first
+        document.querySelectorAll(".editable-section").forEach((sec) => {
+          sec.classList.remove("has-correction");
+          const btn = sec.querySelector(".flag-btn");
+          if (btn) {
+            btn.textContent = "⚑ Gắn cờ";
+            btn.classList.remove("active-flag");
+          }
+          const sid = sec.id;
+          const note = document.getElementById("note-" + sid);
+          if (note) {
+            note.classList.remove("visible");
+            note.textContent = "";
+          }
+        });
+        document
+          .querySelectorAll(".edit-nav-item")
+          .forEach((n) => n.classList.remove("has-issue"));
+
+        const items = _getFlagDraft(profileId);
+        items.forEach((it) => {
+          const label = String(it.section || "").trim();
+          if (!label) return;
+          const secId = Object.keys(_EDIT_SECTION_LABEL).find(
+            (k) => _EDIT_SECTION_LABEL[k] === label,
+          );
+          if (!secId) return;
+          const sec = document.getElementById(secId);
+          if (!sec) return;
+          const btn = sec.querySelector(".flag-btn");
+          const note = document.getElementById("note-" + secId);
+
+          sec.classList.add("has-correction");
+          sec.dataset.correctionLabel = label;
+          if (btn) {
+            btn.textContent = "⚑ Đã gắn cờ";
+            btn.classList.add("active-flag");
+          }
+          if (note) {
+            note.textContent =
+              it.description || "Phần này cần xem lại / bổ sung.";
+            note.classList.add("visible");
+          }
+          flaggedSections.add(label);
+          _flagSectionNotes[label] =
+            it.description || "Phần này cần xem lại / bổ sung.";
+        });
+
+        document.querySelectorAll(".edit-nav-item").forEach((n) => {
+          const prefix = n.textContent.split(".")[0];
+          if ([...flaggedSections].some((s) => s.startsWith(prefix + "."))) {
+            n.classList.add("has-issue");
+          }
+        });
+      }
+
+      async function _postCorrectionRequestIfAny(profileId, overallNote) {
+        console.log(
+          "[CORRECTION DEBUG] Starting _postCorrectionRequestIfAny for profile:",
+          profileId,
+        );
+        const draftItems = _consumeFlagDraft(profileId);
+        console.log("[CORRECTION DEBUG] Draft items consumed:", draftItems);
+        console.log(
+          "[CORRECTION DEBUG] Number of flagged sections:",
+          draftItems.length,
+        );
+
+        if (!draftItems.length) {
+          console.log(
+            "[CORRECTION DEBUG] No draft items, skipping correction post",
+          );
+          return;
+        }
+
+        try {
+          const payload = {
+            profile: profileId,
+            overall_note: overallNote || "Yêu cầu bổ sung hồ sơ",
+            items: draftItems.map((it) => ({
+              section: it.section,
+              field_name: null,
+              description: it.description || overallNote || "Yêu cầu bổ sung",
+            })),
+          };
+          console.log(
+            "[CORRECTION DEBUG] Posting correction request with payload:",
+            JSON.stringify(payload, null, 2),
+          );
+
+          const result = await API.post("/exports/corrections/", payload);
+          console.log(
+            "[CORRECTION DEBUG] ✓ Correction request created successfully:",
+            result,
+          );
+        } catch (e) {
+          console.error(
+            "[CORRECTION DEBUG] ✗ Create correction request failed:",
+            {
+              message: e.message,
+              status: e.status,
+              response: e.response,
+              stack: e.stack,
+            },
+          );
+        }
       }
 
       // Timeline row management
@@ -10452,6 +11788,9 @@
       function addReturnSection(label) {
         if (flaggedSections.has(label)) return;
         flaggedSections.add(label);
+        if (!_flagSectionNotes[label]) {
+          _flagSectionNotes[label] = `Yêu cầu bổ sung ${label}`;
+        }
         const tags = document.getElementById("flaggedSectionTags");
         if (tags) {
           const tag = document.createElement("span");
@@ -10459,31 +11798,117 @@
           tag.innerHTML = `${label} <span class="tag-remove" onclick="removeReturnTag(this,'${label}')">✕</span>`;
           tags.appendChild(tag);
         }
+        _persistFlagDraftForCurrentProfile();
       }
 
       function removeReturnTag(el, label) {
         flaggedSections.delete(label);
+        delete _flagSectionNotes[label];
         el.closest(".crp-section-tag").remove();
+        _persistFlagDraftForCurrentProfile();
       }
 
-      function confirmReturnProfile() {
+      function _buildCorrectionItemsFromFlags() {
+        console.log(
+          "[CORRECTION DEBUG] Building correction items from flags...",
+        );
+        const items = [];
+        const flaggedEls = document.querySelectorAll(
+          ".editable-section.has-correction",
+        );
+        console.log(
+          "[CORRECTION DEBUG] Found .editable-section.has-correction elements:",
+          flaggedEls.length,
+        );
+
+        flaggedEls.forEach((sec) => {
+          const secId = sec.id;
+          const noteEl = document.getElementById("note-" + secId);
+          const noteText = (noteEl?.textContent || "").trim();
+          const sectionLabel =
+            sec.dataset.correctionLabel || _EDIT_SECTION_LABEL[secId] || secId;
+          console.log("[CORRECTION DEBUG] Section:", {
+            secId,
+            sectionLabel,
+            hasNote: !!noteText,
+            notePreview: noteText.substring(0, 50),
+          });
+          items.push({
+            section: sectionLabel,
+            field_name: null,
+            description: noteText || `Yêu cầu bổ sung ${sectionLabel}`,
+          });
+        });
+
+        console.log(
+          "[CORRECTION DEBUG] Built",
+          items.length,
+          "correction items:",
+          items,
+        );
+        return items;
+      }
+
+      async function confirmReturnProfile() {
         const note = document.getElementById("returnModalNote").value;
         if (!note.trim()) {
           showToast("⚠ Vui lòng nhập ghi chú yêu cầu bổ sung");
           return;
         }
-        closeReturnModal();
-        showToast(
-          `✅ Đã trả lại hồ sơ ${currentEditProfile.name} – Thông báo đã gửi qua Zalo OA`,
-        );
-        addActivity(
-          `↩ Trả lại hồ sơ <strong>${currentEditProfile.name}</strong> – ${[...flaggedSections].join(", ")}`,
-        );
-        // Update status select
-        const ss = document.getElementById("editStatusSelect");
-        if (ss) ss.value = "returned";
-        // Go back to profiles list after short delay
-        setTimeout(() => showAdminPageByName("pgProfiles"), 1200);
+        if (!currentEditProfile.id) {
+          showToast("⚠ Không tìm thấy hồ sơ để trả lại");
+          return;
+        }
+        const items = _buildCorrectionItemsFromFlags();
+        try {
+          await API.post(`/profiles/${currentEditProfile.id}/workflow/`, {
+            action: "return",
+            comment: note,
+            return_reason: note,
+          });
+
+          // Notify applicant in-app about returned profile
+          try {
+            const pResp = await API.get(`/profiles/${currentEditProfile.id}/`);
+            const profileObj = pResp.data || pResp;
+            const recipientId = profileObj?.user?.id;
+            if (recipientId) {
+              await API.post("/notifications/send/", {
+                recipient_id: recipientId,
+                profile_id: currentEditProfile.id,
+                channel: "in_app",
+                type: "profile_returned",
+                subject: "Hồ sơ bị trả lại",
+                body: `Hồ sơ của bạn đã bị trả lại với lý do: ${note}`,
+              });
+            }
+          } catch (ne) {
+            console.warn(
+              "[notify] Failed to send return notification:",
+              ne.message,
+            );
+          }
+
+          if (items.length) {
+            await API.post("/exports/corrections/", {
+              profile: currentEditProfile.id,
+              overall_note: note,
+              items,
+            });
+          }
+
+          closeReturnModal();
+          showToast(`✅ Đã trả lại hồ sơ ${currentEditProfile.name}`);
+          addActivity(
+            `↩ Trả lại hồ sơ <strong>${currentEditProfile.name}</strong> – ${[...flaggedSections].join(", ")}`,
+          );
+          const ss = document.getElementById("editStatusSelect");
+          if (ss) ss.value = "returned";
+          _loadVerificationList();
+          setTimeout(() => showAdminPageByName("pgVerify"), 900);
+        } catch (e) {
+          showToast("✗ " + (e.message || "Lỗi trả hồ sơ"));
+        }
       }
 
       // Open edit from profile table "Chỉnh sửa" button
@@ -10996,10 +12421,7 @@
         body += sp(3) + headerBand("CAM ĐOAN VÀ KÝ TÊN") + sp();
         body += `<w:tbl><w:tblPr><w:tblW w:w="${TW}" w:type="dxa"/><w:tblBorders>${BDR()}</w:tblBorders></w:tblPr><w:tblGrid><w:gridCol w:w="${TW}"/></w:tblGrid><w:tr><w:tc><w:tcPr><w:tcW w:w="${TW}" w:type="dxa"/><w:tcBorders>${BDR()}</w:tcBorders><w:tcMar>${CM}</w:tcMar></w:tcPr>${makePara(makeRun("Tôi cam đoan đã khai đầy đủ, rõ ràng, trung thực và chịu trách nhiệm trước Đảng.", { bold: true }), { align: "center", spaceBefore: 60, spaceAfter: 80 })}${makePara(makeRun("......., ngày .... tháng .... năm 20....."), { align: "center" })}${makePara(makeRun("Ký tên", { bold: true }), { align: "center", spaceBefore: 200, spaceAfter: 20 })}${makePara(makeRun("(" + esc(p.fullNameUsual || p.fullName || "") + ")"), { align: "center", spaceBefore: 200, spaceAfter: 40 })}</w:tc></w:tr></w:tbl>`;
 
-        // NHẬN XÉT / CHỨNG NHẬN
-        body += sp(3) + headerBand("NHẬN XÉT CỦA CHI ỦY HOẶC CHI BỘ") + sp();
-        body += `<w:tbl><w:tblPr><w:tblW w:w="${TW}" w:type="dxa"/><w:tblBorders>${BDR()}</w:tblBorders></w:tblPr><w:tblGrid><w:gridCol w:w="${TW}"/></w:tblGrid><w:tr><w:tc><w:tcPr><w:tcW w:w="${TW}" w:type="dxa"/><w:tcBorders>${BDR()}</w:tcBorders><w:tcMar>${CM}</w:tcMar></w:tcPr>${makePara(makeRun("Chi bộ chỉ ghi sau khi thẩm tra xác minh xong. KHÔNG ghi trước khi gửi đi xác minh."))}${sp(4)}${makePara(makeRun("......., ngày .... tháng .... năm 20....."), { align: "right" })}${makePara(makeRun("Bí thư Chi bộ", { bold: true }), { align: "center" })}${makePara(makeRun("(Ký, ghi họ và tên)"), { align: "center", spaceAfter: 80 })}</w:tc></w:tr></w:tbl>`;
-
+        // CHỨNG NHẬN
         body += sp(2) + headerBand("CHỨNG NHẬN CỦA CẤP ỦY CƠ SỞ") + sp();
         body += `<w:tbl><w:tblPr><w:tblW w:w="${TW}" w:type="dxa"/><w:tblBorders>${BDR()}</w:tblBorders></w:tblPr><w:tblGrid><w:gridCol w:w="${TW}"/></w:tblGrid><w:tr><w:tc><w:tcPr><w:tcW w:w="${TW}" w:type="dxa"/><w:tcBorders>${BDR()}</w:tcBorders><w:tcMar>${CM}</w:tcMar></w:tcPr>${makePara(makeRun("Đảng ủy/chi ủy cơ sở ghi sau khi thẩm tra xác minh xong."))}${sp(4)}${makePara(makeRun("......., ngày .... tháng .... năm 20....."), { align: "right" })}${makePara(makeRun("TM. Cấp ủy cơ sở / Bí thư", { bold: true }), { align: "center" })}${makePara(makeRun("(Ký, ghi họ và tên, đóng dấu)"), { align: "center", spaceAfter: 80 })}</w:tc></w:tr></w:tbl>`;
 
@@ -11155,11 +12577,6 @@
         );
       }
 
-      // Initialise export list when settings page opens
-      document.addEventListener("DOMContentLoaded", () => {
-        // Delay to let admin UI build
-        setTimeout(filterWordExportList, 500);
-      });
       // ===== INTEGRATION CONNECT =====
       /* ─────────────────────────────────────────────────────────────────────────
    JWT AUTHENTICATION LAYER  ·  Mẫu 2-KNĐ  ·  Ban Xây dựng Đảng
@@ -11196,6 +12613,10 @@
           // Live Server (port 5500) or file:// → point to Django
           const { protocol, hostname, port } = location;
           if (protocol === "file:" || port === "5500" || port === "5501") {
+            return "http://127.0.0.1:8000/api/v1";
+          }
+          // Production environment
+          if (hostname === "14.224.210.210" || hostname === "lylich.gov.vn") {
             return "http://14.224.210.210:8003/api/v1";
           }
           return "/api/v1";
@@ -11559,46 +12980,61 @@
           );
         }
 
-        // Update sidebar user display
-        const nameEl = document.querySelector(".sidebar-user-name");
-        const roleEl = document.querySelector(".sidebar-user-role");
-        const avatarEl = document.querySelector(".sidebar-avatar");
-        if (nameEl) nameEl.textContent = user.name || user.phone;
-        if (roleEl)
-          roleEl.textContent =
+        // Update sidebar user display (both admin and member sidebars)
+        document.querySelectorAll(".sidebar-user-name").forEach((el) => {
+          el.textContent = user.name || user.phone;
+        });
+        document.querySelectorAll(".sidebar-user-role").forEach((el) => {
+          el.textContent =
             roleCode === "admin"
               ? "Quản trị viên"
               : roleCode === "can_bo_bxd"
                 ? "Cán bộ BXD Đảng"
                 : "Quần chúng";
-        if (avatarEl)
-          avatarEl.textContent = (user.name || "U")
+        });
+        document.querySelectorAll(".sidebar-avatar").forEach((el) => {
+          el.textContent = (user.name || "U")
             .split(" ")
             .map((p) => p[0])
             .slice(-2)
             .join("")
             .toUpperCase();
-        // Admin user display
-        const adminName = document.querySelector(".admin-user-name");
-        const adminRole = document.querySelector(".admin-user-role");
-        const adminAvatar = document.querySelector(".admin-avatar");
-        if (adminName) adminName.textContent = user.name || user.phone;
-        if (adminRole)
-          adminRole.textContent =
-            roleCode === "admin" ? "Quản trị viên" : "Cán bộ BXD Đảng";
-        if (adminAvatar)
-          adminAvatar.textContent = (user.name || "U")
-            .split(" ")
-            .map((p) => p[0])
-            .slice(-2)
-            .join("")
-            .toUpperCase();
+        });
+        // Store roleCode globally for use in other functions
+        window.appState = window.appState || {};
+        window.appState.roleCode = roleCode;
+
+        // Hide/show admin-only navigation tabs based on role
+        const adminOnlyTabs = [
+          "navAdmin",
+          "navProfiles",
+          "navAccounts",
+          "navVerify",
+          "navParty",
+          "navReports",
+          "navSettings",
+        ];
+        adminOnlyTabs.forEach((tabId) => {
+          const tab = document.getElementById(tabId);
+          if (tab) {
+            tab.style.display = roleCode === "quan_chung" ? "none" : "flex";
+          }
+        });
+
+        // Hide role toggle button for regular users to prevent switching to admin UI
+        const btnRoleAdmin = document.getElementById("btnRoleAdmin");
+        if (btnRoleAdmin) {
+          btnRoleAdmin.style.display =
+            roleCode === "quan_chung" ? "none" : "inline-block";
+        }
+
         // Route by role (only quần chúng uses /profiles/my/)
         if (roleCode === "quan_chung") {
           switchRole("member");
           _loadMyProfile();
           _loadNotificationStats();
           _loadNotificationList();
+          _checkMemberNotifBadge();
         } else {
           switchRole("admin");
           _loadDashboard();
@@ -12016,6 +13452,96 @@
       }
 
       /* ─────────────────────────────────────────────────────────────────────────
+   MEMBER NOTIFICATION BELL (quan_chung)
+───────────────────────────────────────────────────────────────────────── */
+      async function _checkMemberNotifBadge() {
+        try {
+          const resp = await API.get("/notifications/stats/");
+          const data = resp.data || resp;
+          const unread = data.unread_count ?? 0;
+          const badge = document.getElementById("memberNotifBadge");
+          if (badge) {
+            badge.textContent = unread > 0 ? unread : "";
+            badge.style.display = unread > 0 ? "" : "none";
+          }
+        } catch {}
+      }
+
+      async function _toggleMemberNotif() {
+        const drop = document.getElementById("memberNotifDropdown");
+        if (!drop) return;
+        const isOpen = drop.style.display !== "none";
+        drop.style.display = isOpen ? "none" : "block";
+        if (!isOpen) await _loadMemberNotifList();
+      }
+
+      async function _loadMemberNotifList() {
+        const list = document.getElementById("memberNotifList");
+        if (!list) return;
+        list.innerHTML =
+          '<div style="padding:12px 14px;color:var(--muted)">⏳ Đang tải…</div>';
+        try {
+          const data = await API.get("/notifications/?page_size=15");
+          const items = data.results || [];
+          if (!items.length) {
+            list.innerHTML =
+              '<div style="padding:16px 14px;color:var(--muted);text-align:center">Không có thông báo nào.</div>';
+            return;
+          }
+          list.innerHTML = items
+            .map((n) => {
+              const time = n.created_at ? _fmtDate(n.created_at) : "";
+              const isUnread = !n.is_read;
+              const iconMap = {
+                profile_returned: "↩",
+                profile_approved: "✅",
+                profile_submitted: "📤",
+                account_created: "👤",
+                correction_request: "✏",
+              };
+              const icon = iconMap[n.type] || "🔔";
+              return `<div onclick="_markMemberNotifRead(${n.id}, this)" style="padding:10px 14px;border-bottom:1px solid var(--border-xl);cursor:pointer;background:${isUnread ? "#EFF6FF" : "#fff"};display:flex;gap:10px;align-items:flex-start" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='${isUnread ? "#EFF6FF" : "#fff"}"'>
+      <div style="font-size:18px;line-height:1.2">${icon}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:12.5px;font-weight:${isUnread ? "700" : "500"};color:var(--navy)">${_esc(n.subject || n.type || "Thông báo")}</div>
+        <div style="font-size:11.5px;color:var(--muted);margin-top:2px;word-break:break-word">${_esc(n.body || "")}</div>
+        <div style="font-size:10.5px;color:var(--hint);margin-top:4px">${time}</div>
+      </div>
+      ${isUnread ? '<div style="width:7px;height:7px;border-radius:50%;background:var(--crimson);flex-shrink:0;margin-top:4px"></div>' : ""}
+    </div>`;
+            })
+            .join("");
+          // Refresh badge count
+          _checkMemberNotifBadge();
+        } catch (e) {
+          list.innerHTML = `<div style="padding:12px 14px;color:var(--red)">✗ Lỗi: ${_esc(e.message)}</div>`;
+        }
+      }
+
+      async function _markMemberNotifRead(id, el) {
+        try {
+          await API.post(`/notifications/${id}/read/`);
+          if (el) {
+            el.style.background = "#fff";
+            const badge = el.querySelector('div[style*="border-radius:50%"]');
+            if (badge) badge.remove();
+          }
+          _checkMemberNotifBadge();
+        } catch {}
+      }
+
+      async function _markAllMemberNotifRead() {
+        try {
+          await API.post("/notifications/read-all/");
+          document.getElementById("memberNotifDropdown").style.display = "none";
+          _checkMemberNotifBadge();
+          showToast("✅ Đã đánh dấu tất cả là đã đọc");
+        } catch (e) {
+          showToast("✗ " + e.message);
+        }
+      }
+
+      /* ─────────────────────────────────────────────────────────────────────────
    NOTIFICATIONS — stats badge
 ───────────────────────────────────────────────────────────────────────── */
       async function _loadNotificationStats() {
@@ -12105,7 +13631,7 @@
         const tbody = document.getElementById("verifyTbody");
         if (!tbody) return;
         tbody.innerHTML =
-          '<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--muted)">⏳ Đang tải…</td></tr>';
+          '<tr><td colspan="5" style="text-align:center;padding:24px;color:var(--muted)">⏳ Đang tải…</td></tr>';
         try {
           // Load stats
           const statsResp = await API.get("/verification/stats/");
@@ -12119,59 +13645,279 @@
           if ($("vs-overdue"))
             $("vs-overdue").textContent = stats.overdue ?? "—";
 
-          // Load list
-          const data = await API.get("/verification/?page_size=20");
-          const items = data.results || [];
-          console.log("[API] verifications loaded", items.length);
-          if (!items.length) {
+          // Load users, profiles and verifications in parallel
+          const statusFilter =
+            document.getElementById("verifyStatusFilter")?.value || "";
+          const profileParams = new URLSearchParams({
+            page_size: "100",
+            ordering: "-updated_at",
+          });
+          if (statusFilter) profileParams.set("status", statusFilter);
+
+          const [usersData, profData, verifyData] = await Promise.all([
+            API.get(
+              "/auth/users/?role__code=quan_chung&page_size=300&ordering=-created_at",
+            ),
+            API.get(`/profiles/?${profileParams}`),
+            API.get("/verification/?page_size=200"),
+          ]);
+
+          const users = usersData.results || [];
+          const profiles = profData.results || [];
+          const verifications = verifyData.results || [];
+
+          // Keep profile cache as true profile list so legacy lookups use profile.id, not user.id.
+          _profilesCache = profiles;
+
+          // Index verifications by profile id (most recent per profile)
+          const verifyMap = {};
+          verifications.forEach((v) => {
+            if (!verifyMap[v.profile] || v.id > verifyMap[v.profile].id)
+              verifyMap[v.profile] = v;
+          });
+
+          // Map profile by phone to align with user list serializer fields.
+          const profileByPhone = {};
+          profiles.forEach((p) => {
+            if (p.user_phone) profileByPhone[p.user_phone] = p;
+          });
+
+          // Always show full user list; if a status filter is selected, keep rows with matching profiles only.
+          const displayUsers = statusFilter
+            ? users.filter((u) => {
+                const p = profileByPhone[u.phone];
+                return p && p.status === statusFilter;
+              })
+            : users;
+
+          console.log("[API] verify users loaded", displayUsers.length);
+
+          if (!displayUsers.length) {
             tbody.innerHTML =
-              '<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--muted)">Chưa có yêu cầu xác minh nào.</td></tr>';
+              '<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--muted)">Chưa có hồ sơ nào cần theo dõi.</td></tr>';
             return;
           }
-          const stCls = {
-            pending: "pill-draft",
-            received: "pill-verify",
-            completed: "pill-done",
-            overdue: "pill-overdue",
-          };
-          const stLabel = {
-            pending: "Chờ phản hồi",
-            received: "Đã nhận KQ",
-            completed: "Hoàn tất",
-            overdue: "Quá hạn",
-          };
-          tbody.innerHTML = items
-            .map((v) => {
-              const isOverdue = v.status === "overdue";
-              const cls = stCls[v.status] || "pill-new";
-              const label = stLabel[v.status] || v.status_display || v.status;
-              return `<tr${isOverdue ? ' style="background:#FEF8F8"' : ""}>
-        <td><div class="name-cell">${_esc(v.profile_name || "—")}</div><div class="sub-cell">Quần chúng xin vào Đảng</div></td>
-        <td style="font-size:12px">${_esc(v.agency_name || "—")}</td>
-        <td style="font-size:12px;max-width:200px">${_esc(v.content || "—")}</td>
-        <td style="font-size:12px;white-space:nowrap">${v.sent_date ? v.sent_date.split("-").reverse().join("/") : "—"}</td>
-        <td style="font-size:12px;white-space:nowrap${isOverdue ? ";font-weight:700;color:var(--crimson)" : ""}">${v.deadline ? v.deadline.split("-").reverse().join("/") : "—"}${isOverdue ? " ⚠" : ""}</td>
-        <td><span class="pill ${cls}">${label}</span></td>
-        <td style="white-space:nowrap">
-          ${v.status === "pending" ? `<button class="act-btn act-view" onclick="API.post('/verification/${v.id}/remind/',{}).then(()=>showToast('Đã nhắc'))">Nhắc lại</button> <button class="act-btn act-approve" onclick="_receiveVerify(${v.id})">Nhận KQ</button>` : ""}
-          ${v.status === "received" ? `<button class="act-btn act-view">Xem KQ</button>` : ""}
-          ${v.status === "completed" ? `<button class="act-btn act-view">Xem</button>` : ""}
-          ${isOverdue ? `<button class="act-btn act-return" onclick="API.post('/verification/${v.id}/remind/',{channel:'email'}).then(()=>showToast('Đã gửi nhắc khẩn'))">Nhắc khẩn</button>` : ""}
+
+          tbody.innerHTML = displayUsers
+            .map((u) => {
+              const p = profileByPhone[u.phone] || null;
+              const st = p
+                ? statusMap[p.status] || {
+                    cls: "pill-new",
+                    label: p.status_display || p.status,
+                  }
+                : { cls: "pill-new", label: "Chưa tạo hồ sơ" };
+              const canApprove =
+                !!p &&
+                ["submitted", "pending", "under_review"].includes(p.status);
+              const canReturn =
+                !!p &&
+                ["submitted", "pending", "under_review", "verifying"].includes(
+                  p.status,
+                );
+              const v = p ? verifyMap[p.id] : null;
+              const canConfirmVerify = !!p && p.status === "approved" && !v;
+              const safeName = _esc(p?.full_name || u.full_name || "—");
+              const updated = p?.updated_at ? _fmtDate(p.updated_at) : "—";
+              const submitted = p?.submitted_at
+                ? _fmtDate(p.submitted_at)
+                : p?.created_at
+                  ? _fmtDate(p.created_at)
+                  : "—";
+              const canExportWord = !!p && p.status === "completed";
+              return `<tr>
+        <td><div class="name-cell">${safeName}</div><div class="sub-cell">${_esc(u.phone || "")}</div></td>
+        <td><span class="pill ${st.cls}">${st.label}</span></td>
+        <td style="font-size:12px;white-space:nowrap">${submitted}</td>
+        <td style="font-size:12px;white-space:nowrap">${updated}</td>
+        <td style="white-space:nowrap;display:flex;gap:4px;flex-wrap:wrap;padding:6px 8px">
+          ${canReturn ? `<button class="act-btn act-return" title="Trả lại hồ sơ" onclick="apiReturnProfile(${p.id},'${safeName}')">↩</button>` : ""}
+          ${p ? `<button class="act-btn act-view" title="Xem và chỉnh sửa" onclick="openDetailById(${p.id})">Xem</button>` : `<button class="act-btn act-view" title="Xem thông tin user" onclick="_openUserInfo(${u.id})">Xem</button>`}
+          ${canApprove ? `<button class="act-btn act-approve" title="Duyệt hồ sơ" onclick="apiApproveProfile(${p.id},'${safeName}')">✓ Duyệt</button>` : ""}
+          ${canConfirmVerify ? `<button class="act-btn act-view" style="background:#EEF6FF;color:#1d4ed8" title="Xác nhận yêu cầu xác minh" onclick="_confirmVerifyRequest(${p.id},'${safeName}')">Xác nhận YC</button>` : ""}
+        </td>
+        <td style="padding:6px 8px;white-space:nowrap">
+          ${canExportWord ? `<button class="act-btn act-view" title="Xuất Word" onclick="exportWordAPI(${p.id})">📄 Xuất</button>` : `<span style="font-size:11px;color:var(--hint)">Chưa đủ điều kiện</span>`}
         </td>
       </tr>`;
             })
             .join("");
         } catch (e) {
-          tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--red)">✗ Lỗi: ${_esc(e.message)}</td></tr>`;
+          tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--red)">✗ Lỗi: ${_esc(e.message)}</td></tr>`;
         }
       }
+
+      async function _getVerificationDetail(id) {
+        const resp = await API.get(`/verification/${id}/`);
+        return resp.data || resp;
+      }
+
+      async function _sendVerificationReminder(id, urgent) {
+        try {
+          const payload = urgent
+            ? {
+                channel: "email",
+                note: "Nhắc khẩn: yêu cầu phản hồi xác minh sớm.",
+              }
+            : { channel: "email", note: "Nhắc lại yêu cầu xác minh." };
+          await API.post(`/verification/${id}/remind/`, payload);
+          showToast(urgent ? "✅ Đã gửi nhắc khẩn" : "✅ Đã gửi nhắc lại");
+          _loadVerificationList();
+        } catch (e) {
+          showToast("✗ " + (e.message || "Lỗi gửi nhắc"));
+        }
+      }
+
+      async function _openVerificationDetail(id) {
+        const modal = document.getElementById("verifyDetailModal");
+        const body = document.getElementById("verifyDetailBody");
+        if (!modal || !body) return;
+        modal.classList.add("open");
+        body.innerHTML = "⏳ Đang tải...";
+
+        try {
+          const v = await _getVerificationDetail(id);
+          const sent = v.sent_date
+            ? v.sent_date.split("-").reverse().join("/")
+            : "—";
+          const deadline = v.deadline
+            ? v.deadline.split("-").reverse().join("/")
+            : "—";
+          const reminded = v.last_reminded_at
+            ? _fmtDate(v.last_reminded_at)
+            : "Chưa có";
+          const status = _esc(v.status_display || v.status || "—");
+          body.innerHTML = `
+      <div style="display:grid;grid-template-columns:170px 1fr;gap:8px 14px">
+        <div style="color:var(--muted)">Quần chúng:</div><div><strong>${_esc(v.profile_name || "—")}</strong></div>
+        <div style="color:var(--muted)">Đơn vị xác minh:</div><div>${_esc(v.agency_name || "—")}</div>
+        <div style="color:var(--muted)">Trạng thái:</div><div>${status}</div>
+        <div style="color:var(--muted)">Ngày gửi:</div><div>${sent}</div>
+        <div style="color:var(--muted)">Hạn phản hồi:</div><div>${deadline}</div>
+        <div style="color:var(--muted)">Số lần nhắc:</div><div>${v.reminder_count ?? 0}</div>
+        <div style="color:var(--muted)">Nhắc gần nhất:</div><div>${_esc(reminded)}</div>
+        <div style="color:var(--muted)">Nội dung:</div><div style="white-space:pre-wrap">${_esc(v.content || "—")}</div>
+      </div>
+    `;
+        } catch (e) {
+          body.innerHTML = `<div style="color:var(--red)">✗ Không tải được chi tiết: ${_esc(e.message || "Lỗi không xác định")}</div>`;
+        }
+      }
+
+      async function _openVerificationResult(id) {
+        const modal = document.getElementById("verifyDetailModal");
+        const body = document.getElementById("verifyDetailBody");
+        if (!modal || !body) return;
+        modal.classList.add("open");
+        body.innerHTML = "⏳ Đang tải kết quả...";
+
+        try {
+          const v = await _getVerificationDetail(id);
+          const receivedAt = v.received_at ? _fmtDate(v.received_at) : "—";
+          const completedAt = v.completed_at ? _fmtDate(v.completed_at) : "—";
+          const resultText = (v.result_summary || "").trim();
+
+          body.innerHTML = `
+      <div style="padding:10px 12px;background:#F6FAFF;border:1px solid #D7E8FF;border-radius:8px;margin-bottom:12px">
+        <div style="font-size:12px;color:var(--muted);margin-bottom:4px">Quần chúng</div>
+        <div style="font-size:14px;font-weight:700;color:var(--navy)">${_esc(v.profile_name || "—")}</div>
+      </div>
+      <div style="display:grid;grid-template-columns:170px 1fr;gap:8px 14px">
+        <div style="color:var(--muted)">Trạng thái hiện tại:</div><div>${_esc(v.status_display || v.status || "—")}</div>
+        <div style="color:var(--muted)">Đã nhận kết quả lúc:</div><div>${_esc(receivedAt)}</div>
+        <div style="color:var(--muted)">Hoàn tất lúc:</div><div>${_esc(completedAt)}</div>
+        <div style="color:var(--muted)">Kết luận xác minh:</div>
+        <div style="white-space:pre-wrap">${_esc(resultText || 'Chưa có nội dung kết quả. Cán bộ có thể nhấn "Nhận KQ" để cập nhật trước.')}</div>
+      </div>
+    `;
+        } catch (e) {
+          body.innerHTML = `<div style="color:var(--red)">✗ Không tải được kết quả: ${_esc(e.message || "Lỗi không xác định")}</div>`;
+        }
+      }
+
       async function _receiveVerify(id) {
         try {
-          await API.post(`/verification/${id}/received/`, {});
+          const summary = prompt(
+            "Nhập tóm tắt kết quả xác minh (có thể để trống):",
+            "",
+          );
+          if (summary === null) return;
+          await API.post(`/verification/${id}/received/`, {
+            result_summary: summary || "",
+          });
           showToast("✅ Đã ghi nhận kết quả xác minh");
           _loadVerificationList();
         } catch (e) {
           showToast("✗ " + e.message);
+        }
+      }
+
+      async function _loadProfilesForVerify() {
+        try {
+          const select = document.getElementById("verifyProfileSelect");
+          if (!select) return;
+          // Load profiles that are submitted (for verification)
+          const data = await API.get("/profiles/?page_size=100");
+          const profiles = data.results || [];
+          select.innerHTML =
+            '<option value="">-- Chọn quần chúng --</option>' +
+            profiles
+              .map(
+                (p) =>
+                  `<option value="${p.id}">${p.full_name} (${p.user_phone})</option>`,
+              )
+              .join("");
+        } catch (e) {
+          console.error("Failed to load profiles:", e);
+          const select = document.getElementById("verifyProfileSelect");
+          if (select)
+            select.innerHTML = '<option value="">⚠ Lỗi tải danh sách</option>';
+        }
+      }
+
+      async function submitCreateVerify() {
+        const profileId = document.getElementById("verifyProfileSelect").value;
+        const content = document.getElementById("verifyContent").value.trim();
+        const deadline = document.getElementById("verifyDeadline").value;
+        const urgency = document.getElementById("verifyUrgency").value;
+
+        if (!profileId) {
+          showToast("⚠ Vui lòng chọn quần chúng");
+          return;
+        }
+        if (!content) {
+          showToast("⚠ Vui lòng nhập nội dung xác minh");
+          return;
+        }
+        if (!deadline) {
+          showToast("⚠ Vui lòng chọn hạn xác minh");
+          return;
+        }
+
+        try {
+          const payload = {
+            profile: parseInt(profileId),
+            agency_name: "Ban Xây dựng Đảng",
+            agency_contact: "",
+            content: content,
+            urgency: urgency,
+            deadline: deadline,
+            status: "pending",
+            sent_date: new Date().toISOString().split("T")[0],
+          };
+
+          await API.post("/verification/", payload);
+          showToast("✅ Đã tạo yêu cầu xác minh");
+          document.getElementById("verifyCreateModal").classList.remove("open");
+          // Reset form
+          document.getElementById("verifyProfileSelect").value = "";
+          document.getElementById("verifyContent").value = "";
+          document.getElementById("verifyDeadline").value = "";
+          document.getElementById("verifyUrgency").value = "normal";
+          // Reload list
+          _loadVerificationList();
+        } catch (e) {
+          showToast("✗ " + (e.message || "Lỗi tạo yêu cầu"));
         }
       }
 
@@ -12207,7 +13953,7 @@
               };
               return `<tr>
         <td><div class="name-cell">${_esc(u.full_name || "—")}</div></td>
-        <td style="font-size:11.5px">${_esc(u.phone || "—")}</td>
+        <td style="font-size:11.5px">${_esc(u.cccd || "—")}</td>
         <td style="font-size:11.5px;white-space:nowrap">${created}</td>
         <td><span class="pill ${st.cls}">${st.label}</span></td>
       </tr>`;
@@ -12219,13 +13965,313 @@
       }
 
       /* ─────────────────────────────────────────────────────────────────────────
+   USER INFO MODAL
+───────────────────────────────────────────────────────────────────────── */
+      async function _openUserInfo(userId) {
+        const modal = document.getElementById("userInfoModal");
+        const body = document.getElementById("userInfoBody");
+        if (!modal || !body) return;
+        modal.classList.add("open");
+        body.innerHTML = "⏳ Đang tải thông tin...";
+        try {
+          const resp = await API.get(`/auth/users/${userId}/`);
+          const u = resp.data || resp;
+          const created = u.created_at ? _fmtDate(u.created_at) : "—";
+          const lastLogin = u.last_login_at
+            ? _fmtDate(u.last_login_at)
+            : "Chưa đăng nhập";
+          const accSt = u.status === "active" ? "✅ Hoạt động" : "🔒 Bị khoá";
+          const profileStLabel = u.profile_status
+            ? statusMap[u.profile_status]?.label || u.profile_status
+            : "Chưa có hồ sơ";
+          body.innerHTML = `
+      <div style="display:grid;grid-template-columns:150px 1fr;gap:10px 16px;font-size:13px">
+        <div style="color:var(--muted)">Họ và tên:</div><div><strong>${_esc(u.full_name || "—")}</strong></div>
+        <div style="color:var(--muted)">Số điện thoại:</div><div>${_esc(u.phone || "—")}</div>
+        <div style="color:var(--muted)">Email:</div><div>${_esc(u.email || "—")}</div>
+        <div style="color:var(--muted)">CCCD:</div><div>${_esc(u.cccd || "—")}</div>
+        <div style="color:var(--muted)">Trạng thái TK:</div><div>${accSt}</div>
+        <div style="color:var(--muted)">Trạng thái hồ sơ:</div><div>${_esc(profileStLabel)}</div>
+        <div style="color:var(--muted)">Ngày tạo TK:</div><div>${created}</div>
+        <div style="color:var(--muted)">Đăng nhập gần nhất:</div><div>${_esc(lastLogin)}</div>
+      </div>`;
+        } catch (e) {
+          body.innerHTML = `<div style="color:var(--red)">✗ Không tải được thông tin: ${_esc(e.message)}</div>`;
+        }
+      }
+
+      /* ─────────────────────────────────────────────────────────────────────────
+   CONFIRM VERIFY REQUEST (per profile on verify page)
+───────────────────────────────────────────────────────────────────────── */
+      async function _confirmVerifyRequest(profileId, profileName) {
+        const content = prompt(
+          `Nhập nội dung xác minh cho hồ sơ "${profileName}":\n(Để trống để dùng nội dung mặc định)`,
+          "Xác minh lý lịch nhân thân và quá trình công tác",
+        );
+        if (content === null) return; // user cancelled
+        const deadline = prompt(
+          "Nhập hạn xác minh (YYYY-MM-DD):",
+          new Date(Date.now() + 30 * 86400000).toISOString().split("T")[0],
+        );
+        if (!deadline) return;
+        try {
+          await API.post(`/profiles/${profileId}/workflow/`, {
+            action: "request_verify",
+            comment: "Tạo yêu cầu xác minh",
+          });
+          await API.post("/verification/", {
+            profile: profileId,
+            agency_name: "Ban Xây dựng Đảng",
+            agency_contact: "",
+            content:
+              content || "Xác minh lý lịch nhân thân và quá trình công tác",
+            urgency: "normal",
+            deadline: deadline,
+            status: "pending",
+            sent_date: new Date().toISOString().split("T")[0],
+          });
+          showToast(`✅ Đã tạo yêu cầu xác minh cho ${profileName}`);
+          addActivity(
+            `📨 Yêu cầu xác minh hồ sơ <strong>${profileName}</strong>`,
+          );
+          _loadVerificationList();
+          _loadDashboard();
+        } catch (e) {
+          showToast("✗ " + (e.message || "Lỗi tạo yêu cầu"));
+        }
+      }
+
+      /* ─────────────────────────────────────────────────────────────────────────
    MEMBER — load own profile into form fields
 ───────────────────────────────────────────────────────────────────────── */
+      async function _loadMemberCorrectionHints(profileId, profileStatus) {
+        console.log(
+          "[CORRECTION DEBUG] Starting _loadMemberCorrectionHints for profile:",
+          profileId,
+          "status:",
+          profileStatus,
+        );
+
+        // Clear previous markers
+        document
+          .querySelectorAll(".member-correction-note")
+          .forEach((el) => el.remove());
+        document
+          .querySelectorAll(".section.has-correction")
+          .forEach((sec) => sec.classList.remove("has-correction"));
+        const oldSummary = document.getElementById("memberCorrectionSummary");
+        if (oldSummary) oldSummary.remove();
+
+        if (!profileId) {
+          console.log("[CORRECTION DEBUG] Not loading - missing profileId");
+          return { sections: [], overallNote: "" };
+        }
+
+        try {
+          console.log(
+            "[CORRECTION DEBUG] Fetching corrections from: /exports/corrections/?profile_id=" +
+              profileId,
+          );
+          const resp = await API.get(
+            `/exports/corrections/?profile_id=${profileId}`,
+          );
+          console.log("[CORRECTION DEBUG] API response:", resp);
+
+          const reqListRaw =
+            resp.results || resp.data?.results || resp.data || [];
+          const reqs = Array.isArray(reqListRaw) ? reqListRaw : [];
+          console.log(
+            "[CORRECTION DEBUG] Total correction requests found:",
+            reqs.length,
+          );
+          console.log(
+            "[CORRECTION DEBUG] All requests statuses:",
+            reqs.map((r) => ({ id: r.id, status: r.status })),
+          );
+
+          const sortedReqs = [...reqs].sort((a, b) => {
+            const ta = new Date(a?.created_at || 0).getTime() || 0;
+            const tb = new Date(b?.created_at || 0).getTime() || 0;
+            if (tb !== ta) return tb - ta;
+            return (b?.id || 0) - (a?.id || 0);
+          });
+
+          const activeReq =
+            sortedReqs.find((r) =>
+              ["open", "in_progress"].includes(r.status),
+            ) || sortedReqs[0];
+
+          if (!activeReq) {
+            console.log(
+              "[CORRECTION DEBUG] No active correction request found",
+            );
+            return { sections: [], overallNote: "" };
+          }
+
+          console.log(
+            "[CORRECTION DEBUG] Using correction request:",
+            activeReq.id,
+            "status:",
+            activeReq.status,
+          );
+          console.log(
+            "[CORRECTION DEBUG] Items in this request:",
+            activeReq.items,
+          );
+
+          const secMap = {
+            A: "secA",
+            B: "secB",
+            C: "secC",
+            D: "secD",
+            E: "secE",
+            F: "secF",
+            G: "secG",
+            H: "secH",
+            I: "secI",
+            J: "secJ",
+            K: "secK",
+          };
+
+          const secNames = (activeReq.items || [])
+            .map((it) => (it.section || "").trim())
+            .filter(Boolean);
+
+          console.log(
+            "[CORRECTION DEBUG] Flagged sections to display:",
+            secNames,
+          );
+
+          function _extractSectionCode(rawSection) {
+            const txt = String(rawSection || "").trim();
+            if (!txt) return "";
+
+            // Common forms: "B. Lịch sử...", "Phần B", "section B"
+            let m = txt.match(/^(?:phần\s*)?([A-K])(?:\b|\.|\)|:|-)/i);
+            if (m) return m[1].toUpperCase();
+
+            // Embedded forms: "... Phần B ..."
+            m = txt.match(/\bphần\s+([A-K])\b/i);
+            if (m) return m[1].toUpperCase();
+
+            // ID-like forms: secB / esB
+            m = txt.match(/\b(?:sec|es)\s*([A-K])\b/i);
+            if (m) return m[1].toUpperCase();
+
+            // Last fallback: single standalone letter token
+            m = txt.match(/\b([A-K])\b/i);
+            return m ? m[1].toUpperCase() : "";
+          }
+
+          // Per-section note blocks
+          (activeReq.items || []).forEach((it) => {
+            const sectionCode = _extractSectionCode(it.section);
+            const secId = secMap[sectionCode];
+            console.log(
+              "[CORRECTION DEBUG] Processing item section:",
+              it.section,
+              "-> sectionCode:",
+              sectionCode,
+              "-> secId:",
+              secId,
+            );
+
+            if (!secId) {
+              console.log(
+                "[CORRECTION DEBUG] ⚠ No secId mapping for sectionCode:",
+                sectionCode,
+              );
+              return;
+            }
+
+            const sec = document.getElementById(secId);
+            console.log(
+              "[CORRECTION DEBUG] Section element found:",
+              !!sec,
+              "for id:",
+              secId,
+            );
+
+            if (!sec) {
+              console.log(
+                "[CORRECTION DEBUG] ✗ Cannot find section element with id:",
+                secId,
+              );
+              return;
+            }
+
+            sec.classList.add("has-correction");
+            const host = sec.querySelector(".section-header") || sec;
+            const note = document.createElement("div");
+            note.className = "member-correction-note";
+            note.style.cssText =
+              "margin-top:10px;padding:8px 12px;border-left:3px solid var(--crimson);background:#fff7f7;color:#8B0000;border-radius:8px;font-size:12.5px;line-height:1.45";
+            note.innerHTML = `<strong>Yêu cầu bổ sung:</strong> ${_esc(it.description || activeReq.overall_note || "Vui lòng bổ sung theo hướng dẫn")}`;
+            host.appendChild(note);
+            console.log(
+              "[CORRECTION DEBUG] ✓ Rendered correction note in section:",
+              secId,
+            );
+          });
+
+          console.log(
+            "[CORRECTION DEBUG] ✓ Correction hints loaded successfully",
+          );
+
+          return {
+            sections: secNames,
+            overallNote:
+              activeReq.overall_note ||
+              "Vui lòng cập nhật theo yêu cầu và nộp lại hồ sơ.",
+          };
+        } catch (e) {
+          console.error("[CORRECTION DEBUG] ✗ Correction hints load failed:", {
+            message: e.message,
+            status: e.status,
+            response: e.response,
+            stack: e.stack,
+          });
+          return { sections: [], overallNote: "" };
+        }
+      }
+
+      function _renderReturnedBanner(reason, correctionData) {
+        const old = document.getElementById("returnBanner");
+        if (old) old.remove();
+        if (!reason) return;
+        const box = document.createElement("div");
+        box.id = "returnBanner";
+        box.className = "return-hero";
+        const sections = correctionData?.sections || [];
+        box.innerHTML = `
+          <div class="return-hero-head">
+            <div class="return-hero-icon">↩</div>
+            <div class="return-hero-title">Hồ sơ đã bị trả lại, vui lòng bổ sung theo yêu cầu</div>
+          </div>
+          <div class="return-hero-body">
+            <div class="return-hero-note"><strong>Lý do từ cán bộ:</strong> ${_esc(reason)}</div>
+            ${correctionData?.overallNote ? `<div class="return-hero-note" style="margin-top:8px"><strong>Ghi chú bổ sung:</strong> ${_esc(correctionData.overallNote)}</div>` : ""}
+            ${sections.length ? `<div class="return-hero-sections">${sections.map((s) => `<span class="return-hero-chip">${_esc(s)}</span>`).join("")}</div>` : ""}
+          </div>`;
+        document.querySelector("#memberMain .content")?.prepend(box);
+      }
+
       async function _loadMyProfile() {
         try {
           const p = await API.get("/profiles/my/");
           if (!p.id) return;
           window._profileId = p.id;
+
+          // Route: if profile is submitted/under review/approved → show view panel
+          const FORM_STATUSES = ["draft", "returned"];
+          if (!FORM_STATUSES.includes(p.status)) {
+            _switchToViewMode();
+            await _renderProfileView(p);
+            return;
+          }
+
+          // Otherwise show the normal editable form
+          _switchToFormMode();
 
           // ── Section A: Sơ lược lý lịch ─────────────────────────────────
           _setVal("hoTen", p.full_name);
@@ -12256,25 +14302,344 @@
           // Cập nhật header topbar với tên động
           updateTopbarName(p.full_name || "Chưa nhập tên", p.status || "draft");
 
-          // Show return reason if profile was returned
+          // Return banner is rendered after loading correction hints
+          await _loadAllSections(p.id);
+          const correctionData = await _loadMemberCorrectionHints(
+            p.id,
+            p.status,
+          );
+          if (p.status === "returned") {
+            _renderReturnedBanner(
+              p.return_reason || "Hồ sơ cần bổ sung.",
+              correctionData,
+            );
+          }
+        } catch (e) {
+          console.warn("[API] my profile load failed:", e.message);
+        }
+      }
+
+      // ===== TOPBAR NAME UPDATE =====
+      // ===== PROFILE VIEW MODE =====
+      function _switchToFormMode() {
+        const m = document.querySelector("#memberMain main");
+        if (m) m.style.display = "";
+        document.getElementById("profileViewPanel").classList.remove("active");
+        document.getElementById("memberSideNav").classList.remove("viewmode");
+        const progressWrap = document.getElementById("memberProgressWrap");
+        if (progressWrap) progressWrap.style.display = "";
+        document.querySelector(".topbar-actions").style.display = "";
+      }
+      function _switchToViewMode() {
+        const m = document.querySelector("#memberMain main");
+        if (m) m.style.display = "none";
+        document.getElementById("profileViewPanel").classList.add("active");
+        document.getElementById("memberSideNav").classList.add("viewmode");
+        const progressWrap = document.getElementById("memberProgressWrap");
+        if (progressWrap) progressWrap.style.display = "none";
+        document.querySelector(".topbar-actions").style.display = "none";
+      }
+      const _PV_STATUS_CONFIG = {
+        submitted: {
+          icon: "📤",
+          cls: "s-submitted",
+          title: "Hồ sơ đã được nộp thành công",
+          desc: "Cán bộ Ban XD Đảng sẽ xem xét hồ sơ trong 3–5 ngày làm việc.",
+        },
+        pending: {
+          icon: "🔍",
+          cls: "s-pending",
+          title: "Đang chờ xem xét",
+          desc: "Hồ sơ đang trong hàng đợi, cán bộ chưa bắt đầu thẩm định.",
+        },
+        under_review: {
+          icon: "📑",
+          cls: "s-under_review",
+          title: "Đang được thẩm định",
+          desc: "Cán bộ đang kiểm tra chi tiết hồ sơ của bạn.",
+        },
+        verifying: {
+          icon: "🏛",
+          cls: "s-verifying",
+          title: "Đang xác minh",
+          desc: "Cơ quan xác minh đang xử lý. Chờ kết quả từ Ban XD Đảng.",
+        },
+        approved: {
+          icon: "✅",
+          cls: "s-approved",
+          title: "Hồ sơ đã được phê duyệt",
+          desc: "Chúc mừng! Hồ sơ đã được Ban XD Đảng chấp thuận.",
+        },
+        completed: {
+          icon: "🎉",
+          cls: "s-completed",
+          title: "Hồ sơ đã hoàn thiện",
+          desc: "Quá trình kê khai lý lịch đã hoàn tất.",
+        },
+        rejected: {
+          icon: "❌",
+          cls: "s-rejected",
+          title: "Hồ sơ bị từ chối",
+          desc: "Hồ sơ không đủ điều kiện. Liên hệ cán bộ để biết thêm chi tiết.",
+        },
+      };
+      const _PV_WORKFLOW_STEPS = [
+        { key: "draft", label: "Kê khai", icon: "✏" },
+        { key: "submitted", label: "Đã nộp", icon: "📤" },
+        { key: "under_review", label: "Thẩm định", icon: "📑" },
+        { key: "approved", label: "Phê duyệt", icon: "✅" },
+        { key: "verifying", label: "Xác minh", icon: "🏛" },
+        { key: "completed", label: "Hoàn thiện", icon: "🎉" },
+      ];
+      const _PV_STEP_ORDER = _PV_WORKFLOW_STEPS.map((s) => s.key);
+      async function _renderProfileView(p) {
+        const cfg = _PV_STATUS_CONFIG[p.status] || {
+          icon: "📄",
+          cls: "",
+          title: _statusLabel(p.status),
+          desc: "",
+        };
+        const banner = document.getElementById("pvStatusBanner");
+        banner.className = "pv-status-banner " + cfg.cls;
+        document.getElementById("pvStatusIcon").textContent = cfg.icon;
+        document.getElementById("pvStatusTitle").textContent = cfg.title;
+        document.getElementById("pvStatusDesc").textContent = cfg.desc;
+        const actEl = document.getElementById("pvStatusActions");
+        actEl.innerHTML = "";
+        const wfCard = document.getElementById("pvWorkflowCard");
+        if (wfCard) wfCard.style.display = "none";
+        if (["approved", "verifying", "completed"].includes(p.status)) {
+          const btn = document.createElement("button");
+          btn.className = "btn btn-primary";
+          btn.style.cssText = "padding:8px 16px;font-size:13px";
+          btn.textContent = "📥 Tải file DOCX";
+          btn.onclick = () => _exportMyDocx(p.id);
+          actEl.appendChild(btn);
+        }
+        const retCard = document.getElementById("pvReturnCard");
+        if (p.status === "returned" && p.return_reason) {
+          document.getElementById("pvReturnReason").textContent =
+            p.return_reason;
+          retCard.style.display = "";
+        } else {
+          retCard.style.display = "none";
+        }
+        const _pv = (id, val) => {
+          const el = document.getElementById("pv-" + id);
+          if (!el) return;
+          if (val) {
+            el.textContent = val;
+            el.classList.remove("empty");
+          } else {
+            el.textContent = "Chưa nhập";
+            el.classList.add("empty");
+          }
+        };
+        _pv("full_name", p.full_name);
+        _pv("dob", p.dob ? p.dob.split("-").reverse().join("/") : "");
+        _pv(
+          "gender",
+          p.gender === "male"
+            ? "Nam"
+            : p.gender === "female"
+              ? "Nữ"
+              : p.gender === "other"
+                ? "Khác"
+                : "",
+        );
+        _pv("hometown_detail", p.hometown_detail);
+        _pv("current_address", p.current_address);
+        _pv("occupation", p.occupation);
+        _pv("job_title", p.job_title);
+        _pv("workplace", p.workplace);
+        _pv("general_edu_level", p.general_edu_level);
+        _pv("edu_specialization", p.edu_specialization);
+        _pv("political_level_detail", p.political_level_detail);
+        _pv("foreign_languages", p.foreign_languages);
+        _pv(
+          "youth_union_date",
+          p.youth_union_date
+            ? p.youth_union_date.split("-").reverse().join("/")
+            : "",
+        );
+        _pv("youth_union_place", p.youth_union_place);
+        let tlData = {},
+          famData = [];
+        try {
+          const r = await API.get(`/timelines/${p.id}/all/`);
+          tlData = (r && r.success !== undefined ? r.data : r) || {};
+        } catch (e) {}
+        try {
+          const r = await API.get(`/family/${p.id}/members/`);
+          famData = Array.isArray(r) ? r : r.data || r.results || [];
+        } catch (e) {}
+
+        const _num = (v) => String(v || "").trim();
+        const _period = (it) => {
+          if (it.period_text) return _esc(it.period_text);
+          const fm = _num(it.from_month),
+            fy = _num(it.from_year),
+            tm = _num(it.to_month),
+            ty = _num(it.to_year);
+          const from = fm || fy ? `${fm || "--"}/${fy || "----"}` : "";
+          const to = it.is_present
+            ? "Nay"
+            : tm || ty
+              ? `${tm || "--"}/${ty || "----"}`
+              : "";
+          if (from && to) return `${from} - ${to}`;
+          return from || to || "";
+        };
+        const _li = (arr, mapFn, emptyText = "Chưa nhập") => {
+          if (!arr || !arr.length)
+            return `<div class="pv-sec-empty">${emptyText}</div>`;
+          return `<ul class="pv-sec-list">${arr.map((x) => `<li>${mapFn(x)}</li>`).join("")}</ul>`;
+        };
+        const history = tlData.history || [];
+        const work = tlData.work_history || [];
+        const edu = tlData.education_history || [];
+        const travel = tlData.overseas_travels || [];
+        const awards = tlData.awards || [];
+        const disciplines = tlData.disciplines || [];
+
+        document.getElementById("pvSectionsSummary").innerHTML = [
+          `<div class="pv-sec-block"><div class="pv-sec-head"><div class="pv-sec-badge">B</div><div class="pv-sec-title">Lịch sử bản thân</div></div>${_li(history, (h) => `${_period(h) ? `<strong>${_period(h)}</strong>: ` : ""}${_esc(h.description || "")}${h.location ? ` (Địa điểm: ${_esc(h.location)})` : ""}`)}</div>`,
+          `<div class="pv-sec-block"><div class="pv-sec-head"><div class="pv-sec-badge">C</div><div class="pv-sec-title">Công tác, chức vụ</div></div>${_li(work, (w) => `${_period(w) ? `<strong>${_period(w)}</strong>: ` : ""}${_esc(w.employer || "—")}${w.job_title ? ` - ${_esc(w.job_title)}` : ""}${w.location ? ` (${_esc(w.location)})` : ""}${w.notes ? `; ${_esc(w.notes)}` : ""}`)}</div>`,
+          `<div class="pv-sec-block"><div class="pv-sec-head"><div class="pv-sec-badge">D</div><div class="pv-sec-title">Đặc điểm lịch sử</div></div>${p.political_history_text ? `<div style="font-size:12.5px;line-height:1.5">${_esc(p.political_history_text)}</div>` : `<div class="pv-sec-empty">Chưa nhập</div>`}</div>`,
+          `<div class="pv-sec-block"><div class="pv-sec-head"><div class="pv-sec-badge">E</div><div class="pv-sec-title">Đào tạo, bồi dưỡng</div></div>${_li(edu, (e) => `${_period(e) ? `<strong>${_period(e)}</strong>: ` : ""}${_esc(e.school || "—")}${e.major ? ` - ${_esc(e.major)}` : ""}${e.edu_level ? ` (${_esc(e.edu_level)})` : ""}${e.certificate ? `, ${_esc(e.certificate)}` : ""}${e.location ? `, ${_esc(e.location)}` : ""}`)}</div>`,
+          `<div class="pv-sec-block"><div class="pv-sec-head"><div class="pv-sec-badge">F</div><div class="pv-sec-title">Đi nước ngoài</div></div>${_li(travel, (t) => `${_period(t) ? `<strong>${_period(t)}</strong>: ` : ""}${_esc(t.country || "—")}${t.purpose ? ` - ${_esc(t.purpose)}` : ""}${t.sponsoring_org ? ` (Cơ quan: ${_esc(t.sponsoring_org)})` : ""}`)}</div>`,
+          `<div class="pv-sec-block"><div class="pv-sec-head"><div class="pv-sec-badge">G</div><div class="pv-sec-title">Khen thưởng</div></div>${_li(awards, (a) => `${a.issued_month || "--"}/${a.issued_year || "----"}: ${_esc(a.content || "")}${a.level ? ` (Cấp: ${_esc(a.level)})` : ""}${a.issuer ? ` - ${_esc(a.issuer)}` : ""}`)}</div>`,
+          `<div class="pv-sec-block"><div class="pv-sec-head"><div class="pv-sec-badge">H</div><div class="pv-sec-title">Kỷ luật</div></div>${_li(disciplines, (d) => `${d.issued_month || "--"}/${d.issued_year || "----"}: ${_esc(d.content || "")}${d.level ? ` (Mức: ${_esc(d.level)})` : ""}${d.issuer ? ` - ${_esc(d.issuer)}` : ""}`)}</div>`,
+          `<div class="pv-sec-block"><div class="pv-sec-head"><div class="pv-sec-badge">I</div><div class="pv-sec-title">Hoàn cảnh gia đình</div></div>${_li(famData, (f) => `<strong>${_esc(f.relationship_display || f.relationship || "")}:</strong> ${_esc(f.full_name || "")}${f.birth_year ? ` (${_esc(String(f.birth_year))})` : ""}${f.occupation ? ` - ${_esc(f.occupation)}` : ""}${f.workplace ? `, ${_esc(f.workplace)}` : ""}${f.current_address ? `, ${_esc(f.current_address)}` : ""}`)}</div>`,
+          `<div class="pv-sec-block"><div class="pv-sec-head"><div class="pv-sec-badge">J</div><div class="pv-sec-title">Tự nhận xét</div></div>${p.self_assessment_text ? `<div style="font-size:12.5px;line-height:1.5">${_esc(p.self_assessment_text)}</div>` : `<div class="pv-sec-empty">Chưa nhập</div>`}</div>`,
+        ].join("");
+        try {
+          const rev = await API.get(`/profiles/${p.id}/reviews/`);
+          const reviews = Array.isArray(rev)
+            ? rev
+            : rev.data || rev.results || [];
+          const tlEl = document.getElementById("pvTimeline");
+          if (!reviews.length) {
+            tlEl.innerHTML =
+              '<div style="color:var(--hint);font-size:12.5px">Chưa có lịch sử xét duyệt.</div>';
+          } else {
+            const dotCls = {
+              submit: "submit",
+              approve: "approve",
+              return: "return",
+              reject: "reject",
+              start_review: "review",
+              request_verify: "verify",
+              complete: "complete",
+            };
+            tlEl.innerHTML =
+              '<div class="pv-timeline">' +
+              reviews
+                .slice(0, 20)
+                .map((r) => {
+                  const dc = dotCls[r.action] || "review";
+                  const ts = r.created_at ? _fmtDate(r.created_at) : "";
+                  const who =
+                    r.reviewer_name ||
+                    (r.reviewer && r.reviewer.full_name) ||
+                    "Hệ thống";
+                  const note = r.comment
+                    ? `<div class="pv-tl-note">${_esc(r.comment)}</div>`
+                    : "";
+                  return `<div class="pv-tl-item"><div class="pv-tl-dot ${dc}">📌</div><div class="pv-tl-content"><div class="pv-tl-action">${_esc(_actionLabel(r.action) || r.action)}</div><div class="pv-tl-by">${_esc(who)}</div><div class="pv-tl-time">${ts}</div>${note}</div></div>`;
+                })
+                .join("") +
+              "</div>";
+          }
+        } catch (e) {
+          document.getElementById("pvTimeline").innerHTML =
+            '<div style="color:var(--hint);font-size:12px">Không tải được lịch sử.</div>';
+        }
+        updateTopbarName(p.full_name || "Chưa nhập tên", p.status);
+      }
+      async function _switchToFormModeAndReload() {
+        _switchToFormMode();
+        try {
+          const p = await API.get("/profiles/my/");
+          if (!p.id) return;
+          window._profileId = p.id;
+          _setVal("hoTen", p.full_name);
+          _setVal("hoTenKhac", p.full_name_other);
+          _setVal("ngaySinh", p.dob);
+          _setVal("queQuan", p.hometown_detail);
+          _setVal("noiO", p.current_address);
+          _setVal("ngheNghiep", p.occupation);
+          _setVal("noiCongTac", p.workplace);
+          _setVal("chucVu", p.job_title);
+          _setVal("trinhDoVanHoa", p.general_edu_level);
+          _setVal("trinhDoChuyenMon", p.edu_specialization);
+          _setVal("trinhDoLyLuan", p.political_level_detail);
+          _setVal("ngoaiNgu", p.foreign_languages);
+          _setVal("tinHoc", p.it_level);
+          _setVal("ngayVaoDoan", p.youth_union_date);
+          _setVal("noiVaoDoan", p.youth_union_place);
+          _setVal("tuNhanXet", p.self_assessment_text);
+          if (p.gender) {
+            const r = document.querySelector(
+              `input[name="gioiTinh"][value="${p.gender}"]`,
+            );
+            if (r) r.checked = true;
+          }
+          updateTopbarName(p.full_name || "Chưa nhập tên", p.status);
           if (p.status === "returned" && p.return_reason) {
-            const banner =
+            const b =
               document.getElementById("returnBanner") ||
               (() => {
                 const d = document.createElement("div");
                 d.id = "returnBanner";
                 d.style.cssText =
                   "background:#FEF2F2;border:1px solid rgba(139,0,0,.2);color:#8B0000;padding:10px 16px;border-radius:8px;margin:12px 0;font-size:13px";
-                document.querySelector("#memberMain")?.prepend(d);
+                document.querySelector("#memberMain main")?.prepend(d);
                 return d;
               })();
-            banner.innerHTML = `<strong>↩ Hồ sơ bị trả lại:</strong> ${_esc(p.return_reason)}`;
+            b.innerHTML = `<strong>↩ Hồ sơ bị trả lại:</strong> ${_esc(p.return_reason)}`;
           }
           await _loadAllSections(p.id);
         } catch (e) {
-          console.warn("[API] my profile load failed:", e.message);
+          console.warn("[switchToForm]", e.message);
         }
       }
+      async function _exportMyDocx(profileId) {
+        try {
+          showToast("⏳ Đang tạo file DOCX…");
+          const base =
+            localStorage.getItem("api_base") ||
+            (location.protocol === "file:" ||
+            location.port === "5500" ||
+            location.port === "5501"
+              ? "http://127.0.0.1:8000/api/v1"
+              : location.hostname === "14.224.210.210"
+                ? "http://14.224.210.210:8003/api/v1"
+                : "/api/v1");
+          const tok = localStorage.getItem("access_token");
+          const resp = await fetch(`${base}/exports/word/${profileId}/`, {
+            method: "POST",
+            headers: {
+              Authorization: "Bearer " + tok,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ template_name: "Mẫu 2-KNĐ" }),
+          });
+          if (!resp.ok)
+            throw new Error("Lỗi tạo DOCX (HTTP " + resp.status + ")");
+          const blob = await resp.blob();
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = "SoYeuLyLich.docx";
+          a.click();
+          URL.revokeObjectURL(url);
+          showToast("✅ Tải file DOCX thành công");
+        } catch (e) {
+          showToast("✗ " + e.message);
+        }
+      }
+      // ===== END PROFILE VIEW MODE =====
 
       // ===== TOPBAR NAME UPDATE =====
       function updateTopbarName(name, status) {

@@ -240,6 +240,16 @@ class ProfileWorkflowView(generics.GenericAPIView):
         action = serializer.validated_data['action']
         comment = serializer.validated_data.get('comment', '')
 
+        def _target_status_for_action(current_status, workflow_action):
+            # Keep one "approve" button in UI while still honoring internal staged flow.
+            if workflow_action == 'approve':
+                if current_status == Profile.Status.SUBMITTED:
+                    return Profile.Status.PENDING
+                if current_status == Profile.Status.PENDING:
+                    return Profile.Status.UNDER_REVIEW
+                return Profile.Status.APPROVED
+            return ACTION_TO_STATUS.get(workflow_action)
+
         # Validate role permissions
         if action == 'submit' and request.user.role_code not in ('quan_chung',):
             return Response({'success': False, 'error': 'Chỉ quần chúng mới được nộp hồ sơ.'}, status=403)
@@ -249,7 +259,7 @@ class ProfileWorkflowView(generics.GenericAPIView):
             if request.user.role_code not in ('can_bo_bxd', 'admin'):
                 return Response({'success': False, 'error': 'Chỉ cán bộ mới được thực hiện thao tác này.'}, status=403)
 
-        new_status = ACTION_TO_STATUS.get(action)
+        new_status = _target_status_for_action(profile.status, action)
         if new_status:
             allowed = VALID_TRANSITIONS.get(profile.status, [])
             if new_status not in allowed:
@@ -266,9 +276,14 @@ class ProfileWorkflowView(generics.GenericAPIView):
             profile.status = Profile.Status.SUBMITTED
             profile.submitted_at = now
         elif action == 'approve':
-            profile.status = Profile.Status.APPROVED
-            profile.approved_at = now
-            profile.approved_by = request.user
+            if old_status == Profile.Status.SUBMITTED:
+                profile.status = Profile.Status.PENDING
+            elif old_status == Profile.Status.PENDING:
+                profile.status = Profile.Status.UNDER_REVIEW
+            else:
+                profile.status = Profile.Status.APPROVED
+                profile.approved_at = now
+                profile.approved_by = request.user
         elif action == 'return':
             profile.status = Profile.Status.RETURNED
             profile.last_returned_at = now

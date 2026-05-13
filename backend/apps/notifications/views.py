@@ -62,7 +62,7 @@ def send_notification(request):
         sent_at=timezone.now(),
         template_id=d.get('template_id'),
     )
-    log_activity(request.user, 'notify_send', target_type='Notification', target_id=n.id)
+    log_activity(request.user, 'notify_send', target_model='Notification', target_id=n.id)
     return Response({'success': True, 'data': NotificationSerializer(n).data})
 
 
@@ -137,9 +137,19 @@ class NotificationTemplateDetailView(generics.RetrieveUpdateDestroyAPIView):
 
 
 @api_view(['GET'])
-@permission_classes([IsOfficer])
+@permission_classes([IsOfficerOrApplicant])
 def notification_stats(request):
     from django.db.models import Q
+    user = request.user
+    # Applicants only see their own unread count
+    if getattr(user, 'role_code', None) not in ('admin', 'can_bo_bxd'):
+        unread_count = Notification.objects.filter(recipient=user, is_read=False).count()
+        return Response({
+            'success': True,
+            'data': {
+                'unread_count': unread_count,
+            }
+        })
     today = timezone.now().date()
     return Response({
         'success': True,

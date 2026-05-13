@@ -22,7 +22,7 @@ class VerificationListCreateView(generics.ListCreateAPIView):
 
     def perform_create(self, serializer):
         obj = serializer.save(created_by=self.request.user)
-        log_activity(self.request.user, 'verify_send', target_type='VerificationRequest', target_id=obj.id)
+        log_activity(self.request.user, 'verify_send', target_model='VerificationRequest', target_id=obj.id)
 
 
 class VerificationDetailView(generics.RetrieveUpdateAPIView):
@@ -52,7 +52,7 @@ def send_reminder(request, pk):
     vr.last_reminded_at = timezone.now()
     vr.save(update_fields=['reminder_count', 'last_reminded_at'])
 
-    log_activity(request.user, 'verify_remind', target_type='VerificationRequest', target_id=vr.id)
+    log_activity(request.user, 'verify_remind', target_model='VerificationRequest', target_id=vr.id)
     return Response({'success': True, 'message': 'Đã ghi nhận lần nhắc.'})
 
 
@@ -70,7 +70,7 @@ def mark_received(request, pk):
     vr.updated_by = request.user
     vr.save(update_fields=['status', 'received_at', 'result_summary', 'updated_by'])
 
-    log_activity(request.user, 'verify_receive', target_type='VerificationRequest', target_id=vr.id)
+    log_activity(request.user, 'verify_receive', target_model='VerificationRequest', target_id=vr.id)
     return Response({'success': True, 'data': VerificationRequestSerializer(vr).data})
 
 

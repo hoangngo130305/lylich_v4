@@ -28,13 +28,21 @@ _JSON_PATH = os.path.join(_BACKEND, 'template.json')
 _DOCX_PATH = os.path.join(_BACKEND, 'lylich_sample.docx')
 
 _TEMPLATE_CACHE = None
+_TEMPLATE_MTIME = None
 
 
 def _load_template():
-    global _TEMPLATE_CACHE
-    if _TEMPLATE_CACHE is None:
+    global _TEMPLATE_CACHE, _TEMPLATE_MTIME
+    try:
+        mtime = os.path.getmtime(_JSON_PATH)
+    except OSError:
+        mtime = None
+
+    # Reload template when file changes to avoid stale export structure in long-running processes.
+    if _TEMPLATE_CACHE is None or _TEMPLATE_MTIME != mtime:
         with open(_JSON_PATH, 'r', encoding='utf-8') as f:
             _TEMPLATE_CACHE = json.load(f)
+        _TEMPLATE_MTIME = mtime
     return _TEMPLATE_CACHE
 
 
