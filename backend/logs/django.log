@@ -8460,3 +8460,9 @@ WARNING 2026-05-13 23:30:47,623 log 5536 18268 Bad Request: /api/v1/profiles/my/
 WARNING 2026-05-13 23:30:47,624 log 5536 18268 "PUT /api/v1/profiles/my/ HTTP/1.1" 400 103
 WARNING 2026-05-13 23:53:29,353 log 5536 18248 Bad Request: /api/v1/family/61/members/
 WARNING 2026-05-13 23:53:29,354 log 5536 18248 "POST /api/v1/family/61/members/ HTTP/1.1" 400 157
+WARNING 2026-05-14 10:51:26,302 log 7020 17804 Unauthorized: /api/v1/auth/users/
+WARNING 2026-05-14 10:51:26,308 log 7020 5288 Unauthorized: /api/v1/notifications/stats/
+WARNING 2026-05-14 10:51:26,308 log 7020 8880 Unauthorized: /api/v1/profiles/dashboard/
+WARNING 2026-05-14 10:51:26,309 basehttp 7020 5288 "GET /api/v1/notifications/stats/ HTTP/1.1" 401 291
+WARNING 2026-05-14 10:51:26,310 basehttp 7020 17804 "GET /api/v1/auth/users/?role__code=quan_chung&ordering=-created_at HTTP/1.1" 401 291
+WARNING 2026-05-14 10:51:26,310 basehttp 7020 8880 "GET /api/v1/profiles/dashboard/ HTTP/1.1" 401 291

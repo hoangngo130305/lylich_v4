@@ -6085,7 +6085,6 @@
                           Làm việc gì, ở đâu (tên đơn vị, địa chỉ + nơi sinh
                           sống)
                         </th>
-                        <th style="width: 160px">Chức vụ</th>
                         <th style="width: 40px"></th>
                       </tr>
                     </thead>
@@ -6100,7 +6099,6 @@
                             placeholder="Học ngành … tại ĐH …, sinh sống tại số nhà …, xã …, tỉnh …"
                           />
                         </td>
-                        <td><input type="text" placeholder="Sinh viên" /></td>
                         <td>
                           <button class="del-btn" onclick="delRow(this)">
                             ✕
@@ -6117,7 +6115,6 @@
                             placeholder="Ở nhà phụ giúp gia đình, sinh sống tại …"
                           />
                         </td>
-                        <td><input type="text" /></td>
                         <td>
                           <button class="del-btn" onclick="delRow(this)">
                             ✕
@@ -6134,7 +6131,6 @@
                             placeholder="VD: Tham gia sinh hoạt Đoàn tại chi đoàn … (hay Hội viên Hội LHPN xã Nhà Bè …), sinh sống tại số nhà …, đường …, ấp …, xã …, tỉnh … (điền nếu hiện đang là đoàn viên/hội viên)"
                           />
                         </td>
-                        <td><input type="text" /></td>
                         <td>
                           <button class="del-btn" onclick="delRow(this)">
                             ✕
@@ -6875,14 +6871,6 @@
                 <div class="pv-field">
                   <div class="pv-label">Nghề nghiệp</div>
                   <div class="pv-value" id="pv-occupation"></div>
-                </div>
-                <div class="pv-field">
-                  <div class="pv-label">Chức vụ</div>
-                  <div class="pv-value" id="pv-job_title"></div>
-                </div>
-                <div class="pv-field pv-full">
-                  <div class="pv-label">Nơi công tác</div>
-                  <div class="pv-value" id="pv-workplace"></div>
                 </div>
                 <div class="pv-field">
                   <div class="pv-label">Trình độ văn hoá</div>
@@ -8700,7 +8688,6 @@
           tr.innerHTML =
             `<td><input type="text" value="${_esc(r.period_text || "")}"></td>` +
             `<td class="td-dienbien"><input type="text" value="${_esc(r.employer || "")}"></td>` +
-            `<td><input type="text" value="${_esc(r.job_title || "")}"></td>` +
             `<td><button class="del-btn" onclick="delRow(this)">✕</button></td>`;
         });
         tb.querySelectorAll(".td-dienbien").forEach((td) => {
@@ -8789,17 +8776,15 @@
       function _collC() {
         return [...document.querySelectorAll("#tbC-body tr")].flatMap((tr) => {
           const c = tr.cells;
-          if (!c || c.length < 4) return [];
+          if (!c || c.length < 3) return [];
           const period = _tdv(c[0]),
-            emp = _tdv(c[1]),
-            job = _tdv(c[2]);
+            emp = _tdv(c[1]);
           if (!emp && !period) return [];
           return [
             {
               id: tr.dataset.id || null,
               period_text: period,
               employer: emp,
-              job_title: job,
               sort_order: tr.rowIndex,
             },
           ];
@@ -9815,7 +9800,7 @@
               <div class="field-row">
                 <div class="field-label">CCCD</div>
                 <div class="field-value" id="fv-esA-cccd">—</div>
-                <input class="field-input" id="fi-esA-cccd" value="" maxlength="12" data-field="CCCD">
+                <input class="field-input" id="fi-esA-cccd" value="" maxlength="12" data-field="CCCD" readonly style="background:#f5f5f5;color:#888;cursor:not-allowed" title="CCCD được lấy từ tài khoản. Chỉnh sửa trong mục Quản lý tài khoản.">
               </div>
               <div class="field-row">
                 <div class="field-label">Số điện thoại</div>
@@ -9831,11 +9816,6 @@
                 <div class="field-label">Nghề nghiệp</div>
                 <div class="field-value" id="fv-esA-occupation">—</div>
                 <input class="field-input" id="fi-esA-occupation" value="" data-field="Nghề nghiệp">
-              </div>
-              <div class="field-row">
-                <div class="field-label">Nơi công tác</div>
-                <div class="field-value" id="fv-esA-workplace">—</div>
-                <input class="field-input" id="fi-esA-workplace" value="" data-field="Nơi công tác">
               </div>
             </div>
           </div>
@@ -9880,11 +9860,6 @@
                 <div class="field-label">Trình độ chuyên môn</div>
                 <div class="field-value" id="fv-esC-edu-qual">—</div>
                 <input class="field-input" id="fi-esC-edu-qual" value="" data-field="Trình độ CM">
-              </div>
-              <div class="field-row">
-                <div class="field-label">Chuyên ngành</div>
-                <div class="field-value" id="fv-esC-major">—</div>
-                <input class="field-input" id="fi-esC-major" value="" data-field="Chuyên ngành">
               </div>
               <div class="field-row">
                 <div class="field-label">Lý luận chính trị</div>
@@ -11213,15 +11188,13 @@
             setFv("esA-religion", relName);
 
             // Section A — additional fields
-            setFv("esA-cccd", p.user?.cccd || p.cccd);
+            setFv("esA-cccd", p.cccd || p.user?.cccd);
             setFv("esA-email", p.user?.email);
             setFv("esA-occupation", p.occupation);
-            setFv("esA-workplace", p.workplace);
 
             // Section C — education & qualifications
             setFv("esC-edu-gen", p.general_edu_level);
             setFv("esC-edu-qual", p.edu_specialization || p.highest_degree);
-            setFv("esC-major", p.edu_major);
             setFv("esC-political", p.political_level_detail);
             const flStr =
               p.foreign_languages ||
@@ -11312,7 +11285,6 @@
                           r,
                         ) => `<div class="timeline-edit-row" data-id="${_esc(String(r.id || ""))}">
                     <input value="${_esc(r.school || "")}" placeholder="Trường">
-                    <input value="${_esc(r.major || "")}" placeholder="Chuyên ngành">
                     <input value="${_esc(r.period_text || "")}" placeholder="Thời gian">
                     <input value="${_esc(r.certificate || "")}" placeholder="Bằng cấp">
                     <button class="del-row-btn" onclick="this.closest('.timeline-edit-row').remove()">✕</button>
@@ -11652,10 +11624,8 @@
             "esA-hometown": "hometown_detail",
             "esA-address": "current_address",
             "esA-occupation": "occupation",
-            "esA-workplace": "workplace",
             "esC-edu-gen": "general_edu_level",
             "esC-edu-qual": "edu_specialization",
-            "esC-major": "edu_major",
             "esC-political": "political_level_detail",
             "esC-foreign-lang": "foreign_languages",
             "esC-it": "it_level",
@@ -11714,9 +11684,8 @@
             .map((r) => ({
               id: r.id,
               school: r._vals[0] || "",
-              major: r._vals[1] || null,
-              period_text: r._vals[2] || null,
-              certificate: r._vals[3] || null,
+              period_text: r._vals[1] || null,
+              certificate: r._vals[2] || null,
             }))
             .filter((r) => r.school);
           const travelRows = _collectAdminTimeline("timeline-esF")
@@ -14858,8 +14827,6 @@
         _pv("hometown_detail", p.hometown_detail);
         _pv("current_address", p.current_address);
         _pv("occupation", p.occupation);
-        _pv("job_title", p.job_title);
-        _pv("workplace", p.workplace);
         _pv("general_edu_level", p.general_edu_level);
         _pv("edu_specialization", p.edu_specialization);
         _pv("political_level_detail", p.political_level_detail);
@@ -14912,7 +14879,7 @@
 
         document.getElementById("pvSectionsSummary").innerHTML = [
           `<div class="pv-sec-block"><div class="pv-sec-head"><div class="pv-sec-badge">B</div><div class="pv-sec-title">Lịch sử bản thân</div></div>${_li(history, (h) => `${_period(h) ? `<strong>${_period(h)}</strong>: ` : ""}${_esc(h.description || "")}${h.location ? ` (Địa điểm: ${_esc(h.location)})` : ""}`)}</div>`,
-          `<div class="pv-sec-block"><div class="pv-sec-head"><div class="pv-sec-badge">C</div><div class="pv-sec-title">Công tác, chức vụ</div></div>${_li(work, (w) => `${_period(w) ? `<strong>${_period(w)}</strong>: ` : ""}${_esc(w.employer || "—")}${w.job_title ? ` - ${_esc(w.job_title)}` : ""}${w.location ? ` (${_esc(w.location)})` : ""}${w.notes ? `; ${_esc(w.notes)}` : ""}`)}</div>`,
+          `<div class="pv-sec-block"><div class="pv-sec-head"><div class="pv-sec-badge">C</div><div class="pv-sec-title">Công tác</div></div>${_li(work, (w) => `${_period(w) ? `<strong>${_period(w)}</strong>: ` : ""}${_esc(w.employer || "—")}${w.location ? ` (${_esc(w.location)})` : ""}${w.notes ? `; ${_esc(w.notes)}` : ""}`)}</div>`,
           `<div class="pv-sec-block"><div class="pv-sec-head"><div class="pv-sec-badge">D</div><div class="pv-sec-title">Đặc điểm lịch sử</div></div>${p.political_history_text ? `<div style="font-size:12.5px;line-height:1.5">${_esc(p.political_history_text)}</div>` : `<div class="pv-sec-empty">Chưa nhập</div>`}</div>`,
           `<div class="pv-sec-block"><div class="pv-sec-head"><div class="pv-sec-badge">E</div><div class="pv-sec-title">Đào tạo, bồi dưỡng</div></div>${_li(edu, (e) => `${_period(e) ? `<strong>${_period(e)}</strong>: ` : ""}${_esc(e.school || "—")}${e.major ? ` - ${_esc(e.major)}` : ""}${e.edu_level ? ` (${_esc(e.edu_level)})` : ""}${e.certificate ? `, ${_esc(e.certificate)}` : ""}${e.location ? `, ${_esc(e.location)}` : ""}`)}</div>`,
           `<div class="pv-sec-block"><div class="pv-sec-head"><div class="pv-sec-badge">F</div><div class="pv-sec-title">Đi nước ngoài</div></div>${_li(travel, (t) => `${_period(t) ? `<strong>${_period(t)}</strong>: ` : ""}${_esc(t.country || "—")}${t.purpose ? ` - ${_esc(t.purpose)}` : ""}${t.sponsoring_org ? ` (Cơ quan: ${_esc(t.sponsoring_org)})` : ""}`)}</div>`,

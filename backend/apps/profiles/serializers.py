@@ -32,6 +32,8 @@ class ProfileListSerializer(serializers.ModelSerializer):
 class ProfileDetailSerializer(serializers.ModelSerializer):
     """Full profile — all sections A–K."""
     user = UserPublicSerializer(read_only=True)
+    # CCCD is sourced from the user account, not profile. Read-only here.
+    cccd = serializers.CharField(source='user.cccd', read_only=True, default=None)
     ethnic_group_detail    = EthnicGroupSerializer(source='ethnic_group', read_only=True)
     ethnic_group_name      = serializers.CharField(source='ethnic_group.name', read_only=True, default=None)
     religion_detail        = ReligionSerializer(source='religion', read_only=True)
@@ -87,7 +89,7 @@ class ProfileDetailSerializer(serializers.ModelSerializer):
         model = Profile
         exclude = ['deleted_at']
         read_only_fields = [
-            'id', 'user', 'profile_number', 'ai_score', 'ai_last_scanned_at',
+            'id', 'user', 'cccd', 'profile_number', 'ai_score', 'ai_last_scanned_at',
             'ai_issues_json', 'submitted_at', 'approved_at', 'approved_by',
             'completed_at', 'last_returned_at', 'return_reason',
             'rejected_at', 'rejected_reason', 'created_at', 'updated_at',
