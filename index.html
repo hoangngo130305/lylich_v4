@@ -4021,6 +4021,88 @@
         outline-offset: 0;
       }
 
+      /* ══ Smart Combobox (sel_tinh_ks) ══ */
+      .smart-combobox {
+        position: relative;
+        display: block;
+        width: 100%;
+      }
+      .smart-combobox-input {
+        width: 100%;
+        box-sizing: border-box;
+        border: 1px solid #bfc8d6;
+        border-radius: 8px;
+        padding: 6px 28px 6px 10px;
+        font-size: 12.5px;
+        font-family: inherit;
+        color: #0b2648;
+        background: #fff;
+        cursor: text;
+      }
+      .smart-combobox-input::placeholder {
+        color: #aaa;
+      }
+      .smart-combobox-input:disabled {
+        background: #f0f0f0;
+        color: #999;
+        cursor: not-allowed;
+        opacity: 0.7;
+      }
+      .smart-combobox-input:focus {
+        outline: 2px solid rgba(31, 78, 121, 0.35);
+        border-color: #5c83b1;
+        background: #f8fbff;
+      }
+      .smart-combobox-arrow {
+        position: absolute;
+        right: 8px;
+        top: 50%;
+        transform: translateY(-50%);
+        pointer-events: none;
+        color: #666;
+        font-size: 9px;
+        transition: transform 0.15s;
+      }
+      .smart-combobox-arrow.open {
+        transform: translateY(-50%) rotate(180deg);
+      }
+      .smart-combobox-dropdown {
+        display: none;
+        position: absolute;
+        background: #fff;
+        border: 1px solid #bfc8d6;
+        border-radius: 8px;
+        max-height: 220px;
+        overflow-y: auto;
+        z-index: 9999;
+        box-shadow: 0 4px 16px rgba(11, 38, 72, 0.13);
+      }
+      .smart-combobox-dropdown.open {
+        display: block;
+      }
+      .smart-combobox-option {
+        padding: 7px 12px;
+        font-size: 12.5px;
+        cursor: pointer;
+        color: #0b2648;
+        line-height: 1.4;
+      }
+      .smart-combobox-option:hover,
+      .smart-combobox-option.highlighted {
+        background: #e8f0fb;
+        color: #1f4e79;
+      }
+      .smart-combobox-option.selected {
+        background: #d0e4f5;
+        font-weight: 600;
+      }
+      .smart-combobox-empty {
+        padding: 8px 12px;
+        font-size: 12px;
+        color: #999;
+        font-style: italic;
+      }
+
       /* ══ Admin corrections panel ══ */
       .admin-correction-bar {
         position: sticky;
@@ -5251,13 +5333,18 @@
                   >
                   <div>
                     <div class="loc-row">
-                      <select id="sel_tinh_ks" class="searchable-location">
+                      <select
+                        id="sel_tinh_ks"
+                        class="searchable-location"
+                        onchange="updateBirthPlace()"
+                      >
                         <option value="">-- Tỉnh/TP --</option>
                       </select>
                       <select
                         id="sel_xa_ks"
                         class="searchable-location"
                         disabled
+                        onchange="updateBirthPlace()"
                       >
                         <option value="">-- Xã/Phường --</option>
                       </select>
@@ -5353,24 +5440,42 @@
                   >
                   <div>
                     <div class="loc-row" style="margin-bottom: 6px">
-                      <select id="sel_tinh_tx" class="searchable-location">
+                      <select
+                        id="sel_tinh_tx"
+                        class="searchable-location"
+                        onchange="updateTamTru()"
+                      >
                         <option value="">-- Tỉnh/TP --</option>
                       </select>
                       <select
                         id="sel_xa_tx"
                         class="searchable-location"
                         disabled
+                        onchange="updateTamTru()"
                       >
                         <option value="">-- Phường/Xã --</option>
                       </select>
                     </div>
                     <div class="loc-detail-row">
-                      <input type="text" placeholder="Số nhà / Lô" />
                       <input
                         type="text"
-                        placeholder="Tên đường / ấp / thôn (để trống nếu trùng thường trú)"
+                        id="soNhaTX"
+                        placeholder="Số nhà / Lô"
+                        oninput="updateTamTru()"
+                      />
+                      <input
+                        type="text"
+                        id="tenDuongTX"
+                        placeholder="Tên đường / ấp / thôn"
+                        oninput="updateTamTru()"
                       />
                     </div>
+                    <input
+                      type="text"
+                      id="tamTru"
+                      style="margin-top: 6px"
+                      placeholder="Địa chỉ tạm trú đầy đủ (tự động điền hoặc nhập thủ công)"
+                    />
                   </div>
                 </div>
               </div>
@@ -5523,6 +5628,7 @@
                   >
                   <input
                     type="text"
+                    id="khoaHocCongNghe"
                     placeholder="VD: Chứng chỉ chuyển đổi số, AI/ML, …"
                   />
                 </div>
@@ -5535,14 +5641,18 @@
                       gap: 8px;
                     "
                   >
-                    <select>
+                    <select id="hocViCaoNhat">
                       <option value="">-- Học vị --</option>
                       <option>Tiến sĩ</option>
                       <option>Thạc sĩ</option>
                       <option>Cử nhân / Kỹ sư</option>
                       <option>Cao đẳng</option>
                     </select>
-                    <input type="text" placeholder="Chuyên ngành" />
+                    <input
+                      type="text"
+                      id="hocViChuyenNganh"
+                      placeholder="Chuyên ngành"
+                    />
                   </div>
                 </div>
                 <div class="form-row">
@@ -5551,7 +5661,7 @@
                       >Bỏ trống nếu không có</span
                     ></label
                   >
-                  <select>
+                  <select id="hocHamCaoNhat">
                     <option value="">-- Học hàm --</option>
                     <option>Giáo sư</option>
                     <option>Phó Giáo sư</option>
@@ -5611,6 +5721,7 @@
                   <label>Tiếng dân tộc thiểu số</label>
                   <input
                     type="text"
+                    id="tiengDanToc"
                     placeholder="Tên dân tộc (để trống nếu không có)"
                   />
                 </div>
@@ -5913,7 +6024,7 @@
                             <select class="mm-month">
                               <option value="">MM</option>
                               <option>1</option>
-                              <option>2</option>
+                              <option on>2</option>
                               <option>3</option>
                               <option>4</option>
                               <option>5</option>
@@ -7698,8 +7809,10 @@
         getAllItems,
         placeholder,
         modeLabel,
+        options,
       ) {
         if (!selectEl) return;
+        options = options || {};
 
         const state = {
           active: false,
@@ -7797,7 +7910,8 @@
           const editor = document.createElement("input");
           editor.type = "text";
           editor.className = "inline-search-editor";
-          editor.placeholder = `Nhập để tìm ${modeLabel}...`;
+          editor.placeholder =
+            options.inputPlaceholder || `Nhập để tìm ${modeLabel}...`;
 
           const datalist = document.createElement("datalist");
           datalist.id = `inline-search-list-${selectEl.id}`;
@@ -7852,23 +7966,36 @@
           });
         };
 
-        selectEl.title = `${selectEl.title ? selectEl.title + " | " : ""}Double-click hoặc click mũi tên để nhập từ khóa tìm ${modeLabel}`;
-
-        selectEl.addEventListener("dblclick", () => {
-          enterSearchMode();
-        });
-
-        selectEl.addEventListener("click", (e) => {
-          // Detect if user clicked on the dropdown arrow area (right side of select)
-          const rect = selectEl.getBoundingClientRect();
-          const clickX = e.clientX - rect.left;
-          const arrowWidth = 30; // Typical width of arrow area
-
-          if (clickX > rect.width - arrowWidth && !state.active) {
+        if (options.singleClick) {
+          // Single-click mode: any click immediately opens search input
+          selectEl.title = "Nhấp để mở danh sách – gõ để lọc nhanh";
+          selectEl.addEventListener("click", (e) => {
             e.preventDefault();
             enterSearchMode();
-          }
-        });
+          });
+          // Keyboard: Enter/Space on focused select also opens search
+          selectEl.addEventListener("keydown", (e) => {
+            if ((e.key === "Enter" || e.key === " ") && !state.active) {
+              e.preventDefault();
+              enterSearchMode();
+            }
+          });
+        } else {
+          selectEl.title = `${selectEl.title ? selectEl.title + " | " : ""}Double-click hoặc click mũi tên để nhập từ khóa tìm ${modeLabel}`;
+          selectEl.addEventListener("dblclick", () => {
+            enterSearchMode();
+          });
+          selectEl.addEventListener("click", (e) => {
+            // Detect if user clicked on the dropdown arrow area (right side of select)
+            const rect = selectEl.getBoundingClientRect();
+            const clickX = e.clientX - rect.left;
+            const arrowWidth = 30; // Typical width of arrow area
+            if (clickX > rect.width - arrowWidth && !state.active) {
+              e.preventDefault();
+              enterSearchMode();
+            }
+          });
+        }
 
         selectEl.addEventListener("change", () => {
           if (state.active && selectEl.value) {
@@ -7877,23 +8004,278 @@
         });
       }
 
+      function attachSmartCombobox(selectEl, getAllItems, placeholderText) {
+        if (!selectEl) return;
+
+        // Wrapper replaces the select visually inside the grid cell
+        const wrapper = document.createElement("div");
+        wrapper.className = "smart-combobox";
+        selectEl.parentNode.insertBefore(wrapper, selectEl);
+
+        const input = document.createElement("input");
+        input.type = "text";
+        input.className = "smart-combobox-input";
+        input.placeholder = placeholderText || "Chọn hoặc nhập để tìm kiếm...";
+        input.autocomplete = "off";
+        input.setAttribute("spellcheck", "false");
+        wrapper.appendChild(input);
+
+        const arrow = document.createElement("span");
+        arrow.className = "smart-combobox-arrow";
+        arrow.textContent = "▼";
+        wrapper.appendChild(arrow);
+
+        // Panel appended to body so overflow:hidden on parents won't clip it
+        const panel = document.createElement("div");
+        panel.className = "smart-combobox-dropdown";
+        document.body.appendChild(panel);
+
+        // Keep original select in DOM (hidden) — preserves all event listeners & value
+        selectEl.style.display = "none";
+        wrapper.appendChild(selectEl);
+
+        let isOpen = false;
+        let highlightedIdx = -1;
+        let filteredItems = [];
+
+        const getItems = () => getAllItems() || [];
+
+        const positionPanel = () => {
+          const r = wrapper.getBoundingClientRect();
+          panel.style.left = r.left + window.scrollX + "px";
+          panel.style.top = r.bottom + window.scrollY + 2 + "px";
+          panel.style.width = r.width + "px";
+        };
+
+        const getSelectedName = () => {
+          const val = selectEl.value;
+          if (!val) return "";
+          const found = getItems().find(
+            (it) => String(it.code) === String(val),
+          );
+          return found ? found.name : "";
+        };
+
+        const syncDisplay = () => {
+          if (!isOpen) input.value = getSelectedName();
+        };
+
+        const buildPanel = (keyword) => {
+          const allItems = getItems();
+          const norm = normalizeVietnamese(keyword || "");
+          filteredItems = norm
+            ? allItems.filter((it) =>
+                normalizeVietnamese(it.name).includes(norm),
+              )
+            : allItems;
+
+          panel.innerHTML = "";
+          highlightedIdx = -1;
+
+          if (!filteredItems.length) {
+            const empty = document.createElement("div");
+            empty.className = "smart-combobox-empty";
+            empty.textContent = keyword
+              ? `Không tìm thấy "${keyword}"`
+              : "Không có dữ liệu";
+            panel.appendChild(empty);
+            return;
+          }
+
+          const currentVal = selectEl.value;
+          filteredItems.forEach((item) => {
+            const opt = document.createElement("div");
+            opt.className =
+              "smart-combobox-option" +
+              (String(item.code) === String(currentVal) ? " selected" : "");
+            opt.textContent = item.name;
+            opt.addEventListener("mousedown", (e) => {
+              e.preventDefault(); // prevent blur on input before pick fires
+              pick(item);
+            });
+            panel.appendChild(opt);
+          });
+
+          const selectedEl = panel.querySelector(".selected");
+          if (selectedEl) {
+            requestAnimationFrame(() =>
+              selectedEl.scrollIntoView({ block: "nearest" }),
+            );
+          }
+        };
+
+        const setHighlight = (idx) => {
+          const opts = panel.querySelectorAll(".smart-combobox-option");
+          opts.forEach((o) => o.classList.remove("highlighted"));
+          highlightedIdx = Math.max(0, Math.min(idx, opts.length - 1));
+          if (opts[highlightedIdx]) {
+            opts[highlightedIdx].classList.add("highlighted");
+            opts[highlightedIdx].scrollIntoView({ block: "nearest" });
+          }
+        };
+
+        const open = () => {
+          if (isOpen || input.disabled) return;
+          isOpen = true;
+          positionPanel();
+          buildPanel(input.value);
+          panel.classList.add("open");
+          arrow.classList.add("open");
+        };
+
+        const close = () => {
+          if (!isOpen) return;
+          isOpen = false;
+          panel.classList.remove("open");
+          arrow.classList.remove("open");
+          highlightedIdx = -1;
+          syncDisplay();
+        };
+
+        const pick = (item) => {
+          const prevVal = selectEl.value;
+          selectEl.value = String(item.code);
+          close();
+          if (prevVal !== String(item.code)) {
+            selectEl.dispatchEvent(new Event("change", { bubbles: true }));
+          }
+        };
+
+        // Reposition on scroll / resize
+        const reposition = () => {
+          if (isOpen) positionPanel();
+        };
+        window.addEventListener("scroll", reposition, true);
+        window.addEventListener("resize", reposition);
+
+        // Close on outside click
+        document.addEventListener("mousedown", (e) => {
+          if (
+            isOpen &&
+            !wrapper.contains(e.target) &&
+            !panel.contains(e.target)
+          ) {
+            close();
+          }
+        });
+
+        input.addEventListener("click", () => open());
+
+        input.addEventListener("input", () => {
+          if (!isOpen) {
+            isOpen = true;
+            positionPanel();
+            panel.classList.add("open");
+            arrow.classList.add("open");
+          }
+          buildPanel(input.value);
+          if (!input.value.trim()) selectEl.value = "";
+        });
+
+        input.addEventListener("keydown", (e) => {
+          if (e.key === "ArrowDown") {
+            e.preventDefault();
+            if (!isOpen) {
+              open();
+              return;
+            }
+            setHighlight(highlightedIdx < 0 ? 0 : highlightedIdx + 1);
+          } else if (e.key === "ArrowUp") {
+            e.preventDefault();
+            if (isOpen)
+              setHighlight(
+                Math.max(0, highlightedIdx <= 0 ? 0 : highlightedIdx - 1),
+              );
+          } else if (e.key === "Enter") {
+            e.preventDefault();
+            if (isOpen) {
+              if (highlightedIdx >= 0 && filteredItems[highlightedIdx]) {
+                pick(filteredItems[highlightedIdx]);
+              } else if (filteredItems.length === 1) {
+                pick(filteredItems[0]);
+              }
+            } else {
+              open();
+            }
+          } else if (e.key === "Escape") {
+            e.preventDefault();
+            close();
+          }
+        });
+
+        input.addEventListener("blur", () => {
+          setTimeout(() => {
+            if (!panel.contains(document.activeElement)) close();
+          }, 150);
+        });
+
+        // Intercept programmatic selectEl.disabled = ... (ward disable while loading)
+        try {
+          const disabledDesc = Object.getOwnPropertyDescriptor(
+            HTMLSelectElement.prototype,
+            "disabled",
+          );
+          if (disabledDesc) {
+            Object.defineProperty(selectEl, "disabled", {
+              get() {
+                return disabledDesc.get.call(this);
+              },
+              set(val) {
+                disabledDesc.set.call(this, val);
+                input.disabled = Boolean(val);
+                if (val && isOpen) close();
+              },
+              configurable: true,
+            });
+          }
+        } catch (_) {
+          /* ignore */
+        }
+
+        // Intercept programmatic selectEl.value = ... (admin pre-population)
+        try {
+          const origDesc = Object.getOwnPropertyDescriptor(
+            HTMLSelectElement.prototype,
+            "value",
+          );
+          Object.defineProperty(selectEl, "value", {
+            get() {
+              return origDesc.get.call(this);
+            },
+            set(val) {
+              origDesc.set.call(this, val);
+              if (!isOpen) syncDisplay();
+            },
+            configurable: true,
+          });
+        } catch (_) {
+          /* ignore */
+        }
+
+        // Mirror initial disabled state
+        input.disabled = selectEl.disabled;
+        syncDisplay();
+        selectEl._syncCombobox = syncDisplay;
+        return { open, close, syncDisplay };
+      }
+
       function setupInlineLocationSearchForAllPairs() {
         locationPairs.forEach((pair) => {
           const provinceSelect = document.getElementById(pair.provinceSelectId);
           const wardSelect = document.getElementById(pair.wardSelectId);
 
-          attachInlineSelectSearch(
+          // Province: searchable combobox
+          attachSmartCombobox(
             provinceSelect,
             () => provinceList,
-            "-- Tỉnh/TP --",
-            "tỉnh/thành phố",
+            "Chọn hoặc nhập để tìm kiếm...",
           );
 
-          attachInlineSelectSearch(
+          // Ward: searchable combobox (starts disabled; enabled after province loads wards)
+          attachSmartCombobox(
             wardSelect,
             () => selectSearchState.get(pair.wardSelectId)?.allItems || [],
-            "-- Phường/Xã --",
-            "phường/xã",
+            "Chọn hoặc nhập để tìm kiếm...",
           );
         });
       }
@@ -7919,26 +8301,26 @@
 
           if (!provinceSelect || !wardSelect) return;
 
-          // Fill province select with full list
+          // Populate province <option> elements so selectEl.value = code works in pick()
           fillSelect(provinceSelect, provinceList, "-- Tỉnh/TP --");
+
+          // Initialize ward search state
+          selectSearchState.set(wardId, { allItems: [] });
           resetSelect(wardSelect, "-- Phường/Xã --");
 
-          // Initialize search state for ward
-          selectSearchState.set(wardId, { allItems: [] });
-
-          // Attach inline search
-          attachInlineSelectSearch(
+          // Province: searchable combobox
+          attachSmartCombobox(
             provinceSelect,
             () => provinceList,
-            "-- Tỉnh/TP --",
-            "tỉnh/thành phố",
+            "Chọn hoặc nhập để tìm kiếm...",
           );
 
-          attachInlineSelectSearch(
+          // Ward: disabled until province selected
+          wardSelect.disabled = true;
+          attachSmartCombobox(
             wardSelect,
             () => selectSearchState.get(wardId)?.allItems || [],
-            "-- Phường/Xã --",
-            "phường/xã",
+            "Chọn hoặc nhập để tìm kiếm...",
           );
 
           // Attach province change handler to load wards
@@ -7949,6 +8331,60 @@
           // Remove old listeners and add new one (prevent duplicates)
           provinceSelect.removeEventListener("change", onProvinceChangeHandler);
           provinceSelect.addEventListener("change", onProvinceChangeHandler);
+
+          // Auto-populate adjacent text inputs when ward is selected.
+          if (prefix === "" || prefix === "ct") {
+            wardSelect.addEventListener("change", () => {
+              const formRow = wardSelect.closest(".form-row");
+              if (!formRow) return;
+              const textInp = formRow.querySelector(
+                'input[placeholder*="Số nhà"]',
+              );
+              if (!textInp || textInp.value) return;
+              const wardText = (wardSelect.selectedOptions[0]?.text || "")
+                .replace(/^--.*--$/, "")
+                .trim();
+              const provText = (provinceSelect.selectedOptions[0]?.text || "")
+                .replace(/^--.*--$/, "")
+                .trim();
+              const parts = [wardText, provText].filter(Boolean);
+              if (parts.length) textInp.value = parts.join(", ");
+            });
+          }
+          if (prefix === "ns") {
+            wardSelect.addEventListener("change", () => {
+              const formRow = wardSelect.closest(".form-row");
+              if (!formRow) return;
+              const textInp = formRow.querySelector(
+                "input.fam-text-birth-place",
+              );
+              if (!textInp) return;
+              const wardText = (wardSelect.selectedOptions[0]?.text || "")
+                .replace(/^--.*--$/, "")
+                .trim();
+              const provText = (provinceSelect.selectedOptions[0]?.text || "")
+                .replace(/^--.*--$/, "")
+                .trim();
+              const parts = [wardText, provText].filter(Boolean);
+              if (parts.length) textInp.value = parts.join(", ");
+            });
+          }
+          if (prefix === "qq") {
+            wardSelect.addEventListener("change", () => {
+              const formRow = wardSelect.closest(".form-row");
+              if (!formRow) return;
+              const textInp = formRow.querySelector("input.fam-text-hometown");
+              if (!textInp) return;
+              const wardText = (wardSelect.selectedOptions[0]?.text || "")
+                .replace(/^--.*--$/, "")
+                .trim();
+              const provText = (provinceSelect.selectedOptions[0]?.text || "")
+                .replace(/^--.*--$/, "")
+                .trim();
+              const parts = [wardText, provText].filter(Boolean);
+              if (parts.length) textInp.value = parts.join(", ");
+            });
+          }
         });
       }
 
@@ -7995,6 +8431,15 @@
           if (el && !el.value) el.value = parts.join(", ");
         }
       }
+      function updateBirthPlace() {
+        const ward = _getSelectText("sel_xa_ks");
+        const prov = _getSelectText("sel_tinh_ks");
+        const parts = [ward, prov].filter(Boolean);
+        if (parts.length) {
+          const el = document.getElementById("birthPlaceDetail");
+          if (el && !el.value) el.value = parts.join(", ");
+        }
+      }
       function updateNoiO() {
         const ward = _getSelectText("sel_xa_tt");
         const prov = _getSelectText("sel_tinh_tt");
@@ -8007,6 +8452,17 @@
           const el = document.getElementById("noiO");
           if (el) el.value = parts.join(", ");
         }
+      }
+      function updateTamTru() {
+        const ward = _getSelectText("sel_xa_tx");
+        const prov = _getSelectText("sel_tinh_tx");
+        const num = (document.getElementById("soNhaTX")?.value || "").trim();
+        const street = (
+          document.getElementById("tenDuongTX")?.value || ""
+        ).trim();
+        const parts = [num, street, ward, prov].filter(Boolean);
+        const el = document.getElementById("tamTru");
+        if (el && parts.length) el.value = parts.join(", ");
       }
 
       function validateField(el, type) {
@@ -8102,9 +8558,12 @@
           if (i === cols - 1) {
             td.innerHTML = `<button class="del-btn" onclick="delRow(this)">✕</button>`;
           } else {
-            td.innerHTML = isB
-              ? `<div class="mmyyyy-wrap"><select class="mm-month"><option value="">MM</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select><span class="mmyyyy-slash">/</span><input class="mm-year" type="number" placeholder="YYYY" min="1900" max="2099" step="1"></div>`
-              : `<input type="text" placeholder="">`;
+            if (isB && i < 2) {
+              td.innerHTML = `<div class="mmyyyy-wrap"><select class="mm-month"><option value="">MM</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select><span class="mmyyyy-slash">/</span><input class="mm-year" type="number" placeholder="YYYY" min="1900" max="2099" step="1"></div>`;
+            } else {
+              if (isB && i === 2) td.classList.add("td-dienbien");
+              td.innerHTML = `<input type="text" placeholder="${isB && i === 2 ? ph || "Tiếp theo …" : ""}">`;
+            }
           }
         }
         refreshDienBien(tb.closest(".timeline-table"));
@@ -8226,10 +8685,10 @@
     </div>
     <div id="childOver18_${m.num}" style="display:none">
       <div class="alert alert-info" style="font-size:12px;margin:6px 0 10px">ℹ Con từ 18 tuổi trở lên: khai đầy đủ như bản thân theo quy định Mẫu 2-KNĐ</div>
-      <div class="form-row"><label>Nơi sinh</label><input type="text" placeholder="Xã/Phường …, Tỉnh/TP … (KHÔNG ghi bệnh viện)"></div>
-      <div class="form-row"><label>Quê quán</label><input type="text" placeholder="Xã/Phường …, Tỉnh/TP … (địa danh mới)"></div>
-      <div class="form-row"><label>Dân tộc</label><input type="text"></div>
-      <div class="form-row"><label>Tôn giáo</label><input type="text" placeholder="Không / Tên tôn giáo + chức sắc nếu có"></div>
+      <div class="form-row"><label>Nơi sinh</label><input type="text" class="fam-text-birth-place" placeholder="Xã/Phường …, Tỉnh/TP … (KHÔNG ghi bệnh viện)"></div>
+      <div class="form-row"><label>Quê quán</label><input type="text" class="fam-text-hometown" placeholder="Xã/Phường …, Tỉnh/TP … (địa danh mới)"></div>
+      <div class="form-row"><label>Dân tộc</label><input type="text" class="fam-sel-ethnic-text"></div>
+      <div class="form-row"><label>Tôn giáo</label><input type="text" class="fam-sel-religion-text" placeholder="Không / Tên tôn giáo + chức sắc nếu có"></div>
       <div class="form-row"><label>Nghề nghiệp</label><input type="text"></div>
       <div style="margin-top:12px;margin-bottom:4px;font-size:12px;font-weight:700;color:var(--muted)">Quá trình lịch sử (từ khi sinh đến nay)</div>
       <div class="hist-mode-bar">Nhập theo: <div class="hist-mode-toggle"><button class="hist-mode-btn active" onclick="setHistMode(this,'yyyy')">Năm</button><button class="hist-mode-btn" onclick="setHistMode(this,'mm')">Tháng/Năm</button></div><span style="color:var(--hint);font-size:10.5px">· Chuyển sang Tháng/Năm nếu cần khai chi tiết</span></div>
@@ -8252,10 +8711,10 @@
     <div class="alert alert-info" style="margin-bottom:10px;font-size:12px">ℹ <strong>Lưu ý:</strong> Thông tin ngày lập gia đình và ly hôn (nếu có) <strong>không khai ở đây</strong> — chỉ ghi trong <strong>Phần C</strong> dạng: "Tháng …/…. – Lập gia đình với … chuyển đến sinh sống tại …" và "Tháng …/…. – Ly hôn với … theo Quyết định số … của cấp …"</div>
     <div class="form-row"><label>Họ và tên</label><input type="text" oninput="updateFamName('${m.num}',this.value)"></div>
     <div class="form-row"><label>Năm sinh</label><input type="text" placeholder="YYYY"></div>
-    <div class="form-row"><label>Nơi sinh</label><input type="text" placeholder="Xã/Phường …, Tỉnh/TP … (KHÔNG ghi bệnh viện)"></div>
-    <div class="form-row"><label>Quê quán<span class="hint-lbl">Phải đối chiếu với cha mẹ chồng/vợ</span></label><input type="text" placeholder="Xã/Phường …, Tỉnh/TP … (địa danh mới)"></div>
-    <div class="form-row"><label>Dân tộc</label><input type="text"></div>
-    <div class="form-row"><label>Tôn giáo</label><input type="text" placeholder="Không / Tên tôn giáo + chức sắc nếu có"></div>
+    <div class="form-row"><label>Nơi sinh</label><input type="text" class="fam-text-birth-place" placeholder="Xã/Phường …, Tỉnh/TP … (KHÔNG ghi bệnh viện)"></div>
+    <div class="form-row"><label>Quê quán<span class="hint-lbl">Phải đối chiếu với cha mẹ chồng/vợ</span></label><input type="text" class="fam-text-hometown" placeholder="Xã/Phường …, Tỉnh/TP … (địa danh mới)"></div>
+    <div class="form-row"><label>Dân tộc</label><input type="text" class="fam-sel-ethnic-text"></div>
+    <div class="form-row"><label>Tôn giáo</label><input type="text" class="fam-sel-religion-text" placeholder="Không / Tên tôn giáo + chức sắc nếu có"></div>
     <div class="form-row"><label>Nơi cư trú</label><input type="text" placeholder="Số nhà, đường, ấp, xã, tỉnh …"></div>
     <div class="form-row"><label>Nghề nghiệp</label><input type="text"></div>
     <div style="margin-top:12px;margin-bottom:4px;font-size:12px;font-weight:700;color:var(--muted)">Quá trình lịch sử của chồng/vợ (liên tục từ nhỏ đến nay) <span style="font-weight:400;color:var(--red)">*Bắt buộc</span></div>
@@ -8282,9 +8741,10 @@
     <div class="form-row two-col-50"><div><label>Năm sinh</label><input type="number" placeholder="YYYY" min="1890" max="2010"></div><div><label>Giới tính</label><select><option value="">--</option><option>Nam</option><option>Nữ</option></select></div></div>
     <div class="form-row"><label>Quê quán<span class="hint-lbl">Xã, tỉnh theo địa danh mới</span></label>
       <div class="loc-row"><select id="sel_tinh_fam_qq_${m.num.replace(/\./g, "_")}" class="searchable-location"><option value="">-- Tỉnh/TP --</option></select><select id="sel_xa_fam_qq_${m.num.replace(/\./g, "_")}" class="searchable-location"><option value="">-- Xã/Phường --</option></select></div>
+      <input type="text" class="fam-text-hometown" style="margin-top:4px" placeholder="Quê quán (tự động điền hoặc nhập trực tiếp)">
     </div>
-    <div class="form-row"><label>Dân tộc</label><select><option value="">-- Chọn --</option><option>Kinh</option><option>Tày</option><option>Thái</option><option>Mường</option><option>Khmer</option><option>Khác</option></select></div>
-    <div class="form-row"><label>Tôn giáo</label><select><option value="">-- Chọn --</option><option>Không</option><option>Phật giáo</option><option>Công giáo</option><option>Cao Đài</option><option>Hòa Hảo</option><option>Khác</option></select></div>
+    <div class="form-row"><label>Dân tộc</label><select class="fam-sel-ethnic"><option value="">-- Chọn --</option><option>Kinh</option><option>Tày</option><option>Thái</option><option>Mường</option><option>Khmer</option><option>Khác</option></select></div>
+    <div class="form-row"><label>Tôn giáo</label><select class="fam-sel-religion"><option value="">-- Chọn --</option><option>Không</option><option>Phật giáo</option><option>Công giáo</option><option>Cao Đài</option><option>Hòa Hảo</option><option>Khác</option></select></div>
     <div class="form-row"><label>Nơi cư trú<span class="hint-lbl">Để trống nếu đã mất</span></label><input type="text" placeholder="Số nhà, đường, ấp, xã, tỉnh …"></div>
     <div class="form-row"><label>Nghề nghiệp<span class="hint-lbl">Để trống nếu đã mất</span></label><input type="text" placeholder="Nông dân / Hưu trí / Đã mất …"></div>
     <div class="form-row"><label>Là Đảng viên?</label>
@@ -8308,12 +8768,14 @@
     </div>
     <div class="form-row"><label>Nơi sinh<span class="hint-lbl">Không ghi bệnh viện — ghi Xã/Phường, Tỉnh/TP</span></label>
       <div class="loc-row"><select id="sel_tinh_fam_ns_${m.num.replace(/\./g, "_")}" class="searchable-location"><option value="">-- Tỉnh/TP --</option></select><select id="sel_xa_fam_ns_${m.num.replace(/\./g, "_")}" class="searchable-location"><option value="">-- Xã/Phường --</option></select></div>
+      <input type="text" class="fam-text-birth-place" style="margin-top:4px" placeholder="Nơi sinh (tự động điền hoặc nhập trực tiếp)">
     </div>
     <div class="form-row"><label>Quê quán<span class="hint-lbl">Địa danh hành chính mới</span></label>
       <div class="loc-row"><select id="sel_tinh_fam_qq_${m.num.replace(/\./g, "_")}" class="searchable-location"><option value="">-- Tỉnh/TP --</option></select><select id="sel_xa_fam_qq_${m.num.replace(/\./g, "_")}" class="searchable-location"><option value="">-- Xã/Phường --</option></select></div>
+      <input type="text" class="fam-text-hometown" style="margin-top:4px" placeholder="Quê quán (tự động điền hoặc nhập trực tiếp)">
     </div>
-    <div class="form-row"><label>Dân tộc</label><select><option value="">-- Chọn --</option><option>Kinh</option><option>Tày</option><option>Thái</option><option>Mường</option><option>Khmer</option><option>Nùng</option><option>HMông</option><option>Khác</option></select></div>
-    <div class="form-row"><label>Tôn giáo</label><select><option value="">-- Chọn --</option><option>Không</option><option>Phật giáo</option><option>Công giáo</option><option>Cao Đài</option><option>Hòa Hảo</option><option>Tin Lành</option><option>Hồi giáo</option><option>Khác</option></select></div>
+    <div class="form-row"><label>Dân tộc</label><select class="fam-sel-ethnic"><option value="">-- Chọn --</option><option>Kinh</option><option>Tày</option><option>Thái</option><option>Mường</option><option>Khmer</option><option>Nùng</option><option>HMông</option><option>Khác</option></select></div>
+    <div class="form-row"><label>Tôn giáo</label><select class="fam-sel-religion"><option value="">-- Chọn --</option><option>Không</option><option>Phật giáo</option><option>Công giáo</option><option>Cao Đài</option><option>Hòa Hảo</option><option>Tin Lành</option><option>Hồi giáo</option><option>Khác</option></select></div>
     <div class="form-row"><label>Nơi cư trú<span class="hint-lbl">Để trống nếu đã mất</span></label>
       <div><div class="loc-row" style="margin-bottom:6px"><select id="sel_tinh_fam_ct_${m.num.replace(/\./g, "_")}" class="searchable-location"><option value="">-- Tỉnh/TP --</option></select><select id="sel_xa_fam_ct_${m.num.replace(/\./g, "_")}" class="searchable-location"><option value="">-- Xã/Phường --</option></select></div>
       <input type="text" placeholder="Số nhà, đường, ấp/thôn"></div>
@@ -8758,7 +9220,7 @@
           const f = _getMmYr(c[0]),
             t = _getMmYr(c[1]),
             d = _tdv(c[2]);
-          if (!f.year && !d.trim()) return [];
+          if (!d.trim()) return [];
           return [
             {
               id: tr.dataset.id || null,
@@ -8779,7 +9241,7 @@
           if (!c || c.length < 3) return [];
           const period = _tdv(c[0]),
             emp = _tdv(c[1]);
-          if (!emp && !period) return [];
+          if (!emp) return [];
           return [
             {
               id: tr.dataset.id || null,
@@ -8798,7 +9260,7 @@
             m = _tdv(c[1]),
             p = _tdv(c[2]),
             cert = _tdv(c[3]);
-          if (!s && !m) return [];
+          if (!s) return [];
           return [
             {
               id: tr.dataset.id || null,
@@ -8817,7 +9279,7 @@
           const p = _tdv(c[0]),
             pur = _tdv(c[1]),
             cou = _tdv(c[2]);
-          if (!cou && !pur) return [];
+          if (!cou) return [];
           return [
             {
               id: tr.dataset.id || null,
@@ -8931,11 +9393,27 @@
             chiBoVal = ci?.value.trim() || null;
           }
         }
+        const birthPlaceInp = body.querySelector("input.fam-text-birth-place");
+        const birthPlace = (birthPlaceInp?.value || "").trim() || null;
+        const hometownInp = body.querySelector("input.fam-text-hometown");
+        const hometown = (hometownInp?.value || "").trim() || null;
+        const ethnicSel = body.querySelector("select.fam-sel-ethnic");
+        const ethnicTxt = body.querySelector("input.fam-sel-ethnic-text");
+        const ethnicGroupText =
+          (ethnicSel?.value || ethnicTxt?.value || "").trim() || null;
+        const religionSel = body.querySelector("select.fam-sel-religion");
+        const religionTxt = body.querySelector("input.fam-sel-religion-text");
+        const religionText =
+          (religionSel?.value || religionTxt?.value || "").trim() || null;
         return {
           id: acc.dataset.familyId || null,
           relationship: rel,
           full_name: fullName,
           birth_year: birthYear,
+          birth_place: birthPlace,
+          hometown: hometown,
+          ethnic_group_text: ethnicGroupText,
+          religion_text: religionText,
           current_address: addr,
           occupation: occ,
           is_party_member: isParty,
@@ -8961,8 +9439,34 @@
             break;
           }
         }
+        // For child accordions: show over-18 fields when birth year >= 18 years ago
+        if (m.birth_year) {
+          const numEl = acc.querySelector(".fam-num");
+          const num = (numEl?.textContent || "").trim();
+          if (num && document.getElementById("childOver18_" + num)) {
+            checkChildAge(num, m.birth_year);
+          }
+        }
         const ai = body.querySelector('input[placeholder*="Số nhà"]');
         if (ai) ai.value = m.current_address || "";
+        const bpInp = body.querySelector("input.fam-text-birth-place");
+        if (bpInp) bpInp.value = m.birth_place || "";
+        const htInp = body.querySelector("input.fam-text-hometown");
+        if (htInp) htInp.value = m.hometown || "";
+        const ethSel = body.querySelector("select.fam-sel-ethnic");
+        if (ethSel && m.ethnic_group_text) {
+          ethSel.value = m.ethnic_group_text;
+          if (!ethSel.value) ethSel.value = "Khác";
+        }
+        const ethTxtInp = body.querySelector("input.fam-sel-ethnic-text");
+        if (ethTxtInp) ethTxtInp.value = m.ethnic_group_text || "";
+        const relSel = body.querySelector("select.fam-sel-religion");
+        if (relSel && m.religion_text) {
+          relSel.value = m.religion_text;
+          if (!relSel.value) relSel.value = "Khác";
+        }
+        const relTxtInp = body.querySelector("input.fam-sel-religion-text");
+        if (relTxtInp) relTxtInp.value = m.religion_text || "";
         body.querySelectorAll(".form-row").forEach((row) => {
           const lbl = (
             row.querySelector("label")?.textContent || ""
@@ -8996,9 +9500,112 @@
         }
       }
 
+      // ── Family history helpers ───────────────────────────────────────
+      function _hdcCell(month, year) {
+        const y = year || "";
+        const opts = ["", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+          .map(
+            (v) =>
+              `<option value="${v}"${String(v) === String(month || "") ? " selected" : ""}>${v || "MM"}</option>`,
+          )
+          .join("");
+        return (
+          `<div class="hist-date-cell">` +
+          `<input class="hdc-year" type="number" placeholder="YYYY" min="1900" max="2099" step="1" value="${y}">` +
+          `<select class="hdc-month">${opts}</select>` +
+          `<span class="hdc-slash">/</span>` +
+          `<input class="hdc-myear" type="number" placeholder="YYYY" min="1900" max="2099" step="1" value="${y}">` +
+          `</div>`
+        );
+      }
+
+      function _readAccordionHistory(acc) {
+        const body = acc.querySelector(".family-body");
+        if (!body) return [];
+        const rows = [];
+        body.querySelectorAll(".timeline-table tbody tr").forEach((tr, idx) => {
+          const cells = tr.cells;
+          if (!cells || cells.length < 3) return;
+          const fromYear =
+            parseInt(cells[0].querySelector(".hdc-year")?.value) ||
+            parseInt(cells[0].querySelector(".hdc-myear")?.value) ||
+            null;
+          const fromMonth =
+            parseInt(cells[0].querySelector(".hdc-month")?.value) || null;
+          const toYear =
+            parseInt(cells[1].querySelector(".hdc-year")?.value) ||
+            parseInt(cells[1].querySelector(".hdc-myear")?.value) ||
+            null;
+          const toMonth =
+            parseInt(cells[1].querySelector(".hdc-month")?.value) || null;
+          const desc = _tdv(cells[2]);
+          if (!desc && !fromYear && !toYear) return;
+          rows.push({
+            from_year: fromYear,
+            from_month: fromMonth,
+            to_year: toYear,
+            to_month: toMonth,
+            description: desc,
+            sort_order: idx,
+          });
+        });
+        return rows;
+      }
+
+      function _fillAccordionHistory(acc, histRows) {
+        if (!histRows || !histRows.length) return;
+        const body = acc.querySelector(".family-body");
+        if (!body) return;
+        const tbl = body.querySelector(".timeline-table tbody");
+        if (!tbl) return;
+        tbl.innerHTML = "";
+        const ids = [];
+        histRows.forEach((r) => {
+          if (r.id) ids.push(String(r.id));
+          const tr = tbl.insertRow();
+          if (r.id) tr.dataset.histId = r.id;
+          tr.innerHTML =
+            `<td>${_hdcCell(r.from_month, r.from_year)}</td>` +
+            `<td>${_hdcCell(r.to_month, r.to_year)}</td>` +
+            `<td><input type="text" value="${_esc(r.description || "")}"></td>` +
+            `<td><button class="del-btn" onclick="delRow(this)">✕</button></td>`;
+        });
+        acc.dataset.famHistIds = JSON.stringify(ids);
+      }
+
+      async function _saveFamHistory(profileId, famId, acc) {
+        const rows = _readAccordionHistory(acc);
+        const oldIds = JSON.parse(acc.dataset.famHistIds || "[]");
+        const base = `/timelines/${profileId}/history/`;
+        await Promise.all(
+          oldIds.map((id) => API.del(`${base}${id}/`).catch(() => {})),
+        );
+        const newIds = [];
+        for (const [i, hr] of rows.entries()) {
+          if (!hr.description) continue;
+          try {
+            const cr = await API.post(base, {
+              entry_type: "family",
+              family_member: famId,
+              from_year: hr.from_year || null,
+              from_month: hr.from_month || null,
+              to_year: hr.to_year || null,
+              to_month: hr.to_month || null,
+              description: hr.description,
+              sort_order: i,
+            });
+            if (cr?.id) newIds.push(String(cr.id));
+          } catch (e) {
+            console.warn("[FAM-HIST]", e.message);
+          }
+        }
+        acc.dataset.famHistIds = JSON.stringify(newIds);
+      }
+
       // ── Load all sections (call after profile ID is known) ───────────
       async function _loadAllSections(profileId) {
         if (!profileId) return;
+        let famHistoryRows = [];
         try {
           const res = await API.get(`/timelines/${profileId}/all/`);
           const d = (res && res.success !== undefined ? res.data : res) || {};
@@ -9008,6 +9615,7 @@
           _fillTbF(d.overseas_travels || []);
           _fillTbAwards("tbG-body", d.awards || [], "G");
           _fillTbAwards("tbH-body", d.disciplines || [], "H");
+          famHistoryRows = d.family_history || [];
           console.log(
             "[LOAD] timelines:",
             Object.fromEntries(
@@ -9039,6 +9647,23 @@
           console.log("[LOAD] family:", members.length, "members");
         } catch (e) {
           console.warn("[LOAD] family fail:", e.message);
+        }
+
+        // Populate family member history into their accordions
+        if (famHistoryRows.length) {
+          const histByFam = {};
+          famHistoryRows.forEach((h) => {
+            const k = String(h.family_member);
+            if (!histByFam[k]) histByFam[k] = [];
+            histByFam[k].push(h);
+          });
+          document
+            .querySelectorAll(".family-accordion[data-family-id]")
+            .forEach((acc) => {
+              const famId = acc.dataset.familyId;
+              if (famId && histByFam[famId])
+                _fillAccordionHistory(acc, histByFam[famId]);
+            });
         }
       }
 
@@ -9075,6 +9700,11 @@
             }
           } catch (e) {
             console.warn("[FAM] save fail:", e.message, payload);
+          }
+          // Save family member history (quá trình lịch sử)
+          const famId = acc.dataset.familyId;
+          if (famId) {
+            await _saveFamHistory(profileId, parseInt(famId), acc);
           }
         }
       }
@@ -9723,10 +10353,9 @@
           <div class="edit-nav-item" onclick="scrollToSection('esB')">B. Lịch sử bản thân</div>
           <div class="edit-nav-item" onclick="scrollToSection('esC')">C. Trình độ & Công tác</div>
           <div class="edit-nav-item" id="esD-nav" onclick="scrollToSection('esD')">D. Thành phần gia đình</div>
-          <div class="edit-nav-item" onclick="scrollToSection('esE')">E. Khen thưởng / Kỷ luật</div>
-          <div class="edit-nav-item" onclick="scrollToSection('esF')">F. Tài liệu đính kèm</div>
+          <div class="edit-nav-item" onclick="scrollToSection('esE')">E. Khen thưởng</div>
+          <div class="edit-nav-item" onclick="scrollToSection('esFT')">F. Đi nước ngoài</div>
           <div class="edit-nav-item" onclick="scrollToSection('esH')">H. Kỷ luật</div>
-          <div class="edit-nav-item" onclick="scrollToSection('esI')">I. Hoàn cảnh gia đình</div>
           <div class="edit-nav-item" onclick="scrollToSection('esJ')">J. Tự nhận xét</div>
           <div class="edit-nav-item" onclick="scrollToSection('esK')">K. Cam đoan & Nộp</div>
           <div class="edit-nav-item" onclick="scrollToSection('esG')">G. Lịch sử chỉnh sửa</div>
@@ -9817,6 +10446,11 @@
                 <div class="field-value" id="fv-esA-occupation">—</div>
                 <input class="field-input" id="fi-esA-occupation" value="" data-field="Nghề nghiệp">
               </div>
+              <div class="field-row">
+                <div class="field-label">Nơi tạm trú</div>
+                <div class="field-value" id="fv-esA-temp-addr">—</div>
+                <input class="field-input" id="fi-esA-temp-addr" value="" data-field="Nơi tạm trú" placeholder="Để trống nếu không có">
+              </div>
             </div>
           </div>
 
@@ -9881,6 +10515,26 @@
                 <div class="field-value" id="fv-esC-youth-union">—</div>
                 <input class="field-input" id="fi-esC-youth-union" value="" data-field="Vào Đoàn">
               </div>
+              <div class="field-row">
+                <div class="field-label">Khoa học công nghệ</div>
+                <div class="field-value" id="fv-esC-sci-tech">—</div>
+                <input class="field-input" id="fi-esC-sci-tech" value="" data-field="KHCN" placeholder="Chứng chỉ KHCN, đổi mới sáng tạo…">
+              </div>
+              <div class="field-row">
+                <div class="field-label">Học vị cao nhất</div>
+                <div class="field-value" id="fv-esC-degree">—</div>
+                <input class="field-input" id="fi-esC-degree" value="" data-field="Học vị" placeholder="Thạc sĩ / Tiến sĩ…">
+              </div>
+              <div class="field-row">
+                <div class="field-label">Học hàm cao nhất</div>
+                <div class="field-value" id="fv-esC-acad-title">—</div>
+                <input class="field-input" id="fi-esC-acad-title" value="" data-field="Học hàm" placeholder="Phó Giáo sư / Giáo sư">
+              </div>
+              <div class="field-row">
+                <div class="field-label">Tiếng dân tộc</div>
+                <div class="field-value" id="fv-esC-ethnic-lang">—</div>
+                <input class="field-input" id="fi-esC-ethnic-lang" value="" data-field="Tiếng dân tộc" placeholder="Tên tiếng dân tộc thiểu số">
+              </div>
             </div>
           </div>
 
@@ -9891,6 +10545,7 @@
               <h4>D. Thành phần gia đình</h4>
               <div class="edit-sec-actions">
                 <button class="edit-btn flag-btn" onclick="toggleSectionFlag('esD','D. Gia đình')" title="Đánh dấu cần bổ sung">⚑ Gắn cờ</button>
+                <button class="edit-btn" onclick="toggleEdit('esD')">✏ Chỉnh sửa</button>
               </div>
             </div>
             <div class="edit-sec-body">
@@ -9901,28 +10556,49 @@
             </div>
           </div>
 
-          <!-- E. Awards / Disciplines -->
+          <!-- E. Rewards (maps from Public User Section G) -->
           <div class="editable-section" id="esE">
             <div class="edit-sec-head">
               <div class="card-head-dot"></div>
-              <h4>E. Khen thưởng & Kỷ luật</h4>
+              <h4>E. Khen thưởng</h4>
               <div class="edit-sec-actions">
-                <button class="edit-btn flag-btn" onclick="toggleSectionFlag('esE','E. Khen thưởng/Kỷ luật')">⚑ Gắn cờ</button>
+                <button class="edit-btn flag-btn" onclick="toggleSectionFlag('esE','E. Khen thưởng')">⚑ Gắn cờ</button>
                 <button class="edit-btn" onclick="toggleEdit('esE')">✏ Chỉnh sửa</button>
               </div>
             </div>
             <div class="edit-sec-body">
               <div class="field-correction-note" id="note-esE"></div>
-              <div class="field-row"><div class="field-label">Khen thưởng</div><div class="field-value empty">Chưa khai</div><input class="field-input" placeholder="Danh hiệu / Bằng khen (nếu có)…" data-field="Khen thưởng"></div>
-              <div class="field-row"><div class="field-label">Kỷ luật</div><div class="field-value empty">Không có</div><input class="field-input" placeholder="Không / Ghi hình thức kỷ luật nếu có…" data-field="Kỷ luật"></div>
+              <div id="timeline-esG">
+                <div style="text-align:center;padding:16px;color:var(--muted);font-size:12.5px">⏳ Đang tải khen thưởng…</div>
+              </div>
+              <button class="add-row-btn" style="margin-top:8px" onclick="addAwardRow('timeline-esG')">+ Thêm khen thưởng</button>
             </div>
           </div>
 
-          <!-- H. Disciplinary Details -->
+          <!-- F. Foreign Travel (maps from Public User Section F) -->
+          <div class="editable-section" id="esFT">
+            <div class="edit-sec-head">
+              <div class="card-head-dot"></div>
+              <h4>F. Đi nước ngoài</h4>
+              <div class="edit-sec-actions">
+                <button class="edit-btn flag-btn" onclick="toggleSectionFlag('esFT','F. Đi nước ngoài')">⚑ Gắn cờ</button>
+                <button class="edit-btn" onclick="toggleEdit('esFT')">✏ Chỉnh sửa</button>
+              </div>
+            </div>
+            <div class="edit-sec-body">
+              <div class="field-correction-note" id="note-esFT"></div>
+              <div id="timeline-esF">
+                <div style="text-align:center;padding:16px;color:var(--muted);font-size:12.5px">⏳ Đang tải lịch sử đi nước ngoài…</div>
+              </div>
+              <button class="add-row-btn" style="margin-top:8px" onclick="addTravelRow('timeline-esF')">+ Thêm chuyến đi</button>
+            </div>
+          </div>
+
+          <!-- H. Discipline (maps from Public User Section H) -->
           <div class="editable-section" id="esH">
             <div class="edit-sec-head">
               <div class="card-head-dot"></div>
-              <h4>H. Kỷ luật (chi tiết)</h4>
+              <h4>H. Kỷ luật</h4>
               <div class="edit-sec-actions">
                 <button class="edit-btn flag-btn" onclick="toggleSectionFlag('esH','H. Kỷ luật')">⚑ Gắn cờ</button>
                 <button class="edit-btn" onclick="toggleEdit('esH')">✏ Chỉnh sửa</button>
@@ -9930,51 +10606,10 @@
             </div>
             <div class="edit-sec-body">
               <div class="field-correction-note" id="note-esH"></div>
-              <div class="field-row">
-                <div class="field-label">Kỷ luật từng nhận</div>
-                <div class="field-value empty" id="fv-esH-disciplines">—</div>
-                <textarea class="field-textarea" id="fi-esH-disciplines" placeholder="Ghi rõ loại, mức độ kỷ luật, năm…" data-field="Kỷ luật"></textarea>
+              <div id="timeline-esH">
+                <div style="text-align:center;padding:16px;color:var(--muted);font-size:12.5px">⏳ Đang tải kỷ luật…</div>
               </div>
-            </div>
-          </div>
-
-          <!-- D2. Political History Text -->
-          <div class="editable-section" id="esDpol">
-            <div class="edit-sec-head">
-              <div class="card-head-dot"></div>
-              <h4>D. Đặc điểm lịch sử chính trị</h4>
-              <div class="edit-sec-actions">
-                <button class="edit-btn flag-btn" onclick="toggleSectionFlag('esDpol','D. Đặc điểm lịch sử chính trị')">⚑ Gắn cờ</button>
-                <button class="edit-btn" onclick="toggleEdit('esDpol')">✏ Chỉnh sửa</button>
-              </div>
-            </div>
-            <div class="edit-sec-body">
-              <div class="field-correction-note" id="note-esDpol"></div>
-              <div class="field-row">
-                <div class="field-label">Lịch sử chính trị bản thân và gia đình</div>
-                <div class="field-value empty" id="fv-esDpol-political">—</div>
-                <textarea class="field-textarea" id="fi-esDpol-political" placeholder="Ghi rõ đặc điểm lịch sử chính trị bản thân và gia đình…" data-field="Đặc điểm lịch sử chính trị"></textarea>
-              </div>
-            </div>
-          </div>
-
-          <!-- I. Family Circumstances -->
-          <div class="editable-section" id="esI">
-            <div class="edit-sec-head">
-              <div class="card-head-dot"></div>
-              <h4>I. Hoàn cảnh gia đình</h4>
-              <div class="edit-sec-actions">
-                <button class="edit-btn flag-btn" onclick="toggleSectionFlag('esI','I. Hoàn cảnh gia đình')">⚑ Gắn cờ</button>
-                <button class="edit-btn" onclick="toggleEdit('esI')">✏ Chỉnh sửa</button>
-              </div>
-            </div>
-            <div class="edit-sec-body">
-              <div class="field-correction-note" id="note-esI"></div>
-              <div class="field-row">
-                <div class="field-label">Ghi chú</div>
-                <div class="field-value empty" id="fv-esI-circumstances">—</div>
-                <textarea class="field-textarea" id="fi-esI-circumstances" placeholder="Ghi chú về hoàn cảnh gia đình…" data-field="Hoàn cảnh gia đình"></textarea>
-              </div>
+              <button class="add-row-btn" style="margin-top:8px" onclick="addAwardRow('timeline-esH')">+ Thêm kỷ luật</button>
             </div>
           </div>
 
@@ -10075,9 +10710,8 @@
               <button class="edit-btn" onclick="addReturnSection('C. Trình độ')">+ C. Trình độ</button>
               <button class="edit-btn" onclick="addReturnSection('D. Gia đình')">+ D. Gia đình</button>
               <button class="edit-btn" onclick="addReturnSection('E. Khen thưởng')">+ E. Khen thưởng</button>
-              <button class="edit-btn" onclick="addReturnSection('F. Tài liệu')">+ F. Tài liệu</button>
+              <button class="edit-btn" onclick="addReturnSection('F. Đi nước ngoài')">+ F. Đi nước ngoài</button>
               <button class="edit-btn" onclick="addReturnSection('H. Kỷ luật')">+ H. Kỷ luật</button>
-              <button class="edit-btn" onclick="addReturnSection('I. Hoàn cảnh')">+ I. Hoàn cảnh</button>
               <button class="edit-btn" onclick="addReturnSection('J. Tự nhận xét')">+ J. Tự nhận xét</button>
               <button class="edit-btn" onclick="addReturnSection('K. Cam đoan')">+ K. Cam đoan</button>
             </div>
@@ -11115,10 +11749,10 @@
         esB: "B. Lịch sử bản thân",
         esC: "C. Trình độ",
         esD: "D. Gia đình",
-        esE: "E. Khen thưởng/Kỷ luật",
+        esE: "E. Khen thưởng",
+        esFT: "F. Đi nước ngoài",
         esF: "F. Tài liệu",
         esH: "H. Kỷ luật",
-        esI: "I. Hoàn cảnh gia đình",
         esJ: "J. Tự nhận xét",
         esK: "K. Cam đoan",
       };
@@ -11191,6 +11825,7 @@
             setFv("esA-cccd", p.cccd || p.user?.cccd);
             setFv("esA-email", p.user?.email);
             setFv("esA-occupation", p.occupation);
+            setFv("esA-temp-addr", p.temporary_address);
 
             // Section C — education & qualifications
             setFv("esC-edu-gen", p.general_edu_level);
@@ -11212,6 +11847,10 @@
               "esC-youth-union",
               [yuDate, p.youth_union_place].filter(Boolean).join(" – "),
             );
+            setFv("esC-sci-tech", p.science_tech_qualifications);
+            setFv("esC-degree", p.highest_degree);
+            setFv("esC-acad-title", p.academic_title);
+            setFv("esC-ethnic-lang", p.ethnic_language);
 
             // Reset AI check results for new profile
             aiCheckData = [];
@@ -11357,48 +11996,111 @@
               }
             }
 
-            // Render Section D — family members (read-only table for officer review)
+            // Render Section D — family members table (view + edit modes)
+            const _famRelMap = {
+              cha_ruot: "Cha ruột",
+              me_ruot: "Mẹ ruột",
+              ong_noi: "Ông nội",
+              ba_noi: "Bà nội",
+              ong_ngoai: "Ông ngoại",
+              ba_ngoai: "Bà ngoại",
+              vo_chong: "Vợ/Chồng",
+              con: "Con",
+              anh_chi_em_ruot: "Anh/Chị/Em ruột",
+              cha_chong_vo: "Cha chồng/vợ",
+              me_chong_vo: "Mẹ chồng/vợ",
+              anh_chi_em_chong_vo: "Anh/Chị/Em chồng/vợ",
+              ong_noi_chong_vo: "Ông nội chồng/vợ",
+              ba_noi_chong_vo: "Bà nội chồng/vợ",
+              ong_ngoai_chong_vo: "Ông ngoại chồng/vợ",
+              ba_ngoai_chong_vo: "Bà ngoại chồng/vợ",
+            };
+            window._esDMembers = [];
+            function _renderFamTableView(members) {
+              const famBody = document.getElementById("family-esD-body");
+              if (!famBody) return;
+              window._esDMembers = members;
+              famBody.innerHTML = members.length
+                ? `<div style="overflow-x:auto"><table style="width:100%;font-size:12px;border-collapse:collapse">
+              <thead><tr style="background:#F3F6FB;color:#4A5568">
+                <th style="padding:5px 8px;text-align:left;white-space:nowrap">Quan hệ</th>
+                <th style="padding:5px 8px;text-align:left;white-space:nowrap">Họ và tên</th>
+                <th style="padding:5px 8px;text-align:left;white-space:nowrap">Năm sinh</th>
+                <th style="padding:5px 8px;text-align:left;white-space:nowrap">Nơi sinh</th>
+                <th style="padding:5px 8px;text-align:left;white-space:nowrap">Quê quán</th>
+                <th style="padding:5px 8px;text-align:left;white-space:nowrap">Dân tộc</th>
+                <th style="padding:5px 8px;text-align:left;white-space:nowrap">Tôn giáo</th>
+                <th style="padding:5px 8px;text-align:left;white-space:nowrap">Nghề nghiệp</th>
+                <th style="padding:5px 8px;text-align:left;white-space:nowrap">Nơi ở hiện tại</th>
+                <th style="padding:5px 8px;text-align:left;white-space:nowrap">Đảng viên</th>
+              </tr></thead>
+              <tbody>${members
+                .map(
+                  (m) => `<tr style="border-top:1px solid #EEF2F9">
+                <td style="padding:5px 8px;font-weight:600;white-space:nowrap">${_esc(_famRelMap[m.relationship] || m.relationship)}</td>
+                <td style="padding:5px 8px">${_esc(m.full_name || "—")}</td>
+                <td style="padding:5px 8px">${_esc(String(m.birth_year || "—"))}</td>
+                <td style="padding:5px 8px">${_esc(m.birth_place || "—")}</td>
+                <td style="padding:5px 8px">${_esc(m.hometown || "—")}</td>
+                <td style="padding:5px 8px">${_esc(m.ethnic_group_text || "—")}</td>
+                <td style="padding:5px 8px">${_esc(m.religion_text || "—")}</td>
+                <td style="padding:5px 8px">${_esc(m.occupation || "—")}</td>
+                <td style="padding:5px 8px">${_esc(m.current_address || "—")}</td>
+                <td style="padding:5px 8px">${m.is_party_member ? "Có" : "Không"}</td>
+              </tr>`,
+                )
+                .join("")}</tbody>
+            </table></div>`
+                : '<div style="color:#A0AABF;font-size:13px;padding:8px 0">Chưa có thành viên gia đình.</div>';
+            }
+            function _renderFamTableEdit(members) {
+              const famBody = document.getElementById("family-esD-body");
+              if (!famBody) return;
+              const inpS =
+                'style="width:100%;border:1px solid #CBD5E0;border-radius:3px;padding:3px 5px;font-size:11.5px;box-sizing:border-box"';
+              famBody.innerHTML = members.length
+                ? `<div style="overflow-x:auto"><table style="width:100%;font-size:12px;border-collapse:collapse">
+              <thead><tr style="background:#FEF9EC;color:#4A5568">
+                <th style="padding:5px 8px;text-align:left;white-space:nowrap">Quan hệ</th>
+                <th style="padding:5px 8px;text-align:left;white-space:nowrap">Họ và tên</th>
+                <th style="padding:5px 8px;text-align:left;white-space:nowrap">Năm sinh</th>
+                <th style="padding:5px 8px;text-align:left;white-space:nowrap">Nơi sinh</th>
+                <th style="padding:5px 8px;text-align:left;white-space:nowrap">Quê quán</th>
+                <th style="padding:5px 8px;text-align:left;white-space:nowrap">Dân tộc</th>
+                <th style="padding:5px 8px;text-align:left;white-space:nowrap">Tôn giáo</th>
+                <th style="padding:5px 8px;text-align:left;white-space:nowrap">Nghề nghiệp</th>
+                <th style="padding:5px 8px;text-align:left;white-space:nowrap">Nơi ở hiện tại</th>
+              </tr></thead>
+              <tbody>${members
+                .map(
+                  (
+                    m,
+                  ) => `<tr style="border-top:1px solid #EEF2F9" data-fam-id="${m.id}">
+                <td style="padding:5px 8px;font-weight:600;white-space:nowrap">${_esc(_famRelMap[m.relationship] || m.relationship)}</td>
+                <td style="padding:5px 8px"><input ${inpS} data-field="full_name" value="${_esc(m.full_name || "")}"></td>
+                <td style="padding:5px 8px"><input ${inpS} type="number" data-field="birth_year" value="${m.birth_year || ""}" style="width:70px;border:1px solid #CBD5E0;border-radius:3px;padding:3px 5px;font-size:11.5px"></td>
+                <td style="padding:5px 8px"><input ${inpS} data-field="birth_place" value="${_esc(m.birth_place || "")}"></td>
+                <td style="padding:5px 8px"><input ${inpS} data-field="hometown" value="${_esc(m.hometown || "")}"></td>
+                <td style="padding:5px 8px"><input ${inpS} data-field="ethnic_group_text" value="${_esc(m.ethnic_group_text || "")}"></td>
+                <td style="padding:5px 8px"><input ${inpS} data-field="religion_text" value="${_esc(m.religion_text || "")}"></td>
+                <td style="padding:5px 8px"><input ${inpS} data-field="occupation" value="${_esc(m.occupation || "")}"></td>
+                <td style="padding:5px 8px"><input ${inpS} data-field="current_address" value="${_esc(m.current_address || "")}"></td>
+              </tr>`,
+                )
+                .join("")}</tbody>
+            </table></div>`
+                : '<div style="color:#A0AABF;font-size:13px;padding:8px 0">Chưa có thành viên gia đình.</div>';
+            }
             const famBody = document.getElementById("family-esD-body");
             if (famBody && famRes.status === "fulfilled") {
               const members = Array.isArray(famRes.value)
                 ? famRes.value
                 : famRes.value?.data || famRes.value?.results || [];
-              const relMap = {
-                cha_ruot: "Cha ruột",
-                me_ruot: "Mẹ ruột",
-                ong_noi: "Ông nội",
-                ba_noi: "Bà nội",
-                ong_ngoai: "Ông ngoại",
-                ba_ngoai: "Bà ngoại",
-                vo_chong: "Vợ/Chồng",
-                con: "Con",
-                anh_chi_em_ruot: "Anh/Chị/Em ruột",
-              };
-              famBody.innerHTML = members.length
-                ? `<table style="width:100%;font-size:13px;border-collapse:collapse">
-              <thead><tr style="background:#F3F6FB;color:#4A5568">
-                <th style="padding:6px 10px;text-align:left">Quan hệ</th>
-                <th style="padding:6px 10px;text-align:left">Họ và tên</th>
-                <th style="padding:6px 10px;text-align:left">Năm sinh</th>
-                <th style="padding:6px 10px;text-align:left">Nghề nghiệp</th>
-                <th style="padding:6px 10px;text-align:left">Nơi ở hiện tại</th>
-                <th style="padding:6px 10px;text-align:left">Đảng viên</th>
-              </tr></thead>
-              <tbody>${members
-                .map(
-                  (m) => `<tr style="border-top:1px solid #EEF2F9">
-                <td style="padding:6px 10px;font-weight:600">${_esc(relMap[m.relationship] || m.relationship)}</td>
-                <td style="padding:6px 10px">${_esc(m.full_name || "—")}</td>
-                <td style="padding:6px 10px">${_esc(String(m.birth_year || "—"))}</td>
-                <td style="padding:6px 10px">${_esc(m.occupation || "—")}</td>
-                <td style="padding:6px 10px">${_esc(m.current_address || "—")}</td>
-                <td style="padding:6px 10px">${m.is_party_member ? "Có" : "Không"}</td>
-              </tr>`,
-                )
-                .join("")}</tbody>
-            </table>`
-                : '<div style="color:#A0AABF;font-size:13px;padding:8px 0">Chưa có thành viên gia đình.</div>';
+              _renderFamTableView(members);
             }
+            // Expose family renderers for section D inline edit toggle
+            window._renderFamTableView = _renderFamTableView;
+            window._renderFamTableEdit = _renderFamTableEdit;
 
             // Render Section F — attached files
             const filesBody = document.getElementById("files-esF-body");
@@ -11436,36 +12138,6 @@
             <span style="font-size:18px">＋</span><div>Thêm tài liệu</div>
           </div>`;
             }
-
-            // Section H — Disciplinary details
-            const fiH = document.getElementById("fi-esH-disciplines");
-            if (fiH) fiH.value = p.disciplines_text || "";
-            const fvH = document.getElementById("fv-esH-disciplines");
-            if (fvH)
-              fvH.textContent = p.disciplines_text
-                ? p.disciplines_text.substring(0, 50) +
-                  (p.disciplines_text.length > 50 ? "…" : "")
-                : "—";
-
-            // Section Dpol — Political history text
-            const fiDpol = document.getElementById("fi-esDpol-political");
-            if (fiDpol) fiDpol.value = p.political_history_text || "";
-            const fvDpol = document.getElementById("fv-esDpol-political");
-            if (fvDpol)
-              fvDpol.textContent = p.political_history_text
-                ? p.political_history_text.substring(0, 50) +
-                  (p.political_history_text.length > 50 ? "…" : "")
-                : "—";
-
-            // Section I — Family circumstances
-            const fiI = document.getElementById("fi-esI-circumstances");
-            if (fiI) fiI.value = p.family_circumstances || "";
-            const fvI = document.getElementById("fv-esI-circumstances");
-            if (fvI)
-              fvI.textContent = p.family_circumstances
-                ? p.family_circumstances.substring(0, 50) +
-                  (p.family_circumstances.length > 50 ? "…" : "")
-                : "—";
 
             // Section J — Self-assessment
             const fiJ = document.getElementById("fi-esJ-self");
@@ -11527,24 +12199,85 @@
           "esC",
           "esD",
           "esE",
-          "esF",
+          "esFT",
           "esH",
-          "esI",
           "esJ",
           "esK",
+          "esF",
           "esG",
         ];
         const idx = secIds.indexOf(id);
         if (navItems[idx]) navItems[idx].classList.add("active");
       }
 
+      function _collectEsDFamilyRows() {
+        return [
+          ...document.querySelectorAll("#family-esD-body tr[data-fam-id]"),
+        ].map((row) => {
+          const payload = {};
+          row.querySelectorAll("input[data-field]").forEach((inp) => {
+            const key = inp.dataset.field;
+            if (!key) return;
+            if (key === "birth_year") {
+              const n = parseInt(inp.value, 10);
+              payload[key] = Number.isFinite(n) ? n : null;
+            } else {
+              payload[key] = (inp.value || "").trim();
+            }
+          });
+          return {
+            id: row.dataset.famId,
+            payload,
+          };
+        });
+      }
+
+      async function _saveEsDFamilyEdits() {
+        const profileId = currentEditProfile?.id;
+        if (!profileId) throw new Error("Không tìm thấy ID hồ sơ");
+        const rows = _collectEsDFamilyRows();
+        const base = `/family/${profileId}/members/`;
+        await Promise.all(
+          rows.map((r) => API.patch(`${base}${r.id}/`, r.payload)),
+        );
+
+        const byId = new Map(rows.map((r) => [String(r.id), r.payload]));
+        window._esDMembers = (window._esDMembers || []).map((m) => {
+          const patch = byId.get(String(m.id));
+          return patch ? { ...m, ...patch } : m;
+        });
+        if (typeof window._renderFamTableView === "function") {
+          window._renderFamTableView(window._esDMembers || []);
+        }
+      }
+
       // Toggle inline edit mode for a section
-      function toggleEdit(secId) {
+      async function toggleEdit(secId) {
         const sec = document.getElementById(secId);
         if (!sec) return;
         const isEditing = sec.classList.toggle("editing");
         const btn = sec.querySelector(".edit-btn:not(.flag-btn)");
         if (btn) btn.textContent = isEditing ? "✓ Lưu phần này" : "✏ Chỉnh sửa";
+
+        // Section D uses a custom editable table, not field-input/field-value pairs.
+        if (secId === "esD") {
+          if (isEditing) {
+            if (typeof window._renderFamTableEdit === "function") {
+              window._renderFamTableEdit(window._esDMembers || []);
+            }
+            return;
+          }
+          try {
+            await _saveEsDFamilyEdits();
+            showToast("✅ Đã lưu thay đổi phần D");
+          } catch (e) {
+            showToast("✗ Lưu phần D thất bại: " + e.message);
+            sec.classList.add("editing");
+            if (btn) btn.textContent = "✓ Lưu phần này";
+          }
+          return;
+        }
+
         if (!isEditing) {
           // Save changes: collect all modified fields in this section
           sec
@@ -11615,7 +12348,7 @@
           return;
         }
         try {
-          // Collect Section A + C + H + I + J + K changed fields
+          // Collect Section A + C + J + K changed fields
           const fieldMap = {
             "esA-name": "full_name",
             "esA-gender": "gender",
@@ -11624,13 +12357,16 @@
             "esA-hometown": "hometown_detail",
             "esA-address": "current_address",
             "esA-occupation": "occupation",
+            "esA-temp-addr": "temporary_address",
             "esC-edu-gen": "general_edu_level",
             "esC-edu-qual": "edu_specialization",
             "esC-political": "political_level_detail",
             "esC-foreign-lang": "foreign_languages",
             "esC-it": "it_level",
-            "esH-disciplines": "disciplines_text",
-            "esDpol-political": "political_history_text",
+            "esC-sci-tech": "science_tech_qualifications",
+            "esC-degree": "highest_degree",
+            "esC-acad-title": "academic_title",
+            "esC-ethnic-lang": "ethnic_language",
             "esJ-self": "self_assessment_text",
             "esK-name": "declaration_name",
             "esK-date": "declaration_date",
@@ -11718,6 +12454,10 @@
           };
           const awardRows = _parseAdminAward("timeline-esG", "award");
           const disciplineRows = _parseAdminAward("timeline-esH", "discipline");
+
+          if (document.getElementById("esD")?.classList.contains("editing")) {
+            await _saveEsDFamilyEdits();
+          }
 
           await Promise.allSettled([
             API.patch(`/profiles/${id}/`, payload),
@@ -12020,6 +12760,26 @@
         const row = document.createElement("div");
         row.className = "timeline-edit-row";
         row.innerHTML = `<input placeholder="Từ (năm)"><input placeholder="Đến (năm)"><input placeholder="Diễn biến, nơi sinh sống…"><button class="del-row-btn" onclick="delTimelineRow(this)">✕</button>`;
+        cont.appendChild(row);
+        row.querySelector("input").focus();
+      }
+
+      function addAwardRow(containerId) {
+        const cont = document.getElementById(containerId);
+        if (!cont) return;
+        const row = document.createElement("div");
+        row.className = "timeline-edit-row";
+        row.innerHTML = `<input placeholder="Thời gian (tháng/năm)"><input placeholder="Nội dung"><input placeholder="Cấp"><button class="del-row-btn" onclick="this.closest('.timeline-edit-row').remove()">✕</button>`;
+        cont.appendChild(row);
+        row.querySelector("input").focus();
+      }
+
+      function addTravelRow(containerId) {
+        const cont = document.getElementById(containerId);
+        if (!cont) return;
+        const row = document.createElement("div");
+        row.className = "timeline-edit-row";
+        row.innerHTML = `<input placeholder="Thời gian (tháng/năm)"><input placeholder="Mục đích"><input placeholder="Quốc gia"><button class="del-row-btn" onclick="this.closest('.timeline-edit-row').remove()">✕</button>`;
         cont.appendChild(row);
         row.querySelector("input").focus();
       }
@@ -14582,6 +15342,11 @@
           _setVal("noiVaoDoan", p.youth_union_place);
           _setVal("tuNhanXet", p.self_assessment_text);
           _setVal("lichSuChinhTri", p.political_history_text);
+          _setVal("khoaHocCongNghe", p.science_tech_qualifications);
+          _setVal("hocViCaoNhat", p.highest_degree);
+          _setVal("hocHamCaoNhat", p.academic_title);
+          _setVal("tiengDanToc", p.ethnic_language);
+          _setVal("tamTru", p.temporary_address);
 
           // Ethnic group
           const ethnicText =
@@ -14953,6 +15718,11 @@
           _setVal("noiVaoDoan", p.youth_union_place);
           _setVal("tuNhanXet", p.self_assessment_text);
           _setVal("lichSuChinhTri", p.political_history_text);
+          _setVal("khoaHocCongNghe", p.science_tech_qualifications);
+          _setVal("hocViCaoNhat", p.highest_degree);
+          _setVal("hocHamCaoNhat", p.academic_title);
+          _setVal("tiengDanToc", p.ethnic_language);
+          _setVal("tamTru", p.temporary_address);
           // Ethnic group
           const ethnicText2 =
             p.ethnic_group_other ||
@@ -15168,6 +15938,17 @@
           political_history_text:
             document.getElementById("lichSuChinhTri")?.value?.trim() ||
             undefined,
+          science_tech_qualifications:
+            document.getElementById("khoaHocCongNghe")?.value?.trim() ||
+            undefined,
+          highest_degree:
+            document.getElementById("hocViCaoNhat")?.value || undefined,
+          academic_title:
+            document.getElementById("hocHamCaoNhat")?.value || undefined,
+          ethnic_language:
+            document.getElementById("tiengDanToc")?.value?.trim() || undefined,
+          temporary_address:
+            document.getElementById("tamTru")?.value?.trim() || undefined,
         };
       }
 
@@ -15201,7 +15982,12 @@
 
           if (savedData?.id) window._profileId = savedData.id;
 
-          if (window._profileId) await _saveAllSections(window._profileId);
+          if (window._profileId) {
+            await _saveAllSections(window._profileId);
+            // Reload sections so row IDs are refreshed — prevents duplicate
+            // POSTs on subsequent saves for rows that were just created.
+            await _loadAllSections(window._profileId);
+          }
 
           // Keep officer/admin list in sync immediately after saving draft.
           if (

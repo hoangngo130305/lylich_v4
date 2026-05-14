@@ -80,5 +80,6 @@ def all_sections(request, profile_id):
             'disciplines':       AwardSerializer(Award.objects.filter(profile_id=profile_id, type='discipline'), many=True).data,
             'overseas_travels':  OverseasTravelSerializer(OverseasTravel.objects.filter(profile_id=profile_id), many=True).data,
             'overseas_relatives':OverseasRelativeSerializer(OverseasRelative.objects.filter(profile_id=profile_id), many=True).data,
+            'family_history':    HistoryEntrySerializer(HistoryEntry.objects.filter(profile_id=profile_id, entry_type='family').order_by('family_member_id', 'from_year', 'from_month', 'sort_order'), many=True).data,
         }
     })

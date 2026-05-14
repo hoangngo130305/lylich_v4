@@ -8466,3 +8466,24 @@ WARNING 2026-05-14 10:51:26,308 log 7020 8880 Unauthorized: /api/v1/profiles/das
 WARNING 2026-05-14 10:51:26,309 basehttp 7020 5288 "GET /api/v1/notifications/stats/ HTTP/1.1" 401 291
 WARNING 2026-05-14 10:51:26,310 basehttp 7020 17804 "GET /api/v1/auth/users/?role__code=quan_chung&ordering=-created_at HTTP/1.1" 401 291
 WARNING 2026-05-14 10:51:26,310 basehttp 7020 8880 "GET /api/v1/profiles/dashboard/ HTTP/1.1" 401 291
+WARNING 2026-05-14 13:20:18,957 log 18968 14060 Unauthorized: /api/v1/verification/stats/
+WARNING 2026-05-14 13:20:18,958 basehttp 18968 14060 "GET /api/v1/verification/stats/ HTTP/1.1" 401 291
+WARNING 2026-05-14 14:20:26,839 log 18968 8812 Unauthorized: /api/v1/profiles/61/
+WARNING 2026-05-14 14:20:26,840 basehttp 18968 8812 "GET /api/v1/profiles/61/ HTTP/1.1" 401 291
+WARNING 2026-05-14 15:21:48,849 log 21768 1748 Unauthorized: /api/v1/profiles/dashboard/
+WARNING 2026-05-14 15:21:48,850 log 21768 18608 Unauthorized: /api/v1/notifications/stats/
+WARNING 2026-05-14 15:21:48,853 log 21768 320 Unauthorized: /api/v1/auth/users/
+WARNING 2026-05-14 15:21:48,865 basehttp 21768 18608 "GET /api/v1/notifications/stats/ HTTP/1.1" 401 291
+WARNING 2026-05-14 15:21:48,866 basehttp 21768 1748 "GET /api/v1/profiles/dashboard/ HTTP/1.1" 401 291
+WARNING 2026-05-14 15:21:48,866 basehttp 21768 320 "GET /api/v1/auth/users/?role__code=quan_chung&ordering=-created_at HTTP/1.1" 401 291
+WARNING 2026-05-14 15:29:56,521 log 21768 320 Unauthorized: /api/v1/auth/login/
+WARNING 2026-05-14 15:29:56,521 basehttp 21768 320 "POST /api/v1/auth/login/ HTTP/1.1" 401 107
+WARNING 2026-05-14 17:07:23,176 log 21768 22232 Unauthorized: /api/v1/profiles/59/
+WARNING 2026-05-14 17:07:23,177 basehttp 21768 22232 "GET /api/v1/profiles/59/ HTTP/1.1" 401 291
+ERROR 2026-05-14 17:08:47,087 basehttp 21768 21668 "POST /api/v1/auth/account-requests/ HTTP/1.1" 500 400082
+WARNING 2026-05-14 19:07:00,818 log 21768 18332 Unauthorized: /api/v1/profiles/my/
+WARNING 2026-05-14 19:07:00,820 log 21768 18988 Unauthorized: /api/v1/notifications/stats/
+WARNING 2026-05-14 19:07:00,821 basehttp 21768 18332 "GET /api/v1/profiles/my/ HTTP/1.1" 401 291
+WARNING 2026-05-14 19:07:00,822 basehttp 21768 18988 "GET /api/v1/notifications/stats/ HTTP/1.1" 401 291
+WARNING 2026-05-14 19:07:00,826 log 21768 18988 Unauthorized: /api/v1/notifications/stats/
+WARNING 2026-05-14 19:07:00,827 basehttp 21768 18988 "GET /api/v1/notifications/stats/ HTTP/1.1" 401 291
