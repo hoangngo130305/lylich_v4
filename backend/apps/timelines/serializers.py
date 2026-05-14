@@ -6,28 +6,28 @@ class HistoryEntrySerializer(serializers.ModelSerializer):
     class Meta:
         model = HistoryEntry
         fields = '__all__'
-        read_only_fields = ['id', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'profile', 'created_at', 'updated_at']
 
 
 class WorkHistorySerializer(serializers.ModelSerializer):
     class Meta:
         model = WorkHistory
         fields = '__all__'
-        read_only_fields = ['id', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'profile', 'created_at', 'updated_at']
 
 
 class EducationHistorySerializer(serializers.ModelSerializer):
     class Meta:
         model = EducationHistory
         fields = '__all__'
-        read_only_fields = ['id', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'profile', 'created_at', 'updated_at']
 
 
 class OrgParticipationSerializer(serializers.ModelSerializer):
     class Meta:
         model = OrgParticipation
         fields = '__all__'
-        read_only_fields = ['id', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'profile', 'created_at', 'updated_at']
 
 
 class AwardSerializer(serializers.ModelSerializer):
@@ -36,21 +36,21 @@ class AwardSerializer(serializers.ModelSerializer):
     class Meta:
         model = Award
         fields = '__all__'
-        read_only_fields = ['id', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'profile', 'created_at', 'updated_at']
 
 
 class OverseasTravelSerializer(serializers.ModelSerializer):
     class Meta:
         model = OverseasTravel
         fields = '__all__'
-        read_only_fields = ['id', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'profile', 'created_at', 'updated_at']
 
 
 class OverseasRelativeSerializer(serializers.ModelSerializer):
     class Meta:
         model = OverseasRelative
         fields = '__all__'
-        read_only_fields = ['id', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'profile', 'created_at', 'updated_at']
 
 
 class ProfileSectionsSerializer(serializers.Serializer):

@@ -8438,3 +8438,25 @@ WARNING 2026-05-13 21:21:18,956 log 18348 1720 Forbidden: /api/v1/notifications/
 WARNING 2026-05-13 21:21:18,960 log 18348 1720 "GET /api/v1/notifications/stats/ HTTP/1.1" 403 231
 WARNING 2026-05-13 21:21:18,973 log 18348 1720 Forbidden: /api/v1/notifications/stats/
 WARNING 2026-05-13 21:21:18,974 log 18348 1720 "GET /api/v1/notifications/stats/ HTTP/1.1" 403 231
+WARNING 2026-05-13 21:56:59,256 log 16236 13648 Unauthorized: /api/v1/auth/login/
+WARNING 2026-05-13 21:56:59,256 log 16236 13648 "POST /api/v1/auth/login/ HTTP/1.1" 401 107
+WARNING 2026-05-13 21:57:00,664 log 16236 13648 Unauthorized: /api/v1/auth/login/
+WARNING 2026-05-13 21:57:00,664 log 16236 13648 "POST /api/v1/auth/login/ HTTP/1.1" 401 107
+WARNING 2026-05-13 23:05:35,103 log 16236 20388 Unauthorized: /api/v1/profiles/my/
+WARNING 2026-05-13 23:05:35,106 log 16236 17808 Unauthorized: /api/v1/notifications/stats/
+WARNING 2026-05-13 23:05:35,109 log 16236 17808 "GET /api/v1/notifications/stats/ HTTP/1.1" 401 280
+WARNING 2026-05-13 23:05:35,110 log 16236 20388 "GET /api/v1/profiles/my/ HTTP/1.1" 401 280
+WARNING 2026-05-13 23:05:35,119 log 16236 17808 Unauthorized: /api/v1/notifications/stats/
+WARNING 2026-05-13 23:05:35,120 log 16236 17808 "GET /api/v1/notifications/stats/ HTTP/1.1" 401 280
+WARNING 2026-05-13 23:29:38,401 log 5536 18268 Bad Request: /api/v1/profiles/my/
+WARNING 2026-05-13 23:29:38,402 log 5536 18268 "PUT /api/v1/profiles/my/ HTTP/1.1" 400 103
+WARNING 2026-05-13 23:30:35,459 log 5536 18268 Bad Request: /api/v1/profiles/my/
+WARNING 2026-05-13 23:30:35,462 log 5536 18268 "PUT /api/v1/profiles/my/ HTTP/1.1" 400 103
+WARNING 2026-05-13 23:30:39,314 log 5536 18268 Bad Request: /api/v1/profiles/my/
+WARNING 2026-05-13 23:30:39,316 log 5536 18268 "PUT /api/v1/profiles/my/ HTTP/1.1" 400 103
+WARNING 2026-05-13 23:30:44,327 log 5536 18268 Bad Request: /api/v1/profiles/my/
+WARNING 2026-05-13 23:30:44,330 log 5536 18268 "PUT /api/v1/profiles/my/ HTTP/1.1" 400 103
+WARNING 2026-05-13 23:30:47,623 log 5536 18268 Bad Request: /api/v1/profiles/my/
+WARNING 2026-05-13 23:30:47,624 log 5536 18268 "PUT /api/v1/profiles/my/ HTTP/1.1" 400 103
+WARNING 2026-05-13 23:53:29,353 log 5536 18248 Bad Request: /api/v1/family/61/members/
+WARNING 2026-05-13 23:53:29,354 log 5536 18248 "POST /api/v1/family/61/members/ HTTP/1.1" 400 157

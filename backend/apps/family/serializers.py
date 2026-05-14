@@ -9,7 +9,7 @@ class FamilyMemberSerializer(serializers.ModelSerializer):
     class Meta:
         model = FamilyMember
         exclude = ['deleted_at', 'updated_by']
-        read_only_fields = ['id', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'profile', 'created_at', 'updated_at']
 
     def get_history(self, obj):
         from apps.timelines.serializers import HistoryEntrySerializer

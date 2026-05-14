@@ -33,7 +33,9 @@ class ProfileDetailSerializer(serializers.ModelSerializer):
     """Full profile — all sections A–K."""
     user = UserPublicSerializer(read_only=True)
     ethnic_group_detail    = EthnicGroupSerializer(source='ethnic_group', read_only=True)
+    ethnic_group_name      = serializers.CharField(source='ethnic_group.name', read_only=True, default=None)
     religion_detail        = ReligionSerializer(source='religion', read_only=True)
+    religion_name          = serializers.CharField(source='religion.name', read_only=True, default=None)
     edu_level_detail       = EducationLevelSerializer(source='edu_level', read_only=True)
     political_level_detail_obj = PoliticalLevelSerializer(source='political_level', read_only=True)
     current_ward_detail    = AdministrativeUnitSerializer(source='current_ward', read_only=True)
@@ -90,6 +92,22 @@ class ProfileDetailSerializer(serializers.ModelSerializer):
             'completed_at', 'last_returned_at', 'return_reason',
             'rejected_at', 'rejected_reason', 'created_at', 'updated_at',
         ]
+
+    def get_fields(self):
+        """Allow applicants to have partial profiles - relax required constraint."""
+        fields = super().get_fields()
+        # When reading/writing, don't require fields that would cause 400 errors
+        # for incomplete profiles being edited by applicants
+        for field_name in ['full_name', 'gender']:
+            if field_name in fields:
+                fields[field_name].required = False
+                fields[field_name].allow_blank = True
+        
+        # DateField: not required, but if provided must be valid
+        if 'dob' in fields:
+            fields['dob'].required = False
+        
+        return fields
 
     def update(self, instance, validated_data):
         # Auto word count

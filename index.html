@@ -5184,6 +5184,7 @@
                       >
                       <input
                         type="text"
+                        id="hoTenKhac"
                         placeholder="(Để trống nếu không có)"
                       />
                     </div>
@@ -5207,11 +5208,11 @@
                       <label>04. Giới tính <span class="req">*</span></label>
                       <div class="radio-group">
                         <label class="radio-opt"
-                          ><input type="radio" name="gioiTinh" value="nam" />
+                          ><input type="radio" name="gioiTinh" value="male" />
                           Nam</label
                         >
                         <label class="radio-opt"
-                          ><input type="radio" name="gioiTinh" value="nu" />
+                          ><input type="radio" name="gioiTinh" value="female" />
                           Nữ</label
                         >
                       </div>
@@ -5263,6 +5264,7 @@
                     </div>
                     <input
                       type="text"
+                      id="birthPlaceDetail"
                       style="margin-top: 6px"
                       placeholder="Địa danh cũ (nếu đã thay đổi): VD: xã Nhà Bè, huyện Nhà Bè, tỉnh Gia Định cũ"
                     />
@@ -5275,34 +5277,72 @@
                       >Theo ông/bà nội (cha) hoặc ghi chú CCCD</span
                     ></label
                   >
-                  <div class="loc-row">
-                    <select id="sel_tinh_qq" class="searchable-location">
-                      <option value="">-- Tỉnh/TP --</option>
-                    </select>
-                    <select id="sel_xa_qq" class="searchable-location" disabled>
-                      <option value="">-- Xã/Phường --</option>
-                    </select>
+                  <div>
+                    <div class="loc-row">
+                      <select
+                        id="sel_tinh_qq"
+                        class="searchable-location"
+                        onchange="updateQueQuan()"
+                      >
+                        <option value="">-- Tỉnh/TP --</option>
+                      </select>
+                      <select
+                        id="sel_xa_qq"
+                        class="searchable-location"
+                        disabled
+                        onchange="updateQueQuan()"
+                      >
+                        <option value="">-- Xã/Phường --</option>
+                      </select>
+                    </div>
+                    <input
+                      type="text"
+                      id="queQuan"
+                      style="margin-top: 6px"
+                      placeholder="Địa chỉ quê quán đầy đủ (xã/phường, huyện/quận, tỉnh/TP)"
+                    />
                   </div>
                 </div>
                 <div class="form-row">
                   <label>07a. Nơi thường trú <span class="req">*</span></label>
                   <div>
                     <div class="loc-row" style="margin-bottom: 6px">
-                      <select id="sel_tinh_tt" class="searchable-location">
+                      <select
+                        id="sel_tinh_tt"
+                        class="searchable-location"
+                        onchange="updateNoiO()"
+                      >
                         <option value="">-- Tỉnh/TP --</option>
                       </select>
                       <select
                         id="sel_xa_tt"
                         class="searchable-location"
                         disabled
+                        onchange="updateNoiO()"
                       >
                         <option value="">-- Phường/Xã --</option>
                       </select>
                     </div>
                     <div class="loc-detail-row">
-                      <input type="text" placeholder="Số nhà / Lô" />
-                      <input type="text" placeholder="Tên đường / ấp / thôn" />
+                      <input
+                        type="text"
+                        id="soNhaTT"
+                        placeholder="Số nhà / Lô"
+                        oninput="updateNoiO()"
+                      />
+                      <input
+                        type="text"
+                        id="tenDuongTT"
+                        placeholder="Tên đường / ấp / thôn"
+                        oninput="updateNoiO()"
+                      />
                     </div>
+                    <input
+                      type="text"
+                      id="noiO"
+                      style="margin-top: 6px"
+                      placeholder="Địa chỉ thường trú đầy đủ (tự động điền hoặc nhập thủ công)"
+                    />
                   </div>
                 </div>
                 <div class="form-row">
@@ -5441,6 +5481,7 @@
                   >
                   <input
                     type="text"
+                    id="ngheNghiep"
                     placeholder="Công nhân / Viên chức / Giáo viên / Sinh viên …"
                   />
                 </div>
@@ -5456,7 +5497,7 @@
               <div class="card-body">
                 <div class="form-row">
                   <label>Giáo dục phổ thông <span class="req">*</span></label>
-                  <select>
+                  <select id="trinhDoVanHoa">
                     <option value="">-- Chọn trình độ --</option>
                     <option>Tốt nghiệp THPT hệ 12 năm</option>
                     <option>Tốt nghiệp THPT hệ 10 năm</option>
@@ -5469,6 +5510,7 @@
                   <label>Chuyên môn nghiệp vụ</label>
                   <input
                     type="text"
+                    id="trinhDoChuyenMon"
                     placeholder="VD: Kỹ sư cơ khí / Cử nhân luật / Trung cấp …"
                   />
                 </div>
@@ -5517,7 +5559,7 @@
                 </div>
                 <div class="form-row">
                   <label>Lý luận chính trị</label>
-                  <select>
+                  <select id="trinhDoLyLuan">
                     <option value="">-- Trình độ --</option>
                     <option>Sơ cấp (tập trung)</option>
                     <option>Sơ cấp (không tập trung)</option>
@@ -5538,9 +5580,10 @@
                   >
                     <input
                       type="text"
+                      id="ngoaiNgu"
                       placeholder="Tên tiếng: Tiếng Anh / Tiếng Trung …"
                     />
-                    <select>
+                    <select id="trinhDoNgoaiNgu">
                       <option value="">-- Trình độ --</option>
                       <option>A1</option>
                       <option>A2</option>
@@ -5554,7 +5597,7 @@
                 </div>
                 <div class="form-row">
                   <label>Tin học</label>
-                  <select>
+                  <select id="tinHoc">
                     <option value="">-- Trình độ --</option>
                     <option>Tin học văn phòng</option>
                     <option>Chứng chỉ IC3</option>
@@ -5593,9 +5636,10 @@
                       gap: 8px;
                     "
                   >
-                    <input type="date" />
+                    <input type="date" id="ngayVaoDoan" />
                     <input
                       type="text"
+                      id="noiVaoDoan"
                       placeholder="Tại Chi đoàn / Đoàn cơ sở … xã …, tỉnh …"
                     />
                   </div>
@@ -6129,6 +6173,7 @@
               </div>
               <div class="card-body">
                 <textarea
+                  id="lichSuChinhTri"
                   rows="8"
                   placeholder="Kê khai các đặc điểm lịch sử chính trị liên quan đến bản thân (nếu có). Ghi rõ, đầy đủ, trung thực. Nếu không có: ghi 'Không có đặc điểm cần khai báo'."
                 ></textarea>
@@ -6806,6 +6851,18 @@
                 <div class="pv-field">
                   <div class="pv-label">Giới tính</div>
                   <div class="pv-value" id="pv-gender"></div>
+                </div>
+                <div class="pv-field">
+                  <div class="pv-label">Dân tộc</div>
+                  <div class="pv-value" id="pv-ethnic_group"></div>
+                </div>
+                <div class="pv-field">
+                  <div class="pv-label">Tôn giáo</div>
+                  <div class="pv-value" id="pv-religion"></div>
+                </div>
+                <div class="pv-field pv-full">
+                  <div class="pv-label">Nơi sinh</div>
+                  <div class="pv-value" id="pv-birth_place_detail"></div>
                 </div>
                 <div class="pv-field pv-full">
                   <div class="pv-label">Quê quán</div>
@@ -7934,6 +7991,36 @@
           attachFamilyLocationSearch(num),
         );
       });
+      // ── Address text auto-helpers ─────────────────────────────────────────
+      function _getSelectText(id) {
+        const el = document.getElementById(id);
+        if (!el || !el.value) return "";
+        const txt = el.selectedOptions[0]?.text || "";
+        return txt.replace(/^--.*--$/, "").trim();
+      }
+      function updateQueQuan() {
+        const ward = _getSelectText("sel_xa_qq");
+        const prov = _getSelectText("sel_tinh_qq");
+        const parts = [ward, prov].filter(Boolean);
+        if (parts.length) {
+          const el = document.getElementById("queQuan");
+          if (el && !el.value) el.value = parts.join(", ");
+        }
+      }
+      function updateNoiO() {
+        const ward = _getSelectText("sel_xa_tt");
+        const prov = _getSelectText("sel_tinh_tt");
+        const num = (document.getElementById("soNhaTT")?.value || "").trim();
+        const street = (
+          document.getElementById("tenDuongTT")?.value || ""
+        ).trim();
+        const parts = [num, street, ward, prov].filter(Boolean);
+        if (parts.length) {
+          const el = document.getElementById("noiO");
+          if (el) el.value = parts.join(", ");
+        }
+      }
+
       function validateField(el, type) {
         const err = document.getElementById("err-" + el.id);
         if (type === "required" && !el.value.trim()) {
@@ -8467,15 +8554,34 @@
           alert("Vui lòng xác nhận cam đoan trước khi nộp hồ sơ.");
           return;
         }
-        if (!window._profileId) {
-          showToast('✗ Chưa xác định hồ sơ – hãy nhấn "Lưu nháp" trước');
-          return;
-        }
         (async () => {
           try {
             showToast("⏳ Đang lưu và nộp hồ sơ…");
-            await API.put("/profiles/my/", _collectFormData());
+
+            // Step 1: Save main profile fields (A)
+            const savedResp = await API.put(
+              "/profiles/my/",
+              _collectFormData(),
+            );
+            const savedData = savedResp?.data || savedResp || {};
+            if (savedData?.id) window._profileId = savedData.id;
+
+            // If still no profileId, try GET my profile to retrieve it
+            if (!window._profileId) {
+              const myP = await API.get("/profiles/my/");
+              const pd = myP?.data || myP || {};
+              if (pd?.id) window._profileId = pd.id;
+            }
+
+            if (!window._profileId) {
+              showToast("✗ Không xác định được hồ sơ, vui lòng thử lại.");
+              return;
+            }
+
+            // Step 2: Save all sub-sections B–J
             await _saveAllSections(window._profileId);
+
+            // Step 3: Submit workflow
             await API.post(`/profiles/${window._profileId}/workflow/`, {
               action: "submit",
             });
@@ -9857,6 +9963,26 @@
             </div>
           </div>
 
+          <!-- D2. Political History Text -->
+          <div class="editable-section" id="esDpol">
+            <div class="edit-sec-head">
+              <div class="card-head-dot"></div>
+              <h4>D. Đặc điểm lịch sử chính trị</h4>
+              <div class="edit-sec-actions">
+                <button class="edit-btn flag-btn" onclick="toggleSectionFlag('esDpol','D. Đặc điểm lịch sử chính trị')">⚑ Gắn cờ</button>
+                <button class="edit-btn" onclick="toggleEdit('esDpol')">✏ Chỉnh sửa</button>
+              </div>
+            </div>
+            <div class="edit-sec-body">
+              <div class="field-correction-note" id="note-esDpol"></div>
+              <div class="field-row">
+                <div class="field-label">Lịch sử chính trị bản thân và gia đình</div>
+                <div class="field-value empty" id="fv-esDpol-political">—</div>
+                <textarea class="field-textarea" id="fi-esDpol-political" placeholder="Ghi rõ đặc điểm lịch sử chính trị bản thân và gia đình…" data-field="Đặc điểm lịch sử chính trị"></textarea>
+              </div>
+            </div>
+          </div>
+
           <!-- I. Family Circumstances -->
           <div class="editable-section" id="esI">
             <div class="edit-sec-head">
@@ -11150,6 +11276,115 @@
                 : '<div style="color:#A0AABF;font-size:13px;padding:8px 0">Chưa có dữ liệu lịch sử.</div>';
             }
 
+            // Render Section C — work history
+            if (tlRes.status === "fulfilled") {
+              const d = tlRes.value;
+              const tld = d?.data || d || {};
+
+              // Section C — công tác chức vụ
+              const workBody = document.getElementById("timeline-esC");
+              if (workBody) {
+                const works = tld.work_history || [];
+                workBody.innerHTML = works.length
+                  ? works
+                      .map(
+                        (
+                          r,
+                        ) => `<div class="timeline-edit-row" data-id="${_esc(String(r.id || ""))}">
+                    <input value="${_esc(r.period_text || (r.from_year ? `${r.from_year}–${r.to_year || "nay"}` : ""))}" placeholder="Thời gian">
+                    <input value="${_esc(r.employer || "")}" placeholder="Cơ quan, đơn vị">
+                    <input value="${_esc(r.job_title || "")}" placeholder="Chức vụ">
+                    <button class="del-row-btn" onclick="this.closest('.timeline-edit-row').remove()">✕</button>
+                  </div>`,
+                      )
+                      .join("")
+                  : '<div style="color:#A0AABF;font-size:13px;padding:8px 0">Chưa có dữ liệu.</div>';
+              }
+
+              // Section E — học tập đào tạo
+              const eduBody = document.getElementById("timeline-esE");
+              if (eduBody) {
+                const edus = tld.education_history || [];
+                eduBody.innerHTML = edus.length
+                  ? edus
+                      .map(
+                        (
+                          r,
+                        ) => `<div class="timeline-edit-row" data-id="${_esc(String(r.id || ""))}">
+                    <input value="${_esc(r.school || "")}" placeholder="Trường">
+                    <input value="${_esc(r.major || "")}" placeholder="Chuyên ngành">
+                    <input value="${_esc(r.period_text || "")}" placeholder="Thời gian">
+                    <input value="${_esc(r.certificate || "")}" placeholder="Bằng cấp">
+                    <button class="del-row-btn" onclick="this.closest('.timeline-edit-row').remove()">✕</button>
+                  </div>`,
+                      )
+                      .join("")
+                  : '<div style="color:#A0AABF;font-size:13px;padding:8px 0">Chưa có dữ liệu.</div>';
+              }
+
+              // Section F — đi nước ngoài
+              const travelBody = document.getElementById("timeline-esF");
+              if (travelBody) {
+                const travels = tld.overseas_travels || [];
+                travelBody.innerHTML = travels.length
+                  ? travels
+                      .map(
+                        (
+                          r,
+                        ) => `<div class="timeline-edit-row" data-id="${_esc(String(r.id || ""))}">
+                    <input value="${_esc(r.period_text || "")}" placeholder="Thời gian">
+                    <input value="${_esc(r.purpose || "")}" placeholder="Mục đích">
+                    <input value="${_esc(r.country || "")}" placeholder="Quốc gia">
+                    <button class="del-row-btn" onclick="this.closest('.timeline-edit-row').remove()">✕</button>
+                  </div>`,
+                      )
+                      .join("")
+                  : '<div style="color:#A0AABF;font-size:13px;padding:8px 0">Chưa có dữ liệu.</div>';
+              }
+
+              // Section G — khen thưởng
+              const awardsBody = document.getElementById("timeline-esG");
+              if (awardsBody) {
+                const awards = tld.awards || [];
+                awardsBody.innerHTML = awards.length
+                  ? awards
+                      .map((r) => {
+                        const per = r.issued_month
+                          ? `${r.issued_month}/${r.issued_year || ""}`
+                          : String(r.issued_year || "");
+                        return `<div class="timeline-edit-row" data-id="${_esc(String(r.id || ""))}">
+                        <input value="${_esc(per)}" placeholder="Thời gian (tháng/năm)">
+                        <input value="${_esc(r.content || "")}" placeholder="Nội dung khen thưởng">
+                        <input value="${_esc(r.level || "")}" placeholder="Cấp">
+                        <button class="del-row-btn" onclick="this.closest('.timeline-edit-row').remove()">✕</button>
+                      </div>`;
+                      })
+                      .join("")
+                  : '<div style="color:#A0AABF;font-size:13px;padding:8px 0">Chưa có dữ liệu.</div>';
+              }
+
+              // Section H — kỷ luật
+              const discBody = document.getElementById("timeline-esH");
+              if (discBody) {
+                const discs = tld.disciplines || [];
+                discBody.innerHTML = discs.length
+                  ? discs
+                      .map((r) => {
+                        const per = r.issued_month
+                          ? `${r.issued_month}/${r.issued_year || ""}`
+                          : String(r.issued_year || "");
+                        return `<div class="timeline-edit-row" data-id="${_esc(String(r.id || ""))}">
+                        <input value="${_esc(per)}" placeholder="Thời gian (tháng/năm)">
+                        <input value="${_esc(r.content || "")}" placeholder="Nội dung kỷ luật">
+                        <input value="${_esc(r.level || "")}" placeholder="Mức kỷ luật">
+                        <button class="del-row-btn" onclick="this.closest('.timeline-edit-row').remove()">✕</button>
+                      </div>`;
+                      })
+                      .join("")
+                  : '<div style="color:#A0AABF;font-size:13px;padding:8px 0">Chưa có dữ liệu.</div>';
+              }
+            }
+
             // Render Section D — family members (read-only table for officer review)
             const famBody = document.getElementById("family-esD-body");
             if (famBody && famRes.status === "fulfilled") {
@@ -11238,6 +11473,16 @@
               fvH.textContent = p.disciplines_text
                 ? p.disciplines_text.substring(0, 50) +
                   (p.disciplines_text.length > 50 ? "…" : "")
+                : "—";
+
+            // Section Dpol — Political history text
+            const fiDpol = document.getElementById("fi-esDpol-political");
+            if (fiDpol) fiDpol.value = p.political_history_text || "";
+            const fvDpol = document.getElementById("fv-esDpol-political");
+            if (fvDpol)
+              fvDpol.textContent = p.political_history_text
+                ? p.political_history_text.substring(0, 50) +
+                  (p.political_history_text.length > 50 ? "…" : "")
                 : "—";
 
             // Section I — Family circumstances
@@ -11415,7 +11660,7 @@
             "esC-foreign-lang": "foreign_languages",
             "esC-it": "it_level",
             "esH-disciplines": "disciplines_text",
-            "esI-circumstances": "family_circumstances",
+            "esDpol-political": "political_history_text",
             "esJ-self": "self_assessment_text",
             "esK-name": "declaration_name",
             "esK-date": "declaration_date",
@@ -11443,9 +11688,81 @@
               }
             });
 
+          // Collect other timeline sections from admin edit rows
+          const _collectAdminTimeline = (containerId) => {
+            const rows = [];
+            document
+              .querySelectorAll(`#${containerId} .timeline-edit-row`)
+              .forEach((row) => {
+                const inputs = row.querySelectorAll("input");
+                if (!inputs.length) return;
+                const vals = [...inputs].map((i) => i.value.trim());
+                if (vals.some((v) => v))
+                  rows.push({ id: row.dataset.id || null, _vals: vals });
+              });
+            return rows;
+          };
+          const workRows = _collectAdminTimeline("timeline-esC")
+            .map((r) => ({
+              id: r._vals[0] ? r.id : null,
+              period_text: r._vals[0] || null,
+              employer: r._vals[1] || "",
+              job_title: r._vals[2] || null,
+            }))
+            .filter((r) => r.employer);
+          const eduRows = _collectAdminTimeline("timeline-esE")
+            .map((r) => ({
+              id: r.id,
+              school: r._vals[0] || "",
+              major: r._vals[1] || null,
+              period_text: r._vals[2] || null,
+              certificate: r._vals[3] || null,
+            }))
+            .filter((r) => r.school);
+          const travelRows = _collectAdminTimeline("timeline-esF")
+            .map((r) => ({
+              id: r.id,
+              period_text: r._vals[0] || null,
+              purpose: r._vals[1] || null,
+              country: r._vals[2] || "",
+            }))
+            .filter((r) => r.country);
+          const _parseAdminAward = (containerId, type) => {
+            return _collectAdminTimeline(containerId)
+              .map((r) => {
+                const per = r._vals[0] || "";
+                const mm = per.match(/^(\d{1,2})\/(\d{4})/);
+                return {
+                  id: r.id,
+                  type,
+                  issued_month: mm ? parseInt(mm[1]) : null,
+                  issued_year: mm
+                    ? parseInt(mm[2])
+                    : parseInt(per) > 1900
+                      ? parseInt(per)
+                      : null,
+                  content: r._vals[1] || "",
+                  level: r._vals[2] || null,
+                };
+              })
+              .filter((r) => r.content);
+          };
+          const awardRows = _parseAdminAward("timeline-esG", "award");
+          const disciplineRows = _parseAdminAward("timeline-esH", "discipline");
+
           await Promise.allSettled([
             API.patch(`/profiles/${id}/`, payload),
             _syncSec(`/timelines/${id}/history/`, _adminTlSrvIds, tlRows),
+            workRows.length > 0 &&
+              _syncSec(`/timelines/${id}/work/`, new Set(), workRows),
+            eduRows.length > 0 &&
+              _syncSec(`/timelines/${id}/education/`, new Set(), eduRows),
+            travelRows.length > 0 &&
+              _syncSec(`/timelines/${id}/travel/`, new Set(), travelRows),
+            awardRows.length > 0 &&
+              _syncSec(`/timelines/${id}/awards/`, new Set(), awardRows),
+            disciplineRows.length > 0 &&
+              _syncSec(`/timelines/${id}/awards/`, new Set(), disciplineRows),
           ]);
 
           // Sync correction flags to backend right on Save so applicant can see them immediately.
@@ -14264,7 +14581,8 @@
 
       async function _loadMyProfile() {
         try {
-          const p = await API.get("/profiles/my/");
+          const resp = await API.get("/profiles/my/");
+          const p = resp.data || resp;
           if (!p.id) return;
           window._profileId = p.id;
 
@@ -14285,17 +14603,88 @@
           _setVal("ngaySinh", p.dob);
           _setVal("queQuan", p.hometown_detail);
           _setVal("noiO", p.current_address);
+          _setVal("birthPlaceDetail", p.birth_place_detail);
           _setVal("ngheNghiep", p.occupation);
-          _setVal("noiCongTac", p.workplace);
-          _setVal("chucVu", p.job_title);
           _setVal("trinhDoVanHoa", p.general_edu_level);
           _setVal("trinhDoChuyenMon", p.edu_specialization);
           _setVal("trinhDoLyLuan", p.political_level_detail);
-          _setVal("ngoaiNgu", p.foreign_languages);
           _setVal("tinHoc", p.it_level);
           _setVal("ngayVaoDoan", p.youth_union_date);
           _setVal("noiVaoDoan", p.youth_union_place);
           _setVal("tuNhanXet", p.self_assessment_text);
+          _setVal("lichSuChinhTri", p.political_history_text);
+
+          // Ethnic group
+          const ethnicText =
+            p.ethnic_group_other ||
+            (p.ethnic_group_detail && p.ethnic_group_detail.name) ||
+            "";
+          if (ethnicText) {
+            const danTocEl = document.getElementById("danToc");
+            if (danTocEl) {
+              const found = [...danTocEl.options].find(
+                (o) => o.value === ethnicText || o.text === ethnicText,
+              );
+              if (found) {
+                danTocEl.value = found.value;
+              } else {
+                danTocEl.value = "__other__";
+                _setVal("danTocKhac", ethnicText);
+                const k = document.getElementById("danTocKhac");
+                if (k) k.style.display = "";
+              }
+            }
+          }
+
+          // Religion
+          const religionText =
+            p.religion_other ||
+            (p.religion_detail && p.religion_detail.name) ||
+            "";
+          if (religionText) {
+            const tonGiaoEl = document.getElementById("tonGiao");
+            if (tonGiaoEl) {
+              const found = [...tonGiaoEl.options].find(
+                (o) => o.value === religionText || o.text === religionText,
+              );
+              if (found) {
+                tonGiaoEl.value = found.value;
+                toggleChucSac();
+              } else {
+                tonGiaoEl.value = "__other__";
+                _setVal("tonGiaoKhac", religionText);
+                const k = document.getElementById("tonGiaoKhac");
+                if (k) k.style.display = "";
+                toggleChucSac();
+              }
+            }
+          }
+          _setVal("chucSac", p.religious_title);
+          if (p.religious_title) {
+            const cs = document.getElementById("chucSac");
+            if (cs) cs.style.display = "";
+          }
+
+          // Foreign language: split stored "name level" back to inputs
+          if (p.foreign_languages) {
+            const parts = p.foreign_languages.split(/\s+/);
+            const levelKeywords = [
+              "A1",
+              "A2",
+              "B1",
+              "B2",
+              "C1",
+              "C2",
+              "Đại học",
+            ];
+            const lastPart = parts[parts.length - 1];
+            if (levelKeywords.includes(lastPart)) {
+              _setVal("ngoaiNgu", parts.slice(0, -1).join(" "));
+              _setVal("trinhDoNgoaiNgu", lastPart);
+            } else {
+              _setVal("ngoaiNgu", p.foreign_languages);
+            }
+          }
 
           // Gender radio
           if (p.gender) {
@@ -14453,6 +14842,19 @@
                 ? "Khác"
                 : "",
         );
+        _pv(
+          "ethnic_group",
+          p.ethnic_group_other ||
+            (p.ethnic_group_detail && p.ethnic_group_detail.name) ||
+            "",
+        );
+        _pv(
+          "religion",
+          p.religion_other ||
+            (p.religion_detail && p.religion_detail.name) ||
+            "",
+        );
+        _pv("birth_place_detail", p.birth_place_detail);
         _pv("hometown_detail", p.hometown_detail);
         _pv("current_address", p.current_address);
         _pv("occupation", p.occupation);
@@ -14574,17 +14976,77 @@
           _setVal("ngaySinh", p.dob);
           _setVal("queQuan", p.hometown_detail);
           _setVal("noiO", p.current_address);
+          _setVal("birthPlaceDetail", p.birth_place_detail);
           _setVal("ngheNghiep", p.occupation);
-          _setVal("noiCongTac", p.workplace);
-          _setVal("chucVu", p.job_title);
           _setVal("trinhDoVanHoa", p.general_edu_level);
           _setVal("trinhDoChuyenMon", p.edu_specialization);
           _setVal("trinhDoLyLuan", p.political_level_detail);
-          _setVal("ngoaiNgu", p.foreign_languages);
           _setVal("tinHoc", p.it_level);
           _setVal("ngayVaoDoan", p.youth_union_date);
           _setVal("noiVaoDoan", p.youth_union_place);
           _setVal("tuNhanXet", p.self_assessment_text);
+          _setVal("lichSuChinhTri", p.political_history_text);
+          // Ethnic group
+          const ethnicText2 =
+            p.ethnic_group_other ||
+            (p.ethnic_group_detail && p.ethnic_group_detail.name) ||
+            "";
+          if (ethnicText2) {
+            const danTocEl2 = document.getElementById("danToc");
+            if (danTocEl2) {
+              const found = [...danTocEl2.options].find(
+                (o) => o.value === ethnicText2 || o.text === ethnicText2,
+              );
+              if (found) {
+                danTocEl2.value = found.value;
+              } else {
+                danTocEl2.value = "__other__";
+                _setVal("danTocKhac", ethnicText2);
+                const k = document.getElementById("danTocKhac");
+                if (k) k.style.display = "";
+              }
+            }
+          }
+          // Religion
+          const religionText2 =
+            p.religion_other ||
+            (p.religion_detail && p.religion_detail.name) ||
+            "";
+          if (religionText2) {
+            const tonGiaoEl2 = document.getElementById("tonGiao");
+            if (tonGiaoEl2) {
+              const found = [...tonGiaoEl2.options].find(
+                (o) => o.value === religionText2 || o.text === religionText2,
+              );
+              if (found) {
+                tonGiaoEl2.value = found.value;
+                toggleChucSac();
+              } else {
+                tonGiaoEl2.value = "__other__";
+                _setVal("tonGiaoKhac", religionText2);
+                const k = document.getElementById("tonGiaoKhac");
+                if (k) k.style.display = "";
+                toggleChucSac();
+              }
+            }
+          }
+          _setVal("chucSac", p.religious_title);
+          if (p.religious_title) {
+            const cs = document.getElementById("chucSac");
+            if (cs) cs.style.display = "";
+          }
+          // Foreign language
+          if (p.foreign_languages) {
+            const parts = p.foreign_languages.split(/\s+/);
+            const lvls = ["A1", "A2", "B1", "B2", "C1", "C2", "Đại học"];
+            const last = parts[parts.length - 1];
+            if (lvls.includes(last)) {
+              _setVal("ngoaiNgu", parts.slice(0, -1).join(" "));
+              _setVal("trinhDoNgoaiNgu", last);
+            } else {
+              _setVal("ngoaiNgu", p.foreign_languages);
+            }
+          }
           if (p.gender) {
             const r = document.querySelector(
               `input[name="gioiTinh"][value="${p.gender}"]`,
@@ -14674,33 +15136,71 @@
         const genderEl = document.querySelector(
           'input[name="gioiTinh"]:checked',
         );
+        // Ethnic group: use text value from select, fallback to free-text input
+        const danTocEl = document.getElementById("danToc");
+        const danTocKhacEl = document.getElementById("danTocKhac");
+        let ethnicVal =
+          danTocEl?.value === "__other__"
+            ? danTocKhacEl?.value?.trim() || undefined
+            : danTocEl?.value?.trim() || undefined;
+
+        // Religion: use text value from select, fallback to free-text
+        const tonGiaoEl = document.getElementById("tonGiao");
+        const tonGiaoKhacEl = document.getElementById("tonGiaoKhac");
+        let religionVal =
+          tonGiaoEl?.value === "__other__"
+            ? tonGiaoKhacEl?.value?.trim() || undefined
+            : tonGiaoEl?.value?.trim() || undefined;
+
+        // Foreign language: combine name + level
+        const ngoaiNguEl = document.getElementById("ngoaiNgu");
+        const trinhDoNgoaiNguEl = document.getElementById("trinhDoNgoaiNgu");
+        const ngoaiNguName = ngoaiNguEl?.value?.trim() || "";
+        const ngoaiNguLevel = trinhDoNgoaiNguEl?.value?.trim() || "";
+        const foreignLangVal = ngoaiNguName
+          ? ngoaiNguLevel
+            ? `${ngoaiNguName} ${ngoaiNguLevel}`
+            : ngoaiNguName
+          : undefined;
+
         return {
-          full_name: document.getElementById("hoTen")?.value || undefined,
+          full_name:
+            document.getElementById("hoTen")?.value?.trim() || undefined,
           full_name_other:
-            document.getElementById("hoTenKhac")?.value || undefined,
+            document.getElementById("hoTenKhac")?.value?.trim() || undefined,
           dob: document.getElementById("ngaySinh")?.value || undefined,
           gender: genderEl?.value || undefined,
+          ethnic_group_other: ethnicVal,
+          religion_other: religionVal,
+          religious_title:
+            document.getElementById("chucSac")?.value?.trim() || undefined,
+          birth_place_detail:
+            document.getElementById("birthPlaceDetail")?.value?.trim() ||
+            undefined,
           hometown_detail:
-            document.getElementById("queQuan")?.value || undefined,
-          current_address: document.getElementById("noiO")?.value || undefined,
-          occupation: document.getElementById("ngheNghiep")?.value || undefined,
-          workplace: document.getElementById("noiCongTac")?.value || undefined,
-          job_title: document.getElementById("chucVu")?.value || undefined,
+            document.getElementById("queQuan")?.value?.trim() || undefined,
+          current_address:
+            document.getElementById("noiO")?.value?.trim() || undefined,
+          occupation:
+            document.getElementById("ngheNghiep")?.value?.trim() || undefined,
           general_edu_level:
             document.getElementById("trinhDoVanHoa")?.value || undefined,
           edu_specialization:
-            document.getElementById("trinhDoChuyenMon")?.value || undefined,
+            document.getElementById("trinhDoChuyenMon")?.value?.trim() ||
+            undefined,
           political_level_detail:
             document.getElementById("trinhDoLyLuan")?.value || undefined,
-          foreign_languages:
-            document.getElementById("ngoaiNgu")?.value || undefined,
+          foreign_languages: foreignLangVal,
           it_level: document.getElementById("tinHoc")?.value || undefined,
           youth_union_date:
             document.getElementById("ngayVaoDoan")?.value || undefined,
           youth_union_place:
-            document.getElementById("noiVaoDoan")?.value || undefined,
+            document.getElementById("noiVaoDoan")?.value?.trim() || undefined,
           self_assessment_text:
             document.getElementById("tuNhanXet")?.value || undefined,
+          political_history_text:
+            document.getElementById("lichSuChinhTri")?.value?.trim() ||
+            undefined,
         };
       }
 

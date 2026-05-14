@@ -155,6 +155,13 @@ class MyProfileView(generics.RetrieveUpdateAPIView):
         )
         return profile
 
+    def retrieve(self, request, *args, **kwargs):
+        """Allow applicants to GET their partial profile without all required fields."""
+        profile = self.get_object()
+        # For GET, don't require all fields - applicant may still be filling the profile
+        serializer = self.get_serializer(profile)
+        return Response({'success': True, 'data': serializer.data})
+
     def update(self, request, *args, **kwargs):
         profile = self.get_object()
         if not profile.is_editable_by_applicant:
@@ -164,7 +171,14 @@ class MyProfileView(generics.RetrieveUpdateAPIView):
             )
         kwargs['partial'] = True
         serializer = self.get_serializer(profile, data=request.data, partial=True)
-        serializer.is_valid(raise_exception=True)
+        try:
+            serializer.is_valid(raise_exception=True)
+        except Exception as e:
+            # Log validation errors for debugging
+            return Response(
+                {'success': False, 'error': 'Lỗi lưu hồ sơ:', 'details': serializer.errors},
+                status=status.HTTP_400_BAD_REQUEST
+            )
         serializer.save(updated_by=request.user)
         log_activity(request.user, 'profile_update', target_model='Profile', target_id=profile.id)
         return Response({'success': True, 'data': serializer.data})
