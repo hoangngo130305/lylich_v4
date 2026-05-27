@@ -7,17 +7,18 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from apps.accounts.models import User, Role
 
-from .models import Profile, ProfileReview, CommitteeComment, ProfileOfficerAssignment
+from .models import Profile, ProfileReview, CommitteeComment, ProfileOfficerAssignment, ProfileFieldNote
 from .serializers import (
     ProfileListSerializer, ProfileDetailSerializer,
     ProfileReviewSerializer, CommitteeCommentSerializer, ProfileWorkflowSerializer,
+    ProfileFieldNoteSerializer,
 )
 from apps.accounts.permissions import IsOfficer, IsApplicant, IsOwnerOrOfficer, IsOfficerOrApplicant
 from apps.auditlogs.utils import log_activity
 
 # Status transition rules
 VALID_TRANSITIONS = {
-    Profile.Status.DRAFT:        [Profile.Status.SUBMITTED],
+    Profile.Status.DRAFT:        [Profile.Status.SUBMITTED, Profile.Status.RETURNED],
     Profile.Status.SUBMITTED:    [Profile.Status.PENDING, Profile.Status.RETURNED, Profile.Status.REJECTED],
     Profile.Status.PENDING:      [Profile.Status.UNDER_REVIEW, Profile.Status.RETURNED, Profile.Status.REJECTED],
     Profile.Status.UNDER_REVIEW: [Profile.Status.APPROVED, Profile.Status.RETURNED, Profile.Status.REJECTED],
@@ -199,6 +200,14 @@ class ProfileDetailView(generics.RetrieveUpdateAPIView):
         return ProfileDetailSerializer
 
     def update(self, request, *args, **kwargs):
+        # Officers review profiles via field notes only — they must not overwrite citizen data.
+        if request.user.role_code == 'can_bo_bxd':
+            return Response(
+                {'success': False,
+                 'error': 'Cán bộ không được chỉnh sửa dữ liệu hồ sơ. '
+                          'Vui lòng dùng tính năng nhận xét để yêu cầu quần chúng tự sửa.'},
+                status=status.HTTP_403_FORBIDDEN
+            )
         kwargs['partial'] = True
         profile = self.get_object()
         serializer = self.get_serializer(profile, data=request.data, partial=True)
@@ -447,3 +456,54 @@ def ai_scan_results(request, pk):
     except Profile.DoesNotExist:
         score = None
     return Response({'success': True, 'data': {'score': score, 'issues': data}})
+
+
+class ProfileFieldNoteView(generics.GenericAPIView):
+    """GET/POST per-field review notes for a profile.
+
+    GET  — accessible to the owning citizen (to see feedback) and officers.
+    POST — officers only; bulk-upserts a list of {field_key, note, resolved} objects.
+    """
+    permission_classes = [IsOfficerOrApplicant]
+    serializer_class   = ProfileFieldNoteSerializer
+
+    def _get_profile(self, pk, request):
+        if request.user.role_code == 'quan_chung':
+            return Profile.objects.get(pk=pk, user=request.user, deleted_at__isnull=True)
+        return Profile.objects.get(pk=pk, deleted_at__isnull=True)
+
+    def get(self, request, pk):
+        try:
+            profile = self._get_profile(pk, request)
+        except Profile.DoesNotExist:
+            return Response({'success': False, 'error': 'Hồ sơ không tồn tại.'}, status=404)
+        notes = ProfileFieldNote.objects.filter(profile=profile).exclude(note='')
+        return Response({'success': True, 'data': ProfileFieldNoteSerializer(notes, many=True).data})
+
+    @transaction.atomic
+    def post(self, request, pk):
+        if request.user.role_code not in ('can_bo_bxd', 'admin'):
+            return Response({'success': False, 'error': 'Chỉ cán bộ mới có thể thêm nhận xét.'}, status=403)
+        try:
+            profile = Profile.objects.get(pk=pk, deleted_at__isnull=True)
+        except Profile.DoesNotExist:
+            return Response({'success': False, 'error': 'Hồ sơ không tồn tại.'}, status=404)
+
+        notes_data = request.data if isinstance(request.data, list) else request.data.get('notes', [])
+        saved = []
+        for item in notes_data:
+            field_key  = str(item.get('field_key', '')).strip()
+            note_text  = str(item.get('note', '')).strip()
+            resolved   = bool(item.get('resolved', False))
+            if not field_key:
+                continue
+            obj, _ = ProfileFieldNote.objects.update_or_create(
+                profile=profile,
+                field_key=field_key,
+                defaults={'note': note_text, 'reviewer': request.user, 'resolved': resolved},
+            )
+            saved.append(ProfileFieldNoteSerializer(obj).data)
+
+        log_activity(request.user, 'field_notes_save', target_model='Profile', target_id=profile.id,
+                     description=f'Lưu {len(saved)} nhận xét cho hồ sơ {profile.full_name}')
+        return Response({'success': True, 'data': saved})

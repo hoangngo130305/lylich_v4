@@ -1,7 +1,8 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from unfold.admin import ModelAdmin
-from .models import User, Role, LoginHistory, PasswordReset, AccountRequest
+from django.utils.html import format_html
+from unfold.admin import ModelAdmin, StackedInline
+from .models import User, Role, LoginHistory, PasswordReset, AccountRequest, OfficerPermission
 
 
 @admin.register(Role)
@@ -41,9 +42,125 @@ class UserAdmin(ModelAdmin, BaseUserAdmin):
             'fields': ('full_name', 'phone', 'role', 'password1', 'password2', 'status'),
         }),
     )
-    # BaseUserAdmin compat
     filter_horizontal = []
     list_display_links = ['id', 'full_name']
+
+
+# ── Officer proxy model ───────────────────────────────────────────────────────
+
+class Officer(User):
+    class Meta:
+        proxy = True
+        verbose_name = 'Cán bộ Đảng'
+        verbose_name_plural = 'Quản lý Cán bộ Đảng'
+
+
+class OfficerPermissionInline(StackedInline):
+    model = OfficerPermission
+    can_delete = False
+    verbose_name_plural = 'Phân quyền chức năng'
+    fields = (
+        ('can_create_accounts', 'can_review_profiles', 'can_approve_profiles'),
+        ('can_export_word', 'can_send_notifications', 'can_view_reports'),
+    )
+
+    def get_queryset(self, request):
+        return super().get_queryset(request)
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
+def _bool_icon(val):
+    return format_html('<span style="color:{}">&#{};;</span>', '#16a34a' if val else '#dc2626', '9989' if val else '10060')
+
+
+@admin.register(Officer)
+class OfficerAdmin(ModelAdmin, BaseUserAdmin):
+    list_display  = [
+        'id', 'full_name', 'phone', 'role', 'status',
+        'perm_create_accounts', 'perm_review_profiles', 'perm_approve_profiles',
+        'perm_export_word', 'perm_send_notifications', 'perm_view_reports',
+        'created_at',
+    ]
+    list_filter   = ['role', 'status']
+    search_fields = ['full_name', 'phone', 'email']
+    readonly_fields = ['last_login', 'last_login_at', 'created_at', 'updated_at', 'deleted_at']
+    ordering      = ['full_name']
+    inlines       = [OfficerPermissionInline]
+    filter_horizontal = []
+    list_display_links = ['id', 'full_name']
+
+    fieldsets = (
+        ('Thông tin cơ bản', {
+            'fields': ('full_name', 'phone', 'email', 'role')
+        }),
+        ('Trạng thái', {
+            'fields': ('status', 'is_staff', 'is_superuser', 'deleted_at')
+        }),
+        ('Bảo mật', {
+            'fields': ('password',),
+            'classes': ('collapse',),
+        }),
+        ('Thời gian', {
+            'fields': ('last_login_at', 'created_at', 'updated_at'),
+            'classes': ('collapse',),
+        }),
+    )
+    add_fieldsets = (
+        (None, {
+            'classes': ('wide',),
+            'fields': ('full_name', 'phone', 'email', 'role', 'password1', 'password2', 'status'),
+        }),
+    )
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).filter(
+            role__code__in=['admin', 'can_bo_bxd'],
+            deleted_at__isnull=True,
+        )
+
+    def _perm(self, obj, field):
+        try:
+            return _bool_icon(getattr(obj.officer_permission, field))
+        except OfficerPermission.DoesNotExist:
+            return _bool_icon(obj.is_superuser or obj.role.code == 'admin')
+
+    def perm_create_accounts(self, obj):
+        return self._perm(obj, 'can_create_accounts')
+    perm_create_accounts.short_description = 'Cấp TK'
+    perm_create_accounts.allow_tags = True
+
+    def perm_review_profiles(self, obj):
+        return self._perm(obj, 'can_review_profiles')
+    perm_review_profiles.short_description = 'Xem HS'
+    perm_review_profiles.allow_tags = True
+
+    def perm_approve_profiles(self, obj):
+        return self._perm(obj, 'can_approve_profiles')
+    perm_approve_profiles.short_description = 'Duyệt HS'
+    perm_approve_profiles.allow_tags = True
+
+    def perm_export_word(self, obj):
+        return self._perm(obj, 'can_export_word')
+    perm_export_word.short_description = 'Xuất Word'
+    perm_export_word.allow_tags = True
+
+    def perm_send_notifications(self, obj):
+        return self._perm(obj, 'can_send_notifications')
+    perm_send_notifications.short_description = 'Thông báo'
+    perm_send_notifications.allow_tags = True
+
+    def perm_view_reports(self, obj):
+        return self._perm(obj, 'can_view_reports')
+    perm_view_reports.short_description = 'Báo cáo'
+    perm_view_reports.allow_tags = True
+
+    def save_model(self, request, obj, form, change):
+        if obj.role and obj.role.code == 'admin':
+            obj.is_staff = True
+        super().save_model(request, obj, form, change)
+        OfficerPermission.objects.get_or_create(user=obj)
 
 
 @admin.register(LoginHistory)

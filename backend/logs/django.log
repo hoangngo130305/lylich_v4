@@ -8487,3 +8487,330 @@ WARNING 2026-05-14 19:07:00,821 basehttp 21768 18332 "GET /api/v1/profiles/my/ H
 WARNING 2026-05-14 19:07:00,822 basehttp 21768 18988 "GET /api/v1/notifications/stats/ HTTP/1.1" 401 291
 WARNING 2026-05-14 19:07:00,826 log 21768 18988 Unauthorized: /api/v1/notifications/stats/
 WARNING 2026-05-14 19:07:00,827 basehttp 21768 18988 "GET /api/v1/notifications/stats/ HTTP/1.1" 401 291
+WARNING 2026-05-18 08:38:21,154 log 6512 8088 Unauthorized: /api/v1/profiles/dashboard/
+WARNING 2026-05-18 08:38:21,155 log 6512 9300 Unauthorized: /api/v1/notifications/stats/
+WARNING 2026-05-18 08:38:21,156 log 6512 16992 Unauthorized: /api/v1/auth/users/
+WARNING 2026-05-18 08:38:21,158 basehttp 6512 9300 "GET /api/v1/notifications/stats/ HTTP/1.1" 401 291
+WARNING 2026-05-18 08:38:21,158 basehttp 6512 16992 "GET /api/v1/auth/users/?role__code=quan_chung&ordering=-created_at HTTP/1.1" 401 291
+WARNING 2026-05-18 08:38:21,160 basehttp 6512 8088 "GET /api/v1/profiles/dashboard/ HTTP/1.1" 401 291
+WARNING 2026-05-18 10:34:26,897 log 22260 2288 Unauthorized: /api/v1/profiles/my/
+WARNING 2026-05-18 10:34:26,901 log 22260 22404 Unauthorized: /api/v1/notifications/stats/
+WARNING 2026-05-18 10:34:26,903 basehttp 22260 2288 "GET /api/v1/profiles/my/ HTTP/1.1" 401 291
+WARNING 2026-05-18 10:34:26,903 basehttp 22260 22404 "GET /api/v1/notifications/stats/ HTTP/1.1" 401 291
+WARNING 2026-05-18 10:34:26,910 log 22260 22404 Unauthorized: /api/v1/notifications/stats/
+WARNING 2026-05-18 10:34:26,911 basehttp 22260 22404 "GET /api/v1/notifications/stats/ HTTP/1.1" 401 291
+ERROR 2026-05-22 13:52:51,948 basehttp 312 19116 "POST /api/v1/auth/account-requests/ HTTP/1.1" 500 399674
+WARNING 2026-05-22 16:09:33,426 log 312 19952 Unauthorized: /api/v1/profiles/dashboard/
+WARNING 2026-05-22 16:09:33,447 log 312 10144 Unauthorized: /api/v1/notifications/stats/
+WARNING 2026-05-22 16:09:33,449 basehttp 312 19952 "GET /api/v1/profiles/dashboard/ HTTP/1.1" 401 291
+WARNING 2026-05-22 16:09:33,460 basehttp 312 10144 "GET /api/v1/notifications/stats/ HTTP/1.1" 401 291
+WARNING 2026-05-22 16:09:33,478 log 312 10144 Unauthorized: /api/v1/auth/users/
+WARNING 2026-05-22 16:09:33,480 basehttp 312 10144 "GET /api/v1/auth/users/?role__code=quan_chung&ordering=-created_at HTTP/1.1" 401 291
+WARNING 2026-05-22 22:02:27,981 log 19204 14628 Unauthorized: /api/v1/auth/users/
+WARNING 2026-05-22 22:02:27,982 basehttp 19204 14628 "GET /api/v1/auth/users/?role__code=quan_chung&ordering=-created_at HTTP/1.1" 401 291
+WARNING 2026-05-22 22:22:16,566 log 19204 340 Unauthorized: /api/v1/auth/login/
+WARNING 2026-05-22 22:22:16,567 basehttp 19204 340 "POST /api/v1/auth/login/ HTTP/1.1" 401 112
+ERROR 2026-05-22 22:22:25,738 basehttp 19204 10348 "GET /api/v1/profiles/65/field-notes/ HTTP/1.1" 500 268026
+ERROR 2026-05-22 22:37:23,637 basehttp 19204 11776 "POST /api/v1/profiles/65/field-notes/ HTTP/1.1" 500 278515
+WARNING 2026-05-22 22:42:42,210 log 19204 5356 Not Found: /api/profiles/
+WARNING 2026-05-22 22:42:42,211 basehttp 19204 5356 "GET /api/profiles/ HTTP/1.1" 404 5361
+WARNING 2026-05-23 09:23:21,643 log 17660 8288 Unauthorized: /api/v1/profiles/dashboard/
+WARNING 2026-05-23 09:23:21,644 log 17660 18124 Unauthorized: /api/v1/notifications/stats/
+WARNING 2026-05-23 09:23:21,645 log 17660 9428 Unauthorized: /api/v1/auth/users/
+WARNING 2026-05-23 09:23:21,646 basehttp 17660 18124 "GET /api/v1/notifications/stats/ HTTP/1.1" 401 291
+WARNING 2026-05-23 09:23:21,646 basehttp 17660 8288 "GET /api/v1/profiles/dashboard/ HTTP/1.1" 401 291
+WARNING 2026-05-23 09:23:21,648 basehttp 17660 9428 "GET /api/v1/auth/users/?role__code=quan_chung&ordering=-created_at HTTP/1.1" 401 291
+WARNING 2026-05-23 09:25:15,422 log 17660 17324 Unauthorized: /api/v1/auth/login/
+WARNING 2026-05-23 09:25:15,422 basehttp 17660 17324 "POST /api/v1/auth/login/ HTTP/1.1" 401 112
+WARNING 2026-05-23 09:25:20,447 log 17660 17324 Unauthorized: /api/v1/auth/login/
+WARNING 2026-05-23 09:25:20,448 basehttp 17660 17324 "POST /api/v1/auth/login/ HTTP/1.1" 401 112
+WARNING 2026-05-23 09:25:21,495 log 17660 17324 Unauthorized: /api/v1/auth/login/
+WARNING 2026-05-23 09:25:21,495 basehttp 17660 17324 "POST /api/v1/auth/login/ HTTP/1.1" 401 112
+WARNING 2026-05-23 09:34:51,089 log 17660 18716 Bad Request: /api/v1/profiles/66/workflow/
+WARNING 2026-05-23 09:34:51,091 basehttp 17660 18716 "POST /api/v1/profiles/66/workflow/ HTTP/1.1" 400 95
+WARNING 2026-05-23 09:34:54,565 log 17660 18716 Bad Request: /api/v1/profiles/66/workflow/
+WARNING 2026-05-23 09:34:54,565 basehttp 17660 18716 "POST /api/v1/profiles/66/workflow/ HTTP/1.1" 400 95
+WARNING 2026-05-23 09:40:12,156 log 17660 4776 Bad Request: /api/v1/profiles/66/workflow/
+WARNING 2026-05-23 09:40:12,157 basehttp 17660 4776 "POST /api/v1/profiles/66/workflow/ HTTP/1.1" 400 95
+WARNING 2026-05-23 09:42:42,257 log 17660 13032 Bad Request: /api/v1/profiles/66/workflow/
+WARNING 2026-05-23 09:42:42,264 basehttp 17660 13032 "POST /api/v1/profiles/66/workflow/ HTTP/1.1" 400 95
+WARNING 2026-05-23 09:48:58,228 log 5492 17728 Unauthorized: /api/v1/auth/login/
+WARNING 2026-05-23 09:48:58,229 basehttp 5492 17728 "POST /api/v1/auth/login/ HTTP/1.1" 401 107
+WARNING 2026-05-23 09:50:46,988 log 5492 20452 Unauthorized: /api/v1/verification/stats/
+WARNING 2026-05-23 09:50:46,992 basehttp 5492 20452 "GET /api/v1/verification/stats/ HTTP/1.1" 401 171
+WARNING 2026-05-25 09:03:21,680 log 17052 21816 Unauthorized: /api/v1/auth/logout/
+WARNING 2026-05-25 09:03:21,680 basehttp 17052 21816 "POST /api/v1/auth/logout/ HTTP/1.1" 401 291
+ERROR 2026-05-25 09:11:53,496 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148357
+ERROR 2026-05-25 09:12:09,649 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148284
+ERROR 2026-05-25 09:12:10,047 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148284
+ERROR 2026-05-25 09:12:10,436 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148374
+ERROR 2026-05-25 09:12:10,890 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148443
+ERROR 2026-05-25 09:12:11,320 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148447
+ERROR 2026-05-25 09:12:11,763 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148423
+ERROR 2026-05-25 09:12:12,350 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148289
+ERROR 2026-05-25 09:12:12,675 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148447
+ERROR 2026-05-25 09:12:13,081 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148443
+ERROR 2026-05-25 09:12:13,478 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148402
+ERROR 2026-05-25 09:12:13,901 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148428
+ERROR 2026-05-25 09:12:14,304 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148423
+ERROR 2026-05-25 09:12:14,700 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148443
+ERROR 2026-05-25 09:12:15,104 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148377
+ERROR 2026-05-25 09:12:15,530 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148284
+ERROR 2026-05-25 09:12:15,928 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148428
+ERROR 2026-05-25 09:12:16,360 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148283
+ERROR 2026-05-25 09:12:16,742 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148428
+ERROR 2026-05-25 09:12:17,169 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148423
+ERROR 2026-05-25 09:12:17,580 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148443
+ERROR 2026-05-25 09:12:17,959 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148402
+ERROR 2026-05-25 09:12:18,392 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148428
+ERROR 2026-05-25 09:12:18,782 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148428
+ERROR 2026-05-25 09:12:19,188 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148283
+ERROR 2026-05-25 09:12:19,596 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148284
+ERROR 2026-05-25 09:12:19,985 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148284
+ERROR 2026-05-25 09:12:20,384 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148402
+ERROR 2026-05-25 09:12:20,784 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148423
+ERROR 2026-05-25 09:12:21,187 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148423
+ERROR 2026-05-25 09:12:21,583 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148423
+ERROR 2026-05-25 09:12:21,984 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148443
+ERROR 2026-05-25 09:12:22,393 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148284
+ERROR 2026-05-25 09:12:22,800 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148289
+ERROR 2026-05-25 09:12:23,207 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148402
+ERROR 2026-05-25 09:12:23,602 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148402
+ERROR 2026-05-25 09:12:24,015 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148443
+ERROR 2026-05-25 09:12:24,409 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148402
+ERROR 2026-05-25 09:12:24,720 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148428
+ERROR 2026-05-25 09:12:24,883 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148423
+ERROR 2026-05-25 09:12:25,314 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148423
+ERROR 2026-05-25 09:12:25,700 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148284
+ERROR 2026-05-25 09:12:26,102 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148402
+ERROR 2026-05-25 09:12:26,540 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148402
+ERROR 2026-05-25 09:12:26,949 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148402
+ERROR 2026-05-25 09:12:27,357 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148284
+ERROR 2026-05-25 09:12:27,766 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148283
+ERROR 2026-05-25 09:12:28,160 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148284
+ERROR 2026-05-25 09:12:28,553 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148283
+ERROR 2026-05-25 09:12:28,948 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148443
+ERROR 2026-05-25 09:12:29,249 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148284
+ERROR 2026-05-25 09:12:29,417 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148402
+ERROR 2026-05-25 09:12:29,901 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148300
+ERROR 2026-05-25 09:12:30,313 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148423
+ERROR 2026-05-25 09:12:30,725 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148443
+ERROR 2026-05-25 09:12:31,124 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148283
+ERROR 2026-05-25 09:12:31,516 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148283
+ERROR 2026-05-25 09:12:31,922 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148284
+ERROR 2026-05-25 09:12:32,348 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148283
+ERROR 2026-05-25 09:12:32,731 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148283
+ERROR 2026-05-25 09:12:33,149 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148289
+ERROR 2026-05-25 09:12:33,539 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148423
+ERROR 2026-05-25 09:12:33,935 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148402
+ERROR 2026-05-25 09:12:34,358 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148283
+ERROR 2026-05-25 09:12:34,735 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148423
+ERROR 2026-05-25 09:12:35,141 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148447
+ERROR 2026-05-25 09:12:35,538 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148402
+ERROR 2026-05-25 09:12:35,957 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148289
+ERROR 2026-05-25 09:12:36,377 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148283
+ERROR 2026-05-25 09:12:36,754 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148423
+ERROR 2026-05-25 09:12:37,161 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148402
+ERROR 2026-05-25 09:12:37,563 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148428
+ERROR 2026-05-25 09:12:38,066 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148423
+ERROR 2026-05-25 09:12:38,429 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148374
+ERROR 2026-05-25 09:12:38,783 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148300
+ERROR 2026-05-25 09:12:39,193 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148428
+ERROR 2026-05-25 09:12:39,586 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148374
+ERROR 2026-05-25 09:12:39,982 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148443
+ERROR 2026-05-25 09:12:40,391 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148374
+ERROR 2026-05-25 09:12:40,800 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148283
+ERROR 2026-05-25 09:12:41,208 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148289
+ERROR 2026-05-25 09:12:41,601 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148284
+ERROR 2026-05-25 09:12:42,017 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148423
+ERROR 2026-05-25 09:12:42,421 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148283
+ERROR 2026-05-25 09:12:42,819 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148289
+ERROR 2026-05-25 09:12:43,225 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148428
+ERROR 2026-05-25 09:12:43,632 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148447
+ERROR 2026-05-25 09:12:44,034 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148447
+ERROR 2026-05-25 09:12:44,456 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148374
+ERROR 2026-05-25 09:12:44,866 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148283
+ERROR 2026-05-25 09:12:45,288 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148300
+ERROR 2026-05-25 09:12:45,766 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148289
+ERROR 2026-05-25 09:12:46,175 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148283
+ERROR 2026-05-25 09:12:46,585 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148402
+ERROR 2026-05-25 09:12:47,025 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148284
+ERROR 2026-05-25 09:12:47,443 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148402
+ERROR 2026-05-25 09:12:47,851 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148447
+ERROR 2026-05-25 09:12:48,247 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148283
+ERROR 2026-05-25 09:12:48,651 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148443
+ERROR 2026-05-25 09:12:49,054 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148443
+ERROR 2026-05-25 09:12:49,457 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148447
+ERROR 2026-05-25 09:12:49,871 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148402
+ERROR 2026-05-25 09:12:50,278 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148283
+ERROR 2026-05-25 09:12:50,687 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148289
+ERROR 2026-05-25 09:12:51,093 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148283
+ERROR 2026-05-25 09:12:51,521 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148428
+ERROR 2026-05-25 09:12:51,916 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148428
+ERROR 2026-05-25 09:12:52,326 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148423
+ERROR 2026-05-25 09:12:52,730 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148283
+ERROR 2026-05-25 09:12:53,128 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148283
+ERROR 2026-05-25 09:12:53,515 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148402
+ERROR 2026-05-25 09:12:53,917 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148283
+ERROR 2026-05-25 09:12:54,323 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148284
+ERROR 2026-05-25 09:12:54,747 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148283
+ERROR 2026-05-25 09:12:55,131 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148443
+ERROR 2026-05-25 09:12:55,534 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148428
+ERROR 2026-05-25 09:12:55,936 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148283
+ERROR 2026-05-25 09:12:56,356 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148283
+ERROR 2026-05-25 09:12:56,749 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148377
+ERROR 2026-05-25 09:12:57,160 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148428
+ERROR 2026-05-25 09:12:57,555 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148283
+ERROR 2026-05-25 09:12:57,989 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148428
+ERROR 2026-05-25 09:12:58,440 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148402
+ERROR 2026-05-25 09:12:58,795 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148402
+ERROR 2026-05-25 09:12:59,217 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148283
+ERROR 2026-05-25 09:12:59,643 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148443
+ERROR 2026-05-25 09:13:00,051 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148283
+ERROR 2026-05-25 09:13:00,435 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148447
+ERROR 2026-05-25 09:13:00,833 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148283
+ERROR 2026-05-25 09:13:01,247 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148447
+ERROR 2026-05-25 09:13:01,647 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148447
+ERROR 2026-05-25 09:13:02,049 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148428
+ERROR 2026-05-25 09:13:02,457 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148443
+ERROR 2026-05-25 09:13:02,847 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148402
+ERROR 2026-05-25 09:13:03,251 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148289
+ERROR 2026-05-25 09:13:03,648 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148374
+ERROR 2026-05-25 09:13:04,051 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148428
+ERROR 2026-05-25 09:13:04,438 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148283
+ERROR 2026-05-25 09:13:04,848 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148423
+ERROR 2026-05-25 09:13:05,261 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148283
+ERROR 2026-05-25 09:13:05,653 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148423
+ERROR 2026-05-25 09:13:06,054 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148447
+ERROR 2026-05-25 09:13:06,456 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148402
+ERROR 2026-05-25 09:13:06,846 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148283
+ERROR 2026-05-25 09:13:07,275 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148402
+ERROR 2026-05-25 09:13:07,650 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148423
+ERROR 2026-05-25 09:13:08,056 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148377
+ERROR 2026-05-25 09:13:08,481 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148377
+ERROR 2026-05-25 09:13:08,864 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148443
+ERROR 2026-05-25 09:13:09,288 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148428
+ERROR 2026-05-25 09:13:09,668 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148402
+ERROR 2026-05-25 09:13:10,075 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148423
+ERROR 2026-05-25 09:13:10,486 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148283
+ERROR 2026-05-25 09:13:10,883 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148402
+ERROR 2026-05-25 09:13:11,329 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148284
+ERROR 2026-05-25 09:13:11,699 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148402
+ERROR 2026-05-25 09:13:12,098 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148289
+ERROR 2026-05-25 09:13:12,554 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148423
+ERROR 2026-05-25 09:13:12,964 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148289
+ERROR 2026-05-25 09:13:13,415 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148283
+ERROR 2026-05-25 09:13:13,784 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148402
+ERROR 2026-05-25 09:13:14,236 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148284
+ERROR 2026-05-25 09:13:14,593 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148423
+ERROR 2026-05-25 09:13:14,997 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148423
+ERROR 2026-05-25 09:13:15,425 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148289
+ERROR 2026-05-25 09:13:15,818 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148283
+ERROR 2026-05-25 09:13:16,191 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148284
+ERROR 2026-05-25 09:13:16,588 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148283
+ERROR 2026-05-25 09:13:16,985 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148283
+ERROR 2026-05-25 09:13:17,388 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148283
+ERROR 2026-05-25 09:13:17,817 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148447
+ERROR 2026-05-25 09:13:18,222 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148428
+ERROR 2026-05-25 09:13:18,618 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148402
+ERROR 2026-05-25 09:13:19,021 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148447
+ERROR 2026-05-25 09:13:19,422 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148283
+ERROR 2026-05-25 09:13:19,834 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148283
+ERROR 2026-05-25 09:13:20,252 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148402
+ERROR 2026-05-25 09:13:20,639 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148447
+ERROR 2026-05-25 09:13:21,035 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148402
+ERROR 2026-05-25 09:13:21,437 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148423
+ERROR 2026-05-25 09:13:21,847 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148283
+ERROR 2026-05-25 09:13:22,247 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148284
+ERROR 2026-05-25 09:13:22,654 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148289
+ERROR 2026-05-25 09:13:23,050 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148284
+ERROR 2026-05-25 09:13:23,465 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148428
+ERROR 2026-05-25 09:13:23,848 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148283
+ERROR 2026-05-25 09:13:24,267 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148428
+ERROR 2026-05-25 09:13:24,652 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148283
+ERROR 2026-05-25 09:13:25,053 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148284
+ERROR 2026-05-25 09:13:25,474 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148428
+ERROR 2026-05-25 09:13:25,861 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148289
+ERROR 2026-05-25 09:13:26,253 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148443
+ERROR 2026-05-25 09:13:26,652 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148428
+ERROR 2026-05-25 09:13:27,054 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148289
+ERROR 2026-05-25 09:13:27,459 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148428
+ERROR 2026-05-25 09:13:27,867 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148284
+ERROR 2026-05-25 09:13:28,251 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148402
+ERROR 2026-05-25 09:13:28,649 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148283
+ERROR 2026-05-25 09:13:29,049 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148443
+ERROR 2026-05-25 09:13:29,444 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148428
+ERROR 2026-05-25 09:13:29,856 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148284
+ERROR 2026-05-25 09:13:30,270 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148402
+ERROR 2026-05-25 09:13:30,671 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148423
+ERROR 2026-05-25 09:13:31,081 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148284
+ERROR 2026-05-25 09:13:31,487 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148283
+ERROR 2026-05-25 09:13:31,888 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148423
+ERROR 2026-05-25 09:13:32,299 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148423
+ERROR 2026-05-25 09:13:32,699 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148289
+ERROR 2026-05-25 09:13:33,116 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148443
+ERROR 2026-05-25 09:13:33,516 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148447
+ERROR 2026-05-25 09:13:33,924 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148443
+ERROR 2026-05-25 09:13:34,332 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148402
+ERROR 2026-05-25 09:13:34,726 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148447
+ERROR 2026-05-25 09:13:35,208 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148428
+ERROR 2026-05-25 09:13:35,542 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148289
+ERROR 2026-05-25 09:13:35,933 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148283
+ERROR 2026-05-25 09:13:36,337 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148423
+ERROR 2026-05-25 09:13:36,736 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148428
+ERROR 2026-05-25 09:13:37,138 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148423
+ERROR 2026-05-25 09:13:37,522 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148447
+ERROR 2026-05-25 09:13:38,004 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148447
+ERROR 2026-05-25 09:13:38,417 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148428
+ERROR 2026-05-25 09:13:38,797 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148423
+ERROR 2026-05-25 09:13:39,212 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148447
+ERROR 2026-05-25 09:13:39,616 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148283
+ERROR 2026-05-25 09:13:40,092 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148428
+ERROR 2026-05-25 09:13:40,436 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148284
+ERROR 2026-05-25 09:13:40,839 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148402
+ERROR 2026-05-25 09:13:41,248 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148447
+ERROR 2026-05-25 09:13:41,655 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148443
+ERROR 2026-05-25 09:13:42,049 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148402
+ERROR 2026-05-25 09:13:42,462 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148428
+ERROR 2026-05-25 09:13:42,858 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148284
+ERROR 2026-05-25 09:13:43,275 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148402
+ERROR 2026-05-25 09:13:43,681 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148402
+ERROR 2026-05-25 09:13:44,096 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148283
+ERROR 2026-05-25 09:13:44,505 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148284
+ERROR 2026-05-25 09:13:44,937 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148402
+ERROR 2026-05-25 09:13:45,355 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148283
+ERROR 2026-05-25 09:13:45,750 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148402
+ERROR 2026-05-25 09:13:46,153 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148402
+ERROR 2026-05-25 09:13:46,536 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148402
+ERROR 2026-05-25 09:13:46,952 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148283
+ERROR 2026-05-25 09:13:47,344 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148423
+ERROR 2026-05-25 09:13:47,737 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148402
+ERROR 2026-05-25 09:13:48,183 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148402
+ERROR 2026-05-25 09:13:48,549 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148423
+ERROR 2026-05-25 09:13:48,960 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148402
+ERROR 2026-05-25 09:13:49,425 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148284
+ERROR 2026-05-25 09:13:49,820 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148443
+ERROR 2026-05-25 09:13:50,036 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148428
+ERROR 2026-05-25 09:13:50,252 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148284
+ERROR 2026-05-25 09:13:50,711 basehttp 17052 21816 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 148402
+ERROR 2026-05-25 09:13:56,329 basehttp 16532 13584 "GET /api/v1/auth/superadmin/officers/ HTTP/1.1" 500 123933
+ERROR 2026-05-25 09:24:37,059 basehttp 12244 24220 "POST /api/v1/auth/superadmin/officers/56/reset-password/ HTTP/1.1" 500 312468
+ERROR 2026-05-25 09:31:51,652 basehttp 12244 19980 "POST /api/v1/auth/superadmin/officers/56/reset-password/ HTTP/1.1" 500 312487
+WARNING 2026-05-25 09:47:50,926 log 10392 5632 Unauthorized: /api/v1/auth/login/
+WARNING 2026-05-25 09:47:50,927 basehttp 10392 5632 "POST /api/v1/auth/login/ HTTP/1.1" 401 107
+WARNING 2026-05-25 13:59:22,042 log 13380 1908 Unauthorized: /api/v1/auth/me/
+WARNING 2026-05-25 13:59:22,043 basehttp 13380 1908 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-05-25 13:59:22,300 log 13380 1908 Unauthorized: /api/v1/auth/me/
+WARNING 2026-05-25 13:59:22,302 basehttp 13380 1908 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-05-25 14:06:28,926 log 4796 7692 Not Found: /
+WARNING 2026-05-25 14:06:28,928 basehttp 4796 7692 "GET / HTTP/1.1" 404 5304
+WARNING 2026-05-25 14:06:40,221 log 4796 4188 Not Found: /
+WARNING 2026-05-25 14:06:40,222 basehttp 4796 4188 "GET / HTTP/1.1" 404 5304
+WARNING 2026-05-25 14:06:40,322 log 4796 4188 Not Found: /favicon.ico
+WARNING 2026-05-25 14:06:40,323 basehttp 4796 4188 "GET /favicon.ico HTTP/1.1" 404 5355
+ERROR 2026-05-25 14:07:15,245 basehttp 4796 17808 "GET /admin/accounts/loginhistory/ HTTP/1.1" 500 523137
+ERROR 2026-05-25 14:07:28,003 basehttp 4796 17808 "GET /admin/accounts/loginhistory/ HTTP/1.1" 500 523137
+ERROR 2026-05-25 14:07:30,956 basehttp 4796 17808 "GET /admin/profiles/profile/ HTTP/1.1" 500 522977
+ERROR 2026-05-25 14:08:21,596 basehttp 4796 17808 "GET /admin/accounts/loginhistory/ HTTP/1.1" 500 523137
+ERROR 2026-05-25 14:10:27,721 basehttp 4796 17808 "GET /admin/accounts/loginhistory/ HTTP/1.1" 500 523137
+ERROR 2026-05-25 14:10:58,826 basehttp 4796 17808 "GET /admin/profiles/profile/ HTTP/1.1" 500 522977

@@ -3,7 +3,7 @@ from django.utils import timezone
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
-from .models import User, Role, LoginHistory, AccountRequest
+from .models import User, Role, LoginHistory, AccountRequest, OfficerPermission, get_officer_permissions
 
 
 class RoleSerializer(serializers.ModelSerializer):
@@ -12,21 +12,36 @@ class RoleSerializer(serializers.ModelSerializer):
         fields = ['id', 'code', 'name']
 
 
+class OfficerPermissionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OfficerPermission
+        fields = [
+            'can_create_accounts', 'can_review_profiles', 'can_approve_profiles',
+            'can_export_word', 'can_send_notifications', 'can_view_reports',
+        ]
+
+
 class UserPublicSerializer(serializers.ModelSerializer):
-    role = RoleSerializer(read_only=True)
+    role        = RoleSerializer(read_only=True)
+    permissions = serializers.SerializerMethodField()
 
     class Meta:
         model = User
         fields = ['id', 'full_name', 'phone', 'email', 'role', 'status',
-                  'avatar_path', 'last_login_at', 'created_at']
+                  'avatar_path', 'last_login_at', 'created_at', 'is_superuser', 'permissions']
+
+    def get_permissions(self, obj):
+        return get_officer_permissions(obj)
 
 
 class UserDetailSerializer(serializers.ModelSerializer):
-    role = RoleSerializer(read_only=True)
-    role_id = serializers.PrimaryKeyRelatedField(
+    role        = RoleSerializer(read_only=True)
+    role_id     = serializers.PrimaryKeyRelatedField(
         queryset=Role.objects.all(), source='role', write_only=True, required=False
     )
-    profile_status = serializers.SerializerMethodField()
+    profile_status     = serializers.SerializerMethodField()
+    officer_permission = OfficerPermissionSerializer(read_only=True)
+    permissions        = serializers.SerializerMethodField()
 
     class Meta:
         model = User
@@ -36,7 +51,8 @@ class UserDetailSerializer(serializers.ModelSerializer):
             'email_verified', 'phone_verified',
             'last_login_at', 'login_attempts', 'locked_until',
             'created_by_id', 'created_at', 'updated_at',
-            'profile_status',
+            'profile_status', 'is_superuser',
+            'officer_permission', 'permissions',
         ]
         read_only_fields = ['id', 'last_login_at', 'login_attempts', 'created_at', 'updated_at']
 
@@ -45,6 +61,37 @@ class UserDetailSerializer(serializers.ModelSerializer):
             return obj.profile.status
         except Exception:
             return None
+
+    def get_permissions(self, obj):
+        return get_officer_permissions(obj)
+
+
+class OfficerCreateSerializer(serializers.Serializer):
+    """Used by superadmin to create new officer accounts."""
+    full_name  = serializers.CharField(max_length=255)
+    phone      = serializers.CharField(max_length=20)
+    email      = serializers.EmailField(required=False, allow_blank=True)
+    password   = serializers.CharField(min_length=8, write_only=True)
+    role_code  = serializers.ChoiceField(choices=['admin', 'can_bo_bxd'])
+    # permissions
+    can_create_accounts    = serializers.BooleanField(default=False)
+    can_review_profiles    = serializers.BooleanField(default=False)
+    can_approve_profiles   = serializers.BooleanField(default=False)
+    can_export_word        = serializers.BooleanField(default=False)
+    can_send_notifications = serializers.BooleanField(default=False)
+    can_view_reports       = serializers.BooleanField(default=False)
+
+    def validate_phone(self, value):
+        if User.objects.filter(phone=value).exists():
+            raise serializers.ValidationError('Số điện thoại đã được sử dụng.')
+        return value
+
+
+class OfficerUpdateSerializer(serializers.Serializer):
+    full_name  = serializers.CharField(max_length=255, required=False)
+    email      = serializers.EmailField(required=False, allow_blank=True)
+    status     = serializers.ChoiceField(choices=User.Status.choices, required=False)
+    role_code  = serializers.ChoiceField(choices=['admin', 'can_bo_bxd'], required=False)
 
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -99,7 +146,7 @@ class ResetPasswordRequestSerializer(serializers.Serializer):
 
 
 class ResetPasswordConfirmSerializer(serializers.Serializer):
-    token       = serializers.CharField(required=True)
+    token        = serializers.CharField(required=True)
     new_password = serializers.CharField(required=True, min_length=8)
 
 
@@ -140,14 +187,27 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         LoginHistory.objects.create(user=user, status=LoginHistory.LoginStatus.SUCCESS)
 
         refresh = RefreshToken.for_user(user)
-        refresh['role'] = user.role.code
-        refresh['full_name'] = user.full_name
+        refresh['role']         = user.role.code
+        refresh['full_name']    = user.full_name
+        refresh['is_superuser'] = user.is_superuser
+        refresh['permissions']  = get_officer_permissions(user)
 
         return {
             'refresh': str(refresh),
             'access':  str(refresh.access_token),
-            'user': UserPublicSerializer(user).data,
+            'user':    UserPublicSerializer(user).data,
         }
+
+
+class SuperAdminLoginSerializer(CustomTokenObtainPairSerializer):
+    """Like regular login but only allows is_superuser users."""
+
+    def validate(self, attrs):
+        data = super().validate(attrs)
+        user_data = data['user']
+        if not user_data.get('is_superuser'):
+            raise serializers.ValidationError({'detail': 'Tài khoản này không có quyền truy cập trang quản trị cấp cao.'})
+        return data
 
 
 class AccountRequestSerializer(serializers.ModelSerializer):

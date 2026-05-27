@@ -9,18 +9,21 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.decorators import api_view, permission_classes, throttle_classes
 from rest_framework.response import Response
 from rest_framework.throttling import AnonRateThrottle
+from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError
 
-from .models import User, Role, PasswordReset, AccountRequest, LoginHistory
+from .models import User, Role, PasswordReset, AccountRequest, LoginHistory, OfficerPermission, get_officer_permissions
 from .serializers import (
-    CustomTokenObtainPairSerializer, RegisterSerializer, UserDetailSerializer,
+    CustomTokenObtainPairSerializer, SuperAdminLoginSerializer,
+    RegisterSerializer, UserDetailSerializer,
     ChangePasswordSerializer, ResetPasswordRequestSerializer,
     ResetPasswordConfirmSerializer, AccountRequestSerializer,
     AccountRequestCreateSerializer, LoginHistorySerializer, UserPublicSerializer,
+    OfficerPermissionSerializer, OfficerCreateSerializer, OfficerUpdateSerializer,
 )
-from .permissions import IsOfficer, IsAdmin, IsOfficerOrApplicant
+from .permissions import IsOfficer, IsAdmin, IsOfficerOrApplicant, IsSuperAdmin
 from apps.auditlogs.utils import log_activity
 
 
@@ -294,3 +297,184 @@ def toggle_user_status(request, pk):
         description=f'Đổi trạng thái → {new_status}'
     )
     return Response({'success': True, 'data': UserDetailSerializer(user).data})
+
+
+# ── Super Admin views ─────────────────────────────────────────────────────────
+
+class SuperAdminLoginView(TokenObtainPairView):
+    """Login endpoint exclusive to Django superusers."""
+    serializer_class = SuperAdminLoginSerializer
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        try:
+            serializer.is_valid(raise_exception=True)
+        except Exception as e:
+            return Response({'success': False, 'error': str(e)}, status=status.HTTP_401_UNAUTHORIZED)
+        return Response({'success': True, 'data': serializer.validated_data}, status=status.HTTP_200_OK)
+
+
+class OfficerListCreateView(generics.GenericAPIView):
+    """List all officers or create a new one."""
+    permission_classes = [IsSuperAdmin]
+
+    def get(self, request):
+        officers = (
+            User.objects.select_related('role')
+            .prefetch_related('officer_permission')
+            .filter(
+                role__code__in=['admin', 'can_bo_bxd'],
+                deleted_at__isnull=True,
+            )
+            .order_by('full_name')
+        )
+        data = []
+        for u in officers:
+            perms = get_officer_permissions(u)
+            data.append({
+                'id':          u.id,
+                'full_name':   u.full_name,
+                'phone':       u.phone,
+                'email':       u.email,
+                'role':        u.role.code,
+                'role_name':   u.role.name,
+                'status':      u.status,
+                'is_superuser': u.is_superuser,
+                'last_login_at': u.last_login_at,
+                'created_at':  u.created_at,
+                'permissions': perms,
+            })
+        return Response({'success': True, 'data': data})
+
+    @transaction.atomic
+    def post(self, request):
+        ser = OfficerCreateSerializer(data=request.data)
+        ser.is_valid(raise_exception=True)
+        d = ser.validated_data
+
+        role, _ = Role.objects.get_or_create(
+            code=d['role_code'],
+            defaults={'name': 'Quản trị hệ thống' if d['role_code'] == 'admin' else 'Cán bộ Ban XD Đảng'}
+        )
+        user = User.objects.create_user(
+            phone=d['phone'],
+            password=d['password'],
+            full_name=d['full_name'],
+            email=d.get('email') or None,
+            role=role,
+            status=User.Status.ACTIVE,
+            is_staff=(d['role_code'] == 'admin'),
+            created_by=request.user,
+        )
+        OfficerPermission.objects.create(
+            user=user,
+            can_create_accounts=d.get('can_create_accounts', False),
+            can_review_profiles=d.get('can_review_profiles', False),
+            can_approve_profiles=d.get('can_approve_profiles', False),
+            can_export_word=d.get('can_export_word', False),
+            can_send_notifications=d.get('can_send_notifications', False),
+            can_view_reports=d.get('can_view_reports', False),
+        )
+        log_activity(request.user, 'officer_create', target_model='User', target_id=user.id,
+                     description=f'Tạo tài khoản cán bộ: {user.full_name}')
+        return Response({'success': True, 'data': UserDetailSerializer(user).data},
+                        status=status.HTTP_201_CREATED)
+
+
+class OfficerDetailView(generics.GenericAPIView):
+    permission_classes = [IsSuperAdmin]
+
+    def _get_officer(self, pk):
+        try:
+            return User.objects.select_related('role').prefetch_related('officer_permission').get(
+                pk=pk, role__code__in=['admin', 'can_bo_bxd'], deleted_at__isnull=True
+            )
+        except User.DoesNotExist:
+            return None
+
+    def get(self, request, pk):
+        user = self._get_officer(pk)
+        if not user:
+            return Response({'success': False, 'error': 'Không tìm thấy cán bộ.'}, status=404)
+        return Response({'success': True, 'data': UserDetailSerializer(user).data})
+
+    def put(self, request, pk):
+        user = self._get_officer(pk)
+        if not user:
+            return Response({'success': False, 'error': 'Không tìm thấy cán bộ.'}, status=404)
+        ser = OfficerUpdateSerializer(data=request.data, partial=True)
+        ser.is_valid(raise_exception=True)
+        d = ser.validated_data
+        if 'full_name' in d:
+            user.full_name = d['full_name']
+        if 'email' in d:
+            user.email = d['email'] or None
+        if 'status' in d:
+            user.status = d['status']
+        if 'role_code' in d:
+            role, _ = Role.objects.get_or_create(
+                code=d['role_code'],
+                defaults={'name': 'Quản trị hệ thống' if d['role_code'] == 'admin' else 'Cán bộ Ban XD Đảng'}
+            )
+            user.role = role
+            user.is_staff = (d['role_code'] == 'admin')
+        user.save()
+        log_activity(request.user, 'officer_update', target_model='User', target_id=user.id)
+        return Response({'success': True, 'data': UserDetailSerializer(user).data})
+
+    def delete(self, request, pk):
+        user = self._get_officer(pk)
+        if not user:
+            return Response({'success': False, 'error': 'Không tìm thấy cán bộ.'}, status=404)
+        user.soft_delete()
+        log_activity(request.user, 'officer_delete', target_model='User', target_id=user.id,
+                     description=f'Xóa cán bộ: {user.full_name}')
+        return Response({'success': True, 'message': 'Đã xóa cán bộ.'})
+
+
+class OfficerPermissionView(APIView):
+    """GET or PUT permissions for a specific officer."""
+    permission_classes = [IsSuperAdmin]
+
+    def _get_officer(self, pk):
+        try:
+            return User.objects.get(pk=pk, role__code__in=['admin', 'can_bo_bxd'], deleted_at__isnull=True)
+        except User.DoesNotExist:
+            return None
+
+    def get(self, request, pk):
+        user = self._get_officer(pk)
+        if not user:
+            return Response({'success': False, 'error': 'Không tìm thấy cán bộ.'}, status=404)
+        perm, _ = OfficerPermission.objects.get_or_create(user=user)
+        return Response({'success': True, 'data': OfficerPermissionSerializer(perm).data})
+
+    def put(self, request, pk):
+        user = self._get_officer(pk)
+        if not user:
+            return Response({'success': False, 'error': 'Không tìm thấy cán bộ.'}, status=404)
+        perm, _ = OfficerPermission.objects.get_or_create(user=user)
+        ser = OfficerPermissionSerializer(perm, data=request.data, partial=True)
+        ser.is_valid(raise_exception=True)
+        ser.save()
+        log_activity(request.user, 'officer_permissions_update', target_model='User', target_id=user.id,
+                     description=f'Cập nhật quyền: {user.full_name}')
+        return Response({'success': True, 'data': ser.data})
+
+
+@api_view(['POST'])
+@permission_classes([IsSuperAdmin])
+def officer_reset_password(request, pk):
+    try:
+        user = User.objects.get(pk=pk, role__code__in=['admin', 'can_bo_bxd'], deleted_at__isnull=True)
+    except User.DoesNotExist:
+        return Response({'success': False, 'error': 'Không tìm thấy cán bộ.'}, status=404)
+    new_password = request.data.get('new_password', '')
+    if len(new_password) < 8:
+        return Response({'success': False, 'error': 'Mật khẩu phải ít nhất 8 ký tự.'}, status=400)
+    user.set_password(new_password)
+    user.save(update_fields=['password'])
+    log_activity(request.user, 'officer_reset_password', target_model='User', target_id=user.id)
+    return Response({'success': True, 'message': 'Đã đặt lại mật khẩu.'})
+

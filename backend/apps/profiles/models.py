@@ -286,3 +286,27 @@ class CommitteeComment(models.Model):
 
     def __str__(self):
         return f'{self.profile} – {self.type}'
+
+
+class ProfileFieldNote(models.Model):
+    """Per-field or per-section review notes written by officers.
+    Officers add notes requesting corrections; citizens see them when the profile is returned.
+    """
+    profile    = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='field_notes')
+    field_key  = models.CharField(max_length=100)  # e.g. "secA", "secB", "full_name"
+    note       = models.TextField(blank=True)
+    reviewer   = models.ForeignKey('accounts.User', on_delete=models.PROTECT,
+                                    related_name='field_notes_authored')
+    resolved   = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table        = 'profile_field_notes'
+        unique_together = [['profile', 'field_key']]
+        verbose_name    = 'Nhận xét trường hồ sơ'
+        verbose_name_plural = 'Nhận xét trường hồ sơ'
+        ordering        = ['field_key']
+
+    def __str__(self):
+        return f'{self.profile_id}:{self.field_key}'

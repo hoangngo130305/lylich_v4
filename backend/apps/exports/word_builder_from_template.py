@@ -495,7 +495,9 @@ def _r_text_area(doc, sec, sm, fr):
 
     val = fr.resolve(field) if field else ''
     if val:
-        _safe_para(doc, sm.p('normal')).add_run(val)
+        # Split on newlines so each line becomes its own paragraph, preserving formatting.
+        for line in val.split('\n'):
+            _safe_para(doc, sm.p('normal')).add_run(line)
     else:
         for _ in range(n_lines):
             _safe_para(doc, sm.p('normal'))

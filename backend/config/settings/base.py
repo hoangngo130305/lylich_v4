@@ -129,7 +129,7 @@ AUTH_PASSWORD_VALIDATORS = [
 LANGUAGE_CODE = 'vi'
 TIME_ZONE = 'Asia/Ho_Chi_Minh'
 USE_I18N = True
-USE_TZ = True
+USE_TZ = False
 
 # ── Static & Media Files ──────────────────────────────────────────────────────
 STATIC_URL = '/static/'
@@ -303,6 +303,7 @@ UNFOLD = {
                 'items': [
                     {'title': 'Người dùng', 'icon': 'people', 'link': '/admin/accounts/user/'},
                     {'title': 'Vai trò', 'icon': 'admin_panel_settings', 'link': '/admin/accounts/role/'},
+                    {'title': 'Cán bộ Đảng', 'icon': 'manage_accounts', 'link': '/admin/accounts/officer/'},
                     {'title': 'Lịch sử đăng nhập', 'icon': 'history', 'link': '/admin/accounts/loginhistory/'},
                 ],
             },

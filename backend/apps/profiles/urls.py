@@ -15,6 +15,7 @@ urlpatterns = [
     path('<int:pk>/workflow/', views.ProfileWorkflowView.as_view(), name='profile-workflow'),
     path('<int:pk>/assign-officer/', views.AssignOfficerView.as_view(), name='assign-officer'),
     path('<int:pk>/ai-scan/', views.ai_scan_results, name='ai-scan'),
+    path('<int:pk>/field-notes/', views.ProfileFieldNoteView.as_view(), name='profile-field-notes'),
 
     # Reviews & comments
     path('<int:profile_id>/reviews/', views.ProfileReviewListView.as_view(), name='profile-reviews'),

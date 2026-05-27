@@ -1288,7 +1288,7 @@
         border-bottom: 2px solid var(--success) !important;
       }
 
-      /* Family history mode toggle */
+      /* Family history mode toggle (kept for non-family self-history) */
       .hist-mode-bar {
         display: flex;
         align-items: center;
@@ -1319,6 +1319,73 @@
       .hist-mode-btn.active {
         background: var(--navy);
         color: #fff;
+      }
+      /* Family history MM/YYYY date inputs */
+      .fhd-wrap {
+        display: flex;
+        align-items: center;
+        gap: 2px;
+        width: 100%;
+      }
+      .fhd-input {
+        width: 100%;
+        border: none;
+        border-radius: 0;
+        padding: 8px 5px;
+        font-family: inherit;
+        font-size: 12.5px;
+        background: transparent;
+        outline: none;
+        min-width: 0;
+      }
+      .fhd-present-wrap {
+        display: flex;
+        align-items: center;
+        gap: 3px;
+        white-space: nowrap;
+        flex-shrink: 0;
+        font-size: 11px;
+        color: var(--muted);
+      }
+      .fhd-present-wrap input[type="checkbox"] {
+        cursor: pointer;
+        margin: 0;
+      }
+      td.fhd-to-cell {
+        position: relative;
+      }
+      .fhd-to-inner {
+        display: flex;
+        align-items: center;
+        gap: 3px;
+        width: 100%;
+      }
+      .fhd-to-inner .fhd-input[disabled] {
+        color: var(--hint);
+        font-style: italic;
+      }
+      /* Invalid rows — shared by family history + sections B, C */
+      .fhd-row-invalid td,
+      .tl-row-invalid td {
+        background: #fff3f3 !important;
+      }
+      .fhd-row-invalid td:first-child,
+      .tl-row-invalid td:first-child {
+        border-left: 3px solid var(--crimson) !important;
+      }
+      /* Timeline error banner — shared by all sections */
+      .fhd-error-bar {
+        background: #fff0f0;
+        border: 1px solid #f5a5a5;
+        border-radius: 6px;
+        padding: 6px 10px;
+        font-size: 11.5px;
+        color: var(--crimson);
+        margin-bottom: 6px;
+        display: none;
+      }
+      .fhd-error-bar.visible {
+        display: block;
       }
 
       .hist-date-cell {
@@ -4556,6 +4623,218 @@
         border: 1.5px solid rgba(139, 0, 0, 0.22);
         box-shadow: inset 0 0 0 1px rgba(139, 0, 0, 0.08);
       }
+
+      /* ── Review-locked mode: officer cannot edit citizen data ── */
+      /* Lock ALL inputs/selects/textareas except note areas */
+      #pgProfileEdit.review-locked
+        input:not(.fn-field-note-ta):not([type="checkbox"]):not([type="radio"]),
+      #pgProfileEdit.review-locked select,
+      #pgProfileEdit.review-locked textarea:not(.fn-field-note-ta),
+      #pgProfileEdit.review-locked .field-input,
+      #pgProfileEdit.review-locked .field-select-input,
+      #pgProfileEdit.review-locked .field-textarea {
+        pointer-events: none !important;
+        background: #f0f3f7 !important;
+        color: #4a5568 !important;
+        border-color: #d4dae6 !important;
+        cursor: not-allowed !important;
+        user-select: text !important;
+      }
+      /* Note textareas must remain fully editable */
+      #pgProfileEdit.review-locked .fn-field-note-ta {
+        pointer-events: auto !important;
+        background: #fff !important;
+        color: #1a202c !important;
+        cursor: text !important;
+      }
+      /* Modal inputs/textareas/selects must remain fully editable */
+      #pgProfileEdit.review-locked .modal-backdrop textarea,
+      #pgProfileEdit.review-locked .modal-backdrop input,
+      #pgProfileEdit.review-locked .modal-backdrop select {
+        pointer-events: auto !important;
+        background: #fff !important;
+        color: #1a202c !important;
+        border-color: var(--border) !important;
+        cursor: text !important;
+      }
+      /* Hide ALL "✏ Chỉnh sửa" buttons — keep only flag buttons */
+      #pgProfileEdit.review-locked .edit-btn:not(.flag-btn) {
+        display: none !important;
+      }
+      /* Hide row-add / row-delete controls */
+      #pgProfileEdit.review-locked .add-row-btn,
+      #pgProfileEdit.review-locked .del-row-btn,
+      #pgProfileEdit.review-locked .timeline-edit-row button,
+      #pgProfileEdit.review-locked button[onclick*="addRow"],
+      #pgProfileEdit.review-locked button[onclick*="delRow"] {
+        display: none !important;
+      }
+      /* In field-rows: always show field-value (read display), hide edit inputs */
+      #pgProfileEdit.review-locked .field-row .field-input,
+      #pgProfileEdit.review-locked .field-row .field-select-input,
+      #pgProfileEdit.review-locked .field-row .field-textarea {
+        display: none !important;
+      }
+      #pgProfileEdit.review-locked .field-row .field-value {
+        display: block !important;
+      }
+      /* Dim status select — officer cannot change status directly */
+      #pgProfileEdit.review-locked .status-select-wrap {
+        pointer-events: none !important;
+        opacity: 0.45;
+      }
+
+      /* ── Per-field note area (injected under each field-row) ── */
+      .fn-field-note {
+        margin: 2px 0 0;
+        padding: 5px 8px 6px;
+        background: #fffceb;
+        border: 1.5px solid #f0c040;
+        border-top: 2px solid #e8c000;
+        border-radius: 0 0 5px 5px;
+      }
+      .fn-field-note.fn-section-note {
+        margin: 0 0 10px;
+        border-radius: 6px;
+        border-top: 1.5px solid #f0c040;
+      }
+      .fn-field-note .fn-field-note-label {
+        font-size: 10px;
+        font-weight: 700;
+        color: #7a5000;
+        margin-bottom: 3px;
+        letter-spacing: 0.01em;
+      }
+      .fn-field-note-ta {
+        width: 100%;
+        min-height: 36px;
+        border: 1.5px solid #ddd0a0;
+        border-radius: 4px;
+        padding: 5px 7px;
+        font-size: 11.5px;
+        font-family: inherit;
+        resize: vertical;
+        background: #fff;
+        box-sizing: border-box;
+        transition:
+          border-color 0.15s,
+          background 0.15s;
+        line-height: 1.45;
+        display: block;
+      }
+      .fn-field-note-ta:focus {
+        border-color: #b09000;
+        background: #fffef5;
+        outline: none;
+      }
+      .fn-field-note-ta::placeholder {
+        color: #b09040;
+        font-style: italic;
+      }
+      .fn-field-note-ta.has-content {
+        border-color: #c8a800;
+        background: #fffdf0;
+      }
+      /* Field-row highlight when officer has added a note */
+      .field-row.row-has-note > .field-value {
+        border-left: 3px solid #d4a800;
+        padding-left: 6px;
+      }
+      .field-row.row-has-note .fn-field-note {
+        border-color: #c8a800;
+        background: #fff8d6;
+      }
+
+      /* ── Return-with-notes action bar (officer) ── */
+      #reviewActionBar {
+        display: none;
+        align-items: center;
+        gap: 10px;
+        background: #fff8dc;
+        border: 1.5px solid #f0c040;
+        border-radius: 8px;
+        padding: 8px 14px;
+        margin-bottom: 12px;
+        flex-wrap: wrap;
+      }
+      #reviewActionBar.visible {
+        display: flex;
+      }
+      #reviewActionBar .rab-title {
+        font-size: 12px;
+        font-weight: 700;
+        color: #6a4a00;
+        flex: 1;
+      }
+
+      /* ── Citizen note banners (shown when profile is returned) ── */
+      /* Section-level: groups all notes for a section */
+      .citizen-note-banner {
+        display: none;
+        background: #fff8dc;
+        border: 1.5px solid #f0c040;
+        border-left: 4px solid #d4a800;
+        border-radius: 6px;
+        padding: 8px 12px;
+        margin-bottom: 10px;
+        font-size: 12.5px;
+        color: #5a3e00;
+      }
+      .citizen-note-banner.visible {
+        display: block;
+      }
+      .cnb-body {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+      }
+      .cnb-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 6px;
+        font-size: 12px;
+        color: #5a3e00;
+        line-height: 1.45;
+      }
+      /* Per-field inline banner: shown directly after the input */
+      .citizen-field-note-banner {
+        display: none;
+        align-items: flex-start;
+        gap: 7px;
+        background: #fff8dc;
+        border: 1.5px solid #f0c040;
+        border-left: 3px solid #d4a800;
+        border-radius: 5px;
+        padding: 5px 9px;
+        margin: 3px 0 6px;
+        font-size: 12px;
+        color: #5a3e00;
+        line-height: 1.45;
+      }
+      .citizen-field-note-banner.visible {
+        display: flex;
+      }
+      .cfnb-icon {
+        font-size: 13px;
+        flex-shrink: 0;
+        margin-top: 1px;
+      }
+      /* Highlight citizen form-rows that have a note */
+      .form-row.citizen-has-note > label {
+        color: #8a5c00;
+        font-weight: 700;
+      }
+      .form-row.citizen-has-note > input,
+      .form-row.citizen-has-note > select,
+      .form-row.citizen-has-note > textarea,
+      .form-row.citizen-has-note > div > input {
+        border-color: #d4a800 !important;
+        background: #fffdf5 !important;
+      }
+      /* Highlight sections that have admin feedback */
+      .section.has-admin-note .section-header {
+        border-left: 3px solid #d4a800;
+      }
       .return-hero {
         margin: 12px 0 14px;
         border-radius: 12px;
@@ -5871,6 +6150,7 @@
                 <h3>Timeline lịch sử bản thân</h3>
               </div>
               <div class="card-body" style="padding: 0">
+                <div class="fhd-error-bar" id="errBarB"></div>
                 <div class="timeline-wrap">
                   <table class="timeline-table" id="tbB">
                     <thead>
@@ -6187,22 +6467,47 @@
                 <h3>Bảng công tác</h3>
               </div>
               <div class="card-body" style="padding: 0">
+                <div class="fhd-error-bar" id="errBarC"></div>
                 <div class="timeline-wrap">
                   <table class="timeline-table" id="tbC">
                     <thead>
                       <tr>
-                        <th style="width: 180px">Từ – Đến (tháng/năm)</th>
+                        <th style="width: 120px">Từ (MM/YYYY)</th>
+                        <th style="width: 145px">Đến (MM/YYYY)</th>
                         <th>
                           Làm việc gì, ở đâu (tên đơn vị, địa chỉ + nơi sinh
                           sống)
                         </th>
+                        <th style="width: 130px">Chức vụ</th>
                         <th style="width: 40px"></th>
                       </tr>
                     </thead>
                     <tbody id="tbC-body">
                       <tr>
                         <td>
-                          <input type="text" placeholder="9/2003 – 6/2007" />
+                          <input
+                            class="fhd-input"
+                            type="text"
+                            placeholder="MM/YYYY"
+                            maxlength="7"
+                          />
+                        </td>
+                        <td class="fhd-to-cell">
+                          <div class="fhd-to-inner">
+                            <input
+                              class="fhd-input fhd-to-txt"
+                              type="text"
+                              placeholder="MM/YYYY"
+                              maxlength="7"
+                            /><label class="fhd-present-wrap" title="Đến nay"
+                              ><input
+                                type="checkbox"
+                                class="fhd-present-chk"
+                                onchange="toggleFhdPresent(this)"
+                              />
+                              Nay</label
+                            >
+                          </div>
                         </td>
                         <td class="td-dienbien">
                           <input
@@ -6210,6 +6515,7 @@
                             placeholder="Học ngành … tại ĐH …, sinh sống tại số nhà …, xã …, tỉnh …"
                           />
                         </td>
+                        <td><input type="text" placeholder="" /></td>
                         <td>
                           <button class="del-btn" onclick="delRow(this)">
                             ✕
@@ -6218,7 +6524,29 @@
                       </tr>
                       <tr>
                         <td>
-                          <input type="text" placeholder="7/2007 – 9/2007" />
+                          <input
+                            class="fhd-input"
+                            type="text"
+                            placeholder="MM/YYYY"
+                            maxlength="7"
+                          />
+                        </td>
+                        <td class="fhd-to-cell">
+                          <div class="fhd-to-inner">
+                            <input
+                              class="fhd-input fhd-to-txt"
+                              type="text"
+                              placeholder="MM/YYYY"
+                              maxlength="7"
+                            /><label class="fhd-present-wrap" title="Đến nay"
+                              ><input
+                                type="checkbox"
+                                class="fhd-present-chk"
+                                onchange="toggleFhdPresent(this)"
+                              />
+                              Nay</label
+                            >
+                          </div>
                         </td>
                         <td class="td-dienbien">
                           <input
@@ -6226,6 +6554,7 @@
                             placeholder="Ở nhà phụ giúp gia đình, sinh sống tại …"
                           />
                         </td>
+                        <td><input type="text" placeholder="" /></td>
                         <td>
                           <button class="del-btn" onclick="delRow(this)">
                             ✕
@@ -6234,14 +6563,37 @@
                       </tr>
                       <tr>
                         <td>
-                          <input type="text" placeholder="VD: …/…. đến nay" />
+                          <input
+                            class="fhd-input"
+                            type="text"
+                            placeholder="MM/YYYY"
+                            maxlength="7"
+                          />
+                        </td>
+                        <td class="fhd-to-cell">
+                          <div class="fhd-to-inner">
+                            <input
+                              class="fhd-input fhd-to-txt"
+                              type="text"
+                              placeholder="MM/YYYY"
+                              maxlength="7"
+                            /><label class="fhd-present-wrap" title="Đến nay"
+                              ><input
+                                type="checkbox"
+                                class="fhd-present-chk"
+                                onchange="toggleFhdPresent(this)"
+                              />
+                              Nay</label
+                            >
+                          </div>
                         </td>
                         <td class="td-dienbien">
                           <input
                             type="text"
-                            placeholder="VD: Tham gia sinh hoạt Đoàn tại chi đoàn … (hay Hội viên Hội LHPN xã Nhà Bè …), sinh sống tại số nhà …, đường …, ấp …, xã …, tỉnh … (điền nếu hiện đang là đoàn viên/hội viên)"
+                            placeholder="VD: Tham gia sinh hoạt Đoàn tại chi đoàn …, sinh sống tại số nhà …, đường …, ấp …, xã …, tỉnh …"
                           />
                         </td>
+                        <td><input type="text" placeholder="" /></td>
                         <td>
                           <button class="del-btn" onclick="delRow(this)">
                             ✕
@@ -6252,10 +6604,7 @@
                   </table>
                 </div>
                 <div style="padding: 10px 14px">
-                  <button
-                    class="add-row-btn"
-                    onclick="addRow('tbC-body', 'Tiếp theo …')"
-                  >
+                  <button class="add-row-btn" onclick="addRowC()">
                     + Thêm công tác
                   </button>
                 </div>
@@ -8567,6 +8916,7 @@
           }
         }
         refreshDienBien(tb.closest(".timeline-table"));
+        if (isB) validateSecB();
       }
 
       function addRowE() {
@@ -8576,23 +8926,44 @@
       }
       function addRowF() {
         const tb = document.getElementById("tbF-body");
-        tb.insertRow().innerHTML = `<td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><button class="del-btn" onclick="delRow(this)">✕</button></td>`;
+        tb.insertRow().innerHTML = `<td><input type="text"></td><td><input type="text"></td><td><button class="del-btn" onclick="delRow(this)">✕</button></td>`;
         refreshDienBien(tb.closest(".timeline-table"));
       }
       function addRowG() {
         const tb = document.getElementById("tbG-body");
-        tb.insertRow().innerHTML = `<td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><button class="del-btn" onclick="delRow(this)">✕</button></td>`;
+        tb.insertRow().innerHTML = `<td><input type="text"></td><td><input type="text"></td><td><button class="del-btn" onclick="delRow(this)">✕</button></td>`;
         refreshDienBien(tb.closest(".timeline-table"));
       }
       function addRowH() {
         const tb = document.getElementById("tbH-body");
-        tb.insertRow().innerHTML = `<td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><button class="del-btn" onclick="delRow(this)">✕</button></td>`;
+        tb.insertRow().innerHTML = `<td><input type="text"></td><td><input type="text"></td><td><button class="del-btn" onclick="delRow(this)">✕</button></td>`;
         refreshDienBien(tb.closest(".timeline-table"));
+      }
+
+      function addRowC() {
+        const tb = document.getElementById("tbC-body");
+        if (!tb) return;
+        const row = tb.insertRow();
+        row.innerHTML =
+          `<td><input class="fhd-input" type="text" placeholder="MM/YYYY" maxlength="7"></td>` +
+          `<td class="fhd-to-cell"><div class="fhd-to-inner"><input class="fhd-input fhd-to-txt" type="text" placeholder="MM/YYYY" maxlength="7"><label class="fhd-present-wrap" title="Đến nay"><input type="checkbox" class="fhd-present-chk" onchange="toggleFhdPresent(this)"> Nay</label></div></td>` +
+          `<td class="td-dienbien"><input type="text" placeholder=""></td>` +
+          `<td><input type="text" placeholder=""></td>` +
+          `<td><button class="del-btn" onclick="delRow(this)">✕</button></td>`;
+        refreshDienBien(tb.closest(".timeline-table"));
+        validateSecC();
       }
 
       function delRow(btn) {
         const row = btn.closest("tr");
-        if (row.parentElement.rows.length > 1) row.remove();
+        if (row.parentElement.rows.length > 1) {
+          const acc = row.closest(".accordion");
+          const tbodyId = row.parentElement.id;
+          row.remove();
+          if (acc) validateFamHistory(acc);
+          if (tbodyId === "tbB-body") validateSecB();
+          if (tbodyId === "tbC-body") validateSecC();
+        }
       }
 
       // ===== WORD COUNT =====
@@ -8629,15 +9000,15 @@
 
       function buildFamilyForm(m) {
         const histBlock = `
-    <div style="margin-top:12px;margin-bottom:4px;font-size:12px;font-weight:700;color:var(--muted)">Quá trình lịch sử</div>
-    <div class="hist-mode-bar">Nhập theo: <div class="hist-mode-toggle"><button class="hist-mode-btn active" onclick="setHistMode(this,'yyyy')">Năm</button><button class="hist-mode-btn" onclick="setHistMode(this,'mm')">Tháng/Năm</button></div><span style="color:var(--hint);font-size:10.5px">· Chuyển sang Tháng/Năm nếu cần khai chi tiết</span></div>
+    <div style="margin-top:12px;margin-bottom:4px;font-size:12px;font-weight:700;color:var(--muted)">Quá trình lịch sử <span style="font-weight:400;font-size:11px;color:var(--hint)">(nhập liên tục: cuối giai đoạn trước = đầu giai đoạn sau)</span></div>
+    <div class="fhd-error-bar" id="fhdErr_\${m.num}"></div>
     <div class="timeline-wrap">
 <table class="timeline-table">
-      <thead><tr><th style="width:18%">Từ</th><th style="width:18%">Đến</th><th>Diễn biến + Nơi sinh sống</th><th style="width:36px"></th></tr></thead>
+      <thead><tr><th style="width:17%">Từ (MM/YYYY)</th><th style="width:22%">Đến (MM/YYYY)</th><th>Diễn biến + Nơi sinh sống</th><th style="width:36px"></th></tr></thead>
       <tbody>
-        <tr><td><div class="hist-date-cell"><input class="hdc-year" type="number" placeholder="YYYY" min="1900" max="2099" step="1"><select class="hdc-month"><option value="">MM</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select><span class="hdc-slash">/</span><input class="hdc-myear" type="number" placeholder="YYYY" min="1900" max="2099" step="1"></div></td><td><div class="hist-date-cell"><input class="hdc-year" type="number" placeholder="YYYY" min="1900" max="2099" step="1"><select class="hdc-month"><option value="">MM</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select><span class="hdc-slash">/</span><input class="hdc-myear" type="number" placeholder="YYYY" min="1900" max="2099" step="1"></div></td><td><input type="text" placeholder="Sống với cha mẹ, đi học, làm việc tại …"></td><td><button class="del-btn" onclick="delRow(this)">✕</button></td></tr>
-        <tr><td><div class="hist-date-cell"><input class="hdc-year" type="number" placeholder="YYYY" min="1900" max="2099" step="1"><select class="hdc-month"><option value="">MM</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select><span class="hdc-slash">/</span><input class="hdc-myear" type="number" placeholder="YYYY" min="1900" max="2099" step="1"></div></td><td><div class="hist-date-cell"><input class="hdc-year" type="number" placeholder="YYYY" min="1900" max="2099" step="1"><select class="hdc-month"><option value="">MM</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select><span class="hdc-slash">/</span><input class="hdc-myear" type="number" placeholder="YYYY" min="1900" max="2099" step="1"></div></td><td><input type="text"></td><td><button class="del-btn" onclick="delRow(this)">✕</button></td></tr>
-        <tr><td><div class="hist-date-cell"><input class="hdc-year" type="number" placeholder="YYYY" min="1900" max="2099" step="1"><select class="hdc-month"><option value="">MM</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select><span class="hdc-slash">/</span><input class="hdc-myear" type="number" placeholder="YYYY" min="1900" max="2099" step="1"></div></td><td><div class="hist-date-cell"><input class="hdc-year" type="number" placeholder="YYYY" min="1900" max="2099" step="1"><select class="hdc-month"><option value="">MM</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select><span class="hdc-slash">/</span><input class="hdc-myear" type="number" placeholder="YYYY" min="1900" max="2099" step="1"></div></td><td><input type="text"></td><td><button class="del-btn" onclick="delRow(this)">✕</button></td></tr>
+        <tr><td><input class="fhd-input" type="text" placeholder="MM/YYYY" maxlength="7"></td><td class="fhd-to-cell"><div class="fhd-to-inner"><input class="fhd-input fhd-to-txt" type="text" placeholder="MM/YYYY" maxlength="7"><label class="fhd-present-wrap" title="Đến nay"><input type="checkbox" class="fhd-present-chk" onchange="toggleFhdPresent(this)"> Nay</label></div></td><td><input type="text" placeholder="Sống với cha mẹ, đi học, làm việc tại …"></td><td><button class="del-btn" onclick="delRow(this)">✕</button></td></tr>
+        <tr><td><input class="fhd-input" type="text" placeholder="MM/YYYY" maxlength="7"></td><td class="fhd-to-cell"><div class="fhd-to-inner"><input class="fhd-input fhd-to-txt" type="text" placeholder="MM/YYYY" maxlength="7"><label class="fhd-present-wrap" title="Đến nay"><input type="checkbox" class="fhd-present-chk" onchange="toggleFhdPresent(this)"> Nay</label></div></td><td><input type="text"></td><td><button class="del-btn" onclick="delRow(this)">✕</button></td></tr>
+        <tr><td><input class="fhd-input" type="text" placeholder="MM/YYYY" maxlength="7"></td><td class="fhd-to-cell"><div class="fhd-to-inner"><input class="fhd-input fhd-to-txt" type="text" placeholder="MM/YYYY" maxlength="7"><label class="fhd-present-wrap" title="Đến nay"><input type="checkbox" class="fhd-present-chk" onchange="toggleFhdPresent(this)"> Nay</label></div></td><td><input type="text"></td><td><button class="del-btn" onclick="delRow(this)">✕</button></td></tr>
       </tbody>
     </table>
 </div>
@@ -8676,7 +9047,10 @@
           return `
     <div class="form-row"><label>Họ và tên</label><input type="text" oninput="updateFamName('${m.num}',this.value)"></div>
     <div class="form-row"><label>Năm sinh</label><input type="text" placeholder="YYYY" id="childYear_${m.num}" oninput="checkChildAge('${m.num}',this.value)"></div>
-    <div class="form-row"><label>Nơi ở hiện nay</label><input type="text" placeholder="Số nhà, đường, ấp, xã, tỉnh …"></div>
+    <div class="form-row"><label>Nơi ở hiện nay</label>
+      <div><div class="loc-row" style="margin-bottom:6px"><select id="sel_tinh_fam_ct_${m.num.replace(/\./g, "_")}" class="searchable-location"><option value="">-- Tỉnh/TP --</option></select><select id="sel_xa_fam_ct_${m.num.replace(/\./g, "_")}" class="searchable-location"><option value="">-- Xã/Phường --</option></select></div>
+      <input type="text" placeholder="Số nhà, đường, ấp/thôn"></div>
+    </div>
     <div id="childUnder18_${m.num}">
       <div class="form-row">
         <label>Đang học trường<span class="hint-lbl">Nếu &lt;6 tuổi: ghi "Còn nhỏ" · Nếu &lt;18 tuổi: ghi tên trường</span></label>
@@ -8685,19 +9059,23 @@
     </div>
     <div id="childOver18_${m.num}" style="display:none">
       <div class="alert alert-info" style="font-size:12px;margin:6px 0 10px">ℹ Con từ 18 tuổi trở lên: khai đầy đủ như bản thân theo quy định Mẫu 2-KNĐ</div>
-      <div class="form-row"><label>Nơi sinh</label><input type="text" class="fam-text-birth-place" placeholder="Xã/Phường …, Tỉnh/TP … (KHÔNG ghi bệnh viện)"></div>
-      <div class="form-row"><label>Quê quán</label><input type="text" class="fam-text-hometown" placeholder="Xã/Phường …, Tỉnh/TP … (địa danh mới)"></div>
+      <div class="form-row"><label>Nơi sinh<span class="hint-lbl">Không ghi bệnh viện — ghi Xã/Phường, Tỉnh/TP</span></label>
+        <div class="loc-row"><select id="sel_tinh_fam_ns_${m.num.replace(/\./g, "_")}" class="searchable-location"><option value="">-- Tỉnh/TP --</option></select><select id="sel_xa_fam_ns_${m.num.replace(/\./g, "_")}" class="searchable-location"><option value="">-- Xã/Phường --</option></select></div>
+        <input type="text" class="fam-text-birth-place" style="margin-top:4px" placeholder="Nơi sinh (tự động điền hoặc nhập trực tiếp)"></div>
+      <div class="form-row"><label>Quê quán<span class="hint-lbl">Địa danh hành chính mới</span></label>
+        <div class="loc-row"><select id="sel_tinh_fam_qq_${m.num.replace(/\./g, "_")}" class="searchable-location"><option value="">-- Tỉnh/TP --</option></select><select id="sel_xa_fam_qq_${m.num.replace(/\./g, "_")}" class="searchable-location"><option value="">-- Xã/Phường --</option></select></div>
+        <input type="text" class="fam-text-hometown" style="margin-top:4px" placeholder="Quê quán (tự động điền hoặc nhập trực tiếp)"></div>
       <div class="form-row"><label>Dân tộc</label><input type="text" class="fam-sel-ethnic-text"></div>
       <div class="form-row"><label>Tôn giáo</label><input type="text" class="fam-sel-religion-text" placeholder="Không / Tên tôn giáo + chức sắc nếu có"></div>
       <div class="form-row"><label>Nghề nghiệp</label><input type="text"></div>
-      <div style="margin-top:12px;margin-bottom:4px;font-size:12px;font-weight:700;color:var(--muted)">Quá trình lịch sử (từ khi sinh đến nay)</div>
-      <div class="hist-mode-bar">Nhập theo: <div class="hist-mode-toggle"><button class="hist-mode-btn active" onclick="setHistMode(this,'yyyy')">Năm</button><button class="hist-mode-btn" onclick="setHistMode(this,'mm')">Tháng/Năm</button></div><span style="color:var(--hint);font-size:10.5px">· Chuyển sang Tháng/Năm nếu cần khai chi tiết</span></div>
+      <div style="margin-top:12px;margin-bottom:4px;font-size:12px;font-weight:700;color:var(--muted)">Quá trình lịch sử (từ khi sinh đến nay) <span style="font-weight:400;font-size:11px;color:var(--hint)">(nhập liên tục)</span></div>
+      <div class="fhd-error-bar"></div>
       <div class="timeline-wrap">
 <table class="timeline-table">
-        <thead><tr><th style="width:18%">Từ</th><th style="width:18%">Đến</th><th>Diễn biến + Nơi sinh sống</th><th style="width:36px"></th></tr></thead>
+        <thead><tr><th style="width:17%">Từ (MM/YYYY)</th><th style="width:22%">Đến (MM/YYYY)</th><th>Diễn biến + Nơi sinh sống</th><th style="width:36px"></th></tr></thead>
         <tbody>
-          <tr><td><div class="hist-date-cell"><input class="hdc-year" type="number" placeholder="YYYY" min="1900" max="2099" step="1"><select class="hdc-month"><option value="">MM</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select><span class="hdc-slash">/</span><input class="hdc-myear" type="number" placeholder="YYYY" min="1900" max="2099" step="1"></div></td><td><div class="hist-date-cell"><input class="hdc-year" type="number" placeholder="YYYY" min="1900" max="2099" step="1"><select class="hdc-month"><option value="">MM</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select><span class="hdc-slash">/</span><input class="hdc-myear" type="number" placeholder="YYYY" min="1900" max="2099" step="1"></div></td><td><input type="text" placeholder="Còn nhỏ, sống với cha mẹ tại …"></td><td><button class="del-btn" onclick="delRow(this)">✕</button></td></tr>
-          <tr><td><div class="hist-date-cell"><input class="hdc-year" type="number" placeholder="YYYY" min="1900" max="2099" step="1"><select class="hdc-month"><option value="">MM</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select><span class="hdc-slash">/</span><input class="hdc-myear" type="number" placeholder="YYYY" min="1900" max="2099" step="1"></div></td><td><div class="hist-date-cell"><input class="hdc-year" type="number" placeholder="YYYY" min="1900" max="2099" step="1"><select class="hdc-month"><option value="">MM</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select><span class="hdc-slash">/</span><input class="hdc-myear" type="number" placeholder="YYYY" min="1900" max="2099" step="1"></div></td><td><input type="text"></td><td><button class="del-btn" onclick="delRow(this)">✕</button></td></tr>
+          <tr><td><input class="fhd-input" type="text" placeholder="MM/YYYY" maxlength="7"></td><td class="fhd-to-cell"><div class="fhd-to-inner"><input class="fhd-input fhd-to-txt" type="text" placeholder="MM/YYYY" maxlength="7"><label class="fhd-present-wrap" title="Đến nay"><input type="checkbox" class="fhd-present-chk" onchange="toggleFhdPresent(this)"> Nay</label></div></td><td><input type="text" placeholder="Còn nhỏ, sống với cha mẹ tại …"></td><td><button class="del-btn" onclick="delRow(this)">✕</button></td></tr>
+          <tr><td><input class="fhd-input" type="text" placeholder="MM/YYYY" maxlength="7"></td><td class="fhd-to-cell"><div class="fhd-to-inner"><input class="fhd-input fhd-to-txt" type="text" placeholder="MM/YYYY" maxlength="7"><label class="fhd-present-wrap" title="Đến nay"><input type="checkbox" class="fhd-present-chk" onchange="toggleFhdPresent(this)"> Nay</label></div></td><td><input type="text"></td><td><button class="del-btn" onclick="delRow(this)">✕</button></td></tr>
         </tbody>
       </table>
 </div>
@@ -8711,22 +9089,29 @@
     <div class="alert alert-info" style="margin-bottom:10px;font-size:12px">ℹ <strong>Lưu ý:</strong> Thông tin ngày lập gia đình và ly hôn (nếu có) <strong>không khai ở đây</strong> — chỉ ghi trong <strong>Phần C</strong> dạng: "Tháng …/…. – Lập gia đình với … chuyển đến sinh sống tại …" và "Tháng …/…. – Ly hôn với … theo Quyết định số … của cấp …"</div>
     <div class="form-row"><label>Họ và tên</label><input type="text" oninput="updateFamName('${m.num}',this.value)"></div>
     <div class="form-row"><label>Năm sinh</label><input type="text" placeholder="YYYY"></div>
-    <div class="form-row"><label>Nơi sinh</label><input type="text" class="fam-text-birth-place" placeholder="Xã/Phường …, Tỉnh/TP … (KHÔNG ghi bệnh viện)"></div>
-    <div class="form-row"><label>Quê quán<span class="hint-lbl">Phải đối chiếu với cha mẹ chồng/vợ</span></label><input type="text" class="fam-text-hometown" placeholder="Xã/Phường …, Tỉnh/TP … (địa danh mới)"></div>
+    <div class="form-row"><label>Nơi sinh<span class="hint-lbl">Không ghi bệnh viện — ghi Xã/Phường, Tỉnh/TP</span></label>
+      <div class="loc-row"><select id="sel_tinh_fam_ns_${m.num.replace(/\./g, "_")}" class="searchable-location"><option value="">-- Tỉnh/TP --</option></select><select id="sel_xa_fam_ns_${m.num.replace(/\./g, "_")}" class="searchable-location"><option value="">-- Xã/Phường --</option></select></div>
+      <input type="text" class="fam-text-birth-place" style="margin-top:4px" placeholder="Nơi sinh (tự động điền hoặc nhập trực tiếp)"></div>
+    <div class="form-row"><label>Quê quán<span class="hint-lbl">Phải đối chiếu với cha mẹ chồng/vợ</span></label>
+      <div class="loc-row"><select id="sel_tinh_fam_qq_${m.num.replace(/\./g, "_")}" class="searchable-location"><option value="">-- Tỉnh/TP --</option></select><select id="sel_xa_fam_qq_${m.num.replace(/\./g, "_")}" class="searchable-location"><option value="">-- Xã/Phường --</option></select></div>
+      <input type="text" class="fam-text-hometown" style="margin-top:4px" placeholder="Quê quán (tự động điền hoặc nhập trực tiếp)"></div>
     <div class="form-row"><label>Dân tộc</label><input type="text" class="fam-sel-ethnic-text"></div>
     <div class="form-row"><label>Tôn giáo</label><input type="text" class="fam-sel-religion-text" placeholder="Không / Tên tôn giáo + chức sắc nếu có"></div>
-    <div class="form-row"><label>Nơi cư trú</label><input type="text" placeholder="Số nhà, đường, ấp, xã, tỉnh …"></div>
+    <div class="form-row"><label>Nơi cư trú<span class="hint-lbl">Để trống nếu đã mất</span></label>
+      <div><div class="loc-row" style="margin-bottom:6px"><select id="sel_tinh_fam_ct_${m.num.replace(/\./g, "_")}" class="searchable-location"><option value="">-- Tỉnh/TP --</option></select><select id="sel_xa_fam_ct_${m.num.replace(/\./g, "_")}" class="searchable-location"><option value="">-- Xã/Phường --</option></select></div>
+      <input type="text" placeholder="Số nhà, đường, ấp/thôn"></div>
+    </div>
     <div class="form-row"><label>Nghề nghiệp</label><input type="text"></div>
-    <div style="margin-top:12px;margin-bottom:4px;font-size:12px;font-weight:700;color:var(--muted)">Quá trình lịch sử của chồng/vợ (liên tục từ nhỏ đến nay) <span style="font-weight:400;color:var(--red)">*Bắt buộc</span></div>
-    <div class="hist-mode-bar">Nhập theo: <div class="hist-mode-toggle"><button class="hist-mode-btn active" onclick="setHistMode(this,'yyyy')">Năm</button><button class="hist-mode-btn" onclick="setHistMode(this,'mm')">Tháng/Năm</button></div><span style="color:var(--hint);font-size:10.5px">· Chuyển sang Tháng/Năm nếu cần khai chi tiết</span></div>
+    <div style="margin-top:12px;margin-bottom:4px;font-size:12px;font-weight:700;color:var(--muted)">Quá trình lịch sử của chồng/vợ (liên tục từ nhỏ đến nay) <span style="font-weight:400;color:var(--red)">*Bắt buộc</span> <span style="font-weight:400;font-size:11px;color:var(--hint)">(nhập liên tục)</span></div>
+    <div class="fhd-error-bar"></div>
     <div class="timeline-wrap">
 <table class="timeline-table">
-      <thead><tr><th style="width:14%">Từ</th><th style="width:14%">Đến</th><th>Làm gì, ở đâu + Nơi sinh sống</th><th style="width:14%">Chức vụ</th><th style="width:36px"></th></tr></thead>
+      <thead><tr><th style="width:17%">Từ (MM/YYYY)</th><th style="width:22%">Đến (MM/YYYY)</th><th>Làm gì, ở đâu + Nơi sinh sống</th><th style="width:36px"></th></tr></thead>
       <tbody>
-        <tr><td><div class="hist-date-cell"><input class="hdc-year" type="number" placeholder="YYYY" min="1900" max="2099" step="1"><select class="hdc-month"><option value="">MM</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select><span class="hdc-slash">/</span><input class="hdc-myear" type="number" placeholder="YYYY" min="1900" max="2099" step="1"></div></td><td><div class="hist-date-cell"><input class="hdc-year" type="number" placeholder="YYYY" min="1900" max="2099" step="1"><select class="hdc-month"><option value="">MM</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select><span class="hdc-slash">/</span><input class="hdc-myear" type="number" placeholder="YYYY" min="1900" max="2099" step="1"></div></td><td><input type="text" placeholder="Còn nhỏ, sống với cha mẹ tại …"></td><td><input type="text"></td><td><button class="del-btn" onclick="delRow(this)">✕</button></td></tr>
-        <tr><td><div class="hist-date-cell"><input class="hdc-year" type="number" placeholder="YYYY" min="1900" max="2099" step="1"><select class="hdc-month"><option value="">MM</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select><span class="hdc-slash">/</span><input class="hdc-myear" type="number" placeholder="YYYY" min="1900" max="2099" step="1"></div></td><td><div class="hist-date-cell"><input class="hdc-year" type="number" placeholder="YYYY" min="1900" max="2099" step="1"><select class="hdc-month"><option value="">MM</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select><span class="hdc-slash">/</span><input class="hdc-myear" type="number" placeholder="YYYY" min="1900" max="2099" step="1"></div></td><td><input type="text"></td><td><input type="text"></td><td><button class="del-btn" onclick="delRow(this)">✕</button></td></tr>
-        <tr><td><div class="hist-date-cell"><input class="hdc-year" type="number" placeholder="YYYY" min="1900" max="2099" step="1"><select class="hdc-month"><option value="">MM</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select><span class="hdc-slash">/</span><input class="hdc-myear" type="number" placeholder="YYYY" min="1900" max="2099" step="1"></div></td><td><div class="hist-date-cell"><input class="hdc-year" type="number" placeholder="YYYY" min="1900" max="2099" step="1"><select class="hdc-month"><option value="">MM</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select><span class="hdc-slash">/</span><input class="hdc-myear" type="number" placeholder="YYYY" min="1900" max="2099" step="1"></div></td><td><input type="text"></td><td><input type="text"></td><td><button class="del-btn" onclick="delRow(this)">✕</button></td></tr>
-        <tr><td><div class="hist-date-cell"><input class="hdc-year" type="number" placeholder="YYYY" min="1900" max="2099" step="1"><select class="hdc-month"><option value="">MM</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select><span class="hdc-slash">/</span><input class="hdc-myear" type="number" placeholder="YYYY" min="1900" max="2099" step="1"></div></td><td><div class="hist-date-cell"><input class="hdc-year" type="number" placeholder="YYYY" min="1900" max="2099" step="1"><select class="hdc-month"><option value="">MM</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select><span class="hdc-slash">/</span><input class="hdc-myear" type="number" placeholder="YYYY" min="1900" max="2099" step="1"></div></td><td><input type="text"></td><td><input type="text"></td><td><button class="del-btn" onclick="delRow(this)">✕</button></td></tr>
+        <tr><td><input class="fhd-input" type="text" placeholder="MM/YYYY" maxlength="7"></td><td class="fhd-to-cell"><div class="fhd-to-inner"><input class="fhd-input fhd-to-txt" type="text" placeholder="MM/YYYY" maxlength="7"><label class="fhd-present-wrap" title="Đến nay"><input type="checkbox" class="fhd-present-chk" onchange="toggleFhdPresent(this)"> Nay</label></div></td><td><input type="text" placeholder="Còn nhỏ, sống với cha mẹ tại …"></td><td><button class="del-btn" onclick="delRow(this)">✕</button></td></tr>
+        <tr><td><input class="fhd-input" type="text" placeholder="MM/YYYY" maxlength="7"></td><td class="fhd-to-cell"><div class="fhd-to-inner"><input class="fhd-input fhd-to-txt" type="text" placeholder="MM/YYYY" maxlength="7"><label class="fhd-present-wrap" title="Đến nay"><input type="checkbox" class="fhd-present-chk" onchange="toggleFhdPresent(this)"> Nay</label></div></td><td><input type="text"></td><td><button class="del-btn" onclick="delRow(this)">✕</button></td></tr>
+        <tr><td><input class="fhd-input" type="text" placeholder="MM/YYYY" maxlength="7"></td><td class="fhd-to-cell"><div class="fhd-to-inner"><input class="fhd-input fhd-to-txt" type="text" placeholder="MM/YYYY" maxlength="7"><label class="fhd-present-wrap" title="Đến nay"><input type="checkbox" class="fhd-present-chk" onchange="toggleFhdPresent(this)"> Nay</label></div></td><td><input type="text"></td><td><button class="del-btn" onclick="delRow(this)">✕</button></td></tr>
+        <tr><td><input class="fhd-input" type="text" placeholder="MM/YYYY" maxlength="7"></td><td class="fhd-to-cell"><div class="fhd-to-inner"><input class="fhd-input fhd-to-txt" type="text" placeholder="MM/YYYY" maxlength="7"><label class="fhd-present-wrap" title="Đến nay"><input type="checkbox" class="fhd-present-chk" onchange="toggleFhdPresent(this)"> Nay</label></div></td><td><input type="text"></td><td><button class="del-btn" onclick="delRow(this)">✕</button></td></tr>
       </tbody>
     </table>
 </div>
@@ -8745,7 +9130,10 @@
     </div>
     <div class="form-row"><label>Dân tộc</label><select class="fam-sel-ethnic"><option value="">-- Chọn --</option><option>Kinh</option><option>Tày</option><option>Thái</option><option>Mường</option><option>Khmer</option><option>Khác</option></select></div>
     <div class="form-row"><label>Tôn giáo</label><select class="fam-sel-religion"><option value="">-- Chọn --</option><option>Không</option><option>Phật giáo</option><option>Công giáo</option><option>Cao Đài</option><option>Hòa Hảo</option><option>Khác</option></select></div>
-    <div class="form-row"><label>Nơi cư trú<span class="hint-lbl">Để trống nếu đã mất</span></label><input type="text" placeholder="Số nhà, đường, ấp, xã, tỉnh …"></div>
+    <div class="form-row"><label>Nơi cư trú<span class="hint-lbl">Để trống nếu đã mất</span></label>
+      <div><div class="loc-row" style="margin-bottom:6px"><select id="sel_tinh_fam_ct_${m.num.replace(/\./g, "_")}" class="searchable-location"><option value="">-- Tỉnh/TP --</option></select><select id="sel_xa_fam_ct_${m.num.replace(/\./g, "_")}" class="searchable-location"><option value="">-- Xã/Phường --</option></select></div>
+      <input type="text" placeholder="Số nhà, đường, ấp/thôn"></div>
+    </div>
     <div class="form-row"><label>Nghề nghiệp<span class="hint-lbl">Để trống nếu đã mất</span></label><input type="text" placeholder="Nông dân / Hưu trí / Đã mất …"></div>
     <div class="form-row"><label>Là Đảng viên?</label>
       <div><select onchange="toggleSiblingParty(this,'gpParty_${m.num}')"><option value="no">Không</option><option value="yes">Có – Đảng viên</option></select>
@@ -8833,7 +9221,16 @@
         const tbl = btn.previousElementSibling.querySelector("tbody");
         if (!tbl) return;
         const row = tbl.insertRow();
-        row.innerHTML = `<td><div class="hist-date-cell"><input class="hdc-year" type="number" placeholder="YYYY" min="1900" max="2099" step="1"><select class="hdc-month"><option value="">MM</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select><span class="hdc-slash">/</span><input class="hdc-myear" type="number" placeholder="YYYY" min="1900" max="2099" step="1"></div></td><td><div class="hist-date-cell"><input class="hdc-year" type="number" placeholder="YYYY" min="1900" max="2099" step="1"><select class="hdc-month"><option value="">MM</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select><span class="hdc-slash">/</span><input class="hdc-myear" type="number" placeholder="YYYY" min="1900" max="2099" step="1"></div></td><td><input type="text"></td><td><button class="del-btn" onclick="delRow(this)">✕</button></td>`;
+        row.innerHTML = _famHistRowHtml({
+          from_month: null,
+          from_year: null,
+          to_month: null,
+          to_year: null,
+          is_present: false,
+          description: "",
+        });
+        const acc = btn.closest(".accordion");
+        if (acc) validateFamHistory(acc);
         refreshDienBien(tbl.closest(".timeline-table"));
       }
 
@@ -8841,7 +9238,16 @@
         const tbl = btn.previousElementSibling.querySelector("tbody");
         if (!tbl) return;
         const row = tbl.insertRow();
-        row.innerHTML = `<td><div class="hist-date-cell"><input class="hdc-year" type="number" placeholder="YYYY" min="1900" max="2099" step="1"><select class="hdc-month"><option value="">MM</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select><span class="hdc-slash">/</span><input class="hdc-myear" type="number" placeholder="YYYY" min="1900" max="2099" step="1"></div></td><td><div class="hist-date-cell"><input class="hdc-year" type="number" placeholder="YYYY" min="1900" max="2099" step="1"><select class="hdc-month"><option value="">MM</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select><span class="hdc-slash">/</span><input class="hdc-myear" type="number" placeholder="YYYY" min="1900" max="2099" step="1"></div></td><td><input type="text"></td><td><input type="text"></td><td><button class="del-btn" onclick="delRow(this)">✕</button></td>`;
+        row.innerHTML = _famHistRowHtml({
+          from_month: null,
+          from_year: null,
+          to_month: null,
+          to_year: null,
+          is_present: false,
+          description: "",
+        });
+        const acc = btn.closest(".accordion");
+        if (acc) validateFamHistory(acc);
         refreshDienBien(tbl.closest(".timeline-table"));
       }
 
@@ -9004,6 +9410,31 @@
           alert("Vui lòng xác nhận cam đoan trước khi nộp hồ sơ.");
           return;
         }
+        // Validate all family history timelines before submit
+        let histInvalid = false;
+        document
+          .querySelectorAll(".family-accordion[data-relationship]")
+          .forEach((acc) => {
+            const tbl = acc.querySelector(".timeline-table");
+            if (tbl && !validateFamHistory(acc)) histInvalid = true;
+          });
+        if (!validateSecB()) histInvalid = true;
+        if (!validateSecC()) histInvalid = true;
+        if (histInvalid) {
+          showToast(
+            "⚠ Quá trình lịch sử chưa liên tục — vui lòng kiểm tra lại trước khi nộp",
+          );
+          // Scroll to first invalid row
+          const firstInvalid = document.querySelector(
+            ".fhd-row-invalid, .tl-row-invalid",
+          );
+          if (firstInvalid)
+            firstInvalid.scrollIntoView({
+              behavior: "smooth",
+              block: "center",
+            });
+          return;
+        }
         (async () => {
           try {
             showToast("⏳ Đang lưu và nộp hồ sơ…");
@@ -9145,16 +9576,25 @@
         tb.innerHTML = "";
         rows.forEach((r) => {
           _srvIds.C.add(String(r.id));
+          const isPresent = !!r.is_present;
+          const fromVal = _fmtMY(r.from_month, r.from_year);
+          const toVal = isPresent ? "" : _fmtMY(r.to_month, r.to_year);
+          const toDisabled = isPresent ? " disabled" : "";
+          const toPlaceholder = isPresent ? "Hiện tại" : "MM/YYYY";
+          const chk = isPresent ? " checked" : "";
           const tr = tb.insertRow();
           tr.dataset.id = r.id;
           tr.innerHTML =
-            `<td><input type="text" value="${_esc(r.period_text || "")}"></td>` +
+            `<td><input class="fhd-input" type="text" placeholder="MM/YYYY" maxlength="7" value="${_esc(fromVal)}"></td>` +
+            `<td class="fhd-to-cell"><div class="fhd-to-inner"><input class="fhd-input fhd-to-txt" type="text" maxlength="7"${toDisabled} placeholder="${toPlaceholder}" value="${_esc(toVal)}"><label class="fhd-present-wrap" title="Đến nay"><input type="checkbox" class="fhd-present-chk"${chk} onchange="toggleFhdPresent(this)"> Nay</label></div></td>` +
             `<td class="td-dienbien"><input type="text" value="${_esc(r.employer || "")}"></td>` +
+            `<td><input type="text" value="${_esc(r.job_title || "")}"></td>` +
             `<td><button class="del-btn" onclick="delRow(this)">✕</button></td>`;
         });
         tb.querySelectorAll(".td-dienbien").forEach((td) => {
           if (!td.dataset.db) initDienBien(td);
         });
+        validateSecC();
       }
 
       function _fillTbE(rows) {
@@ -9238,15 +9678,26 @@
       function _collC() {
         return [...document.querySelectorAll("#tbC-body tr")].flatMap((tr) => {
           const c = tr.cells;
-          if (!c || c.length < 3) return [];
-          const period = _tdv(c[0]),
-            emp = _tdv(c[1]);
-          if (!emp) return [];
+          if (!c || c.length < 4) return [];
+          const fromVal = c[0].querySelector(".fhd-input")?.value?.trim() || "";
+          const toInput = c[1].querySelector(".fhd-to-txt");
+          const toVal = toInput?.value?.trim() || "";
+          const isPresent = !!c[1].querySelector(".fhd-present-chk")?.checked;
+          const emp = _tdv(c[2]);
+          const title = c.length > 4 ? _tdv(c[3]) : "";
+          if (!emp && !fromVal) return [];
+          const fp = _parseMY(fromVal);
+          const tp = isPresent ? null : _parseMY(toVal);
           return [
             {
               id: tr.dataset.id || null,
-              period_text: period,
+              from_year: fp?.year || null,
+              from_month: fp?.month || null,
+              to_year: tp?.year || null,
+              to_month: tp?.month || null,
+              is_present: isPresent,
               employer: emp,
+              job_title: title || null,
               sort_order: tr.rowIndex,
             },
           ];
@@ -9501,22 +9952,291 @@
       }
 
       // ── Family history helpers ───────────────────────────────────────
-      function _hdcCell(month, year) {
-        const y = year || "";
-        const opts = ["", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
-          .map(
-            (v) =>
-              `<option value="${v}"${String(v) === String(month || "") ? " selected" : ""}>${v || "MM"}</option>`,
+
+      // Parse "MM/YYYY" string → {month, year} or null
+      function _parseMY(str) {
+        if (!str) return null;
+        const s = String(str).trim();
+        const full = s.match(/^(\d{1,2})\/(\d{4})$/);
+        if (full) {
+          const m = parseInt(full[1]),
+            y = parseInt(full[2]);
+          if (m >= 1 && m <= 12 && y >= 1800 && y <= 2200)
+            return { month: m, year: y };
+          return null;
+        }
+        const yOnly = s.match(/^(\d{4})$/);
+        if (yOnly) {
+          const y = parseInt(yOnly[1]);
+          if (y >= 1800 && y <= 2200) return { month: null, year: y };
+        }
+        return null;
+      }
+
+      // Sort key: year*100 + (month||0)
+      function _myKey(month, year) {
+        if (!year) return null;
+        return year * 100 + (month || 0);
+      }
+
+      // Format to "MM/YYYY" or "YYYY"
+      function _fmtMY(month, year) {
+        if (!year) return "";
+        return month
+          ? String(month).padStart(2, "0") + "/" + year
+          : String(year);
+      }
+
+      // Sort key for NEXT month after (month, year)
+      function _nextMonthKey(month, year) {
+        if (!year) return null;
+        if (!month) return year * 100 + 1; // year-only: treat as Jan next year
+        const nm = month === 12 ? 1 : month + 1;
+        const ny = month === 12 ? year + 1 : year;
+        return ny * 100 + nm;
+      }
+
+      // Check continuity between end of row N and start of row N+1.
+      // Returns "ok" | "gap" | "overlap"
+      function _checkContinuity(prevTo, nextFrom) {
+        if (prevTo === null || nextFrom === null) return "ok";
+        if (nextFrom === prevTo) return "ok"; // same month: ok
+        if (
+          nextFrom ===
+          _nextMonthKey(
+            prevTo % 100 === 0 ? null : prevTo % 100,
+            Math.floor(prevTo / 100),
           )
-          .join("");
+        )
+          return "ok"; // adjacent month: ok
+        return nextFrom > prevTo ? "gap" : "overlap";
+      }
+
+      // Generic timeline continuity validator.
+      // tbodyId: tbody element id; errBarId: error bar div id;
+      // getFromTo(tr) → {fromKey, toKey, isPresent, isEmpty}
+      function _validateTimelineSection(tbodyId, errBarId, getFromTo) {
+        const tbody = document.getElementById(tbodyId);
+        const errBar = document.getElementById(errBarId);
+        if (!tbody) return true;
+        const rows = tbody.querySelectorAll("tr");
+        const errors = [];
+        let prevToKey = null;
+        let dataRowIdx = 0;
+        rows.forEach((tr) => {
+          tr.classList.remove("tl-row-invalid");
+          const { fromKey, toKey, isPresent, isEmpty, fromInvalid, toInvalid } =
+            getFromTo(tr);
+          if (isEmpty) return;
+          const rowNum = ++dataRowIdx;
+          let rowBad = false;
+          if (fromInvalid) {
+            errors.push(`Dòng ${rowNum}: "Từ" không hợp lệ — dùng MM/YYYY`);
+            rowBad = true;
+          }
+          if (toInvalid) {
+            errors.push(`Dòng ${rowNum}: "Đến" không hợp lệ — dùng MM/YYYY`);
+            rowBad = true;
+          }
+          if (fromKey !== null && toKey !== null && fromKey > toKey) {
+            errors.push(`Dòng ${rowNum}: "Từ" sau "Đến"`);
+            rowBad = true;
+          }
+          if (dataRowIdx > 1 && prevToKey !== null && fromKey !== null) {
+            const cont = _checkContinuity(prevToKey, fromKey);
+            if (cont === "gap") {
+              errors.push(
+                `Dòng ${rowNum}: Thời gian bị gián đoạn với dòng trên`,
+              );
+              rowBad = true;
+            }
+            if (cont === "overlap") {
+              errors.push(
+                `Dòng ${rowNum}: Thời gian bị chồng lấp với dòng trên`,
+              );
+              rowBad = true;
+            }
+          }
+          if (rowBad) tr.classList.add("tl-row-invalid");
+          prevToKey = isPresent ? null : toKey !== null ? toKey : fromKey;
+        });
+        if (errBar) {
+          if (errors.length) {
+            errBar.innerHTML = "⚠ " + errors.join("<br>⚠ ");
+            errBar.classList.add("visible");
+          } else {
+            errBar.innerHTML = "";
+            errBar.classList.remove("visible");
+          }
+        }
+        return errors.length === 0;
+      }
+
+      // Render one history row HTML (cells only, for innerHTML of <tr>)
+      function _famHistRowHtml(r) {
+        const fromVal = _fmtMY(r.from_month, r.from_year);
+        const isPresent = !!r.is_present;
+        const toVal = isPresent ? "" : _fmtMY(r.to_month, r.to_year);
+        const toDisabled = isPresent ? " disabled" : "";
+        const toPlaceholder = isPresent ? "Hiện tại" : "MM/YYYY";
+        const chk = isPresent ? " checked" : "";
         return (
-          `<div class="hist-date-cell">` +
-          `<input class="hdc-year" type="number" placeholder="YYYY" min="1900" max="2099" step="1" value="${y}">` +
-          `<select class="hdc-month">${opts}</select>` +
-          `<span class="hdc-slash">/</span>` +
-          `<input class="hdc-myear" type="number" placeholder="YYYY" min="1900" max="2099" step="1" value="${y}">` +
-          `</div>`
+          `<td><input class="fhd-input" type="text" placeholder="MM/YYYY" maxlength="7" value="${_esc(fromVal)}"></td>` +
+          `<td class="fhd-to-cell"><div class="fhd-to-inner">` +
+          `<input class="fhd-input fhd-to-txt" type="text" maxlength="7"${toDisabled} placeholder="${toPlaceholder}" value="${_esc(toVal)}">` +
+          `<label class="fhd-present-wrap" title="Đến nay"><input type="checkbox" class="fhd-present-chk"${chk} onchange="toggleFhdPresent(this)"> Nay</label>` +
+          `</div></td>` +
+          `<td><input type="text" value="${_esc(r.description || "")}"></td>` +
+          `<td><button class="del-btn" onclick="delRow(this)">✕</button></td>`
         );
+      }
+
+      // Toggle Present checkbox — disable/enable the To-date input
+      function toggleFhdPresent(chk) {
+        const toInput = chk
+          .closest(".fhd-to-inner")
+          ?.querySelector(".fhd-to-txt");
+        if (!toInput) return;
+        if (chk.checked) {
+          toInput.value = "";
+          toInput.disabled = true;
+          toInput.placeholder = "Hiện tại";
+        } else {
+          toInput.disabled = false;
+          toInput.placeholder = "MM/YYYY";
+        }
+        const acc = chk.closest(".accordion");
+        if (acc) {
+          validateFamHistory(acc);
+          return;
+        }
+        const row = chk.closest("tr");
+        if (row?.parentElement?.id === "tbC-body") validateSecC();
+      }
+
+      // Validate timeline continuity — returns true if valid
+      function validateFamHistory(acc) {
+        const body = acc.querySelector(".family-body");
+        if (!body) return true;
+        const rows = body.querySelectorAll(".timeline-table tbody tr");
+        const errBar = body.querySelector(".fhd-error-bar");
+        const errors = [];
+        let prevToKey = null;
+        let dataRowIdx = 0;
+
+        rows.forEach((tr) => {
+          tr.classList.remove("fhd-row-invalid");
+          const fromInput = tr.cells[0]?.querySelector(".fhd-input");
+          const toInput = tr.cells[1]?.querySelector(".fhd-to-txt");
+          const isPresent =
+            !!tr.cells[1]?.querySelector(".fhd-present-chk")?.checked;
+          const descInput = tr.cells[2]?.querySelector("input,textarea");
+          const fromVal = fromInput?.value?.trim() || "";
+          const toVal = toInput?.value?.trim() || "";
+          const descVal = descInput?.value?.trim() || "";
+          if (!fromVal && !toVal && !descVal && !isPresent) return;
+
+          const rowNum = dataRowIdx + 1;
+          dataRowIdx++;
+          const fromParsed = _parseMY(fromVal);
+          const toParsed = isPresent ? null : _parseMY(toVal);
+          let rowInvalid = false;
+
+          if (fromVal && !fromParsed) {
+            errors.push(
+              `Dòng ${rowNum}: "Từ" không hợp lệ — dùng MM/YYYY hoặc YYYY`,
+            );
+            rowInvalid = true;
+          }
+          if (!isPresent && toVal && !toParsed) {
+            errors.push(
+              `Dòng ${rowNum}: "Đến" không hợp lệ — dùng MM/YYYY hoặc YYYY`,
+            );
+            rowInvalid = true;
+          }
+          if (fromParsed && toParsed) {
+            const fk = _myKey(fromParsed.month, fromParsed.year);
+            const tk = _myKey(toParsed.month, toParsed.year);
+            if (fk > tk) {
+              errors.push(`Dòng ${rowNum}: "Từ" sau "Đến"`);
+              rowInvalid = true;
+            }
+          }
+          if (dataRowIdx > 1 && prevToKey !== null && fromParsed) {
+            const fk = _myKey(fromParsed.month, fromParsed.year);
+            const cont = _checkContinuity(prevToKey, fk);
+            if (cont !== "ok") {
+              const diff = cont === "gap" ? "bị gián đoạn" : "bị chồng lấp";
+              errors.push(`Dòng ${rowNum}: Thời gian ${diff} với dòng trên`);
+              rowInvalid = true;
+            }
+          }
+          if (rowInvalid) tr.classList.add("fhd-row-invalid");
+
+          if (isPresent) {
+            prevToKey = null;
+          } else if (toParsed) {
+            prevToKey = _myKey(toParsed.month, toParsed.year);
+          } else if (fromParsed) {
+            prevToKey = _myKey(fromParsed.month, fromParsed.year);
+          }
+        });
+
+        if (errBar) {
+          if (errors.length) {
+            errBar.innerHTML = "⚠ " + errors.join("<br>⚠ ");
+            errBar.classList.add("visible");
+          } else {
+            errBar.innerHTML = "";
+            errBar.classList.remove("visible");
+          }
+        }
+        return errors.length === 0;
+      }
+
+      // Section B (personal history) continuity validator
+      function validateSecB() {
+        return _validateTimelineSection("tbB-body", "errBarB", (tr) => {
+          const f = _getMmYr(tr.cells[0]);
+          const t = _getMmYr(tr.cells[1]);
+          const d = tr.cells[2] ? _tdv(tr.cells[2]) : "";
+          const isEmpty = !f.year && !t.year && !d;
+          const fromKey = f.year ? _myKey(f.month, f.year) : null;
+          const toKey = t.year ? _myKey(t.month, t.year) : null;
+          return {
+            fromKey,
+            toKey,
+            isPresent: false,
+            isEmpty,
+            fromInvalid: false,
+            toInvalid: false,
+          };
+        });
+      }
+
+      // Section C (work history) continuity validator
+      function validateSecC() {
+        return _validateTimelineSection("tbC-body", "errBarC", (tr) => {
+          const fromInput = tr.cells[0]?.querySelector(".fhd-input");
+          const toInput = tr.cells[1]?.querySelector(".fhd-to-txt");
+          const isPresent =
+            !!tr.cells[1]?.querySelector(".fhd-present-chk")?.checked;
+          const empInput = tr.cells[2]?.querySelector("input");
+          const fromVal = fromInput?.value?.trim() || "";
+          const toVal = toInput?.value?.trim() || "";
+          const empVal = empInput?.value?.trim() || "";
+          const isEmpty = !fromVal && !toVal && !empVal && !isPresent;
+          const fp = fromVal ? _parseMY(fromVal) : null;
+          const tp = !isPresent && toVal ? _parseMY(toVal) : null;
+          return {
+            fromKey: fp ? _myKey(fp.month, fp.year) : null,
+            toKey: tp ? _myKey(tp.month, tp.year) : null,
+            isPresent,
+            isEmpty,
+            fromInvalid: !!(fromVal && !fp),
+            toInvalid: !!(!isPresent && toVal && !tp),
+          };
+        });
       }
 
       function _readAccordionHistory(acc) {
@@ -9526,25 +10246,22 @@
         body.querySelectorAll(".timeline-table tbody tr").forEach((tr, idx) => {
           const cells = tr.cells;
           if (!cells || cells.length < 3) return;
-          const fromYear =
-            parseInt(cells[0].querySelector(".hdc-year")?.value) ||
-            parseInt(cells[0].querySelector(".hdc-myear")?.value) ||
-            null;
-          const fromMonth =
-            parseInt(cells[0].querySelector(".hdc-month")?.value) || null;
-          const toYear =
-            parseInt(cells[1].querySelector(".hdc-year")?.value) ||
-            parseInt(cells[1].querySelector(".hdc-myear")?.value) ||
-            null;
-          const toMonth =
-            parseInt(cells[1].querySelector(".hdc-month")?.value) || null;
+          const fromVal =
+            cells[0].querySelector(".fhd-input")?.value?.trim() || "";
+          const toInput = cells[1].querySelector(".fhd-to-txt");
+          const toVal = toInput?.value?.trim() || "";
+          const isPresent =
+            !!cells[1].querySelector(".fhd-present-chk")?.checked;
           const desc = _tdv(cells[2]);
-          if (!desc && !fromYear && !toYear) return;
+          if (!desc && !fromVal && !toVal && !isPresent) return;
+          const fp = _parseMY(fromVal);
+          const tp = isPresent ? null : _parseMY(toVal);
           rows.push({
-            from_year: fromYear,
-            from_month: fromMonth,
-            to_year: toYear,
-            to_month: toMonth,
+            from_year: fp?.year || null,
+            from_month: fp?.month || null,
+            to_year: tp?.year || null,
+            to_month: tp?.month || null,
+            is_present: isPresent,
             description: desc,
             sort_order: idx,
           });
@@ -9564,16 +10281,19 @@
           if (r.id) ids.push(String(r.id));
           const tr = tbl.insertRow();
           if (r.id) tr.dataset.histId = r.id;
-          tr.innerHTML =
-            `<td>${_hdcCell(r.from_month, r.from_year)}</td>` +
-            `<td>${_hdcCell(r.to_month, r.to_year)}</td>` +
-            `<td><input type="text" value="${_esc(r.description || "")}"></td>` +
-            `<td><button class="del-btn" onclick="delRow(this)">✕</button></td>`;
+          tr.innerHTML = _famHistRowHtml(r);
         });
         acc.dataset.famHistIds = JSON.stringify(ids);
+        validateFamHistory(acc);
       }
 
       async function _saveFamHistory(profileId, famId, acc) {
+        if (!validateFamHistory(acc)) {
+          showToast(
+            "⚠ Quá trình lịch sử chưa liên tục — vui lòng kiểm tra lại",
+          );
+          return false;
+        }
         const rows = _readAccordionHistory(acc);
         const oldIds = JSON.parse(acc.dataset.famHistIds || "[]");
         const base = `/timelines/${profileId}/history/`;
@@ -9591,6 +10311,7 @@
               from_month: hr.from_month || null,
               to_year: hr.to_year || null,
               to_month: hr.to_month || null,
+              is_present: hr.is_present || false,
               description: hr.description,
               sort_order: i,
             });
@@ -9600,6 +10321,7 @@
           }
         }
         acc.dataset.famHistIds = JSON.stringify(newIds);
+        return true;
       }
 
       // ── Load all sections (call after profile ID is known) ───────────
@@ -9804,6 +10526,40 @@
       updateProgress();
       // initAllDienBien chạy sau khi toàn bộ DOM (kể cả family blocks) đã render
       requestAnimationFrame(() => initAllDienBien());
+
+      // Auto-validate timelines when the user edits date inputs
+      document.addEventListener("input", (e) => {
+        const inp = e.target;
+        // Family history accordion
+        if (
+          inp.classList.contains("fhd-input") ||
+          inp.classList.contains("fhd-to-txt")
+        ) {
+          const acc = inp.closest(".accordion");
+          if (acc) {
+            validateFamHistory(acc);
+            return;
+          }
+          // Section C fhd-input (not inside accordion)
+          if (inp.closest("#tbC-body")) {
+            validateSecC();
+            return;
+          }
+        }
+        // Section B mm-year number input
+        if (inp.classList.contains("mm-year") && inp.closest("#tbB-body")) {
+          validateSecB();
+        }
+      });
+      // Section B mm-month select fires "change"
+      document.addEventListener("change", (e) => {
+        if (
+          e.target.classList.contains("mm-month") &&
+          e.target.closest("#tbB-body")
+        ) {
+          validateSecB();
+        }
+      });
 
       // Gọi lại sau mỗi accordion mở để cover các table mới inject vào DOM
       document.addEventListener("click", (e) => {
@@ -10112,7 +10868,7 @@
           <div class="admin-page-sub">Quản lý và gửi thông báo đến quần chúng qua Zalo, SMS, Email</div>
         </div>
         <div class="admin-page-actions">
-          <button class="btn btn-primary" onclick="document.getElementById('notifModal').classList.add('open')">+ Gửi thông báo mới</button>
+          <button id="btnSendNotif" class="btn btn-primary" onclick="document.getElementById('notifModal').classList.add('open')">+ Gửi thông báo mới</button>
         </div>
       </div>
       <div class="notif-stat-grid">
@@ -10321,7 +11077,7 @@
           <button class="btn btn-ghost" style="font-size:12px;padding:6px 12px" onclick="showAdminPageByName('pgVerify')">← Về danh sách</button>
         </div>
         <div id="editProfileBreadcrumb" style="font-size:12.5px;color:var(--muted)">
-          Chỉnh sửa hồ sơ: <strong id="editProfileTitle" style="color:var(--navy)">—</strong>
+          <span id="editProfileBreadcrumbLabel">Chỉnh sửa hồ sơ:</span> <strong id="editProfileTitle" style="color:var(--navy)">—</strong>
         </div>
         <div style="margin-left:auto;display:flex;gap:8px;flex-wrap:wrap;">
           <div class="status-select-wrap">
@@ -10339,8 +11095,15 @@
               <option value="withdrawn">Rút hồ sơ</option>
             </select>
           </div>
-          <button class="btn btn-primary" style="font-size:12px" onclick="saveAllEdits()">💾 Lưu tất cả</button>
+          <button id="btnSaveAllEdits" class="btn btn-primary" style="font-size:12px" onclick="saveAllEdits()">💾 Lưu tất cả</button>
         </div>
+      </div>
+
+      <!-- Review action bar — visible only for can_bo_bxd -->
+      <div id="reviewActionBar">
+        <div class="rab-title">🔍 Chế độ thẩm định — Dữ liệu hồ sơ ở trạng thái chỉ đọc. Thêm nhận xét tại từng phần rồi trả lại cho quần chúng sửa.</div>
+        <button class="btn" style="background:#ffeaa0;color:#7a4000;border:1.5px solid #d4a800;font-size:12px" onclick="saveFieldNotesOnly()">💾 Lưu nhận xét</button>
+        <button class="btn btn-primary" style="font-size:12px;background:var(--crimson)" onclick="openReturnModalFromReview()">↩ Trả lại hồ sơ</button>
       </div>
 
       <!-- Two-column: sidenav + main edit area -->
@@ -10847,6 +11610,18 @@
       }
 
       function showAdminPageByName(pid) {
+        // Permission guard
+        const permMap = {
+          pgAccount: "can_create_accounts",
+          pgNotif:   "can_send_notifications",
+          pgReport:  "can_view_reports",
+          pgVerify:  "can_review_profiles",
+        };
+        if (permMap[pid] && !_hasPermOrSuper(permMap[pid])
+            && !(pid === "pgVerify" && _hasPermOrSuper("can_approve_profiles"))) {
+          showToast("✗ Bạn không có quyền truy cập chức năng này.");
+          return;
+        }
         document.querySelectorAll(".admin-nav .nav-item").forEach((n) => {
           n.classList.toggle("active", n.dataset.adminPage === pid);
         });
@@ -11147,15 +11922,10 @@
         const btnReturn = document.getElementById("detailBtnReturn");
         if (!btnApprove || !btnReturn) return;
 
-        const canApprove = ["submitted", "pending", "under_review"].includes(
-          status,
-        );
-        const canReturn = [
-          "submitted",
-          "pending",
-          "under_review",
-          "verifying",
-        ].includes(status);
+        const canApprove = _hasPermOrSuper("can_approve_profiles") &&
+          ["submitted", "pending", "under_review"].includes(status);
+        const canReturn = (_hasPermOrSuper("can_review_profiles") || _hasPermOrSuper("can_approve_profiles")) &&
+          ["draft", "submitted", "pending", "under_review", "verifying"].includes(status);
 
         btnApprove.style.display = canApprove ? "" : "none";
         btnReturn.style.display = canReturn ? "" : "none";
@@ -11365,7 +12135,7 @@
           addActivity(
             `📋 Nhận kết quả xác minh – hồ sơ <strong>${name}</strong>`,
           );
-          showToast(`✅ Hoàn thiện hồ sơ ${name}`);
+          showToast(` Hoàn thiện hồ sơ ${name}`);
           _loadProfileList();
         } catch (e) {
           showToast("✗ " + e.message);
@@ -11745,9 +12515,11 @@
       let _flagSectionNotes = {};
       let _adminTlSrvIds = new Set();
       const _EDIT_SECTION_LABEL = {
+        // Section-level keys
         esA: "A. Sơ lược lý lịch",
         esB: "B. Lịch sử bản thân",
-        esC: "C. Trình độ",
+        "esC-work": "C. Lịch sử công tác",
+        esC: "C. Trình độ & Công tác",
         esD: "D. Gia đình",
         esE: "E. Khen thưởng",
         esFT: "F. Đi nước ngoài",
@@ -11755,6 +12527,33 @@
         esH: "H. Kỷ luật",
         esJ: "J. Tự nhận xét",
         esK: "K. Cam đoan",
+        // Per-field keys → section labels (for return modal grouping)
+        "fi-esA-name": "A. Họ và tên",
+        "fi-esA-gender": "A. Giới tính",
+        "fi-esA-dob": "A. Ngày sinh",
+        "fi-esA-birthplace": "A. Nơi sinh",
+        "fi-esA-hometown": "A. Quê quán",
+        "fi-esA-ethnic": "A. Dân tộc",
+        "fi-esA-religion": "A. Tôn giáo",
+        "fi-esA-address": "A. Nơi thường trú",
+        "fi-esA-cccd": "A. CCCD",
+        "fi-esA-phone": "A. Điện thoại",
+        "fi-esA-email": "A. Email",
+        "fi-esA-occupation": "A. Nghề nghiệp",
+        "fi-esA-temp-addr": "A. Nơi tạm trú",
+        "fi-esC-edu-gen": "C. Trình độ phổ thông",
+        "fi-esC-edu-qual": "C. Trình độ chuyên môn",
+        "fi-esC-political": "C. Lý luận chính trị",
+        "fi-esC-foreign-lang": "C. Ngoại ngữ",
+        "fi-esC-it": "C. Tin học",
+        "fi-esC-youth-union": "C. Vào Đoàn",
+        "fi-esC-sci-tech": "C. Khoa học công nghệ",
+        "fi-esC-degree": "C. Học vị",
+        "fi-esC-acad-title": "C. Học hàm",
+        "fi-esC-ethnic-lang": "C. Tiếng dân tộc",
+        "fi-esJ-self": "J. Tự nhận xét",
+        "fi-esK-name": "K. Họ tên cam đoan",
+        "fi-esK-date": "K. Ngày ký cam đoan",
       };
 
       // Open the edit page for a given profile (by ID preferred)
@@ -12166,6 +12965,9 @@
                 ? declDate.split("-").reverse().join("/")
                 : "—";
 
+            // pgProfileEdit is always review-only — no one edits citizen data directly
+            await _enterAdminReviewMode(profileId);
+
             return;
           } catch (e) {
             showToast("✗ Lỗi tải hồ sơ: " + e.message);
@@ -12251,8 +13053,226 @@
         }
       }
 
+      // ── Review-mode helpers ──────────────────────────────────────────
+
+      let _fieldNotes = {};
+      let _reviewProfileId = null;
+
+      function _isReviewMode() {
+        return document
+          .getElementById("pgProfileEdit")
+          ?.classList.contains("review-locked");
+      }
+
+      // Reset pgProfileEdit back to full admin-edit state (called before entering any mode)
+      function _resetPgProfileEditMode() {
+        const pg = document.getElementById("pgProfileEdit");
+        if (!pg) return;
+        pg.classList.remove("review-locked");
+        // Restore edit + row buttons
+        pg.querySelectorAll(".edit-btn, .add-row-btn, .del-row-btn").forEach(
+          (b) => {
+            b.style.display = "";
+          },
+        );
+        // Re-enable inputs (skip those that were originally disabled/readonly in HTML)
+        pg.querySelectorAll(
+          ".field-input, .field-select-input, .field-textarea",
+        ).forEach((el) => {
+          if (el.dataset.reviewDisabled) {
+            el.disabled = false;
+            el.readOnly = false;
+            delete el.dataset.reviewDisabled;
+          }
+          el.style.pointerEvents = "";
+          el.style.background = "";
+          el.style.cursor = "";
+        });
+        // Show save btn + status select
+        const saveBtn = document.getElementById("btnSaveAllEdits");
+        if (saveBtn) saveBtn.style.display = "";
+        const sw = pg.querySelector(".status-select-wrap");
+        if (sw) sw.style.display = "";
+        // Hide review action bar
+        document.getElementById("reviewActionBar")?.classList.remove("visible");
+        // Clean up injected note areas
+        pg.querySelectorAll(".fn-field-note").forEach((el) => el.remove());
+        pg.querySelectorAll(".field-row.row-has-note").forEach((r) =>
+          r.classList.remove("row-has-note"),
+        );
+      }
+
+      // Enter review-only mode for can_bo_bxd — direct DOM manipulation for reliability
+      async function _enterAdminReviewMode(profileId) {
+        _reviewProfileId = profileId;
+        const pg = document.getElementById("pgProfileEdit");
+        if (!pg) return;
+
+        // Clean slate first
+        _resetPgProfileEditMode();
+        pg.classList.add("review-locked");
+
+        // ── Breadcrumb ──
+        const lbl = document.getElementById("editProfileBreadcrumbLabel");
+        if (lbl) lbl.textContent = "Thẩm định hồ sơ:";
+
+        // ── Hide save btn + status select, show review action bar ──
+        const saveBtn = document.getElementById("btnSaveAllEdits");
+        if (saveBtn) saveBtn.style.display = "none";
+        const sw = pg.querySelector(".status-select-wrap");
+        if (sw) sw.style.display = "none";
+        document.getElementById("reviewActionBar")?.classList.add("visible");
+
+        // Hide "Trả lại" button if officer lacks review/approve permissions
+        const rabReturnBtn = document.querySelector("#reviewActionBar .btn-primary");
+        if (rabReturnBtn) rabReturnBtn.style.display =
+          (_hasPermOrSuper("can_review_profiles") || _hasPermOrSuper("can_approve_profiles")) ? "" : "none";
+
+        // ── Physically hide ALL "Chỉnh sửa" edit buttons (not relying on CSS) ──
+        pg.querySelectorAll(".edit-btn:not(.flag-btn)").forEach((btn) => {
+          btn.style.display = "none";
+        });
+        // Hide add / delete row buttons
+        pg.querySelectorAll(".add-row-btn, .del-row-btn").forEach((btn) => {
+          btn.style.display = "none";
+        });
+
+        // ── Disable ALL field inputs at attribute level ──
+        pg.querySelectorAll(
+          ".field-input, .field-select-input, .field-textarea",
+        ).forEach((el) => {
+          if (!el.disabled && !el.readOnly) {
+            el.dataset.reviewDisabled = "1"; // track so we can restore
+            el.disabled = true;
+          }
+          el.style.pointerEvents = "none";
+          el.style.background = "#f0f3f7";
+          el.style.cursor = "not-allowed";
+        });
+
+        // ── Inject per-field note areas under every .field-row ──
+        pg.querySelectorAll(".field-row").forEach((row) => {
+          const inp = row.querySelector(
+            ".field-input[id], .field-select-input[id], .field-textarea[id]",
+          );
+          if (!inp) return;
+          const fieldKey = inp.id;
+          const fieldLabel = inp.dataset.field || fieldKey;
+          const nd = document.createElement("div");
+          nd.className = "fn-field-note";
+          nd.dataset.fieldKey = fieldKey;
+          nd.innerHTML =
+            `<div class="fn-field-note-label">💬 Góp ý: ${_esc(fieldLabel)}</div>` +
+            `<textarea class="fn-field-note-ta" placeholder="Nhập góp ý để quần chúng chỉnh sửa…" rows="2"></textarea>`;
+          row.appendChild(nd);
+        });
+
+        // ── Section-level notes for timeline / table sections ──
+        [
+          { key: "esB", label: "B. Lịch sử bản thân", secId: "esB" },
+          { key: "esC-work", label: "C. Lịch sử công tác", secId: "esC" },
+          { key: "esD", label: "D. Thành phần gia đình", secId: "esD" },
+          { key: "esE", label: "E. Khen thưởng", secId: "esE" },
+          { key: "esFT", label: "F. Đi nước ngoài", secId: "esFT" },
+          { key: "esH", label: "H. Kỷ luật", secId: "esH" },
+        ].forEach(({ key, label, secId }) => {
+          const sec = document.getElementById(secId);
+          if (!sec) return;
+          const body = sec.querySelector(".edit-sec-body");
+          if (!body) return;
+          const nd = document.createElement("div");
+          nd.className = "fn-field-note fn-section-note";
+          nd.dataset.fieldKey = key;
+          nd.innerHTML =
+            `<div class="fn-field-note-label">💬 Góp ý: ${label}</div>` +
+            `<textarea class="fn-field-note-ta" placeholder="Nhập góp ý cho phần này để quần chúng chỉnh sửa…" rows="2"></textarea>`;
+          body.insertBefore(nd, body.firstElementChild);
+        });
+
+        // ── Load and populate existing notes ──
+        try {
+          const resp = await API.get(`/profiles/${profileId}/field-notes/`);
+          const notes = Array.isArray(resp) ? resp : resp.data || [];
+          _fieldNotes = {};
+          notes.forEach((n) => {
+            _fieldNotes[n.field_key] = n.note;
+          });
+
+          pg.querySelectorAll(".fn-field-note[data-field-key]").forEach(
+            (nd) => {
+              const note = _fieldNotes[nd.dataset.fieldKey];
+              if (!note) return;
+              const ta = nd.querySelector(".fn-field-note-ta");
+              if (ta) {
+                ta.value = note;
+                ta.classList.add("has-content");
+              }
+              nd.classList.add("has-note");
+              nd.closest(".field-row")?.classList.add("row-has-note");
+            },
+          );
+        } catch (e) {
+          console.warn("[REVIEW] load notes fail:", e.message);
+        }
+      }
+
+      function _toggleNoteArea() {} // no-op kept for safety
+
+      // Collect all per-field note textareas → [{field_key, note}]
+      function _collectFieldNotes() {
+        const notes = [];
+        document
+          .querySelectorAll("#pgProfileEdit .fn-field-note[data-field-key]")
+          .forEach((nd) => {
+            const key = nd.dataset.fieldKey;
+            const ta = nd.querySelector(".fn-field-note-ta");
+            const note = ta?.value?.trim() || "";
+            if (key) notes.push({ field_key: key, note });
+          });
+        return notes;
+      }
+
+      // Save notes to API (without returning)
+      async function saveFieldNotesOnly() {
+        const id = _reviewProfileId || currentEditProfile?.id;
+        if (!id) {
+          showToast("⚠ Không xác định được hồ sơ");
+          return;
+        }
+        try {
+          const notes = _collectFieldNotes().filter((n) => n.note);
+          await API.post(`/profiles/${id}/field-notes/`, notes);
+          showToast("✅ Đã lưu nhận xét");
+        } catch (e) {
+          showToast("✗ Lưu nhận xét thất bại: " + e.message);
+        }
+      }
+
+      // Open the return modal, pre-saving notes
+      async function openReturnModalFromReview() {
+        // Save notes first
+        const id = _reviewProfileId || currentEditProfile?.id;
+        if (id) {
+          try {
+            const notes = _collectFieldNotes().filter((n) => n.note);
+            if (notes.length)
+              await API.post(`/profiles/${id}/field-notes/`, notes);
+          } catch (_) {}
+        }
+        // Pre-populate flaggedSections Set from field notes so the return modal shows them
+        flaggedSections.clear();
+        _collectFieldNotes()
+          .filter((n) => n.note)
+          .forEach((n) => {
+            const lbl = _EDIT_SECTION_LABEL?.[n.field_key] || n.field_key;
+            flaggedSections.add(lbl);
+          });
+        openReturnModal();
+      }
+
       // Toggle inline edit mode for a section
       async function toggleEdit(secId) {
+        if (_isReviewMode()) return; // review mode: editing blocked — officer uses per-field notes
         const sec = document.getElementById(secId);
         if (!sec) return;
         const isEditing = sec.classList.toggle("editing");
@@ -12342,6 +13362,11 @@
 
       // Save all open editing sections at once
       async function saveAllEdits() {
+        if (_isReviewMode()) {
+          // Officers use notes-only workflow
+          await saveFieldNotesOnly();
+          return;
+        }
         const id = currentEditProfile.id;
         if (!id) {
           showToast("⚠ Không tìm thấy ID hồ sơ");
@@ -13086,7 +14111,7 @@
         </div>
         <span class="pill ${st.cls}" style="font-size:10px;flex-shrink:0">${st.label}</span>
         <div style="display:flex;gap:6px;flex-shrink:0">
-          <button class="btn btn-ghost" style="padding:6px 12px;font-size:12px" onclick="exportSingleWord('${p.name}',${p.id})">
+          <button class="btn btn-ghost" style="padding:6px 12px;font-size:12px;${_hasPermOrSuper('can_export_word') ? '' : 'display:none'}" onclick="exportSingleWord('${p.name}',${p.id})">
             📄 Xuất .docx
           </button>
         </div>`;
@@ -13187,30 +14212,31 @@
         return `<w:tbl><w:tblPr><w:tblW w:w="${TW}" w:type="dxa"/><w:tblBorders>${BDR()}</w:tblBorders></w:tblPr><w:tblGrid><w:gridCol w:w="2800"/><w:gridCol w:w="${TW - 2800}"/></w:tblGrid>${rows}</w:tbl>`;
       }
 
-      function historyTable(entries, hasPos = false) {
-        // Column widths optimized for layout
+      function historyTable(entries) {
+        // Column widths: From | To | Events+Residence
         const fw = 1500,
           tw = 1500,
-          dw = hasPos ? 4838 : 6338,
-          pw = 1800;
-        const cols = hasPos
-          ? `<w:gridCol w:w="${fw}"/><w:gridCol w:w="${tw}"/><w:gridCol w:w="${dw}"/><w:gridCol w:w="${pw}"/>`
-          : `<w:gridCol w:w="${fw}"/><w:gridCol w:w="${tw}"/><w:gridCol w:w="${dw}"/>`;
+          dw = 6638;
+        const cols = `<w:gridCol w:w="${fw}"/><w:gridCol w:w="${tw}"/><w:gridCol w:w="${dw}"/>`;
         const hdr = `<w:tr>
     <w:tc><w:tcPr><w:tcW w:w="${fw}" w:type="dxa"/><w:tcBorders>${BDR()}</w:tcBorders><w:shd w:val="clear" w:color="auto" w:fill="F2F2F2"/><w:tcMar><w:top w:w="60" w:type="dxa"/><w:left w:w="120" w:type="dxa"/><w:bottom w:w="60" w:type="dxa"/><w:right w:w="80" w:type="dxa"/></w:tcMar></w:tcPr>${makePara(makeRun("Từ tháng/năm", { bold: true, size: 18 }))}</w:tc>
     <w:tc><w:tcPr><w:tcW w:w="${tw}" w:type="dxa"/><w:tcBorders>${BDR()}</w:tcBorders><w:shd w:val="clear" w:color="auto" w:fill="F2F2F2"/><w:tcMar><w:top w:w="60" w:type="dxa"/><w:left w:w="120" w:type="dxa"/><w:bottom w:w="60" w:type="dxa"/><w:right w:w="80" w:type="dxa"/></w:tcMar></w:tcPr>${makePara(makeRun("Đến tháng/năm", { bold: true, size: 18 }))}</w:tc>
     <w:tc><w:tcPr><w:tcW w:w="${dw}" w:type="dxa"/><w:tcBorders>${BDR()}</w:tcBorders><w:shd w:val="clear" w:color="auto" w:fill="F2F2F2"/><w:tcMar><w:top w:w="60" w:type="dxa"/><w:left w:w="120" w:type="dxa"/><w:bottom w:w="60" w:type="dxa"/><w:right w:w="80" w:type="dxa"/></w:tcMar></w:tcPr>${makePara(makeRun("Làm gì, ở đâu (ghi rõ nơi sinh sống)", { bold: true, size: 18 }))}</w:tc>
-    ${hasPos ? `<w:tc><w:tcPr><w:tcW w:w="${pw}" w:type="dxa"/><w:tcBorders>${BDR()}</w:tcBorders><w:shd w:val="clear" w:color="auto" w:fill="F2F2F2"/><w:tcMar><w:top w:w="60" w:type="dxa"/><w:left w:w="120" w:type="dxa"/><w:bottom w:w="60" w:type="dxa"/><w:right w:w="80" w:type="dxa"/></w:tcMar></w:tcPr>${makePara(makeRun("Chức vụ", { bold: true, size: 18 }))}</w:tc>` : ""}
   </w:tr>`;
         const drows = (entries || [])
-          .map(
-            (e) => `<w:tr>
-    <w:tc><w:tcPr><w:tcW w:w="${fw}" w:type="dxa"/><w:tcBorders>${BDR()}</w:tcBorders><w:tcMar><w:top w:w="60" w:type="dxa"/><w:left w:w="120" w:type="dxa"/><w:bottom w:w="60" w:type="dxa"/><w:right w:w="80" w:type="dxa"/></w:tcMar></w:tcPr>${makePara(makeRun(e.from || "", { size: 18 }))}</w:tc>
-    <w:tc><w:tcPr><w:tcW w:w="${tw}" w:type="dxa"/><w:tcBorders>${BDR()}</w:tcBorders><w:tcMar><w:top w:w="60" w:type="dxa"/><w:left w:w="120" w:type="dxa"/><w:bottom w:w="60" w:type="dxa"/><w:right w:w="80" w:type="dxa"/></w:tcMar></w:tcPr>${makePara(makeRun(e.to || "", { size: 18 }))}</w:tc>
-    <w:tc><w:tcPr><w:tcW w:w="${dw}" w:type="dxa"/><w:tcBorders>${BDR()}</w:tcBorders><w:tcMar><w:top w:w="60" w:type="dxa"/><w:left w:w="120" w:type="dxa"/><w:bottom w:w="60" w:type="dxa"/><w:right w:w="80" w:type="dxa"/></w:tcMar></w:tcPr>${makePara(makeRun(e.desc || "", { size: 18 }))}</w:tc>
-    ${hasPos ? `<w:tc><w:tcPr><w:tcW w:w="${pw}" w:type="dxa"/><w:tcBorders>${BDR()}</w:tcBorders><w:tcMar><w:top w:w="60" w:type="dxa"/><w:left w:w="120" w:type="dxa"/><w:bottom w:w="60" w:type="dxa"/><w:right w:w="80" w:type="dxa"/></w:tcMar></w:tcPr>${makePara(makeRun(e.pos || "", { size: 18 }))}</w:tc>` : ""}
-  </w:tr>`,
-          )
+          .map((e) => {
+            // Support both legacy {from, to, desc} and API {from_month, from_year, to_month, to_year, is_present, description}
+            const fromStr = e.from || _fmtMY(e.from_month, e.from_year) || "";
+            const toStr = e.is_present
+              ? "Nay"
+              : e.to || _fmtMY(e.to_month, e.to_year) || "";
+            const descStr = e.desc || e.description || "";
+            return `<w:tr>
+    <w:tc><w:tcPr><w:tcW w:w="${fw}" w:type="dxa"/><w:tcBorders>${BDR()}</w:tcBorders><w:tcMar><w:top w:w="60" w:type="dxa"/><w:left w:w="120" w:type="dxa"/><w:bottom w:w="60" w:type="dxa"/><w:right w:w="80" w:type="dxa"/></w:tcMar></w:tcPr>${makePara(makeRun(fromStr, { size: 18 }))}</w:tc>
+    <w:tc><w:tcPr><w:tcW w:w="${tw}" w:type="dxa"/><w:tcBorders>${BDR()}</w:tcBorders><w:tcMar><w:top w:w="60" w:type="dxa"/><w:left w:w="120" w:type="dxa"/><w:bottom w:w="60" w:type="dxa"/><w:right w:w="80" w:type="dxa"/></w:tcMar></w:tcPr>${makePara(makeRun(toStr, { size: 18 }))}</w:tc>
+    <w:tc><w:tcPr><w:tcW w:w="${dw}" w:type="dxa"/><w:tcBorders>${BDR()}</w:tcBorders><w:tcMar><w:top w:w="60" w:type="dxa"/><w:left w:w="120" w:type="dxa"/><w:bottom w:w="60" w:type="dxa"/><w:right w:w="80" w:type="dxa"/></w:tcMar></w:tcPr>${makePara(makeRun(descStr, { size: 18 }))}</w:tc>
+  </w:tr>`;
+          })
           .join("");
         return `<w:tbl><w:tblPr><w:tblW w:w="${TW}" w:type="dxa"/><w:tblBorders>${BDR()}</w:tblBorders></w:tblPr><w:tblGrid>${cols}</w:tblGrid>${hdr}${drows}</w:tbl>`;
       }
@@ -13230,7 +14256,7 @@
           fieldRow("Nghề nghiệp:", m.occupation || "");
         if (m.marriageDate)
           rows += fieldRow("Ngày lập gia đình:", m.marriageDate);
-        return `${makePara(makeRun(label, { bold: true, size: 20 }), { spaceBefore: 160, spaceAfter: 80 })}${fieldTable(rows)}${makePara(makeRun("Quá trình lịch sử:", { bold: true, size: 20 }), { spaceBefore: 80, spaceAfter: 60 })}${historyTable(m.history, !!m.marriageDate)}`;
+        return `${makePara(makeRun(label, { bold: true, size: 20 }), { spaceBefore: 160, spaceAfter: 80 })}${fieldTable(rows)}${makePara(makeRun("Quá trình lịch sử:", { bold: true, size: 20 }), { spaceBefore: 80, spaceAfter: 60 })}${historyTable(m.history)}`;
       }
 
       function sp(n = 1) {
@@ -13865,6 +14891,8 @@
               role: roleCode,
               role_code: roleCode,
               phone: user.phone,
+              is_superuser: user.is_superuser || false,
+              permissions: user.permissions || undefined,
             }),
           );
 
@@ -14081,7 +15109,11 @@
         }
 
         // Route by role (only quần chúng uses /profiles/my/)
-        if (roleCode === "quan_chung") {
+        if (user.is_superuser) {
+          // Superuser → go straight to the dedicated management interface
+          window.location.href = '/admin/';
+          return;
+        } else if (roleCode === "quan_chung") {
           switchRole("member");
           _loadMyProfile();
           _loadNotificationStats();
@@ -14089,6 +15121,7 @@
           _checkMemberNotifBadge();
         } else {
           switchRole("admin");
+          _applyAdminPermissions();
           _loadDashboard();
           _loadNotificationStats();
           _loadNotificationList();
@@ -14097,6 +15130,51 @@
         showToast(
           `✓ Đăng nhập thành công · Xin chào ${user.name || user.phone}`,
         );
+      }
+
+      // Returns true if current user is superuser OR has the given permission.
+      // If no permissions key stored (old session), officers get full access.
+      function _hasPermOrSuper(permName) {
+        const u = API.currentUser();
+        if (!u) return false;
+        if (u.is_superuser) return true;
+        if (u.permissions === undefined || u.permissions === null) return true;
+        return !!u.permissions[permName];
+      }
+
+      function _applyAdminPermissions() {
+        const u = API.currentUser();
+        if (!u) return;
+        const isSuperuser = !!u.is_superuser;
+
+        // Map: page id → permission key (null = always visible)
+        const pagePerms = {
+          pgAccount: "can_create_accounts",
+          pgNotif:   "can_send_notifications",
+          pgReport:  "can_view_reports",
+          pgVerify:  null, // checked separately (review OR approve)
+        };
+
+        // Helper to show/hide a page's tab in sidebar + top nav
+        function setPageVisible(pageId, visible) {
+          // Sidebar
+          const sideItem = document.querySelector(`[data-admin-page="${pageId}"]`);
+          if (sideItem) sideItem.style.display = visible ? "" : "none";
+          // Top nav (desktop + mobile)
+          document.querySelectorAll(`[data-page="${pageId}"]`).forEach(el => {
+            el.style.display = visible ? "" : "none";
+          });
+        }
+
+        setPageVisible("pgAccount", _hasPermOrSuper("can_create_accounts"));
+        setPageVisible("pgNotif",   _hasPermOrSuper("can_send_notifications"));
+        setPageVisible("pgReport",  _hasPermOrSuper("can_view_reports"));
+        setPageVisible("pgVerify",  _hasPermOrSuper("can_review_profiles") || _hasPermOrSuper("can_approve_profiles"));
+
+
+        // "Gửi thông báo" button on notification page
+        const btnSendNotif = document.getElementById("btnSendNotif");
+        if (btnSendNotif) btnSendNotif.style.display = _hasPermOrSuper("can_send_notifications") ? "" : "none";
       }
 
       /* ─────────────────────────────────────────────────────────────────────────
@@ -14219,7 +15297,7 @@
                     p.ai_score > 0
                       ? `<div class="ai-score" style="color:${scoreColor(p.ai_score)}">${p.ai_score}% <div class="ai-score-bar"><div class="ai-score-fill" style="width:${p.ai_score}%;background:${scoreColor(p.ai_score)}"></div></div></div>`
                       : "—";
-                  const canAct = [
+                  const canAct = _hasPermOrSuper("can_approve_profiles") && [
                     "submitted",
                     "pending",
                     "under_review",
@@ -14760,15 +15838,22 @@
                   }
                 : { cls: "pill-new", label: "Chưa tạo hồ sơ" };
               const canApprove =
+                _hasPermOrSuper("can_approve_profiles") &&
                 !!p &&
                 ["submitted", "pending", "under_review"].includes(p.status);
               const canReturn =
+                (_hasPermOrSuper("can_review_profiles") || _hasPermOrSuper("can_approve_profiles")) &&
                 !!p &&
-                ["submitted", "pending", "under_review", "verifying"].includes(
-                  p.status,
-                );
+                [
+                  "draft",
+                  "submitted",
+                  "pending",
+                  "under_review",
+                  "verifying",
+                ].includes(p.status);
               const v = p ? verifyMap[p.id] : null;
               const canConfirmVerify = !!p && p.status === "approved" && !v;
+              const canComplete = !!p && p.status === "verifying";
               const safeName = _esc(p?.full_name || u.full_name || "—");
               const updated = p?.updated_at ? _fmtDate(p.updated_at) : "—";
               const submitted = p?.submitted_at
@@ -14776,7 +15861,7 @@
                 : p?.created_at
                   ? _fmtDate(p.created_at)
                   : "—";
-              const canExportWord = !!p && p.status === "completed";
+              const canExportWord = _hasPermOrSuper("can_export_word") && !!p && p.status === "completed";
               return `<tr>
         <td><div class="name-cell">${safeName}</div><div class="sub-cell">${_esc(u.phone || "")}</div></td>
         <td><span class="pill ${st.cls}">${st.label}</span></td>
@@ -14787,6 +15872,7 @@
           ${p ? `<button class="act-btn act-view" title="Xem và chỉnh sửa" onclick="openDetailById(${p.id})">Xem</button>` : `<button class="act-btn act-view" title="Xem thông tin user" onclick="_openUserInfo(${u.id})">Xem</button>`}
           ${canApprove ? `<button class="act-btn act-approve" title="Duyệt hồ sơ" onclick="apiApproveProfile(${p.id},'${safeName}')">✓ Duyệt</button>` : ""}
           ${canConfirmVerify ? `<button class="act-btn act-view" style="background:#EEF6FF;color:#1d4ed8" title="Xác nhận yêu cầu xác minh" onclick="_confirmVerifyRequest(${p.id},'${safeName}')">Xác nhận YC</button>` : ""}
+          ${canComplete ? `<button class="act-btn act-approve" style="background:#ECFDF5;color:#065f46" title="Hoàn thiện hồ sơ" onclick="_completeProfile(${p.id},'${safeName}')"> Hoàn thiện</button>` : ""}
         </td>
         <td style="padding:6px 8px;white-space:nowrap">
           ${canExportWord ? `<button class="act-btn act-view" title="Xuất Word" onclick="exportWordAPI(${p.id})">📄 Xuất</button>` : `<span style="font-size:11px;color:var(--hint)">Chưa đủ điều kiện</span>`}
@@ -14899,6 +15985,27 @@
           });
           showToast("✅ Đã ghi nhận kết quả xác minh");
           _loadVerificationList();
+        } catch (e) {
+          showToast("✗ " + e.message);
+        }
+      }
+
+      async function _completeProfile(id, name) {
+        if (
+          !confirm(
+            `Xác nhận hoàn thiện hồ sơ "${name}"?\nHồ sơ sẽ chuyển sang trạng thái Hoàn thiện và có thể xuất Word.`,
+          )
+        )
+          return;
+        try {
+          await API.post(`/profiles/${id}/workflow/`, {
+            action: "complete",
+            comment: "Hoàn thiện hồ sơ sau xác minh",
+          });
+          showToast(` Hồ sơ ${name} đã Hoàn thiện — có thể xuất Word`);
+          addActivity(` Hoàn thiện hồ sơ <strong>${name}</strong>`);
+          _loadVerificationList();
+          _loadDashboard();
         } catch (e) {
           showToast("✗ " + e.message);
         }
@@ -15442,6 +16549,8 @@
               p.return_reason || "Hồ sơ cần bổ sung.",
               correctionData,
             );
+            // Show per-section field notes from officer
+            await _showCitizenFieldNotes(p.id);
           }
         } catch (e) {
           console.warn("[API] my profile load failed:", e.message);
@@ -15450,6 +16559,139 @@
 
       // ===== TOPBAR NAME UPDATE =====
       // ===== PROFILE VIEW MODE =====
+
+      // Map: admin field key → citizen form input ID (or null to fall back to section)
+      const _FIELD_KEY_TO_CITIZEN_INPUT = {
+        "fi-esA-name": "hoTen",
+        "fi-esA-dob": "ngaySinh",
+        "fi-esA-birthplace": "birthPlaceDetail",
+        "fi-esA-hometown": "queQuan",
+        "fi-esA-address": "noiO",
+        "fi-esA-temp-addr": "tamTru",
+        // fields without a single citizen input fall back to their section
+        "fi-esA-gender": null,
+        "fi-esA-ethnic": null,
+        "fi-esA-religion": null,
+        "fi-esA-cccd": null,
+        "fi-esA-phone": null,
+        "fi-esA-email": null,
+        "fi-esA-occupation": null,
+        // Section C fields → section secC
+        "fi-esC-edu-gen": null,
+        "fi-esC-edu-qual": null,
+        "fi-esC-political": null,
+        "fi-esC-foreign-lang": null,
+        "fi-esC-it": null,
+        "fi-esC-youth-union": null,
+        "fi-esC-sci-tech": null,
+        "fi-esC-degree": null,
+        "fi-esC-acad-title": null,
+        "fi-esC-ethnic-lang": null,
+        // Section J
+        "fi-esJ-self": null,
+        // Section K
+        "fi-esK-name": null,
+        "fi-esK-date": null,
+      };
+      // Map: admin field key → fallback citizen section ID
+      const _FIELD_KEY_TO_CITIZEN_SEC = {
+        // per-field esA keys with no direct input → secA
+        "fi-esA-gender": "secA",
+        "fi-esA-ethnic": "secA",
+        "fi-esA-religion": "secA",
+        "fi-esA-cccd": "secA",
+        "fi-esA-phone": "secA",
+        "fi-esA-email": "secA",
+        "fi-esA-occupation": "secA",
+        // section-level table notes
+        esB: "secB",
+        "esC-work": "secC",
+        esD: "secD",
+        esE: "secG",
+        esFT: "secF",
+        esH: "secH",
+        // section C fields
+        "fi-esC-edu-gen": "secC",
+        "fi-esC-edu-qual": "secC",
+        "fi-esC-political": "secC",
+        "fi-esC-foreign-lang": "secC",
+        "fi-esC-it": "secC",
+        "fi-esC-youth-union": "secC",
+        "fi-esC-sci-tech": "secC",
+        "fi-esC-degree": "secC",
+        "fi-esC-acad-title": "secC",
+        "fi-esC-ethnic-lang": "secC",
+        // J / K
+        "fi-esJ-self": "secJ",
+        "fi-esK-name": "secK",
+        "fi-esK-date": "secK",
+      };
+
+      async function _showCitizenFieldNotes(profileId) {
+        // Remove old banners
+        document
+          .querySelectorAll(".citizen-note-banner, .citizen-field-note-banner")
+          .forEach((el) => el.remove());
+        document
+          .querySelectorAll(".section.has-admin-note")
+          .forEach((el) => el.classList.remove("has-admin-note"));
+
+        try {
+          const resp = await API.get(`/profiles/${profileId}/field-notes/`);
+          const notes = Array.isArray(resp) ? resp : resp.data || [];
+
+          notes.forEach((n) => {
+            if (!n.note || n.resolved) return;
+            const key = n.field_key;
+            const citizenInputId = _FIELD_KEY_TO_CITIZEN_INPUT[key];
+            const citizenSecId = _FIELD_KEY_TO_CITIZEN_SEC[key] || null;
+
+            if (citizenInputId) {
+              // Show banner next to the specific citizen form input
+              const inp = document.getElementById(citizenInputId);
+              if (!inp) return;
+              const banner = document.createElement("div");
+              banner.className = "citizen-field-note-banner visible";
+              banner.innerHTML =
+                `<span class="cfnb-icon">💬</span>` +
+                `<span><strong>Góp ý BXĐ:</strong> ${_esc(n.note)}</span>`;
+              // Inject after the input (or its form-row if available)
+              const formRow = inp.closest(".form-row");
+              if (formRow) formRow.after(banner);
+              else inp.after(banner);
+              // Highlight the input's form-row
+              if (formRow) formRow.classList.add("citizen-has-note");
+              // Mark parent section
+              const sec = inp.closest(".section");
+              if (sec) sec.classList.add("has-admin-note");
+            } else if (citizenSecId) {
+              // Section-level banner
+              const sec = document.getElementById(citizenSecId);
+              if (!sec) return;
+              sec.classList.add("has-admin-note");
+              // Check if a banner for this section already exists; append note to it
+              let banner = sec.querySelector(".citizen-note-banner");
+              if (!banner) {
+                banner = document.createElement("div");
+                banner.className = "citizen-note-banner visible";
+                banner.innerHTML = `<div class="cnb-body"></div>`;
+                const header = sec.querySelector(".section-header");
+                if (header) header.after(banner);
+                else sec.prepend(banner);
+              }
+              const body = banner.querySelector(".cnb-body");
+              if (body) {
+                const item = document.createElement("div");
+                item.className = "cnb-item";
+                item.innerHTML = `<span class="cfnb-icon">💬</span><span>${_esc(n.note)}</span>`;
+                body.appendChild(item);
+              }
+            }
+          });
+        } catch (e) {
+          console.warn("[CITIZEN NOTES] load fail:", e.message);
+        }
+      }
       function _switchToFormMode() {
         const m = document.querySelector("#memberMain main");
         if (m) m.style.display = "";
@@ -15644,7 +16886,7 @@
 
         document.getElementById("pvSectionsSummary").innerHTML = [
           `<div class="pv-sec-block"><div class="pv-sec-head"><div class="pv-sec-badge">B</div><div class="pv-sec-title">Lịch sử bản thân</div></div>${_li(history, (h) => `${_period(h) ? `<strong>${_period(h)}</strong>: ` : ""}${_esc(h.description || "")}${h.location ? ` (Địa điểm: ${_esc(h.location)})` : ""}`)}</div>`,
-          `<div class="pv-sec-block"><div class="pv-sec-head"><div class="pv-sec-badge">C</div><div class="pv-sec-title">Công tác</div></div>${_li(work, (w) => `${_period(w) ? `<strong>${_period(w)}</strong>: ` : ""}${_esc(w.employer || "—")}${w.location ? ` (${_esc(w.location)})` : ""}${w.notes ? `; ${_esc(w.notes)}` : ""}`)}</div>`,
+          `<div class="pv-sec-block"><div class="pv-sec-head"><div class="pv-sec-badge">C</div><div class="pv-sec-title">Công tác</div></div>${_li(work, (w) => `${_period(w) ? `<strong>${_period(w)}</strong>: ` : ""}${_esc(w.employer || "—")}${w.job_title ? ` – ${_esc(w.job_title)}` : ""}${w.location ? ` (${_esc(w.location)})` : ""}${w.notes ? `; ${_esc(w.notes)}` : ""}`)}</div>`,
           `<div class="pv-sec-block"><div class="pv-sec-head"><div class="pv-sec-badge">D</div><div class="pv-sec-title">Đặc điểm lịch sử</div></div>${p.political_history_text ? `<div style="font-size:12.5px;line-height:1.5">${_esc(p.political_history_text)}</div>` : `<div class="pv-sec-empty">Chưa nhập</div>`}</div>`,
           `<div class="pv-sec-block"><div class="pv-sec-head"><div class="pv-sec-badge">E</div><div class="pv-sec-title">Đào tạo, bồi dưỡng</div></div>${_li(edu, (e) => `${_period(e) ? `<strong>${_period(e)}</strong>: ` : ""}${_esc(e.school || "—")}${e.major ? ` - ${_esc(e.major)}` : ""}${e.edu_level ? ` (${_esc(e.edu_level)})` : ""}${e.certificate ? `, ${_esc(e.certificate)}` : ""}${e.location ? `, ${_esc(e.location)}` : ""}`)}</div>`,
           `<div class="pv-sec-block"><div class="pv-sec-head"><div class="pv-sec-badge">F</div><div class="pv-sec-title">Đi nước ngoài</div></div>${_li(travel, (t) => `${_period(t) ? `<strong>${_period(t)}</strong>: ` : ""}${_esc(t.country || "—")}${t.purpose ? ` - ${_esc(t.purpose)}` : ""}${t.sponsoring_org ? ` (Cơ quan: ${_esc(t.sponsoring_org)})` : ""}`)}</div>`,
@@ -16142,8 +17384,20 @@
         const user = API.currentUser();
         const accessToken = API.token.access();
         if (user && accessToken) {
-          // Restore session without re-login
-          _onLoginSuccess({});
+          // Fetch fresh permissions from server before restoring session
+          API.get("/auth/me/").then((resp) => {
+            const fresh = resp.data || resp;
+            const stored = API.currentUser() || {};
+            localStorage.setItem("api_user", JSON.stringify({
+              ...stored,
+              is_superuser: fresh.is_superuser || false,
+              permissions: fresh.permissions || stored.permissions,
+            }));
+          }).catch(() => {
+            // Token expired or network error — proceed with cached user
+          }).finally(() => {
+            _onLoginSuccess({});
+          });
         } else {
           // Show login after a brief moment so the UI renders first
           setTimeout(_showLoginModal, 200);
@@ -16235,6 +17489,18 @@
           clearTimeout(autoSaveTimer);
           autoSaveTimer = setTimeout(() => showToast("↑ Tự động lưu…"), 4000);
         }
+      });
+
+      // Update has-content + row-has-note state live when officer types a field note
+      document.addEventListener("input", (e) => {
+        const ta = e.target;
+        if (!ta.classList.contains("fn-field-note-ta")) return;
+        const hasContent = ta.value.trim().length > 0;
+        ta.classList.toggle("has-content", hasContent);
+        const nd = ta.closest(".fn-field-note");
+        if (nd) nd.classList.toggle("has-note", hasContent);
+        const row = ta.closest(".field-row");
+        if (row) row.classList.toggle("row-has-note", hasContent);
       });
 
       // ===== AI CHECK =====
@@ -16477,3 +17743,4 @@
     ></div>
   </body>
 </html>
+  

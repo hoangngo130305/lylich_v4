@@ -136,22 +136,60 @@ class User(AbstractBaseUser, PermissionsMixin):
         self.save(update_fields=['login_attempts', 'last_login_at'])
 
 
-class Session(models.Model):
-    id            = models.CharField(max_length=128, primary_key=True)
-    user          = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sessions')
-    ip_address    = models.GenericIPAddressField(null=True, blank=True)
-    user_agent    = models.CharField(max_length=500, null=True, blank=True)
-    payload       = models.TextField(null=True, blank=True)
-    last_activity = models.PositiveIntegerField()
-    expires_at    = models.DateTimeField()
+class OfficerPermission(models.Model):
+    """Granular feature permissions for admin/can_bo_bxd users.
+    Managed by superuser via the super-admin interface.
+    """
+    user                   = models.OneToOneField(User, on_delete=models.CASCADE,
+                                                  related_name='officer_permission')
+    can_create_accounts    = models.BooleanField(default=False, verbose_name='Cấp tài khoản quần chúng')
+    can_review_profiles    = models.BooleanField(default=False, verbose_name='Xem & trả lại hồ sơ')
+    can_approve_profiles   = models.BooleanField(default=False, verbose_name='Phê duyệt hồ sơ')
+    can_export_word        = models.BooleanField(default=False, verbose_name='Xuất file Word')
+    can_send_notifications = models.BooleanField(default=False, verbose_name='Gửi thông báo')
+    can_view_reports       = models.BooleanField(default=False, verbose_name='Xem báo cáo')
+    created_at             = models.DateTimeField(auto_now_add=True)
+    updated_at             = models.DateTimeField(auto_now=True)
 
     class Meta:
-        db_table = 'sessions'
-        verbose_name = 'Phiên đăng nhập'
-        verbose_name_plural = 'Phiên đăng nhập'
+        db_table = 'officer_permissions'
+        verbose_name = 'Phân quyền cán bộ'
+        verbose_name_plural = 'Phân quyền cán bộ'
 
     def __str__(self):
-        return f'Session {self.id[:8]} – {self.user}'
+        return f'Permissions for {self.user}'
+
+    def as_dict(self):
+        return {
+            'can_create_accounts':    self.can_create_accounts,
+            'can_review_profiles':    self.can_review_profiles,
+            'can_approve_profiles':   self.can_approve_profiles,
+            'can_export_word':        self.can_export_word,
+            'can_send_notifications': self.can_send_notifications,
+            'can_view_reports':       self.can_view_reports,
+        }
+
+
+def get_officer_permissions(user) -> dict:
+    """Return effective feature permissions for a user."""
+    if user.is_superuser:
+        return {k: True for k in [
+            'can_create_accounts', 'can_review_profiles', 'can_approve_profiles',
+            'can_export_word', 'can_send_notifications', 'can_view_reports',
+        ]}
+    try:
+        return user.officer_permission.as_dict()
+    except OfficerPermission.DoesNotExist:
+        # Legacy admin without explicit record → full access
+        if getattr(user, 'role_code', None) == 'admin':
+            return {k: True for k in [
+                'can_create_accounts', 'can_review_profiles', 'can_approve_profiles',
+                'can_export_word', 'can_send_notifications', 'can_view_reports',
+            ]}
+        return {k: False for k in [
+            'can_create_accounts', 'can_review_profiles', 'can_approve_profiles',
+            'can_export_word', 'can_send_notifications', 'can_view_reports',
+        ]}
 
 
 class LoginHistory(models.Model):

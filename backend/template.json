@@ -278,12 +278,7 @@
         {
           "header": "Làm gì, ở đâu (ghi rõ nơi sinh sống)",
           "field": "description",
-          "width_cm": 10.5
-        },
-        {
-          "header": "Chức vụ",
-          "field": "location",
-          "width_cm": 3.0
+          "width_cm": 13.5
         }
       ]
     },
@@ -317,19 +312,31 @@
         {
           "header": "Làm gì, ở đâu (ghi rõ nơi sinh sống)",
           "field": "employer",
-          "width_cm": 7.5
+          "width_cm": 10.0
         },
         {
           "header": "Chức vụ",
           "field": "job_title",
-          "width_cm": 3.0
-        },
-        {
-          "header": "Ghi chú",
-          "field": "notes",
-          "width_cm": 3.0
+          "width_cm": 3.5
         }
       ]
+    },
+    {
+      "id": "phan_d_heading",
+      "type": "section_heading",
+      "text": "PHẦN D – ĐẶC ĐIỂM LỊCH SỬ CHÍNH TRỊ"
+    },
+    {
+      "id": "phan_d_note",
+      "type": "instruction",
+      "text": "Khai rõ những đặc điểm lịch sử chính trị của bản thân và gia đình liên quan đến an ninh chính trị (nếu có). Bỏ trống nếu không có."
+    },
+    {
+      "id": "phan_d_content",
+      "type": "text_area",
+      "label": "Đặc điểm lịch sử chính trị",
+      "field": "profile.political_history_text",
+      "empty_lines": 8
     },
     {
       "id": "phan_e_heading",
@@ -403,17 +410,12 @@
         {
           "header": "Nội dung đi",
           "field": "purpose",
-          "width_cm": 7.0
+          "width_cm": 9.5
         },
         {
           "header": "Nước nào",
           "field": "country",
-          "width_cm": 3.5
-        },
-        {
-          "header": "Cơ quan bảo lãnh",
-          "field": "sponsoring_org",
-          "width_cm": 3.5
+          "width_cm": 4.0
         }
       ]
     },
@@ -572,12 +574,7 @@
         {
           "header": "Làm gì, ở đâu (ghi rõ nơi sinh sống)",
           "field": "description",
-          "width_cm": 10.5
-        },
-        {
-          "header": "Chức vụ",
-          "field": "location",
-          "width_cm": 3.0
+          "width_cm": 13.5
         }
       ]
     },
@@ -646,12 +643,7 @@
         {
           "header": "Làm gì, ở đâu (ghi rõ nơi sinh sống)",
           "field": "description",
-          "width_cm": 10.5
-        },
-        {
-          "header": "Chức vụ",
-          "field": "location",
-          "width_cm": 3.0
+          "width_cm": 13.5
         }
       ]
     },
@@ -739,12 +731,7 @@
         {
           "header": "Làm gì, ở đâu (ghi rõ nơi sinh sống)",
           "field": "description",
-          "width_cm": 10.5
-        },
-        {
-          "header": "Chức vụ",
-          "field": "location",
-          "width_cm": 3.0
+          "width_cm": 13.5
         }
       ]
     },
@@ -821,12 +808,7 @@
         {
           "header": "Làm gì, ở đâu (ghi rõ nơi sinh sống)",
           "field": "description",
-          "width_cm": 10.5
-        },
-        {
-          "header": "Chức vụ",
-          "field": "location",
-          "width_cm": 3.0
+          "width_cm": 13.5
         }
       ]
     },
@@ -878,12 +860,7 @@
         {
           "header": "Làm gì, ở đâu (ghi rõ nơi sinh sống)",
           "field": "description",
-          "width_cm": 10.5
-        },
-        {
-          "header": "Chức vụ",
-          "field": "location",
-          "width_cm": 3.0
+          "width_cm": 13.5
         }
       ]
     },

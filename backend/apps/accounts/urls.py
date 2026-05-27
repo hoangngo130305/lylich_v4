@@ -23,4 +23,11 @@ urlpatterns = [
     # Account requests
     path('account-requests/',          views.AccountRequestListView.as_view(),   name='account-request-list'),
     path('account-requests/<int:pk>/', views.AccountRequestDetailView.as_view(), name='account-request-detail'),
+
+    # ── Super Admin ──────────────────────────────────────────────────────────
+    path('superadmin/login/',                          views.SuperAdminLoginView.as_view(),       name='superadmin-login'),
+    path('superadmin/officers/',                       views.OfficerListCreateView.as_view(),     name='superadmin-officer-list'),
+    path('superadmin/officers/<int:pk>/',              views.OfficerDetailView.as_view(),         name='superadmin-officer-detail'),
+    path('superadmin/officers/<int:pk>/permissions/', views.OfficerPermissionView.as_view(),     name='superadmin-officer-permissions'),
+    path('superadmin/officers/<int:pk>/reset-password/', views.officer_reset_password,           name='superadmin-officer-reset-password'),
 ]

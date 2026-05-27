@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Profile, ProfileReview, CommitteeComment, ProfileOfficerAssignment
+from .models import Profile, ProfileReview, CommitteeComment, ProfileOfficerAssignment, ProfileFieldNote
 from apps.accounts.serializers import UserPublicSerializer
 from apps.common.serializers import (
     EthnicGroupSerializer, ReligionSerializer, EducationLevelSerializer,
@@ -142,3 +142,12 @@ class ProfileWorkflowSerializer(serializers.Serializer):
     comment = serializers.CharField(required=False, allow_blank=True)
     return_reason   = serializers.CharField(required=False, allow_blank=True)
     rejected_reason = serializers.CharField(required=False, allow_blank=True)
+
+
+class ProfileFieldNoteSerializer(serializers.ModelSerializer):
+    reviewer_name = serializers.CharField(source='reviewer.full_name', read_only=True)
+
+    class Meta:
+        model = ProfileFieldNote
+        fields = ['id', 'field_key', 'note', 'reviewer_name', 'resolved', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'reviewer_name', 'created_at', 'updated_at']

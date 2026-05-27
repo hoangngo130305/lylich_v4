@@ -17,7 +17,7 @@ class ActivityLog(models.Model):
 
     user         = models.ForeignKey('accounts.User', null=True, blank=True, on_delete=models.SET_NULL,
                                       related_name='activity_logs')
-    action       = models.CharField(max_length=20, choices=Action.choices)
+    action       = models.CharField(max_length=50, choices=Action.choices)
     target_model = models.CharField(max_length=80, null=True, blank=True)
     target_id    = models.BigIntegerField(null=True, blank=True)
     description  = models.TextField(null=True, blank=True)
