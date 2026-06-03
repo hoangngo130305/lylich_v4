@@ -170,6 +170,14 @@ class OfficerPermission(models.Model):
         }
 
 
+class Officer(User):
+    """Proxy model for managing officers via Django admin."""
+    class Meta:
+        proxy = True
+        verbose_name = 'Cán bộ Đảng'
+        verbose_name_plural = 'Quản lý Cán bộ Đảng'
+
+
 def get_officer_permissions(user) -> dict:
     """Return effective feature permissions for a user."""
     if user.is_superuser:

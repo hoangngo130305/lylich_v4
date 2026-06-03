@@ -5,7 +5,7 @@ from rest_framework import generics, status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 
-from apps.accounts.permissions import IsOfficer, IsAdmin
+from apps.accounts.permissions import IsOfficer, IsAdmin, CanViewReports
 from apps.profiles.models import Profile
 from apps.auditlogs.utils import log_activity
 from apps.auditlogs.models import ActivityLog
@@ -14,7 +14,7 @@ from .serializers import StatsMonthlySerializer, ReportExportSerializer
 
 
 @api_view(['GET'])
-@permission_classes([IsOfficer])
+@permission_classes([CanViewReports])
 def dashboard_stats(request):
     """Aggregated counts for the admin dashboard KPI cards."""
     now  = timezone.now()
@@ -46,7 +46,7 @@ def dashboard_stats(request):
 
 
 @api_view(['GET'])
-@permission_classes([IsOfficer])
+@permission_classes([CanViewReports])
 def monthly_stats(request):
     year  = request.query_params.get('year', timezone.now().year)
     month = request.query_params.get('month')
@@ -60,7 +60,7 @@ def monthly_stats(request):
 
 
 @api_view(['POST'])
-@permission_classes([IsOfficer])
+@permission_classes([CanViewReports])
 def export_excel_report(request):
     """Export monthly stats to Excel via openpyxl."""
     try:
@@ -115,7 +115,7 @@ def export_excel_report(request):
 
 class ReportExportListView(generics.ListAPIView):
     serializer_class   = ReportExportSerializer
-    permission_classes = [IsOfficer]
+    permission_classes = [CanViewReports]
 
     def get_queryset(self):
         return ReportExport.objects.select_related('created_by').order_by('-created_at')

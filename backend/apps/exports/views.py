@@ -8,7 +8,7 @@ from rest_framework import generics, status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 
-from apps.accounts.permissions import IsOfficer, IsOfficerOrApplicant
+from apps.accounts.permissions import IsOfficer, IsOfficerOrApplicant, _has_officer_perm
 from apps.auditlogs.utils import log_activity
 from apps.auditlogs.models import ActivityLog
 from apps.profiles.models import Profile
@@ -142,13 +142,18 @@ def export_word(request, profile_id):
             pk=profile_id,
         )
 
-        # Object-level access check: applicant can only export their own profile
+        # Only officers can export Word — applicants cannot
         if request.user.role_code not in ('admin', 'can_bo_bxd'):
-            if profile.user_id != request.user.id:
-                return Response(
-                    {'success': False, 'detail': 'Không có quyền xuất hồ sơ này.'},
-                    status=status.HTTP_403_FORBIDDEN,
-                )
+            return Response(
+                {'success': False, 'detail': 'Quần chúng không có quyền xuất file Word.'},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        # Granular permission: can_bo_bxd must have can_export_word flag
+        if request.user.role_code == 'can_bo_bxd' and not _has_officer_perm(request.user, 'can_export_word'):
+            return Response(
+                {'success': False, 'detail': 'Bạn chưa được cấp quyền xuất file Word.'},
+                status=status.HTTP_403_FORBIDDEN,
+            )
 
         template = request.data.get('template_name', 'Mẫu 2-KNĐ')
 

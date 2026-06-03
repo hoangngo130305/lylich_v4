@@ -8814,3 +8814,67 @@ ERROR 2026-05-25 14:07:30,956 basehttp 4796 17808 "GET /admin/profiles/profile/ 
 ERROR 2026-05-25 14:08:21,596 basehttp 4796 17808 "GET /admin/accounts/loginhistory/ HTTP/1.1" 500 523137
 ERROR 2026-05-25 14:10:27,721 basehttp 4796 17808 "GET /admin/accounts/loginhistory/ HTTP/1.1" 500 523137
 ERROR 2026-05-25 14:10:58,826 basehttp 4796 17808 "GET /admin/profiles/profile/ HTTP/1.1" 500 522977
+WARNING 2026-05-27 09:52:10,183 log 19536 10844 Unauthorized: /api/v1/auth/me/
+WARNING 2026-05-27 09:52:10,185 basehttp 19536 10844 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-05-27 09:54:59,328 log 19536 13332 Not Found: /
+WARNING 2026-05-27 09:54:59,329 basehttp 19536 13332 "GET / HTTP/1.1" 404 5304
+WARNING 2026-05-27 09:54:59,393 log 19536 13332 Not Found: /favicon.ico
+WARNING 2026-05-27 09:54:59,394 basehttp 19536 13332 "GET /favicon.ico HTTP/1.1" 404 5355
+WARNING 2026-05-27 09:58:10,898 log 19536 22208 Not Found: /.well-known/appspecific/com.chrome.devtools.json
+WARNING 2026-05-27 09:58:10,899 basehttp 19536 22208 "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 5466
+WARNING 2026-05-27 10:08:29,539 log 13368 16380 Not Found: /
+WARNING 2026-05-27 10:08:29,540 basehttp 13368 16380 "GET / HTTP/1.1" 404 5304
+WARNING 2026-05-27 10:08:34,665 log 13368 16380 Not Found: /
+WARNING 2026-05-27 10:08:34,666 basehttp 13368 16380 "GET / HTTP/1.1" 404 5304
+WARNING 2026-05-27 10:23:50,381 log 11288 1536 Unauthorized: /api/v1/auth/login/
+WARNING 2026-05-27 10:23:50,381 basehttp 11288 1536 "POST /api/v1/auth/login/ HTTP/1.1" 401 107
+WARNING 2026-05-29 11:12:49,166 log 19372 1588 Not Found: /favicon.ico
+WARNING 2026-05-29 11:12:49,167 basehttp 19372 1588 "GET /favicon.ico HTTP/1.1" 404 5355
+WARNING 2026-05-29 11:19:32,406 log 19372 1588 Not Found: /
+WARNING 2026-05-29 11:19:32,407 basehttp 19372 1588 "GET / HTTP/1.1" 404 5304
+WARNING 2026-06-02 18:49:42,685 log 17336 7364 Unauthorized: /api/v1/auth/me/
+WARNING 2026-06-02 18:49:42,697 basehttp 17336 7364 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-06-02 18:50:21,260 log 17336 7364 Unauthorized: /api/v1/auth/login/
+WARNING 2026-06-02 18:50:21,261 basehttp 17336 7364 "POST /api/v1/auth/login/ HTTP/1.1" 401 112
+WARNING 2026-06-02 18:50:30,826 log 17336 7364 Unauthorized: /api/v1/auth/login/
+WARNING 2026-06-02 18:50:30,826 basehttp 17336 7364 "POST /api/v1/auth/login/ HTTP/1.1" 401 107
+WARNING 2026-06-02 18:50:38,445 log 17336 19344 Not Found: /favicon.ico
+WARNING 2026-06-02 18:50:38,445 basehttp 17336 19344 "GET /favicon.ico HTTP/1.1" 404 5355
+WARNING 2026-06-02 18:51:19,492 log 17336 7364 Unauthorized: /api/v1/auth/login/
+WARNING 2026-06-02 18:51:19,493 basehttp 17336 7364 "POST /api/v1/auth/login/ HTTP/1.1" 401 107
+WARNING 2026-06-02 18:52:34,772 log 17336 7364 Unauthorized: /api/v1/auth/login/
+WARNING 2026-06-02 18:52:34,772 basehttp 17336 7364 "POST /api/v1/auth/login/ HTTP/1.1" 401 107
+WARNING 2026-06-02 18:52:43,847 log 17336 7364 Unauthorized: /api/v1/auth/login/
+WARNING 2026-06-02 18:52:43,847 basehttp 17336 7364 "POST /api/v1/auth/login/ HTTP/1.1" 401 107
+WARNING 2026-06-02 18:57:31,028 log 17336 7364 Unauthorized: /api/v1/auth/login/
+WARNING 2026-06-02 18:57:31,029 basehttp 17336 7364 "POST /api/v1/auth/login/ HTTP/1.1" 401 112
+WARNING 2026-06-03 09:11:43,522 log 20980 9236 Unauthorized: /api/v1/auth/me/
+WARNING 2026-06-03 09:11:43,524 basehttp 20980 9236 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-06-03 09:24:51,637 log 20980 1028 Not Found: /favicon.ico
+WARNING 2026-06-03 09:24:51,638 basehttp 20980 1028 "GET /favicon.ico HTTP/1.1" 404 5355
+WARNING 2026-06-03 14:03:00,377 log 20980 19692 Unauthorized: /api/v1/verification/stats/
+WARNING 2026-06-03 14:03:00,378 basehttp 20980 19692 "GET /api/v1/verification/stats/ HTTP/1.1" 401 291
+WARNING 2026-06-03 14:06:00,644 log 20980 4528 Unauthorized: /api/v1/auth/login/
+WARNING 2026-06-03 14:06:00,645 basehttp 20980 4528 "POST /api/v1/auth/login/ HTTP/1.1" 401 107
+WARNING 2026-06-03 14:06:20,228 log 20980 22148 Not Found: /favicon.ico
+WARNING 2026-06-03 14:06:20,229 basehttp 20980 22148 "GET /favicon.ico HTTP/1.1" 404 5355
+WARNING 2026-06-03 14:20:28,984 log 20980 6528 Bad Request: /api/v1/timelines/67/work/
+WARNING 2026-06-03 14:20:28,992 basehttp 20980 6528 "POST /api/v1/timelines/67/work/ HTTP/1.1" 400 183
+WARNING 2026-06-03 14:20:29,005 log 20980 23788 Bad Request: /api/v1/timelines/67/work/
+WARNING 2026-06-03 14:20:29,005 basehttp 20980 23788 "POST /api/v1/timelines/67/work/ HTTP/1.1" 400 183
+WARNING 2026-06-03 15:04:56,074 log 20980 15728 Unauthorized: /api/v1/verification/stats/
+WARNING 2026-06-03 15:04:56,076 basehttp 20980 15728 "GET /api/v1/verification/stats/ HTTP/1.1" 401 291
+WARNING 2026-06-03 16:48:47,814 log 20980 10944 Unauthorized: /api/v1/auth/users/
+WARNING 2026-06-03 16:48:47,815 basehttp 20980 10944 "GET /api/v1/auth/users/?role__code=quan_chung&ordering=-created_at HTTP/1.1" 401 291
+WARNING 2026-06-03 17:00:33,508 log 20980 1984 Unauthorized: /api/v1/auth/me/
+WARNING 2026-06-03 17:00:33,509 basehttp 20980 1984 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-06-03 17:49:58,009 log 20980 11300 Unauthorized: /api/v1/verification/stats/
+WARNING 2026-06-03 17:49:58,010 basehttp 20980 11300 "GET /api/v1/verification/stats/ HTTP/1.1" 401 291
+WARNING 2026-06-03 18:30:59,319 log 20980 19168 Unauthorized: /api/v1/auth/me/
+WARNING 2026-06-03 18:30:59,327 basehttp 20980 19168 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-06-03 18:56:28,031 log 20980 23052 Unauthorized: /api/v1/auth/users/
+WARNING 2026-06-03 18:56:28,031 basehttp 20980 23052 "GET /api/v1/auth/users/?role__code=quan_chung&ordering=-created_at HTTP/1.1" 401 291
+WARNING 2026-06-03 19:33:33,863 log 20980 22560 Unauthorized: /api/v1/auth/me/
+WARNING 2026-06-03 19:33:33,864 basehttp 20980 22560 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-06-03 20:23:25,580 log 20980 2516 Unauthorized: /api/v1/auth/me/
+WARNING 2026-06-03 20:23:25,592 basehttp 20980 2516 "GET /api/v1/auth/me/ HTTP/1.1" 401 291

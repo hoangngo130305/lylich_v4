@@ -98,18 +98,19 @@ class ProfileDetailSerializer(serializers.ModelSerializer):
     def get_fields(self):
         """Allow applicants to have partial profiles - relax required constraint."""
         fields = super().get_fields()
-        # When reading/writing, don't require fields that would cause 400 errors
-        # for incomplete profiles being edited by applicants
         for field_name in ['full_name', 'gender']:
             if field_name in fields:
                 fields[field_name].required = False
                 fields[field_name].allow_blank = True
-        
-        # DateField: not required, but if provided must be valid
         if 'dob' in fields:
             fields['dob'].required = False
-        
         return fields
+
+    def validate_dob(self, value):
+        from datetime import date
+        if value and value > date.today():
+            raise serializers.ValidationError('Ngày sinh không được lớn hơn ngày hiện tại.')
+        return value
 
     def update(self, instance, validated_data):
         # Auto word count

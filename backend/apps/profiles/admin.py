@@ -1,6 +1,10 @@
 from django.contrib import admin
+from django.http import HttpResponse
 from unfold.admin import ModelAdmin, TabularInline
 from .models import Profile, ProfileReview, CommitteeComment, ProfileOfficerAssignment
+import zipfile
+import io
+import re
 
 
 class ProfileReviewInline(TabularInline):
@@ -19,8 +23,57 @@ class CommitteeCommentInline(TabularInline):
     readonly_fields = ['created_at', 'updated_at']
 
 
+@admin.action(description='Xuất Word Mẫu 2-KNĐ (hàng loạt)')
+def export_word_bulk(modeladmin, request, queryset):
+    from apps.exports.word_builder import build_lylich_docx
+    from apps.exports.models import WordExportLog
+
+    profiles = queryset.select_related(
+        'user', 'ethnic_group', 'religion', 'edu_level', 'political_level',
+        'officer_in_charge', 'current_ward', 'birth_place_ward', 'hometown_ward',
+    ).prefetch_related(
+        'committee_comments', 'family_members', 'history_entries',
+        'work_history', 'education_history', 'awards', 'overseas_travels',
+    )
+
+    if profiles.count() == 1:
+        profile = profiles.first()
+        buf = build_lylich_docx(profile)
+        content = buf.read()
+        safe_name = re.sub(r'[^\w\-]', '_', profile.full_name or 'profile')
+        file_name = f'SoYeuLyLich_{safe_name}.docx'
+        WordExportLog.objects.create(
+            profile=profile, exported_by=request.user,
+            template_name='Mẫu 2-KNĐ', file_name=file_name, file_size=len(content),
+        )
+        response = HttpResponse(content, content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+        response['Content-Disposition'] = f'attachment; filename="{file_name}"'
+        return response
+
+    zip_buf = io.BytesIO()
+    with zipfile.ZipFile(zip_buf, 'w', zipfile.ZIP_DEFLATED) as zf:
+        for profile in profiles:
+            try:
+                buf = build_lylich_docx(profile)
+                content = buf.read()
+                safe_name = re.sub(r'[^\w\-]', '_', profile.full_name or f'profile_{profile.id}')
+                file_name = f'SoYeuLyLich_{safe_name}.docx'
+                zf.writestr(file_name, content)
+                WordExportLog.objects.create(
+                    profile=profile, exported_by=request.user,
+                    template_name='Mẫu 2-KNĐ', file_name=file_name, file_size=len(content),
+                )
+            except Exception:
+                continue
+    zip_buf.seek(0)
+    response = HttpResponse(zip_buf.read(), content_type='application/zip')
+    response['Content-Disposition'] = 'attachment; filename="LyLich_export.zip"'
+    return response
+
+
 @admin.register(Profile)
 class ProfileAdmin(ModelAdmin):
+    actions = [export_word_bulk]
     list_display  = [
         'id', 'profile_number', 'full_name', 'gender', 'dob',
         'status', 'ai_score', 'officer_in_charge', 'submitted_at', 'created_at',

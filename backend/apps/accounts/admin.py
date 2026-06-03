@@ -1,8 +1,32 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django.contrib.auth.forms import UserCreationForm, UserChangeForm
+from django.core.exceptions import ValidationError
+from django.db import IntegrityError
 from django.utils.html import format_html
 from unfold.admin import ModelAdmin, StackedInline
-from .models import User, Role, LoginHistory, PasswordReset, AccountRequest, OfficerPermission
+from .models import User, Role, LoginHistory, PasswordReset, AccountRequest, OfficerPermission, Officer
+
+
+class UserAddForm(UserCreationForm):
+    class Meta(UserCreationForm.Meta):
+        model = User
+        fields = ('phone', 'full_name', 'role', 'status')
+
+    def clean_password1(self):
+        password1 = self.cleaned_data.get('password1', '')
+        if not password1:
+            raise ValidationError('Mật khẩu không được để trống.')
+        return password1
+
+    def clean_password2(self):
+        password1 = self.cleaned_data.get('password1', '')
+        password2 = self.cleaned_data.get('password2', '')
+        if not password2:
+            raise ValidationError('Vui lòng xác nhận mật khẩu.')
+        if password1 and password1 != password2:
+            raise ValidationError('Hai mật khẩu không khớp.')
+        return password2
 
 
 @admin.register(Role)
@@ -14,6 +38,7 @@ class RoleAdmin(ModelAdmin):
 
 @admin.register(User)
 class UserAdmin(ModelAdmin, BaseUserAdmin):
+    add_form      = UserAddForm
     list_display  = ['id', 'full_name', 'phone', 'role', 'status', 'phone_verified', 'created_at']
     list_filter   = ['role', 'status', 'phone_verified', 'email_verified']
     search_fields = ['full_name', 'phone', 'email', 'cccd']
@@ -45,34 +70,35 @@ class UserAdmin(ModelAdmin, BaseUserAdmin):
     filter_horizontal = []
     list_display_links = ['id', 'full_name']
 
+    def save_model(self, request, obj, form, change):
+        try:
+            super().save_model(request, obj, form, change)
+        except IntegrityError:
+            from django.contrib import messages
+            messages.error(request, f'Số điện thoại "{obj.phone}" đã được đăng ký trong hệ thống. Vui lòng dùng số khác.')
 
 # ── Officer proxy model ───────────────────────────────────────────────────────
-
-class Officer(User):
-    class Meta:
-        proxy = True
-        verbose_name = 'Cán bộ Đảng'
-        verbose_name_plural = 'Quản lý Cán bộ Đảng'
-
+# Officer model is defined in models.py
 
 class OfficerPermissionInline(StackedInline):
     model = OfficerPermission
     can_delete = False
+    min_num = 1
+    extra = 0
     verbose_name_plural = 'Phân quyền chức năng'
     fields = (
         ('can_create_accounts', 'can_review_profiles', 'can_approve_profiles'),
         ('can_export_word', 'can_send_notifications', 'can_view_reports'),
     )
 
-    def get_queryset(self, request):
-        return super().get_queryset(request)
-
     def has_delete_permission(self, request, obj=None):
         return False
 
 
 def _bool_icon(val):
-    return format_html('<span style="color:{}">&#{};;</span>', '#16a34a' if val else '#dc2626', '9989' if val else '10060')
+    icon = '✓' if val else '✗'
+    color = '#16a34a' if val else '#dc2626'
+    return format_html('<span style="color:{}; font-weight:bold">{}</span>', color, icon)
 
 
 @admin.register(Officer)
@@ -160,7 +186,6 @@ class OfficerAdmin(ModelAdmin, BaseUserAdmin):
         if obj.role and obj.role.code == 'admin':
             obj.is_staff = True
         super().save_model(request, obj, form, change)
-        OfficerPermission.objects.get_or_create(user=obj)
 
 
 @admin.register(LoginHistory)

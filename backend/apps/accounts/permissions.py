@@ -1,6 +1,20 @@
 from rest_framework.permissions import BasePermission
 
 
+def _has_officer_perm(user, flag: str) -> bool:
+    """True for superusers and 'admin' role; for 'can_bo_bxd' checks the OfficerPermission flag."""
+    if not (user and user.is_authenticated):
+        return False
+    if user.is_superuser or getattr(user, 'role_code', None) == 'admin':
+        return True
+    if getattr(user, 'role_code', None) != 'can_bo_bxd':
+        return False
+    try:
+        return bool(getattr(user.officer_permission, flag, False))
+    except Exception:
+        return False
+
+
 class IsSuperAdmin(BasePermission):
     """Only Django superusers (createsuperuser) can access."""
     def has_permission(self, request, view):
@@ -54,3 +68,36 @@ class IsOwnerOrOfficer(BasePermission):
         if hasattr(obj, 'profile') and hasattr(obj.profile, 'user_id'):
             return obj.profile.user_id == request.user.id
         return False
+
+
+# ── Granular OfficerPermission enforcement ────────────────────────────────────
+
+class CanCreateAccounts(BasePermission):
+    def has_permission(self, request, view):
+        return _has_officer_perm(request.user, 'can_create_accounts')
+
+
+class CanReviewProfiles(BasePermission):
+    def has_permission(self, request, view):
+        return _has_officer_perm(request.user, 'can_review_profiles')
+
+
+class CanApproveProfiles(BasePermission):
+    def has_permission(self, request, view):
+        return _has_officer_perm(request.user, 'can_approve_profiles')
+
+
+class CanExportWord(BasePermission):
+    def has_permission(self, request, view):
+        return _has_officer_perm(request.user, 'can_export_word')
+
+
+class CanSendNotifications(BasePermission):
+    def has_permission(self, request, view):
+        return _has_officer_perm(request.user, 'can_send_notifications')
+
+
+class CanViewReports(BasePermission):
+    def has_permission(self, request, view):
+        return _has_officer_perm(request.user, 'can_view_reports')
+

@@ -8,7 +8,7 @@ from .serializers import (
     NotificationSerializer, NotificationTemplateSerializer,
     SendNotificationSerializer, BulkSendSerializer, NotificationBatchSerializer,
 )
-from apps.accounts.permissions import IsOfficer, IsOfficerOrApplicant
+from apps.accounts.permissions import IsOfficer, IsOfficerOrApplicant, CanSendNotifications
 from apps.auditlogs.utils import log_activity
 
 
@@ -45,7 +45,7 @@ def mark_all_read(request):
 
 
 @api_view(['POST'])
-@permission_classes([IsOfficer])
+@permission_classes([CanSendNotifications])
 def send_notification(request):
     serializer = SendNotificationSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
@@ -67,7 +67,7 @@ def send_notification(request):
 
 
 @api_view(['POST'])
-@permission_classes([IsOfficer])
+@permission_classes([CanSendNotifications])
 def bulk_send(request):
     serializer = BulkSendSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)

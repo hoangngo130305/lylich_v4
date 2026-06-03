@@ -13,7 +13,7 @@ from .serializers import (
     ProfileReviewSerializer, CommitteeCommentSerializer, ProfileWorkflowSerializer,
     ProfileFieldNoteSerializer,
 )
-from apps.accounts.permissions import IsOfficer, IsApplicant, IsOwnerOrOfficer, IsOfficerOrApplicant
+from apps.accounts.permissions import IsOfficer, IsApplicant, IsOwnerOrOfficer, IsOfficerOrApplicant, _has_officer_perm
 from apps.auditlogs.utils import log_activity
 
 # Status transition rules
@@ -281,6 +281,11 @@ class ProfileWorkflowView(generics.GenericAPIView):
         if action in ('approve', 'reject', 'return', 'complete', 'request_verify'):
             if request.user.role_code not in ('can_bo_bxd', 'admin'):
                 return Response({'success': False, 'error': 'Chỉ cán bộ mới được thực hiện thao tác này.'}, status=403)
+        # Granular OfficerPermission checks for can_bo_bxd
+        if action in ('return', 'reject') and not _has_officer_perm(request.user, 'can_review_profiles'):
+            return Response({'success': False, 'error': 'Bạn chưa được cấp quyền trả lại/từ chối hồ sơ.'}, status=403)
+        if action in ('approve', 'complete', 'request_verify') and not _has_officer_perm(request.user, 'can_approve_profiles'):
+            return Response({'success': False, 'error': 'Bạn chưa được cấp quyền phê duyệt hồ sơ.'}, status=403)
 
         new_status = _target_status_for_action(profile.status, action)
         if new_status:
@@ -484,6 +489,8 @@ class ProfileFieldNoteView(generics.GenericAPIView):
     def post(self, request, pk):
         if request.user.role_code not in ('can_bo_bxd', 'admin'):
             return Response({'success': False, 'error': 'Chỉ cán bộ mới có thể thêm nhận xét.'}, status=403)
+        if not _has_officer_perm(request.user, 'can_review_profiles'):
+            return Response({'success': False, 'error': 'Bạn chưa được cấp quyền xem & trả lại hồ sơ.'}, status=403)
         try:
             profile = Profile.objects.get(pk=pk, deleted_at__isnull=True)
         except Profile.DoesNotExist:

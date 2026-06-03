@@ -1,6 +1,7 @@
 import secrets
 import string
 from django.conf import settings
+from django.contrib.auth import login as django_login
 from django.core.mail import send_mail
 from django.utils import timezone
 from django.db import transaction
@@ -23,7 +24,7 @@ from .serializers import (
     AccountRequestCreateSerializer, LoginHistorySerializer, UserPublicSerializer,
     OfficerPermissionSerializer, OfficerCreateSerializer, OfficerUpdateSerializer,
 )
-from .permissions import IsOfficer, IsAdmin, IsOfficerOrApplicant, IsSuperAdmin
+from .permissions import IsOfficer, IsAdmin, IsOfficerOrApplicant, IsSuperAdmin, CanCreateAccounts
 from apps.auditlogs.utils import log_activity
 
 
@@ -177,7 +178,7 @@ class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
 
 
 class AccountRequestListView(generics.ListCreateAPIView):
-    permission_classes = [IsOfficer]
+    permission_classes = [CanCreateAccounts]
     filterset_fields  = ['status']
     search_fields     = ['full_name', 'phone', 'cccd']
 
@@ -263,7 +264,7 @@ class AccountRequestListView(generics.ListCreateAPIView):
 
 class AccountRequestDetailView(generics.RetrieveUpdateAPIView):
     serializer_class = AccountRequestSerializer
-    permission_classes = [IsOfficer]
+    permission_classes = [CanCreateAccounts]
     queryset = AccountRequest.objects.all()
 
 
@@ -280,7 +281,7 @@ class LoginHistoryListView(generics.ListAPIView):
 
 
 @api_view(['POST'])
-@permission_classes([IsOfficer])
+@permission_classes([CanCreateAccounts])
 def toggle_user_status(request, pk):
     try:
         user = User.objects.get(pk=pk, deleted_at__isnull=True)
@@ -477,4 +478,27 @@ def officer_reset_password(request, pk):
     user.save(update_fields=['password'])
     log_activity(request.user, 'officer_reset_password', target_model='User', target_id=user.id)
     return Response({'success': True, 'message': 'Đã đặt lại mật khẩu.'})
+
+
+class AdminSessionLoginView(APIView):
+    """
+    GET /auth/admin-session/?token=<access_token>
+    Validates the JWT, creates a Django session for the superuser, then redirects to /admin/.
+    Using GET redirect instead of AJAX avoids cross-origin cookie issues.
+    """
+    permission_classes = [permissions.AllowAny]
+
+    def get(self, request):
+        from django.shortcuts import redirect
+        from rest_framework_simplejwt.tokens import AccessToken
+        token_str = request.GET.get('token', '')
+        if not token_str:
+            return redirect('/admin/')
+        try:
+            access_token = AccessToken(token_str)
+            user = User.objects.get(pk=access_token['user_id'], is_superuser=True, deleted_at__isnull=True)
+        except Exception:
+            return redirect('/admin/')
+        django_login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+        return redirect('/admin/')
 
