@@ -81,4 +81,9 @@ class AdministrativeUnit(models.Model):
         ]
 
     def __str__(self):
-        return f'{self.get_type_display()} {self.name}'
+        parts = [self.name]
+        p = self.parent
+        while p:
+            parts.append(p.name)
+            p = p.parent
+        return ', '.join(parts)

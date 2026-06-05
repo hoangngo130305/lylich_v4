@@ -8878,3 +8878,31 @@ WARNING 2026-06-03 19:33:33,863 log 20980 22560 Unauthorized: /api/v1/auth/me/
 WARNING 2026-06-03 19:33:33,864 basehttp 20980 22560 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
 WARNING 2026-06-03 20:23:25,580 log 20980 2516 Unauthorized: /api/v1/auth/me/
 WARNING 2026-06-03 20:23:25,592 basehttp 20980 2516 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-06-04 08:29:19,057 log 9896 22660 Unauthorized: /api/v1/auth/me/
+WARNING 2026-06-04 08:29:19,059 basehttp 9896 22660 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-06-04 08:29:42,303 log 9896 3772 Not Found: /favicon.ico
+WARNING 2026-06-04 08:29:42,304 basehttp 9896 3772 "GET /favicon.ico HTTP/1.1" 404 5355
+WARNING 2026-06-04 14:31:48,668 log 14708 20720 Unauthorized: /api/v1/auth/me/
+WARNING 2026-06-04 14:31:48,669 basehttp 14708 20720 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-06-04 14:31:52,275 log 14708 19364 Not Found: /favicon.ico
+WARNING 2026-06-04 14:31:52,276 basehttp 14708 19364 "GET /favicon.ico HTTP/1.1" 404 5355
+WARNING 2026-06-04 14:37:25,647 log 14708 22468 Unauthorized: /api/v1/auth/login/
+WARNING 2026-06-04 14:37:25,648 basehttp 14708 22468 "POST /api/v1/auth/login/ HTTP/1.1" 401 107
+WARNING 2026-06-04 15:08:49,596 log 11292 4976 Unauthorized: /api/v1/auth/me/
+WARNING 2026-06-04 15:08:49,597 basehttp 11292 4976 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-06-04 15:51:08,021 log 11292 16372 Unauthorized: /api/v1/auth/me/
+WARNING 2026-06-04 15:51:08,058 basehttp 11292 16372 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-06-04 16:10:27,093 log 11292 10708 Unauthorized: /api/v1/auth/me/
+WARNING 2026-06-04 16:10:27,095 basehttp 11292 10708 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-06-04 17:00:15,805 log 11292 9576 Unauthorized: /api/v1/auth/me/
+WARNING 2026-06-04 17:00:15,809 basehttp 11292 9576 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-06-04 17:11:27,954 log 11292 10188 Unauthorized: /api/v1/profiles/my/
+WARNING 2026-06-04 17:11:27,955 basehttp 11292 10188 "PUT /api/v1/profiles/my/ HTTP/1.1" 401 291
+WARNING 2026-06-04 18:08:19,140 log 18368 4240 Unauthorized: /api/v1/verification/stats/
+WARNING 2026-06-04 18:08:19,141 basehttp 18368 4240 "GET /api/v1/verification/stats/ HTTP/1.1" 401 291
+WARNING 2026-06-04 18:15:58,590 log 18368 12364 Unauthorized: /api/v1/auth/me/
+WARNING 2026-06-04 18:15:58,592 basehttp 18368 12364 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-06-04 18:15:59,035 log 18368 12364 Unauthorized: /api/v1/auth/me/
+WARNING 2026-06-04 18:15:59,036 basehttp 18368 12364 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-06-04 18:15:59,103 log 18368 12364 Unauthorized: /api/v1/auth/token/refresh/
+WARNING 2026-06-04 18:15:59,104 basehttp 18368 12364 "POST /api/v1/auth/token/refresh/ HTTP/1.1" 401 146

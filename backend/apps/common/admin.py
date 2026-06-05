@@ -21,6 +21,9 @@ class EducationLevelAdmin(ModelAdmin):
     list_editable = ['sort']
     search_fields = ['name', 'code']
 
+    def get_queryset(self, request):
+        return super().get_queryset(request).exclude(name__iexact='Tiểu học')
+
 
 @admin.register(PoliticalLevel)
 class PoliticalLevelAdmin(ModelAdmin):

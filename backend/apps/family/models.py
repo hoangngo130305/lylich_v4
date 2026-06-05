@@ -42,6 +42,7 @@ class FamilyMember(models.Model):
 
     ethnic_group_text = models.CharField(max_length=100, null=True, blank=True)
     religion_text     = models.CharField(max_length=100, null=True, blank=True)
+    nationality       = models.CharField(max_length=100, null=True, blank=True)
 
     occupation = models.CharField(max_length=255, null=True, blank=True)
     workplace  = models.CharField(max_length=500, null=True, blank=True)

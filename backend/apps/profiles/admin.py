@@ -1,10 +1,14 @@
 from django.contrib import admin
+from django.db.models import DateField
+from django.forms.widgets import DateInput
 from django.http import HttpResponse
 from unfold.admin import ModelAdmin, TabularInline
 from .models import Profile, ProfileReview, CommitteeComment, ProfileOfficerAssignment
 import zipfile
 import io
 import re
+
+_DATE_WIDGET = DateInput(attrs={'type': 'text', 'placeholder': 'dd/mm/yyyy'}, format='%d/%m/%Y')
 
 
 class ProfileReviewInline(TabularInline):
@@ -25,7 +29,7 @@ class CommitteeCommentInline(TabularInline):
 
 @admin.action(description='Xuất Word Mẫu 2-KNĐ (hàng loạt)')
 def export_word_bulk(modeladmin, request, queryset):
-    from apps.exports.word_builder import build_lylich_docx
+    from apps.exports.word_builder import build_profile_docx as build_lylich_docx
     from apps.exports.models import WordExportLog
 
     profiles = queryset.select_related(
@@ -74,6 +78,27 @@ def export_word_bulk(modeladmin, request, queryset):
 @admin.register(Profile)
 class ProfileAdmin(ModelAdmin):
     actions = [export_word_bulk]
+
+    formfield_overrides = {
+        DateField: {'widget': _DATE_WIDGET},
+    }
+
+    def _ward_display(self, obj, field_name):
+        ward = getattr(obj, field_name, None)
+        return str(ward) if ward else '—'
+
+    def hometown_ward_display(self, obj):
+        return self._ward_display(obj, 'hometown_ward')
+    hometown_ward_display.short_description = 'Quê quán (Xã → Tỉnh)'
+
+    def birth_place_ward_display(self, obj):
+        return self._ward_display(obj, 'birth_place_ward')
+    birth_place_ward_display.short_description = 'Nơi sinh (Xã → Tỉnh)'
+
+    def current_ward_display(self, obj):
+        return self._ward_display(obj, 'current_ward')
+    current_ward_display.short_description = 'Nơi thường trú (Xã → Tỉnh)'
+
     list_display  = [
         'id', 'profile_number', 'full_name', 'gender', 'dob',
         'status', 'ai_score', 'officer_in_charge', 'submitted_at', 'created_at',
@@ -84,6 +109,7 @@ class ProfileAdmin(ModelAdmin):
         'ai_score', 'ai_last_scanned_at', 'ai_issues_json',
         'submitted_at', 'approved_at', 'approved_by', 'completed_at',
         'last_returned_at', 'rejected_at', 'created_at', 'updated_at', 'deleted_at',
+        'hometown_ward_display', 'birth_place_ward_display', 'current_ward_display',
     ]
     raw_id_fields = ['user', 'officer_in_charge', 'approved_by', 'photo_file',
                      'ethnic_group', 'religion', 'edu_level', 'political_level',
@@ -97,10 +123,12 @@ class ProfileAdmin(ModelAdmin):
             'fields': (
                 'user', 'profile_number', 'officer_in_charge',
                 'full_name', 'full_name_other', 'gender', 'dob',
-                'birth_place_province_text', 'birth_place_old_name', 'birth_place_detail', 'birth_place_ward',
+                'birth_place_province_text', 'birth_place_old_name', 'birth_place_detail',
+                'birth_place_ward', 'birth_place_ward_display',
                 'ethnic_group', 'ethnic_group_other', 'religion', 'religion_other', 'religious_title',
-                'hometown_detail', 'hometown_ward',
-                'current_address_number', 'current_address_street', 'current_address', 'current_ward',
+                'hometown_detail', 'hometown_ward', 'hometown_ward_display',
+                'current_address_number', 'current_address_street', 'current_address',
+                'current_ward', 'current_ward_display',
                 'temporary_ward', 'temporary_address_number', 'temporary_address_street',
             )
         }),
