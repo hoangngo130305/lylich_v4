@@ -77,7 +77,15 @@ def _period_str(from_month, from_year, to_month, to_year, is_present=False):
 def _fmt_date(d):
     if not d:
         return ''
-    return d.strftime('%d/%m/%Y')
+    try:
+        # Xử lý cả date và datetime (naive hoặc aware)
+        if hasattr(d, 'strftime'):
+            return d.strftime('%d/%m/%Y')
+        return str(d)
+    except (ValueError, TypeError) as e:
+        # Fallback nếu có lỗi timezone
+        print(f"[EXPORT] Warning: date format failed for {d}: {e}")
+        return str(d)[:10]  # Trả về phần date của string
 
 
 # ── Main builder ──────────────────────────────────────────────────────────────
@@ -218,7 +226,10 @@ def build_profile_docx(profile, sections=None) -> io.BytesIO:
                 hdr[3].text = 'Nghề nghiệp'
                 hdr[4].text = 'Nơi ở'
                 for fm in family_qs:
-                    birth_year = fm.dob.year if fm.dob else (fm.birth_year or '')
+                    try:
+                        birth_year = fm.dob.year if fm.dob else (fm.birth_year or '')
+                    except (AttributeError, ValueError, TypeError):
+                        birth_year = fm.birth_year or ''
                     _table_row(tbl, [
                         fm.get_relationship_display(),
                         fm.full_name,

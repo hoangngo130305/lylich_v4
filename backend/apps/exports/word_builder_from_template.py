@@ -362,7 +362,12 @@ class FieldResolver:
         if isinstance(val, bool):
             return 'Có' if val else 'Không'
         if isinstance(val, (date, datetime)):
-            return val.strftime('%d/%m/%Y')
+            try:
+                return val.strftime('%d/%m/%Y')
+            except (ValueError, TypeError) as e:
+                # Handle naive datetime timezone conversion errors
+                print(f"[EXPORT] Warning: date format failed for {val}: {e}")
+                return str(val)[:10]  # Return date part from string representation
         return str(val)
 
     @staticmethod

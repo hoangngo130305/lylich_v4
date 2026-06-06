@@ -31,18 +31,36 @@ class UserAddForm(UserCreationForm):
 
 @admin.register(Role)
 class RoleAdmin(ModelAdmin):
-    list_display  = ['id', 'code', 'name', 'created_at']
+    def created_date_display(self, obj):
+        if obj.created_at:
+            try:
+                return obj.created_at.strftime('%d/%m/%Y %H:%M')
+            except (ValueError, TypeError, AttributeError):
+                return '—'
+        return '—'
+    created_date_display.short_description = 'Ngày tạo'
+
+    list_display  = ['id', 'code', 'name', 'created_date_display']
     search_fields = ['code', 'name']
-    readonly_fields = ['created_at']
+    readonly_fields = ['created_at', 'created_date_display']
 
 
 @admin.register(User)
 class UserAdmin(ModelAdmin, BaseUserAdmin):
+    def user_created_date_display(self, obj):
+        if obj.created_at:
+            try:
+                return obj.created_at.strftime('%d/%m/%Y %H:%M')
+            except (ValueError, TypeError, AttributeError):
+                return '—'
+        return '—'
+    user_created_date_display.short_description = 'Ngày tạo'
+
     add_form      = UserAddForm
-    list_display  = ['id', 'full_name', 'phone', 'role', 'status', 'phone_verified', 'created_at']
+    list_display  = ['id', 'full_name', 'phone', 'role', 'status', 'phone_verified', 'user_created_date_display']
     list_filter   = ['role', 'status', 'phone_verified', 'email_verified']
     search_fields = ['full_name', 'phone', 'email', 'cccd']
-    readonly_fields = ['last_login', 'last_login_at', 'created_at', 'updated_at', 'deleted_at']
+    readonly_fields = ['last_login', 'last_login_at', 'created_at', 'updated_at', 'deleted_at', 'user_created_date_display']
     ordering      = ['-created_at']
     fieldsets     = (
         ('Thông tin cơ bản', {
@@ -190,11 +208,19 @@ class OfficerAdmin(ModelAdmin, BaseUserAdmin):
 
 @admin.register(LoginHistory)
 class LoginHistoryAdmin(ModelAdmin):
-    list_display  = ['id', 'user', 'status', 'ip_address', 'fail_reason', 'created_at']
+    def login_date_display(self, obj):
+        if obj.created_at:
+            try:
+                return obj.created_at.strftime('%d/%m/%Y %H:%M')
+            except (ValueError, TypeError, AttributeError):
+                return '—'
+        return '—'
+    login_date_display.short_description = 'Ngày'
+
+    list_display  = ['id', 'user', 'status', 'ip_address', 'fail_reason', 'login_date_display']
     list_filter   = ['status']
     search_fields = ['user__full_name', 'user__phone', 'ip_address']
-    readonly_fields = ['user', 'status', 'ip_address', 'user_agent', 'fail_reason', 'created_at']
-    date_hierarchy = 'created_at'
+    readonly_fields = ['user', 'status', 'ip_address', 'user_agent', 'fail_reason', 'created_at', 'login_date_display']
 
     def has_add_permission(self, request):
         return False
@@ -205,8 +231,17 @@ class LoginHistoryAdmin(ModelAdmin):
 
 @admin.register(AccountRequest)
 class AccountRequestAdmin(ModelAdmin):
-    list_display  = ['id', 'full_name', 'phone', 'cccd', 'status', 'requested_by', 'created_at']
+    def request_date_display(self, obj):
+        if obj.created_at:
+            try:
+                return obj.created_at.strftime('%d/%m/%Y %H:%M')
+            except (ValueError, TypeError, AttributeError):
+                return '—'
+        return '—'
+    request_date_display.short_description = 'Ngày'
+
+    list_display  = ['id', 'full_name', 'phone', 'cccd', 'status', 'requested_by', 'request_date_display']
     list_filter   = ['status', 'notify_sms', 'notify_zalo']
     search_fields = ['full_name', 'phone', 'cccd']
-    readonly_fields = ['created_at', 'processed_at', 'created_user']
+    readonly_fields = ['created_at', 'processed_at', 'created_user', 'request_date_display']
     raw_id_fields   = ['requested_by', 'officer_in_charge', 'created_user']

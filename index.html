@@ -1085,9 +1085,27 @@
       .del-btn:hover {
         color: var(--crimson);
       }
-      .row-act-wrap { display:flex;flex-direction:column;gap:2px;align-items:center;padding:2px 0; }
-      .ins-btn { display:none;background:none;border:1px solid var(--primary);border-radius:3px;color:var(--primary);cursor:pointer;font-size:9px;padding:1px 5px;line-height:1.4; }
-      tr:hover .ins-btn { display:inline-block; }
+      .row-act-wrap {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        align-items: center;
+        padding: 2px 0;
+      }
+      .ins-btn {
+        display: none;
+        background: none;
+        border: 1px solid var(--primary);
+        border-radius: 3px;
+        color: var(--primary);
+        cursor: pointer;
+        font-size: 9px;
+        padding: 1px 5px;
+        line-height: 1.4;
+      }
+      tr:hover .ins-btn {
+        display: inline-block;
+      }
 
       .add-row-btn {
         display: flex;
@@ -5909,7 +5927,12 @@
               <div class="card-body">
                 <div class="form-row">
                   <label>Giáo dục phổ thông <span class="req">*</span></label>
-                  <select id="trinhDoVanHoa" onchange="toggleKhacInput('trinhDoVanHoa','trinhDoVanHoaKhac')">
+                  <select
+                    id="trinhDoVanHoa"
+                    onchange="
+                      toggleKhacInput('trinhDoVanHoa', 'trinhDoVanHoaKhac')
+                    "
+                  >
                     <option value="">-- Chọn trình độ --</option>
                     <option>Tốt nghiệp THPT hệ 12 năm</option>
                     <option>Tốt nghiệp THPT hệ 10 năm</option>
@@ -5917,7 +5940,12 @@
                     <option>Trung học cơ sở</option>
                     <option value="Khác">Khác</option>
                   </select>
-                  <input type="text" id="trinhDoVanHoaKhac" style="display:none;margin-top:6px" placeholder="Nhập trình độ thực tế…" />
+                  <input
+                    type="text"
+                    id="trinhDoVanHoaKhac"
+                    style="display: none; margin-top: 6px"
+                    placeholder="Nhập trình độ thực tế…"
+                  />
                 </div>
                 <div class="form-row">
                   <label>Chuyên môn nghiệp vụ</label>
@@ -5989,10 +6017,28 @@
                 </div>
                 <div class="form-row">
                   <label>Ngoại ngữ</label>
-                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-                    <input type="text" id="ngoaiNgu" placeholder="Tên tiếng: Tiếng Anh / Tiếng Trung …" />
+                  <div
+                    style="
+                      display: grid;
+                      grid-template-columns: 1fr 1fr;
+                      gap: 8px;
+                    "
+                  >
+                    <input
+                      type="text"
+                      id="ngoaiNgu"
+                      placeholder="Tên tiếng: Tiếng Anh / Tiếng Trung …"
+                    />
                     <div>
-                      <select id="trinhDoNgoaiNgu" onchange="toggleKhacInput('trinhDoNgoaiNgu','trinhDoNgoaiNguKhac')">
+                      <select
+                        id="trinhDoNgoaiNgu"
+                        onchange="
+                          toggleKhacInput(
+                            'trinhDoNgoaiNgu',
+                            'trinhDoNgoaiNguKhac',
+                          )
+                        "
+                      >
                         <option value="">-- Trình độ --</option>
                         <option>A1</option>
                         <option>A2</option>
@@ -6003,13 +6049,21 @@
                         <option>Đại học</option>
                         <option value="Khác">Khác</option>
                       </select>
-                      <input type="text" id="trinhDoNgoaiNguKhac" style="display:none;margin-top:6px" placeholder="Nhập trình độ ngoại ngữ…" />
+                      <input
+                        type="text"
+                        id="trinhDoNgoaiNguKhac"
+                        style="display: none; margin-top: 6px"
+                        placeholder="Nhập trình độ ngoại ngữ…"
+                      />
                     </div>
                   </div>
                 </div>
                 <div class="form-row">
                   <label>Tin học</label>
-                  <select id="tinHoc" onchange="toggleKhacInput('tinHoc','tinHocKhac')">
+                  <select
+                    id="tinHoc"
+                    onchange="toggleKhacInput('tinHoc', 'tinHocKhac')"
+                  >
                     <option value="">-- Trình độ --</option>
                     <option>Tin học văn phòng</option>
                     <option>Chứng chỉ IC3</option>
@@ -6019,7 +6073,12 @@
                     <option>Đại học chuyên ngành CNTT</option>
                     <option value="Khác">Khác</option>
                   </select>
-                  <input type="text" id="tinHocKhac" style="display:none;margin-top:6px" placeholder="Nhập trình độ tin học…" />
+                  <input
+                    type="text"
+                    id="tinHocKhac"
+                    style="display: none; margin-top: 6px"
+                    placeholder="Nhập trình độ tin học…"
+                  />
                 </div>
                 <div class="form-row">
                   <label>Tiếng dân tộc thiểu số</label>
@@ -6040,19 +6099,88 @@
               </div>
               <div class="card-body">
                 <div class="form-row">
-                  <label>12. Ngày vào Đoàn TNCS HCM <span class="req">*</span></label>
+                  <label
+                    >12. Ngày vào Đoàn TNCS HCM
+                    <span class="req">*</span></label
+                  >
                   <div>
-                    <div style="margin-bottom:8px;display:flex;gap:16px;flex-wrap:wrap">
-                      <label style="display:flex;align-items:center;gap:6px;cursor:pointer">
-                        <input type="radio" name="doanStatus" value="yes" checked onchange="toggleDoanFields()"> Đã từng là đoàn viên
+                    <div
+                      style="
+                        margin-bottom: 8px;
+                        display: flex;
+                        gap: 16px;
+                        flex-wrap: wrap;
+                      "
+                    >
+                      <label
+                        style="
+                          display: flex;
+                          align-items: center;
+                          gap: 6px;
+                          cursor: pointer;
+                        "
+                      >
+                        <input
+                          type="radio"
+                          name="doanStatus"
+                          value="yes"
+                          checked
+                          onchange="toggleDoanFields()"
+                        />
+                        Đã từng là đoàn viên
                       </label>
-                      <label style="display:flex;align-items:center;gap:6px;cursor:pointer">
-                        <input type="radio" name="doanStatus" value="no" onchange="toggleDoanFields()"> Chưa từng là đoàn viên
+                      <label
+                        style="
+                          display: flex;
+                          align-items: center;
+                          gap: 6px;
+                          cursor: pointer;
+                        "
+                      >
+                        <input
+                          type="radio"
+                          name="doanStatus"
+                          value="no"
+                          onchange="toggleDoanFields()"
+                        />
+                        Chưa từng là đoàn viên
+                      </label>
+                      <label
+                        style="
+                          display: flex;
+                          align-items: center;
+                          gap: 6px;
+                          cursor: pointer;
+                        "
+                      >
+                        <input
+                          type="radio"
+                          name="doanStatus"
+                          value="none"
+                          onchange="toggleDoanFields()"
+                        />
+                        Không
                       </label>
                     </div>
-                    <div id="doanFields" style="display:grid;grid-template-columns:180px 1fr;gap:8px">
-                      <input type="text" id="ngayVaoDoan" placeholder="dd/mm/yyyy" maxlength="10" />
-                      <input type="text" id="noiVaoDoan" placeholder="Tại Chi đoàn / Đoàn cơ sở … xã …, tỉnh …" />
+                    <div
+                      id="doanFields"
+                      style="
+                        display: grid;
+                        grid-template-columns: 180px 1fr;
+                        gap: 8px;
+                      "
+                    >
+                      <input
+                        type="text"
+                        id="ngayVaoDoan"
+                        placeholder="dd/mm/yyyy"
+                        maxlength="10"
+                      />
+                      <input
+                        type="text"
+                        id="noiVaoDoan"
+                        placeholder="Tại Chi đoàn / Đoàn cơ sở … xã …, tỉnh …"
+                      />
                     </div>
                   </div>
                 </div>
@@ -6095,8 +6223,17 @@
                       gap: 8px;
                     "
                   >
-                    <input type="text" id="ngayVaoDang1" placeholder="dd/mm/yyyy" maxlength="10" />
-                    <input type="text" placeholder="Tại Chi bộ …, Đảng bộ …" id="noiVaoDang1" />
+                    <input
+                      type="text"
+                      id="ngayVaoDang1"
+                      placeholder="dd/mm/yyyy"
+                      maxlength="10"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Tại Chi bộ …, Đảng bộ …"
+                      id="noiVaoDang1"
+                    />
                   </div>
                 </div>
                 <div class="form-row">
@@ -6105,7 +6242,13 @@
                       >DD/MM/YYYY</span
                     ></label
                   >
-                  <input type="text" id="ngayChinhThuc1" placeholder="dd/mm/yyyy" maxlength="10" style="max-width: 220px" />
+                  <input
+                    type="text"
+                    id="ngayChinhThuc1"
+                    placeholder="dd/mm/yyyy"
+                    maxlength="10"
+                    style="max-width: 220px"
+                  />
                 </div>
                 <div class="form-row">
                   <label
@@ -6571,7 +6714,22 @@
                           </div>
                         </td>
                         <td class="td-dienbien">
-                          <textarea class="fhd-input" rows="2" placeholder="Học ngành … tại ĐH …, sinh sống tại số nhà …, xã …, tỉnh …" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'" style="width:100%;resize:none;min-height:38px;overflow:hidden;box-sizing:border-box"></textarea>
+                          <textarea
+                            class="fhd-input"
+                            rows="2"
+                            placeholder="Học ngành … tại ĐH …, sinh sống tại số nhà …, xã …, tỉnh …"
+                            oninput="
+                              this.style.height = 'auto';
+                              this.style.height = this.scrollHeight + 'px';
+                            "
+                            style="
+                              width: 100%;
+                              resize: none;
+                              min-height: 38px;
+                              overflow: hidden;
+                              box-sizing: border-box;
+                            "
+                          ></textarea>
                         </td>
                         <td><input type="text" placeholder="" /></td>
                         <td>
@@ -6646,7 +6804,22 @@
                           </div>
                         </td>
                         <td class="td-dienbien">
-                          <textarea class="fhd-input" rows="2" placeholder="Ở nhà phụ giúp gia đình, sinh sống tại …" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'" style="width:100%;resize:none;min-height:38px;overflow:hidden;box-sizing:border-box"></textarea>
+                          <textarea
+                            class="fhd-input"
+                            rows="2"
+                            placeholder="Ở nhà phụ giúp gia đình, sinh sống tại …"
+                            oninput="
+                              this.style.height = 'auto';
+                              this.style.height = this.scrollHeight + 'px';
+                            "
+                            style="
+                              width: 100%;
+                              resize: none;
+                              min-height: 38px;
+                              overflow: hidden;
+                              box-sizing: border-box;
+                            "
+                          ></textarea>
                         </td>
                         <td><input type="text" placeholder="" /></td>
                         <td>
@@ -6721,7 +6894,22 @@
                           </div>
                         </td>
                         <td class="td-dienbien">
-                          <textarea class="fhd-input" rows="2" placeholder="VD: Tham gia sinh hoạt Đoàn tại chi đoàn …, sinh sống tại số nhà …, đường …, ấp …, xã …, tỉnh …" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'" style="width:100%;resize:none;min-height:38px;overflow:hidden;box-sizing:border-box"></textarea>
+                          <textarea
+                            class="fhd-input"
+                            rows="2"
+                            placeholder="VD: Tham gia sinh hoạt Đoàn tại chi đoàn …, sinh sống tại số nhà …, đường …, ấp …, xã …, tỉnh …"
+                            oninput="
+                              this.style.height = 'auto';
+                              this.style.height = this.scrollHeight + 'px';
+                            "
+                            style="
+                              width: 100%;
+                              resize: none;
+                              min-height: 38px;
+                              overflow: hidden;
+                              box-sizing: border-box;
+                            "
+                          ></textarea>
                         </td>
                         <td><input type="text" placeholder="" /></td>
                         <td>
@@ -7502,11 +7690,11 @@
                   <div class="pv-label">Nơi tạm trú</div>
                   <div class="pv-value" id="pv-temporary_address"></div>
                 </div>
-                <div class="pv-field" style="display:none">
+                <div class="pv-field" style="display: none">
                   <div class="pv-label">Nơi làm việc</div>
                   <div class="pv-value" id="pv-workplace"></div>
                 </div>
-                <div class="pv-field" style="display:none">
+                <div class="pv-field" style="display: none">
                   <div class="pv-label">Chức danh/Chức vụ</div>
                   <div class="pv-value" id="pv-job_title"></div>
                 </div>
@@ -7528,7 +7716,10 @@
                 </div>
                 <div class="pv-field pv-full">
                   <div class="pv-label">Khoa học công nghệ</div>
-                  <div class="pv-value" id="pv-science_tech_qualifications"></div>
+                  <div
+                    class="pv-value"
+                    id="pv-science_tech_qualifications"
+                  ></div>
                 </div>
                 <div class="pv-field">
                   <div class="pv-label">Chức sắc tôn giáo</div>
@@ -7536,15 +7727,24 @@
                 </div>
                 <div class="pv-field">
                   <div class="pv-label">Ngày vào Đảng lần 1</div>
-                  <div class="pv-value" id="pv-rejoin_first_party_join_date"></div>
+                  <div
+                    class="pv-value"
+                    id="pv-rejoin_first_party_join_date"
+                  ></div>
                 </div>
                 <div class="pv-field pv-full">
                   <div class="pv-label">Nơi vào Đảng lần 1</div>
-                  <div class="pv-value" id="pv-rejoin_first_party_join_place"></div>
+                  <div
+                    class="pv-value"
+                    id="pv-rejoin_first_party_join_place"
+                  ></div>
                 </div>
                 <div class="pv-field">
                   <div class="pv-label">Ngày chính thức lần 1</div>
-                  <div class="pv-value" id="pv-rejoin_first_official_date"></div>
+                  <div
+                    class="pv-value"
+                    id="pv-rejoin_first_official_date"
+                  ></div>
                 </div>
               </div>
             </div>
@@ -8238,8 +8438,8 @@
         if (!res.ok) return [];
         const data = await res.json();
         const wards = [];
-        (data.districts || []).forEach(d => {
-          (d.wards || []).forEach(w => {
+        (data.districts || []).forEach((d) => {
+          (d.wards || []).forEach((w) => {
             wards.push({ code: w.code, name: w.name, districtName: d.name });
           });
         });
@@ -8897,9 +9097,15 @@
                 'input[placeholder*="Số nhà"]',
               );
               if (!textInp || textInp.value) return;
-              const wardText = (wardSelect.selectedOptions[0]?.text || "").replace(/^--.*--$/, "").trim();
-              const distText = (wardSelect.selectedOptions[0]?.dataset.districtName || "").trim();
-              const provText = (provinceSelect.selectedOptions[0]?.text || "").replace(/^--.*--$/, "").trim();
+              const wardText = (wardSelect.selectedOptions[0]?.text || "")
+                .replace(/^--.*--$/, "")
+                .trim();
+              const distText = (
+                wardSelect.selectedOptions[0]?.dataset.districtName || ""
+              ).trim();
+              const provText = (provinceSelect.selectedOptions[0]?.text || "")
+                .replace(/^--.*--$/, "")
+                .trim();
               const parts = [wardText, distText, provText].filter(Boolean);
               if (parts.length) textInp.value = parts.join(", ");
             });
@@ -8912,9 +9118,15 @@
                 "input.fam-text-birth-place",
               );
               if (!textInp) return;
-              const wardText = (wardSelect.selectedOptions[0]?.text || "").replace(/^--.*--$/, "").trim();
-              const distText = (wardSelect.selectedOptions[0]?.dataset.districtName || "").trim();
-              const provText = (provinceSelect.selectedOptions[0]?.text || "").replace(/^--.*--$/, "").trim();
+              const wardText = (wardSelect.selectedOptions[0]?.text || "")
+                .replace(/^--.*--$/, "")
+                .trim();
+              const distText = (
+                wardSelect.selectedOptions[0]?.dataset.districtName || ""
+              ).trim();
+              const provText = (provinceSelect.selectedOptions[0]?.text || "")
+                .replace(/^--.*--$/, "")
+                .trim();
               const parts = [wardText, distText, provText].filter(Boolean);
               if (parts.length) textInp.value = parts.join(", ");
             });
@@ -8925,9 +9137,15 @@
               if (!formRow) return;
               const textInp = formRow.querySelector("input.fam-text-hometown");
               if (!textInp) return;
-              const wardText = (wardSelect.selectedOptions[0]?.text || "").replace(/^--.*--$/, "").trim();
-              const distText = (wardSelect.selectedOptions[0]?.dataset.districtName || "").trim();
-              const provText = (provinceSelect.selectedOptions[0]?.text || "").replace(/^--.*--$/, "").trim();
+              const wardText = (wardSelect.selectedOptions[0]?.text || "")
+                .replace(/^--.*--$/, "")
+                .trim();
+              const distText = (
+                wardSelect.selectedOptions[0]?.dataset.districtName || ""
+              ).trim();
+              const provText = (provinceSelect.selectedOptions[0]?.text || "")
+                .replace(/^--.*--$/, "")
+                .trim();
               const parts = [wardText, distText, provText].filter(Boolean);
               if (parts.length) textInp.value = parts.join(", ");
             });
@@ -8962,19 +9180,25 @@
           attachFamilyLocationSearch(num),
         );
         // Init insert-in-middle buttons for existing static rows
-        _initInsertBtns('tbB-body', 'B');
-        _initInsertBtns('tbC-body', 'C');
+        _initInsertBtns("tbB-body", "B");
+        _initInsertBtns("tbC-body", "C");
         // B9: convert tbC description inputs to textarea
-        document.querySelectorAll('#tbC-body td.td-dienbien input[type="text"]').forEach(inp => {
-          const ta = document.createElement('textarea');
-          ta.className = inp.className || 'fhd-input';
-          ta.rows = 2;
-          ta.placeholder = inp.placeholder || '';
-          ta.value = inp.value || '';
-          ta.style.cssText = 'width:100%;resize:none;min-height:38px;overflow:hidden;box-sizing:border-box';
-          ta.oninput = function() { this.style.height='auto'; this.style.height=this.scrollHeight+'px'; };
-          inp.replaceWith(ta);
-        });
+        document
+          .querySelectorAll('#tbC-body td.td-dienbien input[type="text"]')
+          .forEach((inp) => {
+            const ta = document.createElement("textarea");
+            ta.className = inp.className || "fhd-input";
+            ta.rows = 2;
+            ta.placeholder = inp.placeholder || "";
+            ta.value = inp.value || "";
+            ta.style.cssText =
+              "width:100%;resize:none;min-height:38px;overflow:hidden;box-sizing:border-box";
+            ta.oninput = function () {
+              this.style.height = "auto";
+              this.style.height = this.scrollHeight + "px";
+            };
+            inp.replaceWith(ta);
+          });
       });
       // ── Address text auto-helpers ─────────────────────────────────────────
       function _getSelectText(id) {
@@ -9114,63 +9338,86 @@
       }
 
       // ===== INSERT ROW HELPERS =====
-      const _mmyyyySelect = () => `<div class="mmyyyy-wrap"><select class="mm-month"><option value="">MM</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select><span class="mmyyyy-slash">/</span><input class="mm-year" type="number" placeholder="YYYY" min="1900" max="2099" step="1"></div>`;
-      const _rowActTd = (type) => `<td><div class="row-act-wrap"><button class="ins-btn" onclick="insertRowAbove(this,'${type}')" title="Chèn dòng trên">▲</button><button class="del-btn" onclick="delRow(this)">✕</button><button class="ins-btn" onclick="insertRowBelow(this,'${type}')" title="Chèn dòng dưới">▼</button></div></td>`;
+      const _mmyyyySelect = () =>
+        `<div class="mmyyyy-wrap"><select class="mm-month"><option value="">MM</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select><span class="mmyyyy-slash">/</span><input class="mm-year" type="number" placeholder="YYYY" min="1900" max="2099" step="1"></div>`;
+      const _rowActTd = (type) =>
+        `<td><div class="row-act-wrap"><button class="ins-btn" onclick="insertRowAbove(this,'${type}')" title="Chèn dòng trên">▲</button><button class="del-btn" onclick="delRow(this)">✕</button><button class="ins-btn" onclick="insertRowBelow(this,'${type}')" title="Chèn dòng dưới">▼</button></div></td>`;
       function _makeBRow(ph) {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `<td>${_mmyyyySelect()}</td><td>${_mmyyyySelect()}</td><td class="td-dienbien"><input type="text" placeholder="${ph||''}"></td>${_rowActTd('B')}`;
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${_mmyyyySelect()}</td><td>${_mmyyyySelect()}</td><td class="td-dienbien"><input type="text" placeholder="${ph || ""}"></td>${_rowActTd("B")}`;
         return tr;
       }
       function _makeCRow() {
-        const tr = document.createElement('tr');
+        const tr = document.createElement("tr");
         const monthYearFrom = `<div class="mmyyyy-wrap"><select class="mm-month"><option value="">MM</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select><span class="mmyyyy-slash">/</span><input class="mm-year" type="number" placeholder="YYYY" min="1900" max="2099" step="1"></div>`;
         const monthYearTo = `<div class="mmyyyy-wrap"><select class="mm-month"><option value="">MM</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select><span class="mmyyyy-slash">/</span><input class="mm-year" type="number" placeholder="YYYY" min="1900" max="2099" step="1"></div>`;
-        tr.innerHTML = `<td>${monthYearFrom}</td><td class="fhd-to-cell"><div class="fhd-to-inner">${monthYearTo}<label class="fhd-present-wrap" title="Đến nay"><input type="checkbox" class="fhd-present-chk" onchange="toggleFhdPresent(this)"> Nay</label></div></td><td class="td-dienbien"><textarea class="fhd-input" rows="2" placeholder="" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'" style="width:100%;resize:none;min-height:38px;overflow:hidden;box-sizing:border-box"></textarea></td><td><input type="text" placeholder=""></td>${_rowActTd('C')}`;
+        tr.innerHTML = `<td>${monthYearFrom}</td><td class="fhd-to-cell"><div class="fhd-to-inner">${monthYearTo}<label class="fhd-present-wrap" title="Đến nay"><input type="checkbox" class="fhd-present-chk" onchange="toggleFhdPresent(this)"> Nay</label></div></td><td class="td-dienbien"><textarea class="fhd-input" rows="2" placeholder="" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'" style="width:100%;resize:none;min-height:38px;overflow:hidden;box-sizing:border-box"></textarea></td><td><input type="text" placeholder=""></td>${_rowActTd("C")}`;
         return tr;
       }
       function _makeFamHistRow() {
-        const tr = document.createElement('tr');
-        tr.innerHTML = _famHistRowHtml({ from_month: null, from_year: null, to_month: null, to_year: null, is_present: false, description: "" });
+        const tr = document.createElement("tr");
+        tr.innerHTML = _famHistRowHtml({
+          from_month: null,
+          from_year: null,
+          to_month: null,
+          to_year: null,
+          is_present: false,
+          description: "",
+        });
         return tr;
       }
       function insertRowAbove(btn, type) {
-        const tr = btn.closest('tr');
-        const newTr = type === 'C' ? _makeCRow() : type === 'fam' ? _makeFamHistRow() : _makeBRow('Tiếp theo …');
-        tr.insertAdjacentElement('beforebegin', newTr);
-        const tb = tr.closest('tbody');
-        refreshDienBien(tb.closest('.timeline-table'));
-        if (type === 'B') validateSecB();
-        if (type === 'C') validateSecC();
+        const tr = btn.closest("tr");
+        const newTr =
+          type === "C"
+            ? _makeCRow()
+            : type === "fam"
+              ? _makeFamHistRow()
+              : _makeBRow("Tiếp theo …");
+        tr.insertAdjacentElement("beforebegin", newTr);
+        const tb = tr.closest("tbody");
+        refreshDienBien(tb.closest(".timeline-table"));
+        if (type === "B") validateSecB();
+        if (type === "C") validateSecC();
       }
       function insertRowBelow(btn, type) {
-        const tr = btn.closest('tr');
-        const newTr = type === 'C' ? _makeCRow() : type === 'fam' ? _makeFamHistRow() : _makeBRow('Tiếp theo …');
-        tr.insertAdjacentElement('afterend', newTr);
-        const tb = tr.closest('tbody');
-        refreshDienBien(tb.closest('.timeline-table'));
-        if (type === 'B') validateSecB();
-        if (type === 'C') validateSecC();
+        const tr = btn.closest("tr");
+        const newTr =
+          type === "C"
+            ? _makeCRow()
+            : type === "fam"
+              ? _makeFamHistRow()
+              : _makeBRow("Tiếp theo …");
+        tr.insertAdjacentElement("afterend", newTr);
+        const tb = tr.closest("tbody");
+        refreshDienBien(tb.closest(".timeline-table"));
+        if (type === "B") validateSecB();
+        if (type === "C") validateSecC();
       }
       function _initInsertBtns(tbodyId, type) {
         const tb = document.getElementById(tbodyId);
         if (!tb) return;
-        Array.from(tb.rows).forEach(row => {
+        Array.from(tb.rows).forEach((row) => {
           const lastTd = row.cells[row.cells.length - 1];
-          if (!lastTd || lastTd.querySelector('.ins-btn')) return;
-          const delBtn = lastTd.querySelector('.del-btn');
+          if (!lastTd || lastTd.querySelector(".ins-btn")) return;
+          const delBtn = lastTd.querySelector(".del-btn");
           if (!delBtn) return;
-          const wrap = document.createElement('div');
-          wrap.className = 'row-act-wrap';
-          const aboveBtn = document.createElement('button');
-          aboveBtn.className = 'ins-btn';
-          aboveBtn.onclick = function() { insertRowAbove(this, type); };
-          aboveBtn.title = 'Chèn dòng trên';
-          aboveBtn.textContent = '▲';
-          const belowBtn = document.createElement('button');
-          belowBtn.className = 'ins-btn';
-          belowBtn.onclick = function() { insertRowBelow(this, type); };
-          belowBtn.title = 'Chèn dòng dưới';
-          belowBtn.textContent = '▼';
+          const wrap = document.createElement("div");
+          wrap.className = "row-act-wrap";
+          const aboveBtn = document.createElement("button");
+          aboveBtn.className = "ins-btn";
+          aboveBtn.onclick = function () {
+            insertRowAbove(this, type);
+          };
+          aboveBtn.title = "Chèn dòng trên";
+          aboveBtn.textContent = "▲";
+          const belowBtn = document.createElement("button");
+          belowBtn.className = "ins-btn";
+          belowBtn.onclick = function () {
+            insertRowBelow(this, type);
+          };
+          belowBtn.title = "Chèn dòng dưới";
+          belowBtn.textContent = "▼";
           const cloned = delBtn.cloneNode(true);
           wrap.appendChild(aboveBtn);
           wrap.appendChild(cloned);
@@ -9183,7 +9430,7 @@
       function addRow(tbodyId, ph) {
         const tb = document.getElementById(tbodyId);
         if (tbodyId === "tbB-body") {
-          tb.appendChild(_makeBRow(ph || 'Tiếp theo …'));
+          tb.appendChild(_makeBRow(ph || "Tiếp theo …"));
           refreshDienBien(tb.closest(".timeline-table"));
           validateSecB();
           return;
@@ -9260,7 +9507,7 @@
       <div class="family-head" onclick="toggleFamily(this)">
         <div class="fam-num">${m.num}</div>
         <div class="fam-info">
-          ${m.title}
+          <strong>${m.title}</strong>
           <span class="fam-name" id="famName_${m.num}">Chưa điền thông tin</span>
         </div>
         <span class="chevron">▾</span>
@@ -9322,6 +9569,7 @@
     <div class="form-row"><label>Là Đảng viên?</label>
       <div>
         <select onchange="toggleSiblingParty(this,'sibParty_${m.num}')">
+          <option value="">-- Chọn --</option>
           <option value="no">Không phải đảng viên</option>
           <option value="yes">Có – Đảng viên</option>
         </select>
@@ -9395,7 +9643,7 @@
     </div>
     <div class="form-row"><label>Nghề nghiệp</label><input type="text"></div>
     <div class="form-row"><label>Là Đảng viên?</label>
-      <div><select onchange="toggleSiblingParty(this,'spouseParty_${m.num}')"><option value="no">Không phải đảng viên</option><option value="yes">Có – Đảng viên</option></select>
+      <div><select onchange="toggleSiblingParty(this,'spouseParty_${m.num}')"><option value="">-- Chọn --</option><option value="no">Không phải đảng viên</option><option value="yes">Có – Đảng viên</option></select>
         <div id="spouseParty_${m.num}" style="display:none;margin-top:8px" class="party-detail-box">
           <div class="form-row"><label>Năm vào Đảng</label><input type="number" placeholder="YYYY" min="1930" max="2099"></div>
           <div class="form-row"><label>Chi bộ / Đảng bộ</label><input type="text" placeholder="Chi bộ … – Đảng bộ …"></div>
@@ -9538,6 +9786,7 @@
     <div class="form-row"><label>Là Đảng viên?</label>
       <div>
         <select onchange="toggleSiblingParty(this,'famParty_${m.num}')">
+          <option value="">-- Chọn --</option>
           <option value="no">Không phải đảng viên</option>
           <option value="yes">Có – Đảng viên</option>
         </select>
@@ -9900,7 +10149,7 @@
         // B9 permanently replaces inputs with textareas (no display:none set).
         // initDienBien keeps input + sets ta.style.display="none" when idle.
         // Using offsetParent breaks when the section itself is hidden (display:none).
-        if (ta && ta.style.display !== 'none') return ta.value || "";
+        if (ta && ta.style.display !== "none") return ta.value || "";
         return i?.value || "";
       }
       function _mmCell(m, y) {
@@ -10052,7 +10301,9 @@
           const fromVal = _getMMyyyy(c[0]) || "";
           const toWrap = c[1]?.querySelector(".mmyyyy-wrap");
           const toInput = c[1]?.querySelector(".fhd-to-txt");
-          const toVal = toWrap ? _getMMyyyy(c[1]) : (toInput?.value?.trim() || "");
+          const toVal = toWrap
+            ? _getMMyyyy(c[1])
+            : toInput?.value?.trim() || "";
           const isPresent = !!c[1]?.querySelector(".fhd-present-chk")?.checked;
           const emp = _tdv(c[2]);
           const title = c.length > 4 ? _tdv(c[3]) : "";
@@ -10204,7 +10455,10 @@
           'select[onchange*="toggleSiblingParty"],select[onchange*="famParty"],select[onchange*="gpParty"],select[onchange*="spouseParty"]',
         );
         const isParty = pSel ? pSel.value === "yes" : false;
-        let partyYear = null, chiBoVal = null, partyAwards = null, partyYearsCount = null;
+        let partyYear = null,
+          chiBoVal = null,
+          partyAwards = null,
+          partyYearsCount = null;
         if (isParty) {
           const pbox = body.querySelector(".party-detail-box");
           if (pbox) {
@@ -10214,7 +10468,9 @@
             chiBoVal = ci?.value.trim() || null;
             const ai = pbox.querySelector('input[placeholder*="Huy hiệu"]');
             partyAwards = ai?.value.trim() || null;
-            const yci = pbox.querySelector('input[type="number"][placeholder="0"]');
+            const yci = pbox.querySelector(
+              'input[type="number"][placeholder="0"]',
+            );
             partyYearsCount = parseInt(yci?.value) || null;
           }
         }
@@ -10230,7 +10486,9 @@
         const religionTxt = body.querySelector("input.fam-sel-religion-text");
         const religionText =
           (religionSel?.value || religionTxt?.value || "").trim() || null;
-        const nationalityInp = body.querySelector("input.fam-nationality-input");
+        const nationalityInp = body.querySelector(
+          "input.fam-nationality-input",
+        );
         const nationality = (nationalityInp?.value || "").trim() || null;
         return {
           id: acc.dataset.familyId || null,
@@ -10332,7 +10590,9 @@
                 if (ai) ai.value = m.party_awards_text;
               }
               if (m.party_years_count) {
-                const yci = pbox.querySelector('input[type="number"][placeholder="0"]');
+                const yci = pbox.querySelector(
+                  'input[type="number"][placeholder="0"]',
+                );
                 if (yci) yci.value = m.party_years_count;
               }
             }
@@ -10486,20 +10746,22 @@
         const sel = document.getElementById(selectId);
         const inp = document.getElementById(inputId);
         if (!sel || !inp) return;
-        inp.style.display = sel.value === 'Khác' ? 'block' : 'none';
-        if (sel.value !== 'Khác') inp.value = '';
+        inp.style.display = sel.value === "Khác" ? "block" : "none";
+        if (sel.value !== "Khác") inp.value = "";
       }
 
       // Toggle Đoàn TNCS fields based on radio selection
       function toggleDoanFields() {
-        const isYes = document.querySelector('input[name="doanStatus"][value="yes"]')?.checked;
-        const fields = document.getElementById('doanFields');
-        if (fields) fields.style.display = isYes ? 'grid' : 'none';
+        const isYes = document.querySelector(
+          'input[name="doanStatus"][value="yes"]',
+        )?.checked;
+        const fields = document.getElementById("doanFields");
+        if (fields) fields.style.display = isYes ? "grid" : "none";
         if (!isYes) {
-          const d = document.getElementById('ngayVaoDoan');
-          const n = document.getElementById('noiVaoDoan');
-          if (d) d.value = '';
-          if (n) n.value = '';
+          const d = document.getElementById("ngayVaoDoan");
+          const n = document.getElementById("noiVaoDoan");
+          if (d) d.value = "";
+          if (n) n.value = "";
         }
       }
 
@@ -10544,7 +10806,9 @@
           const fromVal = _getMMyyyy(tr.cells[0]) || "";
           const toWrap1 = tr.cells[1]?.querySelector(".mmyyyy-wrap");
           const toTxt1 = tr.cells[1]?.querySelector(".fhd-to-txt");
-          const toVal = toWrap1 ? (_getMMyyyy(tr.cells[1]) || "") : (toTxt1?.value?.trim() || "");
+          const toVal = toWrap1
+            ? _getMMyyyy(tr.cells[1]) || ""
+            : toTxt1?.value?.trim() || "";
           const descVal = descInput?.value?.trim() || "";
           if (!fromVal && !toVal && !descVal && !isPresent) return;
 
@@ -10650,8 +10914,11 @@
           const fromVal = _getMMyyyy(tr.cells[0]) || "";
           const toInput = tr.cells[1]?.querySelector(".fhd-to-txt");
           const toWrap = tr.cells[1]?.querySelector(".mmyyyy-wrap");
-          const toVal = toWrap ? _getMMyyyy(tr.cells[1]) : (toInput?.value?.trim() || "");
-          const isPresent = !!tr.cells[1]?.querySelector(".fhd-present-chk")?.checked;
+          const toVal = toWrap
+            ? _getMMyyyy(tr.cells[1])
+            : toInput?.value?.trim() || "";
+          const isPresent =
+            !!tr.cells[1]?.querySelector(".fhd-present-chk")?.checked;
           const empInput = tr.cells[2]?.querySelector("textarea");
           const empVal = empInput?.value?.trim() || "";
           const isEmpty = !fromVal && !toVal && !empVal && !isPresent;
@@ -10678,7 +10945,9 @@
           const fromVal = _getMMyyyy(cells[0]) || "";
           const toWrap = cells[1].querySelector(".mmyyyy-wrap");
           const toInput = cells[1].querySelector(".fhd-to-txt");
-          const toVal = toWrap ? _getMMyyyy(cells[1]) : (toInput?.value?.trim() || "");
+          const toVal = toWrap
+            ? _getMMyyyy(cells[1])
+            : toInput?.value?.trim() || "";
           const isPresent =
             !!cells[1].querySelector(".fhd-present-chk")?.checked;
           const desc = _tdv(cells[2]);
@@ -12054,12 +12323,15 @@
         // Permission guard
         const permMap = {
           pgAccount: "can_create_accounts",
-          pgNotif:   "can_send_notifications",
-          pgReport:  "can_view_reports",
-          pgVerify:  "can_review_profiles",
+          pgNotif: "can_send_notifications",
+          pgReport: "can_view_reports",
+          pgVerify: "can_review_profiles",
         };
-        if (permMap[pid] && !_hasPermOrSuper(permMap[pid])
-            && !(pid === "pgVerify" && _hasPermOrSuper("can_approve_profiles"))) {
+        if (
+          permMap[pid] &&
+          !_hasPermOrSuper(permMap[pid]) &&
+          !(pid === "pgVerify" && _hasPermOrSuper("can_approve_profiles"))
+        ) {
           showToast("✗ Bạn không có quyền truy cập chức năng này.");
           return;
         }
@@ -12363,10 +12635,19 @@
         const btnReturn = document.getElementById("detailBtnReturn");
         if (!btnApprove || !btnReturn) return;
 
-        const canApprove = _hasPermOrSuper("can_approve_profiles") &&
+        const canApprove =
+          _hasPermOrSuper("can_approve_profiles") &&
           ["submitted", "pending", "under_review"].includes(status);
-        const canReturn = (_hasPermOrSuper("can_review_profiles") || _hasPermOrSuper("can_approve_profiles")) &&
-          ["draft", "submitted", "pending", "under_review", "verifying"].includes(status);
+        const canReturn =
+          (_hasPermOrSuper("can_review_profiles") ||
+            _hasPermOrSuper("can_approve_profiles")) &&
+          [
+            "draft",
+            "submitted",
+            "pending",
+            "under_review",
+            "verifying",
+          ].includes(status);
 
         btnApprove.style.display = canApprove ? "" : "none";
         btnReturn.style.display = canReturn ? "" : "none";
@@ -12778,12 +13059,12 @@
 
       // ===== PARTY MEMBER TOGGLE =====
       function toggleFamSelKhac(sel) {
-        const row = sel.closest('.form-row');
+        const row = sel.closest(".form-row");
         if (!row) return;
-        let inp = row.querySelector('.fam-sel-khac-other');
+        let inp = row.querySelector(".fam-sel-khac-other");
         if (!inp) return;
-        inp.style.display = sel.value === 'Khác' ? 'block' : 'none';
-        if (sel.value !== 'Khác') inp.value = '';
+        inp.style.display = sel.value === "Khác" ? "block" : "none";
+        if (sel.value !== "Khác") inp.value = "";
       }
       function toggleSiblingParty(sel, boxId) {
         const box = document.getElementById(boxId);
@@ -13122,30 +13403,39 @@
                 rows.map((r) => String(r.id)).filter(Boolean),
               );
               if (rows.length) {
-                tlBody.innerHTML = rows.map((r) => {
-                  const fromVal = r.from_month
-                    ? `${String(r.from_month).padStart(2,'0')}/${r.from_year||''}`
-                    : (r.from_year ? String(r.from_year) : '');
-                  const toVal = r.is_present ? '' : (r.to_month
-                    ? `${String(r.to_month).padStart(2,'0')}/${r.to_year||''}`
-                    : (r.to_year ? String(r.to_year) : ''));
-                  const toDisabled = r.is_present ? ' disabled' : '';
-                  const presentChk = r.is_present ? ' checked' : '';
-                  return `<div class="timeline-edit-row" data-id="${_esc(String(r.id || ''))}">
+                tlBody.innerHTML = rows
+                  .map((r) => {
+                    const fromVal = r.from_month
+                      ? `${String(r.from_month).padStart(2, "0")}/${r.from_year || ""}`
+                      : r.from_year
+                        ? String(r.from_year)
+                        : "";
+                    const toVal = r.is_present
+                      ? ""
+                      : r.to_month
+                        ? `${String(r.to_month).padStart(2, "0")}/${r.to_year || ""}`
+                        : r.to_year
+                          ? String(r.to_year)
+                          : "";
+                    const toDisabled = r.is_present ? " disabled" : "";
+                    const presentChk = r.is_present ? " checked" : "";
+                    return `<div class="timeline-edit-row" data-id="${_esc(String(r.id || ""))}">
               <input value="${_esc(fromVal)}" placeholder="Từ (MM/YYYY)">
               <input value="${_esc(toVal)}" placeholder="Đến (MM/YYYY)"${toDisabled}>
               <label style="display:flex;align-items:center;gap:3px;font-size:11px;white-space:nowrap;cursor:pointer;padding-top:8px"><input type="checkbox"${presentChk} onchange="const t=this.closest('.timeline-edit-row').querySelectorAll('input')[1];t.disabled=this.checked;if(this.checked)t.value=''"> Hiện tại</label>
-              <textarea placeholder="Diễn biến: Học gì / Làm gì, ở đâu (tên đơn vị, địa chỉ) + Nơi sinh sống…">${_esc(r.description || r.content || '')}</textarea>
+              <textarea placeholder="Diễn biến: Học gì / Làm gì, ở đâu (tên đơn vị, địa chỉ) + Nơi sinh sống…">${_esc(r.description || r.content || "")}</textarea>
               <button class="del-row-btn" onclick="delTimelineRow(this)" style="margin-top:6px">✕</button>
             </div>`;
-                }).join("");
+                  })
+                  .join("");
                 // Auto-expand all textareas to show full content without scrolling
-                tlBody.querySelectorAll('textarea').forEach(ta => {
-                  ta.style.height = 'auto';
-                  ta.style.height = ta.scrollHeight + 'px';
+                tlBody.querySelectorAll("textarea").forEach((ta) => {
+                  ta.style.height = "auto";
+                  ta.style.height = ta.scrollHeight + "px";
                 });
               } else {
-                tlBody.innerHTML = '<div style="color:#A0AABF;font-size:13px;padding:8px 0">Chưa có dữ liệu lịch sử.</div>';
+                tlBody.innerHTML =
+                  '<div style="color:#A0AABF;font-size:13px;padding:8px 0">Chưa có dữ liệu lịch sử.</div>';
               }
             }
 
@@ -13158,27 +13448,43 @@
               const workBody = document.getElementById("timeline-esC");
               if (workBody) {
                 const works = tld.work_history || [];
-                _adminWorkSrvIds = new Set(works.map((r) => String(r.id)).filter(Boolean));
+                _adminWorkSrvIds = new Set(
+                  works.map((r) => String(r.id)).filter(Boolean),
+                );
                 if (works.length) {
-                  workBody.innerHTML = works.map((r) => {
-                    const _fm = (m, y) => m ? `${String(m).padStart(2,'0')}/${y||''}` : (y ? String(y) : '');
-                    const fromStr = _fm(r.from_month, r.from_year);
-                    const toStr = r.is_present ? 'Nay' : _fm(r.to_month, r.to_year);
-                    const periodStr = r.period_text || (fromStr && toStr ? `${fromStr}–${toStr}` : fromStr || toStr || '');
-                    return `<div class="timeline-edit-row" data-id="${_esc(String(r.id || ""))}">
+                  workBody.innerHTML = works
+                    .map((r) => {
+                      const _fm = (m, y) =>
+                        m
+                          ? `${String(m).padStart(2, "0")}/${y || ""}`
+                          : y
+                            ? String(y)
+                            : "";
+                      const fromStr = _fm(r.from_month, r.from_year);
+                      const toStr = r.is_present
+                        ? "Nay"
+                        : _fm(r.to_month, r.to_year);
+                      const periodStr =
+                        r.period_text ||
+                        (fromStr && toStr
+                          ? `${fromStr}–${toStr}`
+                          : fromStr || toStr || "");
+                      return `<div class="timeline-edit-row" data-id="${_esc(String(r.id || ""))}">
                       <input value="${_esc(periodStr)}" placeholder="Từ–Đến (MM/YYYY–MM/YYYY)">
                       <textarea placeholder="Làm việc gì, ở đâu (tên đơn vị, địa chỉ + nơi sinh sống)">${_esc(r.employer || "")}</textarea>
                       <input value="${_esc(r.job_title || "")}" placeholder="Chức vụ">
                       <button class="del-row-btn" onclick="this.closest('.timeline-edit-row').remove()" style="margin-top:6px">✕</button>
                     </div>`;
-                  }).join("");
+                    })
+                    .join("");
                   // Auto-expand all textareas to show full content without scrolling
-                  workBody.querySelectorAll('textarea').forEach(ta => {
-                    ta.style.height = 'auto';
-                    ta.style.height = ta.scrollHeight + 'px';
+                  workBody.querySelectorAll("textarea").forEach((ta) => {
+                    ta.style.height = "auto";
+                    ta.style.height = ta.scrollHeight + "px";
                   });
                 } else {
-                  workBody.innerHTML = '<div style="color:#A0AABF;font-size:13px;padding:8px 0">Chưa có dữ liệu.</div>';
+                  workBody.innerHTML =
+                    '<div style="color:#A0AABF;font-size:13px;padding:8px 0">Chưa có dữ liệu.</div>';
                 }
               }
 
@@ -13290,102 +13596,144 @@
               if (!famBody) return;
               window._esDMembers = members;
               if (!members.length) {
-                famBody.innerHTML = '<div style="color:#A0AABF;font-size:13px;padding:8px 0">Chưa có thành viên gia đình.</div>';
+                famBody.innerHTML =
+                  '<div style="color:#A0AABF;font-size:13px;padding:8px 0">Chưa có thành viên gia đình.</div>';
                 return;
               }
               const LS = 'style="color:#718096;font-size:11px"';
               const mkHist = (history) => {
-                if (!history?.length) return '';
-                const rows = history.map(h => {
-                  const fm = h.from_month ? `${String(h.from_month).padStart(2,'0')}/${h.from_year||''}` : (h.from_year||'');
-                  const to = h.is_present ? 'Hiện tại' : (h.to_month ? `${String(h.to_month).padStart(2,'0')}/${h.to_year||''}` : (h.to_year||''));
-                  return `<tr><td style="padding:2px 6px;white-space:nowrap;border:1px solid #E2E8F0">${_esc(fm)}</td><td style="padding:2px 6px;white-space:nowrap;border:1px solid #E2E8F0">${_esc(to)}</td><td style="padding:2px 6px;border:1px solid #E2E8F0">${_esc(h.description||'')}</td></tr>`;
-                }).join('');
+                if (!history?.length) return "";
+                const rows = history
+                  .map((h) => {
+                    const fm = h.from_month
+                      ? `${String(h.from_month).padStart(2, "0")}/${h.from_year || ""}`
+                      : h.from_year || "";
+                    const to = h.is_present
+                      ? "Hiện tại"
+                      : h.to_month
+                        ? `${String(h.to_month).padStart(2, "0")}/${h.to_year || ""}`
+                        : h.to_year || "";
+                    return `<tr><td style="padding:2px 6px;white-space:nowrap;border:1px solid #E2E8F0">${_esc(fm)}</td><td style="padding:2px 6px;white-space:nowrap;border:1px solid #E2E8F0">${_esc(to)}</td><td style="padding:2px 6px;border:1px solid #E2E8F0">${_esc(h.description || "")}</td></tr>`;
+                  })
+                  .join("");
                 return `<div style="margin-top:8px"><div style="font-size:11px;font-weight:600;color:#718096;margin-bottom:3px">Quá trình lịch sử</div><table style="width:100%;font-size:11px;border-collapse:collapse"><thead><tr style="background:#F7FAFC"><th style="padding:2px 6px;text-align:left;width:90px;border:1px solid #E2E8F0">Từ</th><th style="padding:2px 6px;text-align:left;width:90px;border:1px solid #E2E8F0">Đến</th><th style="padding:2px 6px;text-align:left;border:1px solid #E2E8F0">Nội dung</th></tr></thead><tbody>${rows}</tbody></table></div>`;
               };
-              famBody.innerHTML = members.map(m => {
-                const rel = _esc(_famRelMap[m.relationship] || m.relationship || '');
-                const genderTxt = m.gender === 'male' ? 'Nam' : m.gender === 'female' ? 'Nữ' : (m.gender || '');
-                const fv = (label, val) => val ? `<div><span ${LS}>${label}:</span> ${_esc(String(val))}</div>` : '';
-                const fvW = (label, val) => val ? `<div style="grid-column:span 2"><span ${LS}>${label}:</span> ${_esc(String(val))}</div>` : '';
-                return `<div style="border:1px solid #E2E8F0;border-radius:6px;padding:12px 14px;margin-bottom:10px;font-size:12px">
+              famBody.innerHTML = members
+                .map((m) => {
+                  const rel = _esc(
+                    _famRelMap[m.relationship] || m.relationship || "",
+                  );
+                  const genderTxt =
+                    m.gender === "male"
+                      ? "Nam"
+                      : m.gender === "female"
+                        ? "Nữ"
+                        : m.gender || "";
+                  const fv = (label, val) =>
+                    val
+                      ? `<div><span ${LS}>${label}:</span> ${_esc(String(val))}</div>`
+                      : "";
+                  const fvW = (label, val) =>
+                    val
+                      ? `<div style="grid-column:span 2"><span ${LS}>${label}:</span> ${_esc(String(val))}</div>`
+                      : "";
+                  return `<div style="border:1px solid #E2E8F0;border-radius:6px;padding:12px 14px;margin-bottom:10px;font-size:12px">
                   <div style="font-weight:700;color:#2D3748;margin-bottom:8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
                     <span style="background:#EBF4FF;color:#3B82F6;padding:2px 8px;border-radius:4px;font-size:11px">${rel}</span>
-                    ${_esc(m.full_name||'—')}
-                    ${m.is_deceased ? '<span style="color:#E53E3E;font-size:11px">(Đã mất)</span>' : ''}
+                    ${_esc(m.full_name || "—")}
+                    ${m.is_deceased ? '<span style="color:#E53E3E;font-size:11px">(Đã mất)</span>' : ""}
                   </div>
                   <div style="display:grid;grid-template-columns:1fr 1fr;gap:3px 16px">
-                    ${fv('Giới tính', genderTxt)}
-                    ${fv('Năm sinh', m.birth_year)}
-                    ${fvW('Nơi sinh', m.birth_place)}
-                    ${fvW('Quê quán', m.hometown)}
-                    ${fv('Dân tộc', m.ethnic_group_text)}
-                    ${fv('Tôn giáo', m.religion_text)}
-                    ${fvW('Nơi ở hiện tại', m.current_address)}
-                    ${fv('Nghề nghiệp', m.occupation)}
-                    ${m.relationship === 'anh_chi_em_ruot' ? fv('Quốc tịch', m.nationality || 'Việt Nam') : ''}
-                    ${fv('Nơi làm việc', m.workplace)}
-                    ${fvW('Chức danh/Chức vụ', m.job_title)}
-                    ${m.is_deceased ? fv('Năm mất', m.deceased_year) + fv('Nguyên nhân mất', m.deceased_cause) : ''}
-                    ${fvW('Trường học', m.child_school)}
+                    ${fv("Giới tính", genderTxt)}
+                    ${fv("Năm sinh", m.birth_year)}
+                    ${fvW("Nơi sinh", m.birth_place)}
+                    ${fvW("Quê quán", m.hometown)}
+                    ${fv("Dân tộc", m.ethnic_group_text)}
+                    ${fv("Tôn giáo", m.religion_text)}
+                    ${fvW("Nơi ở hiện tại", m.current_address)}
+                    ${fv("Nghề nghiệp", m.occupation)}
+                    ${m.relationship === "anh_chi_em_ruot" ? fv("Quốc tịch", m.nationality || "Việt Nam") : ""}
+                    ${fv("Nơi làm việc", m.workplace)}
+                    ${fvW("Chức danh/Chức vụ", m.job_title)}
+                    ${m.is_deceased ? fv("Năm mất", m.deceased_year) + fv("Nguyên nhân mất", m.deceased_cause) : ""}
+                    ${fvW("Trường học", m.child_school)}
                   </div>
-                  ${m.is_party_member ? `<div style="margin-top:8px;padding:6px 10px;background:#F0FFF4;border-radius:4px">
+                  ${
+                    m.is_party_member
+                      ? `<div style="margin-top:8px;padding:6px 10px;background:#F0FFF4;border-radius:4px">
                     <div style="font-weight:600;color:#276749;margin-bottom:4px">Đảng viên</div>
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:3px 16px">
-                      ${fv('Ngày vào Đảng', m.party_join_date)}
-                      ${fv('Nơi vào Đảng', m.party_join_place)}
-                      ${fv('Chi bộ/Đảng bộ', m.party_chi_bo)}
-                      ${fv('Khen thưởng/Huy hiệu', m.party_awards_text)}
-                      ${m.party_years_count ? `<div><span ${LS}>Tuổi Đảng:</span> ${m.party_years_count} năm</div>` : ''}
+                      ${fv("Ngày vào Đảng", m.party_join_date)}
+                      ${fv("Nơi vào Đảng", m.party_join_place)}
+                      ${fv("Chi bộ/Đảng bộ", m.party_chi_bo)}
+                      ${fv("Khen thưởng/Huy hiệu", m.party_awards_text)}
+                      ${m.party_years_count ? `<div><span ${LS}>Tuổi Đảng:</span> ${m.party_years_count} năm</div>` : ""}
                     </div>
-                  </div>` : '<div style="margin-top:6px;color:#718096;font-size:11.5px">Không phải đảng viên</div>'}
-                  ${m.notes ? `<div style="margin-top:6px"><span ${LS}>Ghi chú:</span> ${_esc(m.notes)}</div>` : ''}
+                  </div>`
+                      : '<div style="margin-top:6px;color:#718096;font-size:11.5px">Không phải đảng viên</div>'
+                  }
+                  ${m.notes ? `<div style="margin-top:6px"><span ${LS}>Ghi chú:</span> ${_esc(m.notes)}</div>` : ""}
                   ${mkHist(m.history)}
                 </div>`;
-              }).join('');
+                })
+                .join("");
             }
             function _renderFamTableEdit(members) {
               const famBody = document.getElementById("family-esD-body");
               if (!famBody) return;
               if (!members.length) {
-                famBody.innerHTML = '<div style="color:#A0AABF;font-size:13px;padding:8px 0">Chưa có thành viên gia đình.</div>';
+                famBody.innerHTML =
+                  '<div style="color:#A0AABF;font-size:13px;padding:8px 0">Chưa có thành viên gia đình.</div>';
                 return;
               }
-              const IS = 'style="width:100%;border:1px solid #CBD5E0;border-radius:3px;padding:3px 5px;font-size:11.5px;box-sizing:border-box"';
-              const LS = 'style="color:#718096;font-size:11px;display:block;margin-bottom:2px"';
+              const IS =
+                'style="width:100%;border:1px solid #CBD5E0;border-radius:3px;padding:3px 5px;font-size:11.5px;box-sizing:border-box"';
+              const LS =
+                'style="color:#718096;font-size:11px;display:block;margin-bottom:2px"';
               const mkHist = (history) => {
-                if (!history?.length) return '';
-                const rows = history.map(h => {
-                  const fm = h.from_month ? `${String(h.from_month).padStart(2,'0')}/${h.from_year||''}` : (h.from_year||'');
-                  const to = h.is_present ? 'Hiện tại' : (h.to_month ? `${String(h.to_month).padStart(2,'0')}/${h.to_year||''}` : (h.to_year||''));
-                  return `<tr><td style="padding:2px 6px;white-space:nowrap;border:1px solid #E2E8F0">${_esc(fm)}</td><td style="padding:2px 6px;white-space:nowrap;border:1px solid #E2E8F0">${_esc(to)}</td><td style="padding:2px 6px;border:1px solid #E2E8F0">${_esc(h.description||'')}</td></tr>`;
-                }).join('');
+                if (!history?.length) return "";
+                const rows = history
+                  .map((h) => {
+                    const fm = h.from_month
+                      ? `${String(h.from_month).padStart(2, "0")}/${h.from_year || ""}`
+                      : h.from_year || "";
+                    const to = h.is_present
+                      ? "Hiện tại"
+                      : h.to_month
+                        ? `${String(h.to_month).padStart(2, "0")}/${h.to_year || ""}`
+                        : h.to_year || "";
+                    return `<tr><td style="padding:2px 6px;white-space:nowrap;border:1px solid #E2E8F0">${_esc(fm)}</td><td style="padding:2px 6px;white-space:nowrap;border:1px solid #E2E8F0">${_esc(to)}</td><td style="padding:2px 6px;border:1px solid #E2E8F0">${_esc(h.description || "")}</td></tr>`;
+                  })
+                  .join("");
                 return `<div style="margin-top:8px"><div style="font-size:11px;font-weight:600;color:#718096;margin-bottom:3px">Quá trình lịch sử (chỉ xem)</div><table style="width:100%;font-size:11px;border-collapse:collapse"><thead><tr style="background:#F7FAFC"><th style="padding:2px 6px;text-align:left;width:90px;border:1px solid #E2E8F0">Từ</th><th style="padding:2px 6px;text-align:left;width:90px;border:1px solid #E2E8F0">Đến</th><th style="padding:2px 6px;text-align:left;border:1px solid #E2E8F0">Nội dung</th></tr></thead><tbody>${rows}</tbody></table></div>`;
               };
-              famBody.innerHTML = members.map(m => {
-                const rel = _esc(_famRelMap[m.relationship] || m.relationship || '');
-                const partyChecked = m.is_party_member ? ' checked' : '';
-                const deceasedChecked = m.is_deceased ? ' checked' : '';
-                const partyDisplay = m.is_party_member ? 'grid' : 'none';
-                const deceasedDisplay = m.is_deceased ? 'grid' : 'none';
-                return `<div style="border:1px solid #E2E8F0;border-radius:6px;padding:12px 14px;margin-bottom:10px;font-size:12px" data-fam-id="${m.id}">
+              famBody.innerHTML = members
+                .map((m) => {
+                  const rel = _esc(
+                    _famRelMap[m.relationship] || m.relationship || "",
+                  );
+                  const partyChecked = m.is_party_member ? " checked" : "";
+                  const deceasedChecked = m.is_deceased ? " checked" : "";
+                  const partyDisplay = m.is_party_member ? "grid" : "none";
+                  const deceasedDisplay = m.is_deceased ? "grid" : "none";
+                  return `<div style="border:1px solid #E2E8F0;border-radius:6px;padding:12px 14px;margin-bottom:10px;font-size:12px" data-fam-id="${m.id}">
                   <div style="font-weight:700;color:#2D3748;margin-bottom:8px">
                     <span style="background:#FEF9EC;color:#B7791F;padding:2px 8px;border-radius:4px;font-size:11px">${rel}</span>
                   </div>
                   <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px 16px">
-                    <div><label ${LS}>Họ và tên</label><input ${IS} data-field="full_name" value="${_esc(m.full_name||'')}"></div>
-                    <div><label ${LS}>Năm sinh</label><input ${IS} type="number" data-field="birth_year" value="${m.birth_year||''}"></div>
-                    <div style="grid-column:span 2"><label ${LS}>Nơi sinh</label><input ${IS} data-field="birth_place" value="${_esc(m.birth_place||'')}"></div>
-                    <div style="grid-column:span 2"><label ${LS}>Quê quán</label><input ${IS} data-field="hometown" value="${_esc(m.hometown||'')}"></div>
-                    <div><label ${LS}>Dân tộc</label><input ${IS} data-field="ethnic_group_text" value="${_esc(m.ethnic_group_text||'')}"></div>
-                    <div><label ${LS}>Tôn giáo</label><input ${IS} data-field="religion_text" value="${_esc(m.religion_text||'')}"></div>
-                    <div style="grid-column:span 2"><label ${LS}>Nơi ở hiện tại</label><input ${IS} data-field="current_address" value="${_esc(m.current_address||'')}"></div>
-                    <div><label ${LS}>Nghề nghiệp</label><input ${IS} data-field="occupation" value="${_esc(m.occupation||'')}"></div>
-                    ${m.relationship === 'anh_chi_em_ruot' ? `<div><label ${LS}>Quốc tịch</label><input ${IS} data-field="nationality" value="${_esc(m.nationality||'Việt Nam')}"></div>` : ''}
-                    <div><label ${LS}>Nơi làm việc</label><input ${IS} data-field="workplace" value="${_esc(m.workplace||'')}"></div>
-                    <div style="grid-column:span 2"><label ${LS}>Chức danh/Chức vụ</label><input ${IS} data-field="job_title" value="${_esc(m.job_title||'')}"></div>
-                    <div style="grid-column:span 2"><label ${LS}>Trường học (nếu là con dưới 18)</label><input ${IS} data-field="child_school" value="${_esc(m.child_school||'')}"></div>
-                    <div style="grid-column:span 2"><label ${LS}>Ghi chú</label><input ${IS} data-field="notes" value="${_esc(m.notes||'')}"></div>
+                    <div><label ${LS}>Họ và tên</label><input ${IS} data-field="full_name" value="${_esc(m.full_name || "")}"></div>
+                    <div><label ${LS}>Năm sinh</label><input ${IS} type="number" data-field="birth_year" value="${m.birth_year || ""}"></div>
+                    <div style="grid-column:span 2"><label ${LS}>Nơi sinh</label><input ${IS} data-field="birth_place" value="${_esc(m.birth_place || "")}"></div>
+                    <div style="grid-column:span 2"><label ${LS}>Quê quán</label><input ${IS} data-field="hometown" value="${_esc(m.hometown || "")}"></div>
+                    <div><label ${LS}>Dân tộc</label><input ${IS} data-field="ethnic_group_text" value="${_esc(m.ethnic_group_text || "")}"></div>
+                    <div><label ${LS}>Tôn giáo</label><input ${IS} data-field="religion_text" value="${_esc(m.religion_text || "")}"></div>
+                    <div style="grid-column:span 2"><label ${LS}>Nơi ở hiện tại</label><input ${IS} data-field="current_address" value="${_esc(m.current_address || "")}"></div>
+                    <div><label ${LS}>Nghề nghiệp</label><input ${IS} data-field="occupation" value="${_esc(m.occupation || "")}"></div>
+                    ${m.relationship === "anh_chi_em_ruot" ? `<div><label ${LS}>Quốc tịch</label><input ${IS} data-field="nationality" value="${_esc(m.nationality || "Việt Nam")}"></div>` : ""}
+                    <div><label ${LS}>Nơi làm việc</label><input ${IS} data-field="workplace" value="${_esc(m.workplace || "")}"></div>
+                    <div style="grid-column:span 2"><label ${LS}>Chức danh/Chức vụ</label><input ${IS} data-field="job_title" value="${_esc(m.job_title || "")}"></div>
+                    <div style="grid-column:span 2"><label ${LS}>Trường học (nếu là con dưới 18)</label><input ${IS} data-field="child_school" value="${_esc(m.child_school || "")}"></div>
+                    <div style="grid-column:span 2"><label ${LS}>Ghi chú</label><input ${IS} data-field="notes" value="${_esc(m.notes || "")}"></div>
                   </div>
                   <div style="margin-top:8px;display:flex;gap:16px;flex-wrap:wrap">
                     <label style="display:flex;align-items:center;gap:4px;font-size:12px;cursor:pointer">
@@ -13398,19 +13746,20 @@
                     </label>
                   </div>
                   <div class="fam-deceased-extra" style="display:${deceasedDisplay};grid-template-columns:1fr 1fr;gap:6px 16px;margin-top:6px;padding:8px 10px;background:#FFF5F5;border-radius:4px">
-                    <div><label ${LS}>Năm mất</label><input ${IS} type="number" data-field="deceased_year" value="${m.deceased_year||''}"></div>
-                    <div><label ${LS}>Nguyên nhân mất</label><input ${IS} data-field="deceased_cause" value="${_esc(m.deceased_cause||'')}"></div>
+                    <div><label ${LS}>Năm mất</label><input ${IS} type="number" data-field="deceased_year" value="${m.deceased_year || ""}"></div>
+                    <div><label ${LS}>Nguyên nhân mất</label><input ${IS} data-field="deceased_cause" value="${_esc(m.deceased_cause || "")}"></div>
                   </div>
                   <div class="fam-party-extra" style="display:${partyDisplay};grid-template-columns:1fr 1fr;gap:6px 16px;margin-top:6px;padding:8px 10px;background:#F0FFF4;border-radius:4px">
-                    <div><label ${LS}>Ngày vào Đảng</label><input ${IS} data-field="party_join_date" value="${_esc(m.party_join_date||'')}"></div>
-                    <div><label ${LS}>Nơi vào Đảng</label><input ${IS} data-field="party_join_place" value="${_esc(m.party_join_place||'')}"></div>
-                    <div><label ${LS}>Chi bộ/Đảng bộ</label><input ${IS} data-field="party_chi_bo" value="${_esc(m.party_chi_bo||'')}"></div>
-                    <div><label ${LS}>Khen thưởng/Huy hiệu</label><input ${IS} data-field="party_awards_text" value="${_esc(m.party_awards_text||'')}"></div>
-                    <div><label ${LS}>Số năm tuổi Đảng</label><input ${IS} type="number" data-field="party_years_count" value="${m.party_years_count||''}"></div>
+                    <div><label ${LS}>Ngày vào Đảng</label><input ${IS} data-field="party_join_date" value="${_esc(m.party_join_date || "")}"></div>
+                    <div><label ${LS}>Nơi vào Đảng</label><input ${IS} data-field="party_join_place" value="${_esc(m.party_join_place || "")}"></div>
+                    <div><label ${LS}>Chi bộ/Đảng bộ</label><input ${IS} data-field="party_chi_bo" value="${_esc(m.party_chi_bo || "")}"></div>
+                    <div><label ${LS}>Khen thưởng/Huy hiệu</label><input ${IS} data-field="party_awards_text" value="${_esc(m.party_awards_text || "")}"></div>
+                    <div><label ${LS}>Số năm tuổi Đảng</label><input ${IS} type="number" data-field="party_years_count" value="${m.party_years_count || ""}"></div>
                   </div>
                   ${mkHist(m.history)}
                 </div>`;
-              }).join('');
+                })
+                .join("");
             }
             const famBody = document.getElementById("family-esD-body");
             if (famBody && famRes.status === "fulfilled") {
@@ -13539,18 +13888,26 @@
           ...document.querySelectorAll("#family-esD-body [data-fam-id]"),
         ].map((card) => {
           const payload = {};
-          card.querySelectorAll("input[data-field], select[data-field], textarea[data-field]").forEach((inp) => {
-            const key = inp.dataset.field;
-            if (!key) return;
-            if (inp.type === "checkbox") {
-              payload[key] = inp.checked;
-            } else if (key === "birth_year" || key === "deceased_year" || key === "party_years_count") {
-              const n = parseInt(inp.value, 10);
-              payload[key] = Number.isFinite(n) ? n : null;
-            } else {
-              payload[key] = (inp.value || "").trim();
-            }
-          });
+          card
+            .querySelectorAll(
+              "input[data-field], select[data-field], textarea[data-field]",
+            )
+            .forEach((inp) => {
+              const key = inp.dataset.field;
+              if (!key) return;
+              if (inp.type === "checkbox") {
+                payload[key] = inp.checked;
+              } else if (
+                key === "birth_year" ||
+                key === "deceased_year" ||
+                key === "party_years_count"
+              ) {
+                const n = parseInt(inp.value, 10);
+                payload[key] = Number.isFinite(n) ? n : null;
+              } else {
+                payload[key] = (inp.value || "").trim();
+              }
+            });
           return {
             id: card.dataset.famId,
             payload,
@@ -13648,9 +14005,15 @@
         document.getElementById("reviewActionBar")?.classList.add("visible");
 
         // Hide "Trả lại" button if officer lacks review/approve permissions
-        const rabReturnBtn = document.querySelector("#reviewActionBar .btn-primary");
-        if (rabReturnBtn) rabReturnBtn.style.display =
-          (_hasPermOrSuper("can_review_profiles") || _hasPermOrSuper("can_approve_profiles")) ? "" : "none";
+        const rabReturnBtn = document.querySelector(
+          "#reviewActionBar .btn-primary",
+        );
+        if (rabReturnBtn)
+          rabReturnBtn.style.display =
+            _hasPermOrSuper("can_review_profiles") ||
+            _hasPermOrSuper("can_approve_profiles")
+              ? ""
+              : "none";
 
         // ── Physically hide ALL "Chỉnh sửa" edit buttons (not relying on CSS) ──
         pg.querySelectorAll(".edit-btn:not(.flag-btn)").forEach((btn) => {
@@ -13930,7 +14293,8 @@
           const _parseMY = (str) => {
             if (!str) return { month: null, year: null };
             const m = /^(\d{1,2})\/(\d{4})$/.exec(str.trim());
-            if (m) return { month: parseInt(m[1], 10), year: parseInt(m[2], 10) };
+            if (m)
+              return { month: parseInt(m[1], 10), year: parseInt(m[2], 10) };
             const y = /^(\d{4})$/.exec(str.trim());
             if (y) return { month: null, year: parseInt(y[1], 10) };
             return { month: null, year: null };
@@ -13947,7 +14311,9 @@
               if (!desc) return;
               const isPresent = inputs[2]?.checked || false;
               const from = _parseMY(inputs[0]?.value);
-              const to = isPresent ? { month: null, year: null } : _parseMY(inputs[1]?.value);
+              const to = isPresent
+                ? { month: null, year: null }
+                : _parseMY(inputs[1]?.value);
               tlRows.push({
                 id: row.dataset.id || null,
                 from_month: from.month,
@@ -13977,11 +14343,13 @@
           };
           const workRows = _collectAdminTimeline("timeline-esC")
             .map((r) => {
-              const period = r._vals[0] || '';
+              const period = r._vals[0] || "";
               const parts = period.split(/\s*[–\-]\s*/);
               const from = _parseMY(parts[0]);
-              const isNay = /nay/i.test(parts[1] || '');
-              const to = isNay ? { month: null, year: null } : _parseMY(parts[1]);
+              const isNay = /nay/i.test(parts[1] || "");
+              const to = isNay
+                ? { month: null, year: null }
+                : _parseMY(parts[1]);
               return {
                 id: period ? r.id : null,
                 period_text: period || null,
@@ -14682,7 +15050,7 @@
         </div>
         <span class="pill ${st.cls}" style="font-size:10px;flex-shrink:0">${st.label}</span>
         <div style="display:flex;gap:6px;flex-shrink:0">
-          <button class="btn btn-ghost" style="padding:6px 12px;font-size:12px;${_hasPermOrSuper('can_export_word') ? '' : 'display:none'}" onclick="exportSingleWord('${p.name}',${p.id})">
+          <button class="btn btn-ghost" style="padding:6px 12px;font-size:12px;${_hasPermOrSuper("can_export_word") ? "" : "display:none"}" onclick="exportSingleWord('${p.name}',${p.id})">
             📄 Xuất .docx
           </button>
         </div>`;
@@ -15260,7 +15628,7 @@
           }
           // Production environment
           if (hostname === "14.224.210.210" || hostname === "lylich.gov.vn") {
-            return "http://14.224.210.210:8006/api/v1";
+            return "http://14.224.210.210:8003/api/v1";
           }
           return "/api/v1";
         }
@@ -15682,7 +16050,7 @@
         // Route by role (only quần chúng uses /profiles/my/)
         if (user.is_superuser) {
           // Redirect to Django admin via session-creation endpoint (avoids CORS cookie issues)
-          const _adminBase = API.BASE.replace(/\/api\/v1\/?$/, '');
+          const _adminBase = API.BASE.replace(/\/api\/v1\/?$/, "");
           const _tok = API.token.access();
           window.location.href = `${_adminBase}/api/v1/auth/admin-session/?token=${encodeURIComponent(_tok)}`;
           return;
@@ -15723,31 +16091,39 @@
         // Map: page id → permission key (null = always visible)
         const pagePerms = {
           pgAccount: "can_create_accounts",
-          pgNotif:   "can_send_notifications",
-          pgReport:  "can_view_reports",
-          pgVerify:  null, // checked separately (review OR approve)
+          pgNotif: "can_send_notifications",
+          pgReport: "can_view_reports",
+          pgVerify: null, // checked separately (review OR approve)
         };
 
         // Helper to show/hide a page's tab in sidebar + top nav
         function setPageVisible(pageId, visible) {
           // Sidebar
-          const sideItem = document.querySelector(`[data-admin-page="${pageId}"]`);
+          const sideItem = document.querySelector(
+            `[data-admin-page="${pageId}"]`,
+          );
           if (sideItem) sideItem.style.display = visible ? "" : "none";
           // Top nav (desktop + mobile)
-          document.querySelectorAll(`[data-page="${pageId}"]`).forEach(el => {
+          document.querySelectorAll(`[data-page="${pageId}"]`).forEach((el) => {
             el.style.display = visible ? "" : "none";
           });
         }
 
         setPageVisible("pgAccount", _hasPermOrSuper("can_create_accounts"));
-        setPageVisible("pgNotif",   _hasPermOrSuper("can_send_notifications"));
-        setPageVisible("pgReport",  _hasPermOrSuper("can_view_reports"));
-        setPageVisible("pgVerify",  _hasPermOrSuper("can_review_profiles") || _hasPermOrSuper("can_approve_profiles"));
-
+        setPageVisible("pgNotif", _hasPermOrSuper("can_send_notifications"));
+        setPageVisible("pgReport", _hasPermOrSuper("can_view_reports"));
+        setPageVisible(
+          "pgVerify",
+          _hasPermOrSuper("can_review_profiles") ||
+            _hasPermOrSuper("can_approve_profiles"),
+        );
 
         // "Gửi thông báo" button on notification page
         const btnSendNotif = document.getElementById("btnSendNotif");
-        if (btnSendNotif) btnSendNotif.style.display = _hasPermOrSuper("can_send_notifications") ? "" : "none";
+        if (btnSendNotif)
+          btnSendNotif.style.display = _hasPermOrSuper("can_send_notifications")
+            ? ""
+            : "none";
       }
 
       /* ─────────────────────────────────────────────────────────────────────────
@@ -15870,11 +16246,9 @@
                     p.ai_score > 0
                       ? `<div class="ai-score" style="color:${scoreColor(p.ai_score)}">${p.ai_score}% <div class="ai-score-bar"><div class="ai-score-fill" style="width:${p.ai_score}%;background:${scoreColor(p.ai_score)}"></div></div></div>`
                       : "—";
-                  const canAct = _hasPermOrSuper("can_approve_profiles") && [
-                    "submitted",
-                    "pending",
-                    "under_review",
-                  ].includes(p.status);
+                  const canAct =
+                    _hasPermOrSuper("can_approve_profiles") &&
+                    ["submitted", "pending", "under_review"].includes(p.status);
                   return `<tr>
             <td><div class="name-cell">${_esc(p.full_name)}</div></td>
             <td><span class="pill ${st.cls}">${st.label}</span></td>
@@ -16415,7 +16789,8 @@
                 !!p &&
                 ["submitted", "pending", "under_review"].includes(p.status);
               const canReturn =
-                (_hasPermOrSuper("can_review_profiles") || _hasPermOrSuper("can_approve_profiles")) &&
+                (_hasPermOrSuper("can_review_profiles") ||
+                  _hasPermOrSuper("can_approve_profiles")) &&
                 !!p &&
                 [
                   "draft",
@@ -16434,7 +16809,10 @@
                 : p?.created_at
                   ? _fmtDate(p.created_at)
                   : "—";
-              const canExportWord = _hasPermOrSuper("can_export_word") && !!p && p.status === "completed";
+              const canExportWord =
+                _hasPermOrSuper("can_export_word") &&
+                !!p &&
+                p.status === "completed";
               return `<tr>
         <td><div class="name-cell">${safeName}</div><div class="sub-cell">${_esc(u.phone || "")}</div></td>
         <td><span class="pill ${st.cls}">${st.label}</span></td>
@@ -17018,10 +17396,10 @@
           // If edu level not a standard option, treat as "Khác"
           const vanHoaSel = document.getElementById("trinhDoVanHoa");
           if (p.general_edu_level && vanHoaSel && !vanHoaSel.value) {
-            vanHoaSel.value = 'Khác';
+            vanHoaSel.value = "Khác";
             _setVal("trinhDoVanHoaKhac", p.general_edu_level);
             const kv = document.getElementById("trinhDoVanHoaKhac");
-            if (kv) kv.style.display = 'block';
+            if (kv) kv.style.display = "block";
           }
           _setVal("trinhDoChuyenMon", p.edu_specialization);
           _setVal("trinhDoLyLuan", p.political_level_detail);
@@ -17029,15 +17407,19 @@
           // If IT level not a standard option, treat as "Khác"
           const tinHocSel = document.getElementById("tinHoc");
           if (p.it_level && tinHocSel && !tinHocSel.value) {
-            tinHocSel.value = 'Khác';
+            tinHocSel.value = "Khác";
             _setVal("tinHocKhac", p.it_level);
             const kt = document.getElementById("tinHocKhac");
-            if (kt) kt.style.display = 'block';
+            if (kt) kt.style.display = "block";
           }
           // Youth union radio
           const hasDoan = !!(p.youth_union_date || p.youth_union_place);
-          const doanYesRadio = document.querySelector('input[name="doanStatus"][value="yes"]');
-          const doanNoRadio = document.querySelector('input[name="doanStatus"][value="no"]');
+          const doanYesRadio = document.querySelector(
+            'input[name="doanStatus"][value="yes"]',
+          );
+          const doanNoRadio = document.querySelector(
+            'input[name="doanStatus"][value="no"]',
+          );
           if (doanYesRadio) doanYesRadio.checked = hasDoan;
           if (doanNoRadio) doanNoRadio.checked = !hasDoan;
           toggleDoanFields();
@@ -17506,38 +17888,85 @@
           `<div class="pv-sec-block"><div class="pv-sec-head"><div class="pv-sec-badge">F</div><div class="pv-sec-title">Đi nước ngoài</div></div>${_li(travel, (t) => `${_period(t) ? `<strong>${_period(t)}</strong>: ` : ""}${_esc(t.country || "—")}${t.purpose ? ` - ${_esc(t.purpose)}` : ""}${t.sponsoring_org ? ` (Cơ quan: ${_esc(t.sponsoring_org)})` : ""}`)}</div>`,
           `<div class="pv-sec-block"><div class="pv-sec-head"><div class="pv-sec-badge">G</div><div class="pv-sec-title">Khen thưởng</div></div>${_li(awards, (a) => `${a.issued_month || "--"}/${a.issued_year || "----"}: ${_esc(a.content || "")}${a.level ? ` (Cấp: ${_esc(a.level)})` : ""}${a.issuer ? ` - ${_esc(a.issuer)}` : ""}`)}</div>`,
           `<div class="pv-sec-block"><div class="pv-sec-head"><div class="pv-sec-badge">H</div><div class="pv-sec-title">Kỷ luật</div></div>${_li(disciplines, (d) => `${d.issued_month || "--"}/${d.issued_year || "----"}: ${_esc(d.content || "")}${d.level ? ` (Mức: ${_esc(d.level)})` : ""}${d.issuer ? ` - ${_esc(d.issuer)}` : ""}`)}</div>`,
-          `<div class="pv-sec-block"><div class="pv-sec-head"><div class="pv-sec-badge">I</div><div class="pv-sec-title">Hoàn cảnh gia đình</div></div>${famData.length ? famData.map(f => {
-            const lines = [];
-            if (f.birth_year) lines.push(`Năm sinh: ${f.birth_year}`);
-            if (f.birth_place) lines.push(`Nơi sinh: ${_esc(f.birth_place)}`);
-            if (f.hometown) lines.push(`Quê quán: ${_esc(f.hometown)}`);
-            if (f.ethnic_group_text) lines.push(`Dân tộc: ${_esc(f.ethnic_group_text)}`);
-            if (f.religion_text) lines.push(`Tôn giáo: ${_esc(f.religion_text)}`);
-            if (f.occupation) lines.push(`Nghề nghiệp: ${_esc(f.occupation)}`);
-            if (f.relationship === 'anh_chi_em_ruot') lines.push(`Quốc tịch: ${_esc(f.nationality || 'Việt Nam')}`);
-            if (f.workplace) lines.push(`Nơi làm việc: ${_esc(f.workplace)}`);
-            if (f.current_address) lines.push(`Nơi ở: ${_esc(f.current_address)}`);
-            if (f.is_deceased) {
-              const d = [`Đã mất`];
-              if (f.deceased_year) d.push(`năm ${f.deceased_year}`);
-              if (f.deceased_cause) d.push(`(${_esc(f.deceased_cause)})`);
-              lines.push(d.join(' '));
-            }
-            const partyLine = f.is_party_member
-              ? [`Đảng viên`,
-                 f.party_join_year ? `Năm vào Đảng: ${f.party_join_year}` : '',
-                 f.party_join_date ? `Ngày chính thức: ${_esc(f.party_join_date)}` : '',
-                 f.party_join_place ? `tại ${_esc(f.party_join_place)}` : '',
-                 f.party_chi_bo ? `Chi bộ/Đảng bộ: ${_esc(f.party_chi_bo)}` : '',
-                 f.party_awards_text ? `Khen thưởng/Huy hiệu: ${_esc(f.party_awards_text)}` : '',
-                 f.party_years_count ? `Số năm tuổi Đảng: ${f.party_years_count}` : ''
-                ].filter(Boolean).join(' | ')
-              : 'Không phải đảng viên';
-            lines.push(partyLine);
-            if (f.notes) lines.push(`Ghi chú: ${_esc(f.notes)}`);
-            const histHtml = (f.history||[]).length ? `<div style="margin-top:4px;margin-left:12px"><em style="font-size:11px;color:var(--muted)">Quá trình lịch sử:</em><ul style="margin:2px 0 0 16px;padding:0;font-size:11px">${(f.history||[]).map(h=>{const fm=h.from_month?`${String(h.from_month).padStart(2,'0')}/${h.from_year||''}`:h.from_year||'';const to=h.is_present?'Nay':(h.to_month?`${String(h.to_month).padStart(2,'0')}/${h.to_year||''}`:h.to_year||'');return `<li>${fm&&to?`<strong>${fm}–${to}</strong>: `:''}${_esc(h.description||'')}</li>`}).join('')}</ul></div>` : '';
-            return `<li><strong>${_esc(f.relationship_display||f.relationship||'')}:</strong> ${_esc(f.full_name||'')}<br><span style="font-size:11px;color:var(--muted)">${lines.join(' · ')}</span>${histHtml}</li>`;
-          }).join('') : `<div class="pv-sec-empty">Chưa nhập</div>`}</div>`,
+          `<div class="pv-sec-block"><div class="pv-sec-head"><div class="pv-sec-badge">I</div><div class="pv-sec-title">Hoàn cảnh gia đình</div></div>${
+            famData.length
+              ? famData
+                  .map((f) => {
+                    const lines = [];
+                    if (f.birth_year) lines.push(`Năm sinh: ${f.birth_year}`);
+                    if (f.birth_place)
+                      lines.push(`Nơi sinh: ${_esc(f.birth_place)}`);
+                    if (f.hometown) lines.push(`Quê quán: ${_esc(f.hometown)}`);
+                    if (f.ethnic_group_text)
+                      lines.push(`Dân tộc: ${_esc(f.ethnic_group_text)}`);
+                    if (f.religion_text)
+                      lines.push(`Tôn giáo: ${_esc(f.religion_text)}`);
+                    if (f.occupation)
+                      lines.push(`Nghề nghiệp: ${_esc(f.occupation)}`);
+                    if (f.relationship === "anh_chi_em_ruot")
+                      lines.push(
+                        `Quốc tịch: ${_esc(f.nationality || "Việt Nam")}`,
+                      );
+                    if (f.workplace)
+                      lines.push(`Nơi làm việc: ${_esc(f.workplace)}`);
+                    if (f.current_address)
+                      lines.push(`Nơi ở: ${_esc(f.current_address)}`);
+                    if (f.is_deceased) {
+                      const d = [`Đã mất`];
+                      if (f.deceased_year) d.push(`năm ${f.deceased_year}`);
+                      if (f.deceased_cause)
+                        d.push(`(${_esc(f.deceased_cause)})`);
+                      lines.push(d.join(" "));
+                    }
+                    const partyLine = f.is_party_member
+                      ? [
+                          `Đảng viên`,
+                          f.party_join_year
+                            ? `Năm vào Đảng: ${f.party_join_year}`
+                            : "",
+                          f.party_join_date
+                            ? `Ngày chính thức: ${_esc(f.party_join_date)}`
+                            : "",
+                          f.party_join_place
+                            ? `tại ${_esc(f.party_join_place)}`
+                            : "",
+                          f.party_chi_bo
+                            ? `Chi bộ/Đảng bộ: ${_esc(f.party_chi_bo)}`
+                            : "",
+                          f.party_awards_text
+                            ? `Khen thưởng/Huy hiệu: ${_esc(f.party_awards_text)}`
+                            : "",
+                          f.party_years_count
+                            ? `Số năm tuổi Đảng: ${f.party_years_count}`
+                            : "",
+                        ]
+                          .filter(Boolean)
+                          .join(" | ")
+                      : "Không phải đảng viên";
+                    lines.push(partyLine);
+                    if (f.notes) lines.push(`Ghi chú: ${_esc(f.notes)}`);
+                    const histHtml = (f.history || []).length
+                      ? `<div style="margin-top:4px;margin-left:12px"><em style="font-size:11px;color:var(--muted)">Quá trình lịch sử:</em><ul style="margin:2px 0 0 16px;padding:0;font-size:11px">${(
+                          f.history || []
+                        )
+                          .map((h) => {
+                            const fm = h.from_month
+                              ? `${String(h.from_month).padStart(2, "0")}/${h.from_year || ""}`
+                              : h.from_year || "";
+                            const to = h.is_present
+                              ? "Nay"
+                              : h.to_month
+                                ? `${String(h.to_month).padStart(2, "0")}/${h.to_year || ""}`
+                                : h.to_year || "";
+                            return `<li>${fm && to ? `<strong>${fm}–${to}</strong>: ` : ""}${_esc(h.description || "")}</li>`;
+                          })
+                          .join("")}</ul></div>`
+                      : "";
+                    return `<li><strong>${_esc(f.relationship_display || f.relationship || "")}:</strong> ${_esc(f.full_name || "")}<br><span style="font-size:11px;color:var(--muted)">${lines.join(" · ")}</span>${histHtml}</li>`;
+                  })
+                  .join("")
+              : `<div class="pv-sec-empty">Chưa nhập</div>`
+          }</div>`,
           `<div class="pv-sec-block"><div class="pv-sec-head"><div class="pv-sec-badge">J</div><div class="pv-sec-title">Tự nhận xét</div></div>${p.self_assessment_text ? `<div style="font-size:12.5px;line-height:1.5">${_esc(p.self_assessment_text)}</div>` : `<div class="pv-sec-empty">Chưa nhập</div>`}</div>`,
         ].join("");
         try {
@@ -17600,24 +18029,28 @@
           _setVal("trinhDoVanHoa", p.general_edu_level);
           const vanHoaSel2 = document.getElementById("trinhDoVanHoa");
           if (p.general_edu_level && vanHoaSel2 && !vanHoaSel2.value) {
-            vanHoaSel2.value = 'Khác';
+            vanHoaSel2.value = "Khác";
             _setVal("trinhDoVanHoaKhac", p.general_edu_level);
             const kv2 = document.getElementById("trinhDoVanHoaKhac");
-            if (kv2) kv2.style.display = 'block';
+            if (kv2) kv2.style.display = "block";
           }
           _setVal("trinhDoChuyenMon", p.edu_specialization);
           _setVal("trinhDoLyLuan", p.political_level_detail);
           _setVal("tinHoc", p.it_level);
           const tinHocSel2 = document.getElementById("tinHoc");
           if (p.it_level && tinHocSel2 && !tinHocSel2.value) {
-            tinHocSel2.value = 'Khác';
+            tinHocSel2.value = "Khác";
             _setVal("tinHocKhac", p.it_level);
             const kt2 = document.getElementById("tinHocKhac");
-            if (kt2) kt2.style.display = 'block';
+            if (kt2) kt2.style.display = "block";
           }
           const hasDoan2 = !!(p.youth_union_date || p.youth_union_place);
-          const doanYesR2 = document.querySelector('input[name="doanStatus"][value="yes"]');
-          const doanNoR2 = document.querySelector('input[name="doanStatus"][value="no"]');
+          const doanYesR2 = document.querySelector(
+            'input[name="doanStatus"][value="yes"]',
+          );
+          const doanNoR2 = document.querySelector(
+            'input[name="doanStatus"][value="no"]',
+          );
           if (doanYesR2) doanYesR2.checked = hasDoan2;
           if (doanNoR2) doanNoR2.checked = !hasDoan2;
           toggleDoanFields();
@@ -17729,7 +18162,7 @@
             location.port === "5501"
               ? "http://127.0.0.1:8000/api/v1"
               : location.hostname === "14.224.210.210"
-                ? "http://14.224.210.210:8006/api/v1"
+                ? "http://14.224.210.210:8003/api/v1"
                 : "/api/v1");
           const tok = localStorage.getItem("access_token");
           const resp = await fetch(`${base}/exports/word/${profileId}/`, {
@@ -17802,12 +18235,15 @@
         // Foreign language: combine name + level (handle "Khác")
         const ngoaiNguEl = document.getElementById("ngoaiNgu");
         const trinhDoNgoaiNguEl = document.getElementById("trinhDoNgoaiNgu");
-        const trinhDoNgoaiNguKhacEl = document.getElementById("trinhDoNgoaiNguKhac");
+        const trinhDoNgoaiNguKhacEl = document.getElementById(
+          "trinhDoNgoaiNguKhac",
+        );
         const ngoaiNguName = ngoaiNguEl?.value?.trim() || "";
         const ngoaiNguLevelRaw = trinhDoNgoaiNguEl?.value?.trim() || "";
-        const ngoaiNguLevel = ngoaiNguLevelRaw === 'Khác'
-          ? (trinhDoNgoaiNguKhacEl?.value?.trim() || '')
-          : ngoaiNguLevelRaw;
+        const ngoaiNguLevel =
+          ngoaiNguLevelRaw === "Khác"
+            ? trinhDoNgoaiNguKhacEl?.value?.trim() || ""
+            : ngoaiNguLevelRaw;
         const foreignLangVal = ngoaiNguName
           ? ngoaiNguLevel
             ? `${ngoaiNguName} ${ngoaiNguLevel}`
@@ -17816,22 +18252,31 @@
 
         // Edu level: handle "Khác"
         const trinhDoVanHoaEl = document.getElementById("trinhDoVanHoa");
-        const trinhDoVanHoaKhacEl = document.getElementById("trinhDoVanHoaKhac");
-        const generalEduVal = trinhDoVanHoaEl?.value === 'Khác'
-          ? (trinhDoVanHoaKhacEl?.value?.trim() || 'Khác')
-          : (trinhDoVanHoaEl?.value || undefined);
+        const trinhDoVanHoaKhacEl =
+          document.getElementById("trinhDoVanHoaKhac");
+        const generalEduVal =
+          trinhDoVanHoaEl?.value === "Khác"
+            ? trinhDoVanHoaKhacEl?.value?.trim() || "Khác"
+            : trinhDoVanHoaEl?.value || undefined;
 
         // IT level: handle "Khác"
         const tinHocEl = document.getElementById("tinHoc");
         const tinHocKhacEl = document.getElementById("tinHocKhac");
-        const itLevelVal = tinHocEl?.value === 'Khác'
-          ? (tinHocKhacEl?.value?.trim() || 'Khác')
-          : (tinHocEl?.value || undefined);
+        const itLevelVal =
+          tinHocEl?.value === "Khác"
+            ? tinHocKhacEl?.value?.trim() || "Khác"
+            : tinHocEl?.value || undefined;
 
         // Youth union: check radio
-        const doanYes = document.querySelector('input[name="doanStatus"][value="yes"]')?.checked !== false;
-        const youthUnionDate = doanYes ? (_parseDMY(document.getElementById("ngayVaoDoan")?.value) || null) : null;
-        const youthUnionPlace = doanYes ? (document.getElementById("noiVaoDoan")?.value?.trim() || null) : null;
+        const doanYes =
+          document.querySelector('input[name="doanStatus"][value="yes"]')
+            ?.checked !== false;
+        const youthUnionDate = doanYes
+          ? _parseDMY(document.getElementById("ngayVaoDoan")?.value) || null
+          : null;
+        const youthUnionPlace = doanYes
+          ? document.getElementById("noiVaoDoan")?.value?.trim() || null
+          : null;
 
         return {
           full_name:
@@ -17879,9 +18324,12 @@
             document.getElementById("tiengDanToc")?.value?.trim() || undefined,
           temporary_address:
             document.getElementById("tamTru")?.value?.trim() || undefined,
-          rejoin_first_party_join_date: _parseDMY(document.getElementById("ngayVaoDang1")?.value) || null,
-          rejoin_first_party_join_place: document.getElementById("noiVaoDang1")?.value?.trim() || null,
-          rejoin_first_official_date: _parseDMY(document.getElementById("ngayChinhThuc1")?.value) || null,
+          rejoin_first_party_join_date:
+            _parseDMY(document.getElementById("ngayVaoDang1")?.value) || null,
+          rejoin_first_party_join_place:
+            document.getElementById("noiVaoDang1")?.value?.trim() || null,
+          rejoin_first_official_date:
+            _parseDMY(document.getElementById("ngayChinhThuc1")?.value) || null,
         };
       }
 
@@ -18041,11 +18489,11 @@
         if (!str) return null;
         const m = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/.exec(str.trim());
         if (!m) return null;
-        return `${m[3]}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`;
+        return `${m[3]}-${m[2].padStart(2, "0")}-${m[1].padStart(2, "0")}`;
       }
       // Convert yyyy-mm-dd ISO to dd/mm/yyyy display
       function _isoToDMY(iso) {
-        if (!iso) return '';
+        if (!iso) return "";
         const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(iso);
         return m ? `${m[3]}/${m[2]}/${m[1]}` : iso;
       }
@@ -18089,29 +18537,36 @@
         const accessToken = API.token.access();
         if (user && accessToken) {
           // Fetch fresh permissions from server before restoring session
-          API.get("/auth/me/").then((resp) => {
-            const fresh = resp.data || resp;
-            const stored = API.currentUser() || {};
-            localStorage.setItem("api_user", JSON.stringify({
-              ...stored,
-              is_superuser: fresh.is_superuser || false,
-              permissions: fresh.permissions || stored.permissions,
-            }));
-          }).catch(() => {
-            // Token expired or network error — proceed with cached user
-          }).finally(() => {
-            const currentUser = API.currentUser();
-            if (currentUser && currentUser.is_superuser) {
-              // Superuser: show login form with a shortcut to Django admin
-              // Don't auto-redirect — user may want to switch account
-              _showLoginModal();
-              const adminBase = API.BASE.replace(/\/api\/v1\/?$/, '');
-              const tok = API.token.access();
-              const banner = document.createElement('div');
-              banner.style.cssText = 'background:#FFF7ED;border:1.5px solid #FED7AA;border-radius:9px;padding:14px;margin-bottom:16px';
-              banner.innerHTML = `
+          API.get("/auth/me/")
+            .then((resp) => {
+              const fresh = resp.data || resp;
+              const stored = API.currentUser() || {};
+              localStorage.setItem(
+                "api_user",
+                JSON.stringify({
+                  ...stored,
+                  is_superuser: fresh.is_superuser || false,
+                  permissions: fresh.permissions || stored.permissions,
+                }),
+              );
+            })
+            .catch(() => {
+              // Token expired or network error — proceed with cached user
+            })
+            .finally(() => {
+              const currentUser = API.currentUser();
+              if (currentUser && currentUser.is_superuser) {
+                // Superuser: show login form with a shortcut to Django admin
+                // Don't auto-redirect — user may want to switch account
+                _showLoginModal();
+                const adminBase = API.BASE.replace(/\/api\/v1\/?$/, "");
+                const tok = API.token.access();
+                const banner = document.createElement("div");
+                banner.style.cssText =
+                  "background:#FFF7ED;border:1.5px solid #FED7AA;border-radius:9px;padding:14px;margin-bottom:16px";
+                banner.innerHTML = `
                 <div style="font-size:12px;color:#92400E;margin-bottom:10px;text-align:center">
-                  Đang có phiên đăng nhập: <b>${currentUser.name || 'Superadmin'}</b>
+                  Đang có phiên đăng nhập: <b>${currentUser.name || "Superadmin"}</b>
                 </div>
                 <button onclick="window.location.href='${adminBase}/api/v1/auth/admin-session/?token=${encodeURIComponent(tok)}'"
                   style="width:100%;padding:9px;background:#7C3AED;color:#fff;border:none;border-radius:7px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:6px">
@@ -18121,12 +18576,15 @@
                   style="width:100%;background:none;border:none;color:#6B7280;font-size:11px;cursor:pointer;font-family:inherit;text-decoration:underline;padding:2px">
                   Đăng xuất · dùng tài khoản khác
                 </button>`;
-              const modalInner = document.querySelector('#apiLoginModal > div');
-              if (modalInner) modalInner.insertBefore(banner, modalInner.firstChild);
-            } else {
-              _onLoginSuccess({});
-            }
-          });
+                const modalInner = document.querySelector(
+                  "#apiLoginModal > div",
+                );
+                if (modalInner)
+                  modalInner.insertBefore(banner, modalInner.firstChild);
+              } else {
+                _onLoginSuccess({});
+              }
+            });
         } else {
           // Show login after a brief moment so the UI renders first
           setTimeout(_showLoginModal, 200);
@@ -18472,4 +18930,3 @@
     ></div>
   </body>
 </html>
-  

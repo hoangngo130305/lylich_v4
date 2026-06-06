@@ -129,11 +129,12 @@ AUTH_PASSWORD_VALIDATORS = [
 LANGUAGE_CODE = 'vi'
 TIME_ZONE = 'Asia/Ho_Chi_Minh'
 USE_I18N = True
-USE_L10N = False
-USE_TZ = False
+USE_L10N = False    
+USE_TZ = True
 
 DATE_FORMAT = 'd/m/Y'
 DATE_INPUT_FORMATS = ['%d/%m/%Y', '%d-%m-%Y', '%Y-%m-%d']
+DATETIME_FORMAT = 'd/m/Y H:i'
 
 # ── Static & Media Files ──────────────────────────────────────────────────────
 STATIC_URL = '/static/'
