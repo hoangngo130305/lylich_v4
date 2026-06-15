@@ -8924,3 +8924,100 @@ WARNING 2026-06-05 23:20:07,004 log 12728 19096 Not Found: /favicon.ico
 WARNING 2026-06-05 23:20:07,007 basehttp 12728 19096 "GET /favicon.ico HTTP/1.1" 404 5355
 WARNING 2026-06-05 23:21:15,994 log 12260 2936 Not Found: /favicon.ico
 WARNING 2026-06-05 23:21:15,995 basehttp 12260 2936 "GET /favicon.ico HTTP/1.1" 404 5355
+WARNING 2026-06-13 18:29:09,707 log 18512 23392 Unauthorized: /api/v1/auth/me/
+WARNING 2026-06-13 18:29:09,709 basehttp 18512 23392 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-06-13 18:29:09,716 log 18512 23392 Unauthorized: /api/v1/auth/token/refresh/
+WARNING 2026-06-13 18:29:09,717 basehttp 18512 23392 "POST /api/v1/auth/token/refresh/ HTTP/1.1" 401 160
+WARNING 2026-06-13 18:29:45,366 log 18512 19900 Not Found: /favicon.ico
+WARNING 2026-06-13 18:29:45,366 basehttp 18512 19900 "GET /favicon.ico HTTP/1.1" 404 5355
+WARNING 2026-06-13 18:50:04,971 log 18512 2860 Bad Request: /api/v1/profiles/67/workflow/
+WARNING 2026-06-13 18:50:04,972 basehttp 18512 2860 "POST /api/v1/profiles/67/workflow/ HTTP/1.1" 400 92
+WARNING 2026-06-13 18:50:09,393 log 18512 2860 Bad Request: /api/v1/profiles/67/workflow/
+WARNING 2026-06-13 18:50:09,394 basehttp 18512 2860 "POST /api/v1/profiles/67/workflow/ HTTP/1.1" 400 92
+WARNING 2026-06-13 21:01:40,260 log 11508 22552 Unauthorized: /api/v1/auth/me/
+WARNING 2026-06-13 21:01:40,263 basehttp 11508 22552 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+ERROR 2026-06-13 21:01:51,150 basehttp 8896 18844 "GET /api/v1/family/67/members/ HTTP/1.1" 500 292545
+ERROR 2026-06-13 21:02:15,864 basehttp 8896 12916 "GET /api/v1/family/67/members/ HTTP/1.1" 500 292545
+ERROR 2026-06-13 21:02:27,378 basehttp 8896 12916 "GET /api/v1/family/67/members/ HTTP/1.1" 500 292545
+ERROR 2026-06-13 21:02:47,826 basehttp 8896 18128 "GET /api/v1/family/67/members/ HTTP/1.1" 500 292545
+ERROR 2026-06-13 21:03:06,473 basehttp 8896 23228 "GET /api/v1/family/67/members/ HTTP/1.1" 500 292545
+ERROR 2026-06-13 21:06:19,694 basehttp 8896 23228 "GET /api/v1/family/67/members/ HTTP/1.1" 500 292545
+ERROR 2026-06-13 21:06:35,000 basehttp 8896 23228 "GET /api/v1/family/67/members/ HTTP/1.1" 500 292545
+ERROR 2026-06-13 21:06:38,562 basehttp 8896 12916 "GET /api/v1/family/67/members/ HTTP/1.1" 500 292545
+ERROR 2026-06-13 21:07:34,258 basehttp 8896 23228 "GET /api/v1/family/67/members/ HTTP/1.1" 500 292545
+ERROR 2026-06-13 21:07:38,244 basehttp 8896 19516 "GET /api/v1/family/67/members/ HTTP/1.1" 500 292545
+ERROR 2026-06-13 21:07:41,831 basehttp 8896 19516 "GET /api/v1/family/67/members/ HTTP/1.1" 500 292545
+ERROR 2026-06-13 21:07:51,011 basehttp 8896 19516 "GET /api/v1/family/67/members/ HTTP/1.1" 500 292545
+ERROR 2026-06-13 21:07:59,896 basehttp 8896 23228 "GET /api/v1/family/67/members/ HTTP/1.1" 500 292545
+ERROR 2026-06-13 21:08:04,534 basehttp 8896 19516 "GET /api/v1/family/67/members/ HTTP/1.1" 500 292545
+ERROR 2026-06-13 21:08:07,931 basehttp 8896 19516 "GET /api/v1/family/67/members/ HTTP/1.1" 500 292545
+ERROR 2026-06-13 21:08:37,355 basehttp 8896 17500 "GET /api/v1/family/67/members/ HTTP/1.1" 500 292545
+ERROR 2026-06-13 21:08:58,772 basehttp 8896 17500 "GET /api/v1/family/67/members/ HTTP/1.1" 500 292545
+ERROR 2026-06-13 21:09:09,323 basehttp 8896 19516 "GET /api/v1/family/67/members/ HTTP/1.1" 500 292545
+ERROR 2026-06-13 21:09:15,211 basehttp 8896 17736 "GET /api/v1/family/67/members/ HTTP/1.1" 500 292545
+ERROR 2026-06-13 21:09:38,173 basehttp 8896 19516 "GET /api/v1/family/67/members/ HTTP/1.1" 500 292545
+ERROR 2026-06-13 21:09:47,769 basehttp 8896 17736 "GET /api/v1/family/67/members/ HTTP/1.1" 500 292545
+WARNING 2026-06-14 19:42:59,138 log 22584 11072 Unauthorized: /api/v1/auth/me/
+WARNING 2026-06-14 19:42:59,139 basehttp 22584 11072 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-06-14 20:46:53,262 log 22584 21000 Unauthorized: /api/v1/auth/me/
+WARNING 2026-06-14 20:46:53,266 basehttp 22584 21000 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-06-14 21:26:19,351 log 7932 12292 Bad Request: /api/v1/family/67/members/
+WARNING 2026-06-14 21:26:19,352 basehttp 7932 12292 "POST /api/v1/family/67/members/ HTTP/1.1" 400 153
+WARNING 2026-06-14 21:26:19,394 log 7932 12292 Bad Request: /api/v1/family/67/members/
+WARNING 2026-06-14 21:26:19,395 basehttp 7932 12292 "POST /api/v1/family/67/members/ HTTP/1.1" 400 151
+WARNING 2026-06-15 08:18:54,587 log 16928 18032 Unauthorized: /api/v1/auth/me/
+WARNING 2026-06-15 08:18:54,588 basehttp 16928 18032 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-06-15 08:19:27,297 log 16928 21220 Unauthorized: /api/v1/auth/me/
+WARNING 2026-06-15 08:19:27,298 basehttp 16928 21220 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-06-15 08:19:27,319 log 16928 21220 Unauthorized: /api/v1/auth/token/refresh/
+WARNING 2026-06-15 08:19:27,321 basehttp 16928 21220 "POST /api/v1/auth/token/refresh/ HTTP/1.1" 401 160
+WARNING 2026-06-15 08:19:41,324 log 16928 22568 Not Found: /favicon.ico
+WARNING 2026-06-15 08:19:41,325 basehttp 16928 22568 "GET /favicon.ico HTTP/1.1" 404 5355
+WARNING 2026-06-15 08:19:59,061 log 16928 21220 Unauthorized: /api/v1/auth/login/
+WARNING 2026-06-15 08:19:59,061 basehttp 16928 21220 "POST /api/v1/auth/login/ HTTP/1.1" 401 107
+WARNING 2026-06-15 08:22:10,439 log 16928 12120 Bad Request: /api/v1/family/67/members/
+WARNING 2026-06-15 08:22:10,439 basehttp 16928 12120 "POST /api/v1/family/67/members/ HTTP/1.1" 400 153
+WARNING 2026-06-15 08:22:10,475 log 16928 12120 Bad Request: /api/v1/family/67/members/
+WARNING 2026-06-15 08:22:10,476 basehttp 16928 12120 "POST /api/v1/family/67/members/ HTTP/1.1" 400 153
+WARNING 2026-06-15 08:43:44,009 log 16928 15452 Bad Request: /api/v1/family/67/members/
+WARNING 2026-06-15 08:43:44,010 basehttp 16928 15452 "POST /api/v1/family/67/members/ HTTP/1.1" 400 153
+WARNING 2026-06-15 08:43:44,046 log 16928 15452 Bad Request: /api/v1/family/67/members/
+WARNING 2026-06-15 08:43:44,046 basehttp 16928 15452 "POST /api/v1/family/67/members/ HTTP/1.1" 400 153
+WARNING 2026-06-15 09:05:45,167 log 16928 16900 Bad Request: /api/v1/family/67/members/
+WARNING 2026-06-15 09:05:45,168 basehttp 16928 16900 "POST /api/v1/family/67/members/ HTTP/1.1" 400 153
+WARNING 2026-06-15 09:05:45,200 log 16928 16900 Bad Request: /api/v1/family/67/members/
+WARNING 2026-06-15 09:05:45,201 basehttp 16928 16900 "POST /api/v1/family/67/members/ HTTP/1.1" 400 153
+WARNING 2026-06-15 09:27:56,936 log 16928 20288 Unauthorized: /api/v1/auth/me/
+WARNING 2026-06-15 09:27:56,941 basehttp 16928 20288 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-06-15 09:27:57,370 log 16928 14436 Unauthorized: /api/v1/auth/me/
+WARNING 2026-06-15 09:27:57,391 basehttp 16928 14436 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-06-15 10:43:13,248 log 16928 21216 Unauthorized: /api/v1/auth/me/
+WARNING 2026-06-15 10:43:13,250 basehttp 16928 21216 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-06-15 10:43:13,370 log 16928 21084 Unauthorized: /api/v1/auth/me/
+WARNING 2026-06-15 10:43:13,372 basehttp 16928 21084 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-06-15 13:24:03,439 log 13808 7096 Unauthorized: /api/v1/auth/me/
+WARNING 2026-06-15 13:24:03,442 basehttp 13808 7096 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-06-15 13:36:07,471 log 13808 14076 Unauthorized: /api/v1/auth/me/
+WARNING 2026-06-15 13:36:07,472 basehttp 13808 14076 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-06-15 13:38:03,015 log 13808 14228 Unauthorized: /api/v1/profiles/67/field-notes/
+WARNING 2026-06-15 13:38:03,016 basehttp 13808 14228 "GET /api/v1/profiles/67/field-notes/ HTTP/1.1" 401 5678
+WARNING 2026-06-15 13:38:03,245 log 13808 13984 Not Found: /favicon.ico
+WARNING 2026-06-15 13:38:03,246 basehttp 13808 13984 "GET /favicon.ico HTTP/1.1" 404 5355
+WARNING 2026-06-15 13:38:12,150 log 13808 13984 Unauthorized: /api/v1/family/67/members/
+WARNING 2026-06-15 13:38:12,152 basehttp 13808 13984 "GET /api/v1/family/67/members/ HTTP/1.1" 401 5459
+WARNING 2026-06-15 13:38:15,075 log 13808 13984 Unauthorized: /api/v1/family/67/members/
+WARNING 2026-06-15 13:38:15,076 basehttp 13808 13984 "GET /api/v1/family/67/members/ HTTP/1.1" 401 5459
+WARNING 2026-06-15 13:38:16,005 log 13808 13984 Unauthorized: /api/v1/family/67/members/
+WARNING 2026-06-15 13:38:16,006 basehttp 13808 13984 "GET /api/v1/family/67/members/ HTTP/1.1" 401 5459
+WARNING 2026-06-15 14:36:35,614 log 14264 12560 Unauthorized: /api/v1/auth/me/
+WARNING 2026-06-15 14:36:35,615 basehttp 14264 12560 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-06-15 15:08:09,871 log 14628 23976 Unauthorized: /api/v1/auth/me/
+WARNING 2026-06-15 15:08:09,871 basehttp 14628 23976 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-06-15 16:35:08,506 log 14628 15972 Unauthorized: /api/v1/auth/me/
+WARNING 2026-06-15 16:35:08,507 basehttp 14628 15972 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-06-15 16:35:11,358 log 14628 21232 Unauthorized: /api/v1/verification/stats/
+WARNING 2026-06-15 16:35:11,359 basehttp 14628 21232 "GET /api/v1/verification/stats/ HTTP/1.1" 401 291
+WARNING 2026-06-15 17:35:19,601 log 14628 20292 Unauthorized: /api/v1/auth/me/
+WARNING 2026-06-15 17:35:19,602 basehttp 14628 20292 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-06-15 17:35:44,660 log 14628 11472 Unauthorized: /api/v1/auth/me/
+WARNING 2026-06-15 17:35:44,660 basehttp 14628 11472 "GET /api/v1/auth/me/ HTTP/1.1" 401 291

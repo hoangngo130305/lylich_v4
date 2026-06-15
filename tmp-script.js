@@ -1,0 +1,11237 @@
+
+      // ===== SECTIONS =====
+      const sections = [
+        "secA",
+        "secB",
+        "secC",
+        "secD",
+        "secE",
+        "secF",
+        "secG",
+        "secH",
+        "secI",
+        "secJ",
+        "secK",
+      ];
+      const sectionLabels = [
+        "Phần A",
+        "Phần B",
+        "Phần C",
+        "Phần D",
+        "Phần E",
+        "Phần F",
+        "Phần G",
+        "Phần H",
+        "Phần I",
+        "Phần J",
+        "Cam đoan",
+      ];
+      let current = 0;
+      const done = new Set();
+
+      function buildDots() {
+        const wrap = document.getElementById("stepDots");
+        wrap.innerHTML = sections
+          .map(
+            (_, i) =>
+              `<div class="step-dot ${i === current ? "active" : done.has(i) ? "done" : ""}" id="dot${i}"></div>`,
+          )
+          .join("");
+      }
+
+      function navigate(dir) {
+        done.add(current);
+        const nav = document.querySelectorAll("#memberSideNav .nav-item")[
+          current
+        ];
+        if (nav) nav.classList.add("done");
+        current = Math.max(0, Math.min(sections.length - 1, current + dir));
+        showSection(current);
+      }
+
+      function showSection(idx) {
+        document
+          .querySelectorAll(".section")
+          .forEach((s, i) => s.classList.toggle("active", i === idx));
+        document
+          .querySelectorAll("#memberSideNav .nav-item")
+          .forEach((n, i) => n.classList.toggle("active", i === idx));
+        current = idx;
+        buildDots();
+        updateProgress();
+        document.querySelector(".topbar-title").textContent =
+          sectionLabels[idx] + " – " + getTitleForSection(idx);
+        document.getElementById("btnPrev").disabled = idx === 0;
+        document.getElementById("btnNext").textContent =
+          idx === sections.length - 1 ? "📤 Nộp hồ sơ" : "Tiếp theo →";
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+
+      function getTitleForSection(i) {
+        return (
+          [
+            "Sơ lược lý lịch",
+            "Lịch sử bản thân",
+            "Công tác chức vụ",
+            "Đặc điểm lịch sử",
+            "Đào tạo bồi dưỡng",
+            "Đi nước ngoài",
+            "Khen thưởng",
+            "Kỷ luật",
+            "Hoàn cảnh gia đình",
+            "Tự nhận xét",
+            "Cam đoan & Nộp",
+          ][i] || ""
+        );
+      }
+
+      function updateProgress() {
+        const pct = Math.round((done.size / sections.length) * 100);
+        document.getElementById("progressFill").style.width = pct + "%";
+        document.getElementById("pct").textContent = pct + "%";
+      }
+
+      document.querySelectorAll("#memberSideNav .nav-item").forEach((n, i) => {
+        n.addEventListener("click", () => {
+          done.add(current);
+          showSection(i);
+        });
+      });
+
+      // ===== VALIDATION =====
+
+      // ===== LOCATION API (provinces.open-api.vn) =====
+      const locationPairs = [
+        { provinceSelectId: "sel_tinh_ks", wardSelectId: "sel_xa_ks" },
+        { provinceSelectId: "sel_tinh_qq", wardSelectId: "sel_xa_qq" },
+        { provinceSelectId: "sel_tinh_tt", wardSelectId: "sel_xa_tt" },
+        { provinceSelectId: "sel_tinh_tx", wardSelectId: "sel_xa_tx" },
+      ];
+      let provinceList = [];
+
+      async function fetchProvinces() {
+        const res = await fetch("https://provinces.open-api.vn/api/v2/p/");
+        if (!res.ok) return [];
+        return await res.json();
+      }
+
+      async function fetchProvinceWards(provinceCode) {
+        if (!provinceCode) return [];
+        const res = await fetch(
+          `https://provinces.open-api.vn/api/p/${provinceCode}?depth=3`,
+        );
+        if (!res.ok) return [];
+        const data = await res.json();
+        const wards = [];
+        (data.districts || []).forEach((d) => {
+          (d.wards || []).forEach((w) => {
+            wards.push({ code: w.code, name: w.name, districtName: d.name });
+          });
+        });
+        return wards;
+      }
+
+      async function fetchWards(provinceCode, search = "") {
+        if (!provinceCode) return [];
+        const url = new URL("https://provinces.open-api.vn/api/v2/w/");
+        url.searchParams.set("province", provinceCode);
+        if (search) url.searchParams.set("search", search);
+        const res = await fetch(url.toString());
+        if (!res.ok) return [];
+        return await res.json();
+      }
+
+      function resetSelect(selectEl, placeholder) {
+        if (!selectEl) return;
+        selectEl.innerHTML = `<option value="">${placeholder}</option>`;
+      }
+
+      function fillSelect(selectEl, items, placeholder) {
+        resetSelect(selectEl, placeholder);
+        items.forEach((item) => {
+          const opt = document.createElement("option");
+          opt.value = item.code;
+          opt.textContent = item.name;
+          if (item.districtName) opt.dataset.districtName = item.districtName;
+          selectEl.appendChild(opt);
+        });
+      }
+
+      function setSelectMessage(selectEl, message) {
+        if (!selectEl) return;
+        selectEl.innerHTML = `<option value="">${message}</option>`;
+      }
+
+      function normalizeVietnamese(value) {
+        return (value || "")
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .replace(/đ/g, "d")
+          .replace(/Đ/g, "D")
+          .toLowerCase()
+          .trim();
+      }
+
+      function filterByKeyword(items, query) {
+        const normalizedQuery = normalizeVietnamese(query);
+        if (!normalizedQuery) return items;
+        return items.filter((item) =>
+          normalizeVietnamese(item.name).includes(normalizedQuery),
+        );
+      }
+
+      // Store search state for dropdowns
+      const selectSearchState = new Map();
+
+      function _setComboboxDisabled(selectEl, disabled) {
+        selectEl.disabled = disabled;
+        const wrapper = selectEl.closest(".smart-combobox");
+        if (wrapper) {
+          const inp = wrapper.querySelector(".smart-combobox-input");
+          if (inp) inp.disabled = disabled;
+        }
+      }
+
+      async function onProvinceChange(provinceSelect, wardSelect) {
+        const provinceCode = provinceSelect.value;
+        resetSelect(wardSelect, "-- Phường/Xã --");
+
+        if (!provinceCode) {
+          _setComboboxDisabled(wardSelect, true);
+          selectSearchState.set(wardSelect.id, { allItems: [] });
+          return;
+        }
+
+        _setComboboxDisabled(wardSelect, true);
+        setSelectMessage(wardSelect, "Đang tải phường/xã...");
+
+        try {
+          const wards = await fetchProvinceWards(provinceCode);
+          if (!wards.length) {
+            setSelectMessage(wardSelect, "Không có dữ liệu phường/xã");
+            return;
+          }
+
+          // Store wards in search state
+          selectSearchState.set(wardSelect.id, { allItems: wards });
+
+          fillSelect(wardSelect, wards, "-- Phường/Xã --");
+          _setComboboxDisabled(wardSelect, false);
+        } catch (error) {
+          console.error("Load wards failed:", error);
+          setSelectMessage(wardSelect, "Không tải được phường/xã");
+        }
+      }
+
+      function setupLocationPair(pair) {
+        const provinceSelect = document.getElementById(pair.provinceSelectId);
+        const wardSelect = document.getElementById(pair.wardSelectId);
+
+        if (!provinceSelect || !wardSelect) return;
+
+        // Store province list for reference
+        selectSearchState.set(pair.provinceSelectId, {
+          allItems: provinceList,
+        });
+
+        // Store empty ward list initially
+        selectSearchState.set(pair.wardSelectId, {
+          allItems: [],
+        });
+
+        provinceSelect.addEventListener("change", async () => {
+          await onProvinceChange(provinceSelect, wardSelect);
+        });
+      }
+
+      function attachInlineSelectSearch(
+        selectEl,
+        getAllItems,
+        placeholder,
+        modeLabel,
+        options,
+      ) {
+        if (!selectEl) return;
+        options = options || {};
+
+        const state = {
+          active: false,
+          keyword: "",
+          selectedBeforeSearch: "",
+          editorEl: null,
+          datalistEl: null,
+          filteredItems: [],
+          lastCommittedValue: "",
+        };
+
+        const commitSelectionFromEditor = (triggerChange = true) => {
+          if (!state.editorEl) return;
+          const typed = state.editorEl.value || "";
+          if (!typed.trim()) return;
+
+          const exact = state.filteredItems.find(
+            (item) =>
+              normalizeVietnamese(item.name) === normalizeVietnamese(typed),
+          );
+          if (!exact) return;
+
+          const nextValue = String(exact.code);
+          const prevValue = selectEl.value;
+          selectEl.value = nextValue;
+
+          if (
+            triggerChange &&
+            (prevValue !== nextValue || state.lastCommittedValue !== nextValue)
+          ) {
+            state.lastCommittedValue = nextValue;
+            selectEl.dispatchEvent(new Event("change", { bubbles: true }));
+          }
+        };
+
+        const renderSearchOptions = () => {
+          const allItems = getAllItems() || [];
+          const filtered = filterByKeyword(allItems, state.keyword);
+          state.filteredItems = filtered;
+          const label = state.keyword
+            ? `Tìm: ${state.keyword} (${filtered.length})`
+            : `Nhập để tìm ${modeLabel}...`;
+          fillSelect(selectEl, filtered, label);
+          selectEl.value = "";
+
+          if (state.datalistEl) {
+            state.datalistEl.innerHTML = "";
+            filtered.slice(0, 30).forEach((item) => {
+              const opt = document.createElement("option");
+              opt.value = item.name;
+              state.datalistEl.appendChild(opt);
+            });
+          }
+        };
+
+        const exitSearchMode = () => {
+          if (!state.active) return;
+          state.active = false;
+          selectEl.classList.remove("inline-search-active");
+
+          if (state.editorEl) {
+            state.editorEl.remove();
+            state.editorEl = null;
+          }
+
+          if (state.datalistEl) {
+            state.datalistEl.remove();
+            state.datalistEl = null;
+          }
+
+          selectEl.style.display = "";
+
+          const allItems = getAllItems() || [];
+          const selectedValue = selectEl.value || state.selectedBeforeSearch;
+          fillSelect(selectEl, allItems, placeholder);
+          if (
+            selectedValue &&
+            allItems.some((item) => String(item.code) === String(selectedValue))
+          ) {
+            selectEl.value = selectedValue;
+          }
+          state.keyword = "";
+        };
+
+        const enterSearchMode = () => {
+          if (selectEl.disabled) return;
+          if (state.active) return;
+
+          state.active = true;
+          state.keyword = "";
+          state.selectedBeforeSearch = selectEl.value || "";
+          selectEl.classList.add("inline-search-active");
+          renderSearchOptions();
+
+          const editor = document.createElement("input");
+          editor.type = "text";
+          editor.className = "inline-search-editor";
+          editor.placeholder =
+            options.inputPlaceholder || `Nhập để tìm ${modeLabel}...`;
+
+          const datalist = document.createElement("datalist");
+          datalist.id = `inline-search-list-${selectEl.id}`;
+          editor.setAttribute("list", datalist.id);
+
+          selectEl.style.display = "none";
+          selectEl.parentElement.insertBefore(editor, selectEl);
+          selectEl.parentElement.insertBefore(datalist, selectEl);
+          state.editorEl = editor;
+          state.datalistEl = datalist;
+          editor.focus();
+
+          editor.addEventListener("input", () => {
+            state.keyword = editor.value || "";
+            renderSearchOptions();
+
+            // If user types/selects exact suggestion, commit immediately.
+            commitSelectionFromEditor(true);
+          });
+
+          editor.addEventListener("keydown", (e) => {
+            if (e.key === "Escape") {
+              e.preventDefault();
+              exitSearchMode();
+              return;
+            }
+
+            if (e.key === "Enter") {
+              e.preventDefault();
+              commitSelectionFromEditor(true);
+              if (!selectEl.value) {
+                const firstMatch = selectEl.options[1];
+                if (firstMatch) {
+                  selectEl.value = firstMatch.value;
+                  selectEl.dispatchEvent(
+                    new Event("change", { bubbles: true }),
+                  );
+                }
+              }
+              exitSearchMode();
+            }
+          });
+
+          editor.addEventListener("blur", () => {
+            setTimeout(() => {
+              // Commit exact typed suggestion even when user clicks away.
+              commitSelectionFromEditor(true);
+              if (state.active && document.activeElement !== editor) {
+                exitSearchMode();
+              }
+            }, 120);
+          });
+        };
+
+        if (options.singleClick) {
+          // Single-click mode: any click immediately opens search input
+          selectEl.title = "Nhấp để mở danh sách – gõ để lọc nhanh";
+          selectEl.addEventListener("click", (e) => {
+            e.preventDefault();
+            enterSearchMode();
+          });
+          // Keyboard: Enter/Space on focused select also opens search
+          selectEl.addEventListener("keydown", (e) => {
+            if ((e.key === "Enter" || e.key === " ") && !state.active) {
+              e.preventDefault();
+              enterSearchMode();
+            }
+          });
+        } else {
+          selectEl.title = `${selectEl.title ? selectEl.title + " | " : ""}Double-click hoặc click mũi tên để nhập từ khóa tìm ${modeLabel}`;
+          selectEl.addEventListener("dblclick", () => {
+            enterSearchMode();
+          });
+          selectEl.addEventListener("click", (e) => {
+            // Detect if user clicked on the dropdown arrow area (right side of select)
+            const rect = selectEl.getBoundingClientRect();
+            const clickX = e.clientX - rect.left;
+            const arrowWidth = 30; // Typical width of arrow area
+            if (clickX > rect.width - arrowWidth && !state.active) {
+              e.preventDefault();
+              enterSearchMode();
+            }
+          });
+        }
+
+        selectEl.addEventListener("change", () => {
+          if (state.active && selectEl.value) {
+            exitSearchMode();
+          }
+        });
+      }
+
+      function attachSmartCombobox(selectEl, getAllItems, placeholderText) {
+        if (!selectEl) return;
+
+        // Wrapper replaces the select visually inside the grid cell
+        const wrapper = document.createElement("div");
+        wrapper.className = "smart-combobox";
+        selectEl.parentNode.insertBefore(wrapper, selectEl);
+
+        const input = document.createElement("input");
+        input.type = "text";
+        input.className = "smart-combobox-input";
+        input.placeholder = placeholderText || "Chọn hoặc nhập để tìm kiếm...";
+        input.autocomplete = "off";
+        input.setAttribute("spellcheck", "false");
+        if (selectEl.disabled) input.disabled = true;
+        wrapper.appendChild(input);
+
+        const arrow = document.createElement("span");
+        arrow.className = "smart-combobox-arrow";
+        arrow.textContent = "▼";
+        wrapper.appendChild(arrow);
+
+        // Panel appended to body so overflow:hidden on parents won't clip it
+        const panel = document.createElement("div");
+        panel.className = "smart-combobox-dropdown";
+        document.body.appendChild(panel);
+
+        // Keep original select in DOM (hidden) — preserves all event listeners & value
+        selectEl.style.display = "none";
+        wrapper.appendChild(selectEl);
+
+        let isOpen = false;
+        let highlightedIdx = -1;
+        let filteredItems = [];
+
+        const getItems = () => getAllItems() || [];
+
+        const positionPanel = () => {
+          const r = wrapper.getBoundingClientRect();
+          panel.style.left = r.left + window.scrollX + "px";
+          panel.style.top = r.bottom + window.scrollY + 2 + "px";
+          panel.style.width = r.width + "px";
+        };
+
+        const getSelectedName = () => {
+          const val = selectEl.value;
+          if (!val) return "";
+          const found = getItems().find(
+            (it) => String(it.code) === String(val),
+          );
+          return found ? found.name : "";
+        };
+
+        const syncDisplay = () => {
+          if (!isOpen) input.value = getSelectedName();
+        };
+
+        const buildPanel = (keyword) => {
+          const allItems = getItems();
+          const norm = normalizeVietnamese(keyword || "");
+          filteredItems = norm
+            ? allItems.filter((it) =>
+                normalizeVietnamese(it.name).includes(norm),
+              )
+            : allItems;
+
+          panel.innerHTML = "";
+          highlightedIdx = -1;
+
+          if (!filteredItems.length) {
+            const empty = document.createElement("div");
+            empty.className = "smart-combobox-empty";
+            empty.textContent = keyword
+              ? `Không tìm thấy "${keyword}"`
+              : "Không có dữ liệu";
+            panel.appendChild(empty);
+            return;
+          }
+
+          const currentVal = selectEl.value;
+          filteredItems.forEach((item) => {
+            const opt = document.createElement("div");
+            opt.className =
+              "smart-combobox-option" +
+              (String(item.code) === String(currentVal) ? " selected" : "");
+            opt.textContent = item.name;
+            opt.addEventListener("mousedown", (e) => {
+              e.preventDefault(); // prevent blur on input before pick fires
+              pick(item);
+            });
+            panel.appendChild(opt);
+          });
+
+          const selectedEl = panel.querySelector(".selected");
+          if (selectedEl) {
+            requestAnimationFrame(() =>
+              selectedEl.scrollIntoView({ block: "nearest" }),
+            );
+          }
+        };
+
+        const setHighlight = (idx) => {
+          const opts = panel.querySelectorAll(".smart-combobox-option");
+          opts.forEach((o) => o.classList.remove("highlighted"));
+          highlightedIdx = Math.max(0, Math.min(idx, opts.length - 1));
+          if (opts[highlightedIdx]) {
+            opts[highlightedIdx].classList.add("highlighted");
+            opts[highlightedIdx].scrollIntoView({ block: "nearest" });
+          }
+        };
+
+        const open = () => {
+          if (isOpen || input.disabled) return;
+          isOpen = true;
+          positionPanel();
+          buildPanel(input.value);
+          panel.classList.add("open");
+          arrow.classList.add("open");
+        };
+
+        const close = () => {
+          if (!isOpen) return;
+          isOpen = false;
+          panel.classList.remove("open");
+          arrow.classList.remove("open");
+          highlightedIdx = -1;
+          syncDisplay();
+        };
+
+        const pick = (item) => {
+          const prevVal = selectEl.value;
+          selectEl.value = String(item.code);
+          close();
+          if (prevVal !== String(item.code)) {
+            selectEl.dispatchEvent(new Event("change", { bubbles: true }));
+          }
+        };
+
+        // Reposition on scroll / resize
+        const reposition = () => {
+          if (isOpen) positionPanel();
+        };
+        window.addEventListener("scroll", reposition, true);
+        window.addEventListener("resize", reposition);
+
+        // Close on outside click
+        document.addEventListener("mousedown", (e) => {
+          if (
+            isOpen &&
+            !wrapper.contains(e.target) &&
+            !panel.contains(e.target)
+          ) {
+            close();
+          }
+        });
+
+        input.addEventListener("click", () => open());
+
+        input.addEventListener("input", () => {
+          if (!isOpen) {
+            isOpen = true;
+            positionPanel();
+            panel.classList.add("open");
+            arrow.classList.add("open");
+          }
+          buildPanel(input.value);
+          if (!input.value.trim()) selectEl.value = "";
+        });
+
+        input.addEventListener("keydown", (e) => {
+          if (e.key === "ArrowDown") {
+            e.preventDefault();
+            if (!isOpen) {
+              open();
+              return;
+            }
+            setHighlight(highlightedIdx < 0 ? 0 : highlightedIdx + 1);
+          } else if (e.key === "ArrowUp") {
+            e.preventDefault();
+            if (isOpen)
+              setHighlight(
+                Math.max(0, highlightedIdx <= 0 ? 0 : highlightedIdx - 1),
+              );
+          } else if (e.key === "Enter") {
+            e.preventDefault();
+            if (isOpen) {
+              if (highlightedIdx >= 0 && filteredItems[highlightedIdx]) {
+                pick(filteredItems[highlightedIdx]);
+              } else if (filteredItems.length === 1) {
+                pick(filteredItems[0]);
+              }
+            } else {
+              open();
+            }
+          } else if (e.key === "Escape") {
+            e.preventDefault();
+            close();
+          }
+        });
+
+        input.addEventListener("blur", () => {
+          setTimeout(() => {
+            if (!panel.contains(document.activeElement)) close();
+          }, 150);
+        });
+
+        // Intercept programmatic selectEl.disabled = ... (ward disable while loading)
+        try {
+          const disabledDesc = Object.getOwnPropertyDescriptor(
+            HTMLSelectElement.prototype,
+            "disabled",
+          );
+          if (disabledDesc) {
+            Object.defineProperty(selectEl, "disabled", {
+              get() {
+                return disabledDesc.get.call(this);
+              },
+              set(val) {
+                disabledDesc.set.call(this, val);
+                input.disabled = Boolean(val);
+                if (val && isOpen) close();
+              },
+              configurable: true,
+            });
+          }
+        } catch (_) {
+          /* ignore */
+        }
+
+        // Intercept programmatic selectEl.value = ... (admin pre-population)
+        try {
+          const origDesc = Object.getOwnPropertyDescriptor(
+            HTMLSelectElement.prototype,
+            "value",
+          );
+          Object.defineProperty(selectEl, "value", {
+            get() {
+              return origDesc.get.call(this);
+            },
+            set(val) {
+              origDesc.set.call(this, val);
+              if (!isOpen) syncDisplay();
+            },
+            configurable: true,
+          });
+        } catch (_) {
+          /* ignore */
+        }
+
+        // Mirror initial disabled state
+        input.disabled = selectEl.disabled;
+        syncDisplay();
+        selectEl._syncCombobox = syncDisplay;
+        return { open, close, syncDisplay };
+      }
+
+      function setupInlineLocationSearchForAllPairs() {
+        locationPairs.forEach((pair) => {
+          const provinceSelect = document.getElementById(pair.provinceSelectId);
+          const wardSelect = document.getElementById(pair.wardSelectId);
+
+          // Province: searchable combobox
+          attachSmartCombobox(
+            provinceSelect,
+            () => provinceList,
+            "Chọn hoặc nhập để tìm kiếm...",
+          );
+
+          // Ward: searchable combobox (starts disabled; enabled after province loads wards)
+          attachSmartCombobox(
+            wardSelect,
+            () => selectSearchState.get(pair.wardSelectId)?.allItems || [],
+            "Chọn hoặc nhập để tìm kiếm...",
+          );
+        });
+      }
+
+      function attachFamilyLocationSearch(mNum) {
+        // Find all location select pairs for this family member
+        // Pattern: sel_tinh_fam_PREFIX_NUM and sel_xa_fam_PREFIX_NUM
+        // Prefixes: (no prefix for nơi cư trú), qq (quê quán), ns (nơi sinh), ct (cư trú)
+
+        const prefixes = ["", "qq", "ns", "ct"];
+        const familyNum = mNum.replace(/\./g, "_");
+
+        prefixes.forEach((prefix) => {
+          const provinceId = prefix
+            ? `sel_tinh_fam_${prefix}_${familyNum}`
+            : `sel_tinh_fam_${familyNum}`;
+          const wardId = prefix
+            ? `sel_xa_fam_${prefix}_${familyNum}`
+            : `sel_xa_fam_${familyNum}`;
+
+          const provinceSelect = document.getElementById(provinceId);
+          const wardSelect = document.getElementById(wardId);
+
+          if (!provinceSelect || !wardSelect) return;
+
+          // Populate province <option> elements so selectEl.value = code works in pick()
+          fillSelect(provinceSelect, provinceList, "-- Tỉnh/TP --");
+
+          // Initialize ward search state
+          selectSearchState.set(wardId, { allItems: [] });
+          resetSelect(wardSelect, "-- Phường/Xã --");
+
+          // Province: searchable combobox
+          attachSmartCombobox(
+            provinceSelect,
+            () => provinceList,
+            "Chọn hoặc nhập để tìm kiếm...",
+          );
+
+          // Ward: disabled until province selected
+          wardSelect.disabled = true;
+          attachSmartCombobox(
+            wardSelect,
+            () => selectSearchState.get(wardId)?.allItems || [],
+            "Chọn hoặc nhập để tìm kiếm...",
+          );
+
+          // Attach province change handler to load wards
+          const onProvinceChangeHandler = async () => {
+            await onProvinceChange(provinceSelect, wardSelect);
+          };
+
+          // Remove old listeners and add new one (prevent duplicates)
+          provinceSelect.removeEventListener("change", onProvinceChangeHandler);
+          provinceSelect.addEventListener("change", onProvinceChangeHandler);
+
+          // Auto-populate adjacent text inputs when ward is selected (2-level: ward + province only).
+          if (prefix === "ns") {
+            wardSelect.addEventListener("change", () => {
+              const formRow = wardSelect.closest(".form-row");
+              if (!formRow) return;
+              const textInp = formRow.querySelector(".fam-text-birth-place");
+              if (!textInp) return;
+              const wardText = (wardSelect.selectedOptions[0]?.text || "")
+                .replace(/^--.*--$/, "")
+                .trim();
+              const provText = (provinceSelect.selectedOptions[0]?.text || "")
+                .replace(/^--.*--$/, "")
+                .trim();
+              const parts = [wardText, provText].filter(Boolean);
+              if (parts.length) {
+                textInp.value = parts.join(", ");
+                if (textInp.tagName === "TEXTAREA") {
+                  textInp.style.height = "auto";
+                  textInp.style.height = textInp.scrollHeight + "px";
+                }
+              }
+            });
+          }
+          if (prefix === "qq") {
+            wardSelect.addEventListener("change", () => {
+              const formRow = wardSelect.closest(".form-row");
+              if (!formRow) return;
+              const textInp = formRow.querySelector(".fam-text-hometown");
+              if (!textInp) return;
+              const wardText = (wardSelect.selectedOptions[0]?.text || "")
+                .replace(/^--.*--$/, "")
+                .trim();
+              const provText = (provinceSelect.selectedOptions[0]?.text || "")
+                .replace(/^--.*--$/, "")
+                .trim();
+              const parts = [wardText, provText].filter(Boolean);
+              if (parts.length) {
+                textInp.value = parts.join(", ");
+                if (textInp.tagName === "TEXTAREA") {
+                  textInp.style.height = "auto";
+                  textInp.style.height = textInp.scrollHeight + "px";
+                }
+              }
+            });
+          }
+        });
+      }
+
+      window.addEventListener("DOMContentLoaded", async () => {
+        provinceList = await fetchProvinces();
+
+        // Setup standard location pairs (sections 05-08)
+        locationPairs.forEach((pair) => {
+          const provinceSelect = document.getElementById(pair.provinceSelectId);
+          const wardSelect = document.getElementById(pair.wardSelectId);
+          if (!provinceSelect || !wardSelect) return;
+          fillSelect(provinceSelect, provinceList, "-- Tỉnh/TP --");
+          resetSelect(wardSelect, "-- Phường/Xã --");
+          wardSelect.disabled = true;
+          setupLocationPair(pair);
+        });
+        setupInlineLocationSearchForAllPairs();
+
+        // Setup family member location searches (Phần I - Hoàn cảnh gia đình)
+        ["1", "2", "3.1", "3.2", "3.3", "10", "11", "12"].forEach((num) =>
+          attachFamilyLocationSearch(num),
+        );
+        ["4", "5", "6", "7"].forEach((num) => attachFamilyLocationSearch(num));
+        ["8", "9", "13.1", "13.2"].forEach((num) =>
+          attachFamilyLocationSearch(num),
+        );
+        ["14", "15", "16", "17"].forEach((num) =>
+          attachFamilyLocationSearch(num),
+        );
+        // Init insert-in-middle buttons for existing static rows
+        _initInsertBtns("tbB-body", "B");
+        _initInsertBtns("tbC-body", "C");
+        // B9: convert tbC description inputs to textarea
+        document
+          .querySelectorAll('#tbC-body td.td-dienbien input[type="text"]')
+          .forEach((inp) => {
+            const ta = document.createElement("textarea");
+            ta.className = inp.className || "fhd-input";
+            ta.rows = 2;
+            ta.placeholder = inp.placeholder || "";
+            ta.value = inp.value || "";
+            ta.style.cssText =
+              "width:100%;resize:none;min-height:38px;overflow:hidden;box-sizing:border-box";
+            ta.oninput = function () {
+              this.style.height = "auto";
+              this.style.height = this.scrollHeight + "px";
+            };
+            inp.replaceWith(ta);
+          });
+      });
+      // ── Address text auto-helpers ─────────────────────────────────────────
+      function _getSelectText(id) {
+        const el = document.getElementById(id);
+        if (!el || !el.value) return "";
+        const txt = el.selectedOptions[0]?.text || "";
+        return txt.replace(/^--.*--$/, "").trim();
+      }
+      function _getWardDistrictText(id) {
+        const el = document.getElementById(id);
+        if (!el || !el.value) return "";
+        return (el.selectedOptions[0]?.dataset.districtName || "").trim();
+      }
+      function updateQueQuan() {
+        const ward = _getSelectText("sel_xa_qq");
+        const prov = _getSelectText("sel_tinh_qq");
+        const parts = [ward, prov].filter(Boolean);
+        const el = document.getElementById("queQuan");
+        if (el && parts.length) el.value = parts.join(", ");
+      }
+      function updateBirthPlace() {
+        const ward = _getSelectText("sel_xa_ks");
+        const prov = _getSelectText("sel_tinh_ks");
+        const parts = [ward, prov].filter(Boolean);
+        const el = document.getElementById("birthPlaceDetail");
+        if (el && parts.length) el.value = parts.join(", ");
+      }
+      function updateNoiO() {
+        const ward = _getSelectText("sel_xa_tt");
+        const prov = _getSelectText("sel_tinh_tt");
+        const num = (document.getElementById("soNhaTT")?.value || "").trim();
+        const street = (
+          document.getElementById("tenDuongTT")?.value || ""
+        ).trim();
+        const parts = [num, street, ward, prov].filter(Boolean);
+        if (parts.length) {
+          const el = document.getElementById("noiO");
+          if (el) el.value = parts.join(", ");
+        }
+      }
+      function updateTamTru() {
+        const ward = _getSelectText("sel_xa_tx");
+        const prov = _getSelectText("sel_tinh_tx");
+        const num = (document.getElementById("soNhaTX")?.value || "").trim();
+        const street = (
+          document.getElementById("tenDuongTX")?.value || ""
+        ).trim();
+        const parts = [num, street, ward, prov].filter(Boolean);
+        const el = document.getElementById("tamTru");
+        if (el && parts.length) el.value = parts.join(", ");
+      }
+
+      function validateField(el, type) {
+        const err = document.getElementById("err-" + el.id);
+        if (type === "required" && !el.value.trim()) {
+          el.classList.add("error");
+          el.classList.remove("valid");
+          if (err) {
+            err.textContent = "Trường này bắt buộc";
+            err.classList.add("show");
+          }
+        } else {
+          el.classList.remove("error");
+          el.classList.add("valid");
+          if (err) err.classList.remove("show");
+        }
+      }
+
+      function validateDOB(el) {
+        const err = document.getElementById("err-ngaySinh");
+        if (!el.value) {
+          err.textContent = "Vui lòng nhập ngày sinh";
+          err.classList.add("show");
+          return;
+        }
+        const iso = _parseDMY(el.value);
+        if (!iso) {
+          el.classList.add("error");
+          err.textContent = "⚠ Định dạng không hợp lệ — nhập theo DD/MM/YYYY";
+          err.classList.add("show");
+          return;
+        }
+        const d = new Date(iso),
+          now = new Date();
+        const age = (now - d) / (365.25 * 24 * 3600 * 1000);
+        if (age < 18) {
+          el.classList.add("error");
+          err.textContent = "⚠ Tuổi < 18 – kiểm tra lại";
+          err.classList.add("show");
+        } else {
+          el.classList.remove("error");
+          el.classList.add("valid");
+          err.classList.remove("show");
+        }
+      }
+
+      function toggleChucSac() {
+        const v = document.getElementById("tonGiao").value;
+        document.getElementById("chucSac").style.display =
+          v && v !== "khong" ? "block" : "none";
+      }
+
+      function filterWards(selectEl, wardSelectId) {
+        const provinceVal = selectEl.value.trim();
+        const wardSelect = document.getElementById(wardSelectId);
+
+        if (!wardSelect) {
+          console.error("Ward select element not found:", wardSelectId);
+          return;
+        }
+
+        // Reset ward select
+        wardSelect.innerHTML = '<option value="">-- Xã/Phường --</option>';
+
+        // If no province selected, return early
+        if (!provinceVal) {
+          wardSelect.disabled = true;
+          return;
+        }
+
+        wardSelect.disabled = false;
+
+        // Get wards for selected province
+        const wards = wardData[provinceVal] || [];
+
+        if (wards.length === 0) {
+          console.warn("No wards found for province:", provinceVal);
+          wardSelect.innerHTML +=
+            '<option value="" disabled style="color:#999">Không có dữ liệu</option>';
+          return;
+        }
+
+        // Populate ward options
+        wards.forEach((ward) => {
+          const option = document.createElement("option");
+          option.value = ward.trim();
+          option.textContent = ward.trim();
+          wardSelect.appendChild(option);
+        });
+      }
+
+      // ===== INSERT ROW HELPERS =====
+      const _mmyyyySelect = () =>
+        `<div class="mmyyyy-wrap"><select class="mm-month"><option value="">MM</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select><span class="mmyyyy-slash">/</span><input class="mm-year" type="number" placeholder="YYYY" min="1900" max="2099" step="1"></div>`;
+      const _rowActTd = (type) =>
+        `<td><div class="row-act-wrap"><button class="ins-btn" onclick="insertRowAbove(this,'${type}')" title="Chèn dòng trên">▲</button><button class="del-btn" onclick="delRow(this)">✕</button><button class="ins-btn" onclick="insertRowBelow(this,'${type}')" title="Chèn dòng dưới">▼</button></div></td>`;
+      function _makeBRow(ph) {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${_mmyyyySelect()}</td><td>${_mmyyyySelect()}</td><td class="td-dienbien"><input type="text" placeholder="${ph || ""}"></td>${_rowActTd("B")}`;
+        return tr;
+      }
+      function _makeCRow() {
+        const tr = document.createElement("tr");
+        const monthYearFrom = `<div class="mmyyyy-wrap"><select class="mm-month"><option value="">MM</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select><span class="mmyyyy-slash">/</span><input class="mm-year" type="number" placeholder="YYYY" min="1900" max="2099" step="1"></div>`;
+        const monthYearTo = `<div class="mmyyyy-wrap"><select class="mm-month"><option value="">MM</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select><span class="mmyyyy-slash">/</span><input class="mm-year" type="number" placeholder="YYYY" min="1900" max="2099" step="1"></div>`;
+        tr.innerHTML = `<td>${monthYearFrom}</td><td class="fhd-to-cell"><div class="fhd-to-inner">${monthYearTo}<label class="fhd-present-wrap" title="Đến nay"><input type="checkbox" class="fhd-present-chk" onchange="toggleFhdPresent(this)"> Nay</label></div></td><td class="td-dienbien"><textarea class="fhd-input" rows="2" placeholder="" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'" style="width:100%;resize:none;min-height:38px;overflow:hidden;box-sizing:border-box"></textarea></td><td><input type="text" placeholder=""></td>${_rowActTd("C")}`;
+        return tr;
+      }
+      function _makeFamHistRow() {
+        const tr = document.createElement("tr");
+        tr.innerHTML = _famHistRowHtml({
+          from_month: null,
+          from_year: null,
+          to_month: null,
+          to_year: null,
+          is_present: false,
+          description: "",
+        });
+        return tr;
+      }
+      function insertRowAbove(btn, type) {
+        const tr = btn.closest("tr");
+        const newTr =
+          type === "C"
+            ? _makeCRow()
+            : type === "fam"
+              ? _makeFamHistRow()
+              : _makeBRow("Tiếp theo …");
+        tr.insertAdjacentElement("beforebegin", newTr);
+        const tb = tr.closest("tbody");
+        refreshDienBien(tb.closest(".timeline-table"));
+        if (type === "B") validateSecB();
+        if (type === "C") validateSecC();
+      }
+      function insertRowBelow(btn, type) {
+        const tr = btn.closest("tr");
+        const newTr =
+          type === "C"
+            ? _makeCRow()
+            : type === "fam"
+              ? _makeFamHistRow()
+              : _makeBRow("Tiếp theo …");
+        tr.insertAdjacentElement("afterend", newTr);
+        const tb = tr.closest("tbody");
+        refreshDienBien(tb.closest(".timeline-table"));
+        if (type === "B") validateSecB();
+        if (type === "C") validateSecC();
+      }
+      function _initInsertBtns(tbodyId, type) {
+        const tb = document.getElementById(tbodyId);
+        if (!tb) return;
+        Array.from(tb.rows).forEach((row) => {
+          const lastTd = row.cells[row.cells.length - 1];
+          if (!lastTd || lastTd.querySelector(".ins-btn")) return;
+          const delBtn = lastTd.querySelector(".del-btn");
+          if (!delBtn) return;
+          const wrap = document.createElement("div");
+          wrap.className = "row-act-wrap";
+          const aboveBtn = document.createElement("button");
+          aboveBtn.className = "ins-btn";
+          aboveBtn.onclick = function () {
+            insertRowAbove(this, type);
+          };
+          aboveBtn.title = "Chèn dòng trên";
+          aboveBtn.textContent = "▲";
+          const belowBtn = document.createElement("button");
+          belowBtn.className = "ins-btn";
+          belowBtn.onclick = function () {
+            insertRowBelow(this, type);
+          };
+          belowBtn.title = "Chèn dòng dưới";
+          belowBtn.textContent = "▼";
+          const cloned = delBtn.cloneNode(true);
+          wrap.appendChild(aboveBtn);
+          wrap.appendChild(cloned);
+          wrap.appendChild(belowBtn);
+          delBtn.replaceWith(wrap);
+        });
+      }
+
+      // ===== TABLE ROWS =====
+      function addRow(tbodyId, ph) {
+        const tb = document.getElementById(tbodyId);
+        if (tbodyId === "tbB-body") {
+          tb.appendChild(_makeBRow(ph || "Tiếp theo …"));
+          refreshDienBien(tb.closest(".timeline-table"));
+          validateSecB();
+          return;
+        }
+        const row = tb.insertRow();
+        const cols = tb.rows[0].cells.length;
+        for (let i = 0; i < cols; i++) {
+          const td = row.insertCell();
+          if (i === cols - 1) {
+            td.innerHTML = `<button class="del-btn" onclick="delRow(this)">✕</button>`;
+          } else {
+            td.innerHTML = `<input type="text" placeholder="">`;
+          }
+        }
+        refreshDienBien(tb.closest(".timeline-table"));
+      }
+
+      function addRowE() {
+        const tb = document.getElementById("tbE-body");
+        tb.insertRow().innerHTML = `<td><input type="text"></td><td><input type="text"></td><td><input type="text" placeholder="MM/YYYY – MM/YYYY"></td><td><input type="text"></td><td><button class="del-btn" onclick="delRow(this)">✕</button></td>`;
+        refreshDienBien(tb.closest(".timeline-table"));
+      }
+      function addRowF() {
+        const tb = document.getElementById("tbF-body");
+        tb.insertRow().innerHTML = `<td><input type="text"></td><td><input type="text"></td><td><button class="del-btn" onclick="delRow(this)">✕</button></td>`;
+        refreshDienBien(tb.closest(".timeline-table"));
+      }
+      function addRowG() {
+        const tb = document.getElementById("tbG-body");
+        tb.insertRow().innerHTML = `<td><input type="text"></td><td><input type="text"></td><td><button class="del-btn" onclick="delRow(this)">✕</button></td>`;
+        refreshDienBien(tb.closest(".timeline-table"));
+      }
+      function addRowH() {
+        const tb = document.getElementById("tbH-body");
+        tb.insertRow().innerHTML = `<td><input type="text"></td><td><input type="text"></td><td><button class="del-btn" onclick="delRow(this)">✕</button></td>`;
+        refreshDienBien(tb.closest(".timeline-table"));
+      }
+
+      function addRowC() {
+        const tb = document.getElementById("tbC-body");
+        if (!tb) return;
+        tb.appendChild(_makeCRow());
+        refreshDienBien(tb.closest(".timeline-table"));
+        validateSecC();
+      }
+
+      function delRow(btn) {
+        const row = btn.closest("tr");
+        if (row.parentElement.rows.length > 1) {
+          const acc = row.closest(".accordion");
+          const tbodyId = row.parentElement.id;
+          row.remove();
+          if (acc) validateFamHistory(acc);
+          if (tbodyId === "tbB-body") validateSecB();
+          if (tbodyId === "tbC-body") validateSecC();
+        }
+      }
+
+      // ===== WORD COUNT =====
+      function countWords() {
+        const text = document.getElementById("tuNhanXet").value;
+        const count = text.trim() ? text.trim().split(/\s+/).length : 0;
+        const el = document.getElementById("wordCount");
+        el.textContent = count + " / tối thiểu 200 từ";
+        el.style.color = count >= 200 ? "var(--success)" : "var(--hint)";
+      }
+
+      // ===== FAMILY BLOCKS =====
+      function buildFamilyBlock(container, members) {
+        container.innerHTML = members
+          .map(
+            (m, i) => `
+    <div class="family-accordion">
+      <div class="family-head" onclick="toggleFamily(this)">
+        <div class="fam-num">${m.num}</div>
+        <div class="fam-info">
+          <strong>${m.title}</strong>
+          <span class="fam-name" id="famName_${m.num}">Chưa điền thông tin</span>
+        </div>
+        <span class="chevron">▾</span>
+      </div>
+      <div class="family-body ${i === 0 ? "open" : ""}">
+        ${buildFamilyForm(m)}
+      </div>
+    </div>
+  `,
+          )
+          .join("");
+      }
+
+      function buildFamilyForm(m) {
+        const histBlock = `
+    <div style="margin-top:12px;margin-bottom:4px;font-size:12px;font-weight:700;color:var(--muted)">Quá trình lịch sử <span style="font-weight:400;font-size:11px;color:var(--hint)">(nhập liên tục: cuối giai đoạn trước = đầu giai đoạn sau)</span></div>
+    <div class="fhd-error-bar" id="fhdErr_\${m.num}"></div>
+    <div class="timeline-wrap">
+<table class="timeline-table">
+      <thead><tr><th style="width:17%">Từ (MM/YYYY)</th><th style="width:22%">Đến (MM/YYYY)</th><th>Diễn biến + Nơi sinh sống</th><th style="width:36px"></th></tr></thead>
+      <tbody>
+        <tr>
+          <td><div class="mmyyyy-wrap"><select class="mm-month"><option value="">MM</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select><span class="mmyyyy-slash">/</span><input class="mm-year" type="number" placeholder="YYYY" min="1900" max="2099" step="1"></div></td>
+          <td class="fhd-to-cell"><div class="fhd-to-inner"><div class="mmyyyy-wrap"><select class="mm-month"><option value="">MM</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select><span class="mmyyyy-slash">/</span><input class="mm-year" type="number" placeholder="YYYY" min="1900" max="2099" step="1"></div><label class="fhd-present-wrap" title="Đến nay"><input type="checkbox" class="fhd-present-chk" onchange="toggleFhdPresent(this)"> Nay</label></div></td>
+          <td class="td-dienbien"><input type="text" placeholder="Sống với cha mẹ, đi học, làm việc tại …"></td>
+          <td><div class="row-act-wrap"><button class="ins-btn" onclick="insertRowAbove(this,'fam')" title="Chèn dòng trên">▲</button><button class="del-btn" onclick="delRow(this)">✕</button><button class="ins-btn" onclick="insertRowBelow(this,'fam')" title="Chèn dòng dưới">▼</button></div></td>
+        </tr>
+        <tr>
+          <td><div class="mmyyyy-wrap"><select class="mm-month"><option value="">MM</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select><span class="mmyyyy-slash">/</span><input class="mm-year" type="number" placeholder="YYYY" min="1900" max="2099" step="1"></div></td>
+          <td class="fhd-to-cell"><div class="fhd-to-inner"><div class="mmyyyy-wrap"><select class="mm-month"><option value="">MM</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select><span class="mmyyyy-slash">/</span><input class="mm-year" type="number" placeholder="YYYY" min="1900" max="2099" step="1"></div><label class="fhd-present-wrap" title="Đến nay"><input type="checkbox" class="fhd-present-chk" onchange="toggleFhdPresent(this)"> Nay</label></div></td>
+          <td class="td-dienbien"><input type="text"></td>
+          <td><div class="row-act-wrap"><button class="ins-btn" onclick="insertRowAbove(this,'fam')" title="Chèn dòng trên">▲</button><button class="del-btn" onclick="delRow(this)">✕</button><button class="ins-btn" onclick="insertRowBelow(this,'fam')" title="Chèn dòng dưới">▼</button></div></td>
+        </tr>
+        <tr>
+          <td><div class="mmyyyy-wrap"><select class="mm-month"><option value="">MM</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select><span class="mmyyyy-slash">/</span><input class="mm-year" type="number" placeholder="YYYY" min="1900" max="2099" step="1"></div></td>
+          <td class="fhd-to-cell"><div class="fhd-to-inner"><div class="mmyyyy-wrap"><select class="mm-month"><option value="">MM</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select><span class="mmyyyy-slash">/</span><input class="mm-year" type="number" placeholder="YYYY" min="1900" max="2099" step="1"></div><label class="fhd-present-wrap" title="Đến nay"><input type="checkbox" class="fhd-present-chk" onchange="toggleFhdPresent(this)"> Nay</label></div></td>
+          <td class="td-dienbien"><input type="text"></td>
+          <td><div class="row-act-wrap"><button class="ins-btn" onclick="insertRowAbove(this,'fam')" title="Chèn dòng trên">▲</button><button class="del-btn" onclick="delRow(this)">✕</button><button class="ins-btn" onclick="insertRowBelow(this,'fam')" title="Chèn dòng dưới">▼</button></div></td>
+        </tr>
+      </tbody>
+    </table>
+</div>
+    <button class="add-row-btn" style="margin-top:8px" onclick="addRowToNearestTable(this)">+ Thêm giai đoạn</button>
+  `;
+
+        if (m.sibling)
+          return `
+    <div class="form-row"><label>Họ và tên</label><input type="text" oninput="updateFamName('${m.num}',this.value)" placeholder=""></div>
+    <div class="form-row two-col-50">
+      <div><label>Năm sinh <span style="color:var(--crimson)">*</span></label><input type="number" placeholder="YYYY" min="1900" max="2099"></div>
+      <div><label>Giới tính <span style="color:var(--crimson)">*</span></label><select><option value="">-- Chọn --</option><option value="male">Nam</option><option value="female">Nữ</option></select></div>
+    </div>
+    <div class="form-row"><label>Đã mất</label>
+      <div><label style="display:inline-flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" class="sib-deceased-chk" style="width:auto;accent-color:var(--crimson)" onchange="toggleSibDeceased(this,'${m.num}')"> Đã mất</label></div>
+    </div>
+    <div id="sibAlive_${m.num}">
+      <div class="form-row"><label>Nơi cư trú <span style="color:var(--crimson)">*</span></label>
+        <div><div class="loc-row"><select id="sel_tinh_fam_${m.num.replace(/\./g, "_")}" class="searchable-location"><option value="">-- Tỉnh/TP --</option></select><select id="sel_xa_fam_${m.num.replace(/\./g, "_")}" class="searchable-location"><option value="">-- Xã/Phường --</option></select></div>
+        <input type="text" class="fam-addr-street" style="margin-top:6px;margin-bottom:4px" placeholder="Số nhà, Đường"><input type="text" class="fam-addr-hamlet" placeholder="Ấp / Khu phố / Thôn"></div>
+      </div>
+      <div class="form-row"><label>Nghề nghiệp hiện nay <span style="color:var(--crimson)">*</span></label><input type="text" placeholder="Công nhân / Viên chức / Nội trợ / Hưu trí …"></div>
+    </div>
+    <div id="sibDeceased_${m.num}" style="display:none">
+      <div class="form-row"><label>Năm mất</label><input type="number" placeholder="YYYY" min="1900" max="2099"></div>
+    </div>
+    <div class="form-row"><label>Quốc tịch <span style="color:var(--crimson)">*</span></label><input type="text" class="fam-nationality-input" placeholder="Việt Nam" value="Việt Nam"></div>
+    <div class="form-row"><label>Là Đảng viên?</label>
+      <div>
+        <select onchange="toggleSiblingParty(this,'sibParty_${m.num}')">
+          <option value="">-- Chọn --</option>
+          <option value="no">Không phải đảng viên</option>
+          <option value="yes">Là đảng viên Đảng Cộng sản Việt Nam</option>
+        </select>
+        <div id="sibParty_${m.num}" style="display:none;margin-top:8px" class="party-detail-box">
+          <div class="form-row"><label>Năm vào Đảng</label><input type="number" placeholder="YYYY" min="1930" max="2099"></div>
+          <div class="form-row"><label>Chi bộ / Đảng bộ</label><input type="text" placeholder="Chi bộ … – Đảng bộ …"></div>
+          <div class="form-row"><label>Khen thưởng / Danh hiệu</label><input type="text" placeholder="Huy hiệu Đảng năm … / Đảng viên xuất sắc …"></div>
+          <div class="form-row"><label>Số năm tuổi Đảng</label><input type="number" placeholder="0" min="0" max="80"> <span class="hint">Tính đến năm hiện tại</span></div>
+        </div>
+      </div>
+    </div>
+  `;
+
+        if (m.child)
+          return `
+    <div class="form-row"><label>Họ và tên</label><input type="text" oninput="updateFamName('${m.num}',this.value)"></div>
+    <div class="form-row"><label>Năm sinh</label><input type="text" placeholder="YYYY" id="childYear_${m.num}" oninput="checkChildAge('${m.num}',this.value)"></div>
+    <div class="form-row"><label>Nơi ở hiện nay</label>
+      <div><div class="loc-row" style="margin-bottom:6px"><select id="sel_tinh_fam_ct_${m.num.replace(/\./g, "_")}" class="searchable-location"><option value="">-- Tỉnh/TP --</option></select><select id="sel_xa_fam_ct_${m.num.replace(/\./g, "_")}" class="searchable-location"><option value="">-- Xã/Phường --</option></select></div>
+      <input type="text" class="fam-addr-street" placeholder="Số nhà, Đường" style="margin-bottom:4px"><input type="text" class="fam-addr-hamlet" placeholder="Ấp / Khu phố / Thôn"></div>
+    </div>
+    <div id="childUnder18_${m.num}">
+      <div class="form-row">
+        <label>Đang học trường<span class="hint-lbl">Nếu &lt;6 tuổi: ghi "Còn nhỏ" · Nếu &lt;18 tuổi: ghi tên trường</span></label>
+        <input type="text" placeholder="VD: Còn nhỏ / Học sinh trường THCS Nhà Bè / …">
+      </div>
+    </div>
+    <div id="childOver18_${m.num}" style="display:none">
+      <div class="alert alert-info" style="font-size:12px;margin:6px 0 10px">ℹ Con từ 18 tuổi trở lên: khai đầy đủ như bản thân theo quy định Mẫu 2-KNĐ</div>
+      <div class="form-row"><label>Nơi sinh<span class="hint-lbl">Không ghi bệnh viện — ghi Xã/Phường, Tỉnh/TP</span></label>
+        <div class="loc-row"><select id="sel_tinh_fam_ns_${m.num.replace(/\./g, "_")}" class="searchable-location"><option value="">-- Tỉnh/TP --</option></select><select id="sel_xa_fam_ns_${m.num.replace(/\./g, "_")}" class="searchable-location"><option value="">-- Xã/Phường --</option></select></div>
+        <textarea class="fam-text-birth-place" rows="2" style="margin-top:4px;width:100%;resize:none;overflow:hidden;box-sizing:border-box" placeholder="Nơi sinh (tự động điền hoặc nhập trực tiếp)" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"></textarea></div>
+      <div class="form-row"><label>Quê quán<span class="hint-lbl">Địa danh hành chính mới</span></label>
+        <div class="loc-row"><select id="sel_tinh_fam_qq_${m.num.replace(/\./g, "_")}" class="searchable-location"><option value="">-- Tỉnh/TP --</option></select><select id="sel_xa_fam_qq_${m.num.replace(/\./g, "_")}" class="searchable-location"><option value="">-- Xã/Phường --</option></select></div>
+        <textarea class="fam-text-hometown" rows="2" style="margin-top:4px;width:100%;resize:none;overflow:hidden;box-sizing:border-box" placeholder="Quê quán (tự động điền hoặc nhập trực tiếp)" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"></textarea></div>
+      <div class="form-row"><label>Dân tộc</label><div><select class="fam-sel-ethnic" onchange="toggleFamSelKhac(this)"><option value="">-- Chọn --</option><option>Kinh</option><option>Tày</option><option>Thái</option><option>Mường</option><option>Khmer</option><option>Nùng</option><option>HMông</option><option>Khác</option></select><input class="fam-sel-khac-other" style="display:none;margin-top:4px;width:100%" placeholder="Nhập tên dân tộc"></div></div>
+      <div class="form-row"><label>Tôn giáo</label><div><select class="fam-sel-religion" onchange="toggleFamSelKhac(this)"><option value="">-- Chọn --</option><option>Không</option><option>Phật giáo</option><option>Công giáo</option><option>Cao Đài</option><option>Hòa Hảo</option><option>Tin Lành</option><option>Hồi giáo</option><option>Khác</option></select><input class="fam-sel-khac-other" style="display:none;margin-top:4px;width:100%" placeholder="Nhập tên tôn giáo"></div></div>
+      <div class="form-row"><label>Chức sắc tôn giáo</label><input type="text" class="fam-religious-rank" placeholder="Linh mục / Mục sư / Hòa thượng / Không có"></div>
+      <div class="form-row"><label>Nơi cư trú</label>
+        <div><div class="loc-row" style="margin-bottom:6px"><select id="sel_tinh_fam_ct_${m.num.replace(/\./g, "_")}" class="searchable-location"><option value="">-- Tỉnh/TP --</option></select><select id="sel_xa_fam_ct_${m.num.replace(/\./g, "_")}" class="searchable-location"><option value="">-- Xã/Phường --</option></select></div>
+        <input type="text" class="fam-addr-street" placeholder="Số nhà, Đường" style="margin-bottom:4px"><input type="text" class="fam-addr-hamlet" placeholder="Ấp / Khu phố / Thôn"></div>
+      </div>
+      <div class="form-row"><label>Nghề nghiệp</label><input type="text"></div>
+      <div style="margin-top:12px;margin-bottom:4px;font-size:12px;font-weight:700;color:var(--muted)">Quá trình lịch sử (từ khi sinh đến nay) <span style="font-weight:400;font-size:11px;color:var(--hint)">(nhập liên tục)</span></div>
+      <div class="fhd-error-bar"></div>
+      <div class="timeline-wrap">
+<table class="timeline-table">
+        <thead><tr><th style="width:17%">Từ (MM/YYYY)</th><th style="width:22%">Đến (MM/YYYY)</th><th>Diễn biến + Nơi sinh sống</th><th style="width:36px"></th></tr></thead>
+        <tbody>
+          <tr><td><input class="fhd-input" type="text" placeholder="MM/YYYY" maxlength="7"></td><td class="fhd-to-cell"><div class="fhd-to-inner"><input class="fhd-input fhd-to-txt" type="text" placeholder="MM/YYYY" maxlength="7"><label class="fhd-present-wrap" title="Đến nay"><input type="checkbox" class="fhd-present-chk" onchange="toggleFhdPresent(this)"> Nay</label></div></td><td><input type="text" placeholder="Còn nhỏ, sống với cha mẹ tại …"></td><td><div class="row-act-wrap"><button class="ins-btn" onclick="insertRowAbove(this,'fam')" title="Chèn dòng trên">▲</button><button class="del-btn" onclick="delRow(this)">✕</button><button class="ins-btn" onclick="insertRowBelow(this,'fam')" title="Chèn dòng dưới">▼</button></div></td></tr>
+          <tr><td><input class="fhd-input" type="text" placeholder="MM/YYYY" maxlength="7"></td><td class="fhd-to-cell"><div class="fhd-to-inner"><input class="fhd-input fhd-to-txt" type="text" placeholder="MM/YYYY" maxlength="7"><label class="fhd-present-wrap" title="Đến nay"><input type="checkbox" class="fhd-present-chk" onchange="toggleFhdPresent(this)"> Nay</label></div></td><td><input type="text"></td><td><div class="row-act-wrap"><button class="ins-btn" onclick="insertRowAbove(this,'fam')" title="Chèn dòng trên">▲</button><button class="del-btn" onclick="delRow(this)">✕</button><button class="ins-btn" onclick="insertRowBelow(this,'fam')" title="Chèn dòng dưới">▼</button></div></td></tr>
+        </tbody>
+      </table>
+</div>
+      <button class="add-row-btn" style="margin-top:8px" onclick="addRowToNearestTable(this)">+ Thêm giai đoạn</button>
+    </div>
+  `;
+
+        if (m.spouse)
+          return `
+    <div class="alert alert-warn" style="margin-bottom:8px;font-size:12px">⚠ Đã ly hôn: chỉ cần khai Họ tên + Năm sinh, các thông tin khác (lập gia đình, ly hôn) ghi trong <strong>Phần C – Lịch sử công tác</strong>. Không cần khai cha mẹ và ông bà bên chồng/vợ khi đã ly hôn.</div>
+    <div class="alert alert-info" style="margin-bottom:10px;font-size:12px">ℹ <strong>Lưu ý:</strong> Thông tin ngày lập gia đình và ly hôn (nếu có) <strong>không khai ở đây</strong> — chỉ ghi trong <strong>Phần C</strong> dạng: "Tháng …/…. – Lập gia đình với … chuyển đến sinh sống tại …" và "Tháng …/…. – Ly hôn với … theo Quyết định số … của cấp …"</div>
+    <div class="form-row"><label>Họ và tên</label><input type="text" oninput="updateFamName('${m.num}',this.value)"></div>
+    <div class="form-row"><label>Năm sinh</label><input type="text" placeholder="YYYY"></div>
+    <div class="form-row"><label>Nơi sinh<span class="hint-lbl">Không ghi bệnh viện — ghi Xã/Phường, Tỉnh/TP</span></label>
+      <div class="loc-row"><select id="sel_tinh_fam_ns_${m.num.replace(/\./g, "_")}" class="searchable-location"><option value="">-- Tỉnh/TP --</option></select><select id="sel_xa_fam_ns_${m.num.replace(/\./g, "_")}" class="searchable-location"><option value="">-- Xã/Phường --</option></select></div>
+      <textarea class="fam-text-birth-place" rows="2" style="margin-top:4px;width:100%;resize:none;overflow:hidden;box-sizing:border-box" placeholder="Nơi sinh (tự động điền hoặc nhập trực tiếp)" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"></textarea></div>
+    <div class="form-row"><label>Quê quán<span class="hint-lbl">Phải đối chiếu với cha mẹ chồng/vợ</span></label>
+      <div class="loc-row"><select id="sel_tinh_fam_qq_${m.num.replace(/\./g, "_")}" class="searchable-location"><option value="">-- Tỉnh/TP --</option></select><select id="sel_xa_fam_qq_${m.num.replace(/\./g, "_")}" class="searchable-location"><option value="">-- Xã/Phường --</option></select></div>
+      <textarea class="fam-text-hometown" rows="2" style="margin-top:4px;width:100%;resize:none;overflow:hidden;box-sizing:border-box" placeholder="Quê quán (tự động điền hoặc nhập trực tiếp)" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"></textarea></div>
+    <div class="form-row"><label>Dân tộc</label><div><select class="fam-sel-ethnic" onchange="toggleFamSelKhac(this)"><option value="">-- Chọn --</option><option>Kinh</option><option>Tày</option><option>Thái</option><option>Mường</option><option>Khmer</option><option>Nùng</option><option>HMông</option><option>Khác</option></select><input class="fam-sel-khac-other" style="display:none;margin-top:4px;width:100%" placeholder="Nhập tên dân tộc"></div></div>
+    <div class="form-row"><label>Tôn giáo</label><div><select class="fam-sel-religion" onchange="toggleFamSelKhac(this)"><option value="">-- Chọn --</option><option>Không</option><option>Phật giáo</option><option>Công giáo</option><option>Cao Đài</option><option>Hòa Hảo</option><option>Tin Lành</option><option>Hồi giáo</option><option>Khác</option></select><input class="fam-sel-khac-other" style="display:none;margin-top:4px;width:100%" placeholder="Nhập tên tôn giáo"></div></div>
+    <div class="form-row"><label>Chức sắc tôn giáo</label><input type="text" class="fam-religious-rank" placeholder="Linh mục / Mục sư / Hòa thượng / Không có"></div>
+    <div class="form-row"><label>Nơi cư trú<span class="hint-lbl">Để trống nếu đã mất</span></label>
+      <div><div class="loc-row" style="margin-bottom:6px"><select id="sel_tinh_fam_ct_${m.num.replace(/\./g, "_")}" class="searchable-location"><option value="">-- Tỉnh/TP --</option></select><select id="sel_xa_fam_ct_${m.num.replace(/\./g, "_")}" class="searchable-location"><option value="">-- Xã/Phường --</option></select></div>
+      <input type="text" class="fam-addr-street" placeholder="Số nhà, Đường" style="margin-bottom:4px"><input type="text" class="fam-addr-hamlet" placeholder="Ấp / Khu phố / Thôn"></div>
+    </div>
+    <div class="form-row"><label>Nghề nghiệp</label><input type="text"></div>
+    <div class="form-row"><label>Là Đảng viên?</label>
+      <div><select onchange="toggleSiblingParty(this,'spouseParty_${m.num}')"><option value="">-- Chọn --</option><option value="no">Không phải đảng viên</option><option value="yes">Là đảng viên Đảng Cộng sản Việt Nam</option></select>
+        <div id="spouseParty_${m.num}" style="display:none;margin-top:8px" class="party-detail-box">
+          <div class="form-row"><label>Năm vào Đảng</label><input type="number" placeholder="YYYY" min="1930" max="2099"></div>
+          <div class="form-row"><label>Chi bộ / Đảng bộ</label><input type="text" placeholder="Chi bộ … – Đảng bộ …"></div>
+          <div class="form-row"><label>Khen thưởng / Huy hiệu Đảng</label><input type="text" placeholder="Huy hiệu Đảng / Đảng viên xuất sắc …"></div>
+          <div class="form-row"><label>Số năm tuổi Đảng</label><input type="number" placeholder="0" min="0" max="80"></div>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:12px;margin-bottom:4px;font-size:12px;font-weight:700;color:var(--muted)">Quá trình lịch sử của chồng/vợ (liên tục từ nhỏ đến nay) <span style="font-weight:400;color:var(--red)">*Bắt buộc</span> <span style="font-weight:400;font-size:11px;color:var(--hint)">(nhập liên tục)</span></div>
+    <div class="fhd-error-bar"></div>
+    <div class="timeline-wrap">
+<table class="timeline-table">
+      <thead><tr><th style="width:17%">Từ (MM/YYYY)</th><th style="width:22%">Đến (MM/YYYY)</th><th>Làm gì, ở đâu + Nơi sinh sống</th><th style="width:36px"></th></tr></thead>
+      <tbody>
+        <tr>
+          <td>
+            <div class="mmyyyy-wrap">
+              <select class="mm-month"><option value="">MM</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select><span class="mmyyyy-slash">/</span><input class="mm-year" type="number" placeholder="YYYY" min="1900" max="2099" step="1">
+            </div>
+          </td>
+          <td class="fhd-to-cell">
+            <div class="fhd-to-inner">
+              <div class="mmyyyy-wrap">
+                <select class="mm-month"><option value="">MM</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select><span class="mmyyyy-slash">/</span><input class="mm-year" type="number" placeholder="YYYY" min="1900" max="2099" step="1">
+              </div>
+              <label class="fhd-present-wrap" title="Đến nay"><input type="checkbox" class="fhd-present-chk" onchange="toggleFhdPresent(this)"> Nay</label>
+            </div>
+          </td>
+          <td class="td-dienbien"><input type="text" placeholder="Còn nhỏ, sống với cha mẹ tại …"></td>
+          <td><div class="row-act-wrap"><button class="ins-btn" onclick="insertRowAbove(this,'fam')" title="Chèn dòng trên">▲</button><button class="del-btn" onclick="delRow(this)">✕</button><button class="ins-btn" onclick="insertRowBelow(this,'fam')" title="Chèn dòng dưới">▼</button></div></td>
+        </tr>
+        <tr>
+          <td>
+            <div class="mmyyyy-wrap">
+              <select class="mm-month"><option value="">MM</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select><span class="mmyyyy-slash">/</span><input class="mm-year" type="number" placeholder="YYYY" min="1900" max="2099" step="1">
+            </div>
+          </td>
+          <td class="fhd-to-cell">
+            <div class="fhd-to-inner">
+              <div class="mmyyyy-wrap">
+                <select class="mm-month"><option value="">MM</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select><span class="mmyyyy-slash">/</span><input class="mm-year" type="number" placeholder="YYYY" min="1900" max="2099" step="1">
+              </div>
+              <label class="fhd-present-wrap" title="Đến nay"><input type="checkbox" class="fhd-present-chk" onchange="toggleFhdPresent(this)"> Nay</label>
+            </div>
+          </td>
+          <td class="td-dienbien"><input type="text"></td>
+          <td><div class="row-act-wrap"><button class="ins-btn" onclick="insertRowAbove(this,'fam')" title="Chèn dòng trên">▲</button><button class="del-btn" onclick="delRow(this)">✕</button><button class="ins-btn" onclick="insertRowBelow(this,'fam')" title="Chèn dòng dưới">▼</button></div></td>
+        </tr>
+        <tr>
+          <td>
+            <div class="mmyyyy-wrap">
+              <select class="mm-month"><option value="">MM</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select><span class="mmyyyy-slash">/</span><input class="mm-year" type="number" placeholder="YYYY" min="1900" max="2099" step="1">
+            </div>
+          </td>
+          <td class="fhd-to-cell">
+            <div class="fhd-to-inner">
+              <div class="mmyyyy-wrap">
+                <select class="mm-month"><option value="">MM</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select><span class="mmyyyy-slash">/</span><input class="mm-year" type="number" placeholder="YYYY" min="1900" max="2099" step="1">
+              </div>
+              <label class="fhd-present-wrap" title="Đến nay"><input type="checkbox" class="fhd-present-chk" onchange="toggleFhdPresent(this)"> Nay</label>
+            </div>
+          </td>
+          <td class="td-dienbien"><input type="text"></td>
+          <td><div class="row-act-wrap"><button class="ins-btn" onclick="insertRowAbove(this,'fam')" title="Chèn dòng trên">▲</button><button class="del-btn" onclick="delRow(this)">✕</button><button class="ins-btn" onclick="insertRowBelow(this,'fam')" title="Chèn dòng dưới">▼</button></div></td>
+        </tr>
+        <tr>
+          <td>
+            <div class="mmyyyy-wrap">
+              <select class="mm-month"><option value="">MM</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select><span class="mmyyyy-slash">/</span><input class="mm-year" type="number" placeholder="YYYY" min="1900" max="2099" step="1">
+            </div>
+          </td>
+          <td class="fhd-to-cell">
+            <div class="fhd-to-inner">
+              <div class="mmyyyy-wrap">
+                <select class="mm-month"><option value="">MM</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select><span class="mmyyyy-slash">/</span><input class="mm-year" type="number" placeholder="YYYY" min="1900" max="2099" step="1">
+              </div>
+              <label class="fhd-present-wrap" title="Đến nay"><input type="checkbox" class="fhd-present-chk" onchange="toggleFhdPresent(this)"> Nay</label>
+            </div>
+          </td>
+          <td class="td-dienbien"><input type="text"></td>
+          <td><div class="row-act-wrap"><button class="ins-btn" onclick="insertRowAbove(this,'fam')" title="Chèn dòng trên">▲</button><button class="del-btn" onclick="delRow(this)">✕</button><button class="ins-btn" onclick="insertRowBelow(this,'fam')" title="Chèn dòng dưới">▼</button></div></td>
+        </tr>
+      </tbody>
+    </table>
+</div>
+    <button class="add-row-btn" style="margin-top:8px" onclick="addRowSpouse(this)">+ Thêm giai đoạn</button>
+  `;
+
+        // grandparent type: Quê quán · Dân tộc · Tôn giáo · Nơi cư trú · Nghề nghiệp (NO Nơi sinh per Mẫu 2-KNĐ)
+        if (m.grandparent)
+          return `
+    <div class="alert alert-info" style="font-size:12px;margin-bottom:10px">ℹ <strong>Hướng dẫn khai quá trình:</strong> Nếu tính đến năm 1975 ông/bà đã trên 18 tuổi → khai theo 2 giai đoạn: (1) từ khi sinh ra đến 1975, (2) từ 1975 đến nay. Nếu dưới 18 tuổi tính đến 1975 → chọn mốc thời gian phù hợp (lập gia đình, đi làm …) để tách giai đoạn.</div>
+    <div class="form-row"><label>Họ và tên</label><input type="text" oninput="updateFamName('${m.num}',this.value)"></div>
+    <div class="form-row two-col-50"><div><label>Năm sinh</label><input type="number" placeholder="YYYY" min="1890" max="2010"></div><div><label>Giới tính</label><select><option value="">--</option><option value="male">Nam</option><option value="female">Nữ</option></select></div></div>
+    <div class="form-row"><label>Quê quán<span class="hint-lbl">Xã, tỉnh theo địa danh mới</span></label>
+      <div class="loc-row"><select id="sel_tinh_fam_qq_${m.num.replace(/\./g, "_")}" class="searchable-location"><option value="">-- Tỉnh/TP --</option></select><select id="sel_xa_fam_qq_${m.num.replace(/\./g, "_")}" class="searchable-location"><option value="">-- Xã/Phường --</option></select></div>
+      <textarea class="fam-text-hometown" rows="2" style="margin-top:4px;width:100%;resize:none;overflow:hidden;box-sizing:border-box" placeholder="Quê quán (tự động điền hoặc nhập trực tiếp)" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"></textarea>
+    </div>
+    <div class="form-row"><label>Dân tộc</label><div><select class="fam-sel-ethnic" onchange="toggleFamSelKhac(this)"><option value="">-- Chọn --</option><option>Kinh</option><option>Tày</option><option>Thái</option><option>Mường</option><option>Khmer</option><option>Khác</option></select><input class="fam-sel-khac-other" style="display:none;margin-top:4px;width:100%" placeholder="Nhập tên dân tộc"></div></div>
+    <div class="form-row"><label>Tôn giáo</label><div><select class="fam-sel-religion" onchange="toggleFamSelKhac(this)"><option value="">-- Chọn --</option><option>Không</option><option>Phật giáo</option><option>Công giáo</option><option>Cao Đài</option><option>Hòa Hảo</option><option>Khác</option></select><input class="fam-sel-khac-other" style="display:none;margin-top:4px;width:100%" placeholder="Nhập tên tôn giáo"></div></div>
+    <div class="form-row"><label>Chức sắc tôn giáo</label><input type="text" class="fam-religious-rank" placeholder="Linh mục / Mục sư / Hòa thượng / Không có"></div>
+    <div class="form-row"><label>Nơi cư trú<span class="hint-lbl">Để trống nếu đã mất</span></label>
+      <div><div class="loc-row" style="margin-bottom:6px"><select id="sel_tinh_fam_ct_${m.num.replace(/\./g, "_")}" class="searchable-location"><option value="">-- Tỉnh/TP --</option></select><select id="sel_xa_fam_ct_${m.num.replace(/\./g, "_")}" class="searchable-location"><option value="">-- Xã/Phường --</option></select></div>
+      <input type="text" class="fam-addr-street" placeholder="Số nhà, Đường" style="margin-bottom:4px"><input type="text" class="fam-addr-hamlet" placeholder="Ấp / Khu phố / Thôn"></div>
+    </div>
+    <div class="form-row"><label>Nghề nghiệp<span class="hint-lbl">Để trống nếu đã mất</span></label><input type="text" placeholder="Nông dân / Hưu trí / Đã mất …"></div>
+    <div class="form-row"><label>Là Đảng viên?</label>
+      <div><select onchange="toggleSiblingParty(this,'gpParty_${m.num}')"><option value="no">Không</option><option value="yes">Là đảng viên Đảng Cộng sản Việt Nam</option></select>
+        <div id="gpParty_${m.num}" style="display:none;margin-top:8px" class="party-detail-box">
+          <div class="form-row"><label>Năm vào Đảng</label><input type="number" placeholder="YYYY" min="1930" max="2099"></div>
+          <div class="form-row"><label>Khen thưởng / Huy hiệu</label><input type="text" placeholder="Huy hiệu Đảng 50 năm / Đảng viên xuất sắc …"></div>
+          <div class="form-row"><label>Số năm tuổi Đảng</label><input type="number" placeholder="0" min="0" max="100"></div>
+        </div>
+      </div>
+    </div>
+    ${histBlock}
+  `;
+
+        // default: Cha/Mẹ ruột, Cha/Mẹ chồng/vợ — có Nơi sinh
+        return `
+    <div class="form-row"><label>Họ và tên</label><input type="text" oninput="updateFamName('${m.num}',this.value)"></div>
+    <div class="form-row two-col-50">
+      <div><label>Năm sinh</label><input type="number" placeholder="YYYY" min="1900" max="2099"></div>
+      <div><label>Giới tính</label><select><option value="">--</option><option value="male">Nam</option><option value="female">Nữ</option></select></div>
+    </div>
+    <div class="form-row"><label>Nơi sinh<span class="hint-lbl">Không ghi bệnh viện — ghi Xã/Phường, Tỉnh/TP</span></label>
+      <div class="loc-row"><select id="sel_tinh_fam_ns_${m.num.replace(/\./g, "_")}" class="searchable-location"><option value="">-- Tỉnh/TP --</option></select><select id="sel_xa_fam_ns_${m.num.replace(/\./g, "_")}" class="searchable-location"><option value="">-- Xã/Phường --</option></select></div>
+      <textarea class="fam-text-birth-place" rows="2" style="margin-top:4px;width:100%;resize:none;overflow:hidden;box-sizing:border-box" placeholder="Nơi sinh (tự động điền hoặc nhập trực tiếp)" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"></textarea>
+    </div>
+    <div class="form-row"><label>Quê quán<span class="hint-lbl">Địa danh hành chính mới</span></label>
+      <div class="loc-row"><select id="sel_tinh_fam_qq_${m.num.replace(/\./g, "_")}" class="searchable-location"><option value="">-- Tỉnh/TP --</option></select><select id="sel_xa_fam_qq_${m.num.replace(/\./g, "_")}" class="searchable-location"><option value="">-- Xã/Phường --</option></select></div>
+      <textarea class="fam-text-hometown" rows="2" style="margin-top:4px;width:100%;resize:none;overflow:hidden;box-sizing:border-box" placeholder="Quê quán (tự động điền hoặc nhập trực tiếp)" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"></textarea>
+    </div>
+    <div class="form-row"><label>Dân tộc</label><div><select class="fam-sel-ethnic" onchange="toggleFamSelKhac(this)"><option value="">-- Chọn --</option><option>Kinh</option><option>Tày</option><option>Thái</option><option>Mường</option><option>Khmer</option><option>Nùng</option><option>HMông</option><option>Khác</option></select><input class="fam-sel-khac-other" style="display:none;margin-top:4px;width:100%" placeholder="Nhập tên dân tộc"></div></div>
+    <div class="form-row"><label>Tôn giáo</label><div><select class="fam-sel-religion" onchange="toggleFamSelKhac(this)"><option value="">-- Chọn --</option><option>Không</option><option>Phật giáo</option><option>Công giáo</option><option>Cao Đài</option><option>Hòa Hảo</option><option>Tin Lành</option><option>Hồi giáo</option><option>Khác</option></select><input class="fam-sel-khac-other" style="display:none;margin-top:4px;width:100%" placeholder="Nhập tên tôn giáo"></div></div>
+    <div class="form-row"><label>Chức sắc tôn giáo</label><input type="text" class="fam-religious-rank" placeholder="Linh mục / Mục sư / Hòa thượng / Không có"></div>
+    <div class="form-row"><label>Nơi cư trú<span class="hint-lbl">Để trống nếu đã mất</span></label>
+      <div>
+        <div class="loc-row" style="margin-bottom:6px"><select id="sel_tinh_fam_ct_${m.num.replace(/\./g, "_")}" class="searchable-location"><option value="">-- Tỉnh/TP --</option></select><select id="sel_xa_fam_ct_${m.num.replace(/\./g, "_")}" class="searchable-location"><option value="">-- Xã/Phường --</option></select></div>
+        <input type="text" class="fam-addr-street" placeholder="Số nhà, Đường" style="margin-bottom:4px">
+        <input type="text" class="fam-addr-hamlet" placeholder="Ấp / Khu phố / Thôn">
+      </div>
+    </div>
+    <div class="form-row"><label>Nghề nghiệp<span class="hint-lbl">Để trống nếu đã mất</span></label><input type="text" placeholder="Nông dân / Công nhân / Hưu trí / Đã mất …"></div>
+    <div class="form-row"><label>Là Đảng viên?</label>
+      <div>
+        <select onchange="toggleSiblingParty(this,'famParty_${m.num}')">
+          <option value="">-- Chọn --</option>
+          <option value="no">Không phải đảng viên</option>
+          <option value="yes">Là đảng viên Đảng Cộng sản Việt Nam</option>
+        </select>
+        <div id="famParty_${m.num}" style="display:none;margin-top:8px" class="party-detail-box">
+          <div class="form-row"><label>Năm vào Đảng</label><input type="number" placeholder="YYYY" min="1930" max="2099"></div>
+          <div class="form-row"><label>Chi bộ / Đảng bộ</label><input type="text" placeholder="Chi bộ … – Đảng bộ …"></div>
+          <div class="form-row"><label>Khen thưởng / Huy hiệu Đảng</label><input type="text" placeholder="Huy hiệu Đảng 30 năm / Đảng viên xuất sắc …"></div>
+          <div class="form-row"><label>Số năm tuổi Đảng</label><input type="number" placeholder="0" min="0" max="80"> <span class="hint">Tính đến năm hiện tại</span></div>
+        </div>
+      </div>
+    </div>
+    ${m.history !== false ? histBlock : ""}
+  `;
+      }
+
+      function updateFamName(num, val) {
+        const el = document.getElementById("famName_" + num);
+        if (el) el.textContent = val || "Chưa điền thông tin";
+      }
+
+      function checkChildAge(num, yearVal) {
+        const year = parseInt(yearVal);
+        if (!year || year < 1900) return;
+        const age = new Date().getFullYear() - year;
+        const under18 = document.getElementById("childUnder18_" + num);
+        const over18 = document.getElementById("childOver18_" + num);
+        if (!under18 || !over18) return;
+        if (age >= 18) {
+          under18.style.display = "none";
+          over18.style.display = "block";
+        } else {
+          under18.style.display = "block";
+          over18.style.display = "none";
+        }
+      }
+
+      function toggleFamily(head) {
+        const body = head.nextElementSibling;
+        const chevron = head.querySelector(".chevron");
+        body.classList.toggle("open");
+        chevron.style.transform = body.classList.contains("open")
+          ? "rotate(180deg)"
+          : "";
+      }
+
+      function addRowToNearestTable(btn) {
+        const tbl = btn.previousElementSibling.querySelector("tbody");
+        if (!tbl) return;
+        const row = tbl.insertRow();
+        row.innerHTML = _famHistRowHtml({
+          from_month: null,
+          from_year: null,
+          to_month: null,
+          to_year: null,
+          is_present: false,
+          description: "",
+        });
+        const acc = btn.closest(".family-accordion");
+        if (acc) validateFamHistory(acc);
+        refreshDienBien(tbl.closest(".timeline-table"));
+      }
+
+      function addRowSpouse(btn) {
+        const tbl = btn.previousElementSibling.querySelector("tbody");
+        if (!tbl) return;
+        const row = tbl.insertRow();
+        row.innerHTML = _famHistRowHtml({
+          from_month: null,
+          from_year: null,
+          to_month: null,
+          to_year: null,
+          is_present: false,
+          description: "",
+        });
+        const acc = btn.closest(".family-accordion");
+        if (acc) validateFamHistory(acc);
+        refreshDienBien(tbl.closest(".timeline-table"));
+      }
+
+      // Thêm cha dượng động
+      let fatherCount = 2;
+      function addFamFather(silent = false) {
+        const cont = document.getElementById("famBlocksFathers");
+        const num = "1." + fatherCount;
+        const ordinal = fatherCount - 1;
+        fatherCount++;
+        const div = document.createElement("div");
+        div.innerHTML = buildFamilyBlockItem(
+          { num, title: `Cha dượng ${ordinal}` },
+          false,
+        );
+        const el = div.firstElementChild;
+        el.dataset.relationship = "cha_duong";
+        const chevron = el.querySelector(".chevron");
+        if (chevron) {
+          const removeBtn = document.createElement("button");
+          removeBtn.innerHTML = "🗑";
+          removeBtn.title = "Xóa thành viên này";
+          removeBtn.style.cssText =
+            "border:none;background:none;cursor:pointer;font-size:14px;padding:4px 6px;color:var(--hint);margin-left:4px;border-radius:4px;transition:all .15s;";
+          removeBtn.onmouseenter = function () {
+            this.style.color = "var(--crimson)";
+            this.style.background = "var(--crimson-xl)";
+          };
+          removeBtn.onmouseleave = function () {
+            this.style.color = "var(--hint)";
+            this.style.background = "none";
+          };
+          removeBtn.onclick = function (e) {
+            e.stopPropagation();
+            const acc = this.closest(".family-accordion");
+            if (acc) {
+              acc.style.transition = "all .25s";
+              acc.style.opacity = "0";
+              acc.style.transform = "translateY(-6px)";
+              setTimeout(() => acc.remove(), 260);
+            }
+          };
+          chevron.parentNode.insertBefore(removeBtn, chevron);
+        }
+        cont.appendChild(el);
+        attachFamilyLocationSearch(num);
+        if (!silent) {
+          setTimeout(
+            () => el.scrollIntoView({ behavior: "smooth", block: "nearest" }),
+            80,
+          );
+          showToast("✓ Đã thêm cha dượng");
+        }
+      }
+
+      // Thêm mẹ kế động
+      let motherCount = 2;
+      function addFamMother(silent = false) {
+        const cont = document.getElementById("famBlocksMother");
+        const num = "2." + motherCount;
+        const ordinal = motherCount - 1;
+        motherCount++;
+        const div = document.createElement("div");
+        div.innerHTML = buildFamilyBlockItem(
+          { num, title: `Mẹ kế ${ordinal}` },
+          false,
+        );
+        const el = div.firstElementChild;
+        el.dataset.relationship = "me_ke";
+        const chevron = el.querySelector(".chevron");
+        if (chevron) {
+          const removeBtn = document.createElement("button");
+          removeBtn.innerHTML = "🗑";
+          removeBtn.title = "Xóa thành viên này";
+          removeBtn.style.cssText =
+            "border:none;background:none;cursor:pointer;font-size:14px;padding:4px 6px;color:var(--hint);margin-left:4px;border-radius:4px;transition:all .15s;";
+          removeBtn.onmouseenter = function () {
+            this.style.color = "var(--crimson)";
+            this.style.background = "var(--crimson-xl)";
+          };
+          removeBtn.onmouseleave = function () {
+            this.style.color = "var(--hint)";
+            this.style.background = "none";
+          };
+          removeBtn.onclick = function (e) {
+            e.stopPropagation();
+            const acc = this.closest(".family-accordion");
+            if (acc) {
+              acc.style.transition = "all .25s";
+              acc.style.opacity = "0";
+              acc.style.transform = "translateY(-6px)";
+              setTimeout(() => acc.remove(), 260);
+            }
+          };
+          chevron.parentNode.insertBefore(removeBtn, chevron);
+        }
+        cont.appendChild(el);
+        attachFamilyLocationSearch(num);
+        if (!silent) {
+          setTimeout(
+            () => el.scrollIntoView({ behavior: "smooth", block: "nearest" }),
+            80,
+          );
+          showToast("✓ Đã thêm mẹ kế");
+        }
+      }
+
+      // Thêm anh/chị/em ruột động
+      let sibCount = 4;
+      function addFamSibling(silent = false) {
+        const cont = document.getElementById("famBlocks");
+        const num = "3." + sibCount;
+        const ordinal = sibCount - 1;
+        sibCount++;
+        const div = document.createElement("div");
+        div.innerHTML = buildFamilyBlockItem(
+          { num, title: `Anh/Chị/Em ruột thứ ${ordinal}`, sibling: true },
+          false,
+        );
+        const el = div.firstElementChild;
+        // Add remove button to header
+        const chevron = el.querySelector(".chevron");
+        if (chevron) {
+          const removeBtn = document.createElement("button");
+          removeBtn.innerHTML = "🗑";
+          removeBtn.title = "Xóa thành viên này";
+          removeBtn.style.cssText =
+            "border:none;background:none;cursor:pointer;font-size:14px;padding:4px 6px;color:var(--hint);margin-left:4px;border-radius:4px;transition:all .15s;";
+          removeBtn.onmouseenter = function () {
+            this.style.color = "var(--crimson)";
+            this.style.background = "var(--crimson-xl)";
+          };
+          removeBtn.onmouseleave = function () {
+            this.style.color = "var(--hint)";
+            this.style.background = "none";
+          };
+          removeBtn.onclick = function (e) {
+            e.stopPropagation();
+            const acc = this.closest(".family-accordion");
+            if (acc) {
+              acc.style.transition = "all .25s";
+              acc.style.opacity = "0";
+              acc.style.transform = "translateY(-6px)";
+              setTimeout(() => acc.remove(), 260);
+            }
+          };
+          chevron.parentNode.insertBefore(removeBtn, chevron);
+        }
+        el.dataset.relationship = "anh_chi_em_ruot";
+        cont.appendChild(el);
+        attachFamilyLocationSearch(num);
+        if (!silent) {
+          setTimeout(
+            () => el.scrollIntoView({ behavior: "smooth", block: "nearest" }),
+            80,
+          );
+          showToast("✓ Đã thêm thành viên mới");
+        }
+      }
+
+      // Thêm anh/chị/em chồng/vợ động
+      let sibSpouseCount = 3;
+      function addFamSiblingSpouse(silent = false) {
+        const cont = document.getElementById("famBlocks3");
+        const num = "13." + sibSpouseCount;
+        const ordinal = sibSpouseCount - 1;
+        sibSpouseCount++;
+        const div = document.createElement("div");
+        div.innerHTML = buildFamilyBlockItem(
+          { num, title: `Anh/Chị/Em chồng (vợ) thứ ${ordinal}`, sibling: true },
+          false,
+        );
+        const el = div.firstElementChild;
+        const chevron = el.querySelector(".chevron");
+        if (chevron) {
+          const removeBtn = document.createElement("button");
+          removeBtn.innerHTML = "🗑";
+          removeBtn.title = "Xóa thành viên này";
+          removeBtn.style.cssText =
+            "border:none;background:none;cursor:pointer;font-size:14px;padding:4px 6px;color:var(--hint);margin-left:4px;border-radius:4px;transition:all .15s;";
+          removeBtn.onmouseenter = function () {
+            this.style.color = "var(--crimson)";
+            this.style.background = "var(--crimson-xl)";
+          };
+          removeBtn.onmouseleave = function () {
+            this.style.color = "var(--hint)";
+            this.style.background = "none";
+          };
+          removeBtn.onclick = function (e) {
+            e.stopPropagation();
+            const acc = this.closest(".family-accordion");
+            if (acc) {
+              acc.style.transition = "all .25s";
+              acc.style.opacity = "0";
+              acc.style.transform = "translateY(-6px)";
+              setTimeout(() => acc.remove(), 260);
+            }
+          };
+          chevron.parentNode.insertBefore(removeBtn, chevron);
+        }
+        el.dataset.relationship = "anh_chi_em_chong_vo";
+        cont.appendChild(el);
+        attachFamilyLocationSearch(num);
+        if (!silent) {
+          setTimeout(
+            () => el.scrollIntoView({ behavior: "smooth", block: "nearest" }),
+            80,
+          );
+          showToast("✓ Đã thêm thành viên mới");
+        }
+      }
+
+      function buildFamilyBlockItem(m, isFirst) {
+        return `<div class="family-accordion">
+    <div class="family-head" onclick="toggleFamily(this)">
+      <div class="fam-num">${m.num}</div>
+      <div class="fam-info"><strong>${m.title}</strong><span class="fam-name" id="famName_${m.num}">Chưa điền thông tin</span></div>
+      <span class="chevron">▾</span>
+    </div>
+    <div class="family-body ${isFirst ? "open" : ""}">
+      ${buildFamilyForm(m)}
+    </div>
+  </div>`;
+      }
+
+      // Build family sections
+      buildFamilyBlock(document.getElementById("famBlocksFathers"), [
+        { num: "1", title: "Cha ruột" },
+      ]);
+      buildFamilyBlock(document.getElementById("famBlocksMother"), [
+        { num: "2", title: "Mẹ ruột" },
+      ]);
+      buildFamilyBlock(document.getElementById("famBlocks"), [
+        { num: "3.1", title: "Anh/Chị/Em ruột thứ 1", sibling: true },
+        { num: "3.2", title: "Anh/Chị/Em ruột thứ 2", sibling: true },
+        { num: "3.3", title: "Anh/Chị/Em ruột thứ 3", sibling: true },
+      ]);
+      buildFamilyBlock(document.getElementById("famBlocksSpouse"), [
+        { num: "10", title: "Chồng / Vợ", spouse: true },
+        { num: "11", title: "Con ruột (1)", child: true },
+        { num: "12", title: "Con ruột (2)", child: true },
+      ]);
+
+      buildFamilyBlock(document.getElementById("famBlocks2"), [
+        { num: "4", title: "Ông nội", grandparent: true },
+        { num: "5", title: "Bà nội", grandparent: true },
+        { num: "6", title: "Ông ngoại", grandparent: true },
+        { num: "7", title: "Bà ngoại", grandparent: true },
+      ]);
+
+      buildFamilyBlock(document.getElementById("famBlocks3"), [
+        { num: "8", title: "Cha chồng (vợ)" },
+        { num: "9", title: "Mẹ chồng (vợ)" },
+        { num: "13.1", title: "Anh/Chị/Em chồng (vợ) thứ 1", sibling: true },
+        { num: "13.2", title: "Anh/Chị/Em chồng (vợ) thứ 2", sibling: true },
+      ]);
+
+      buildFamilyBlock(document.getElementById("famBlocks4"), [
+        { num: "14", title: "Ông nội chồng (vợ)", grandparent: true },
+        { num: "15", title: "Bà nội chồng (vợ)", grandparent: true },
+        { num: "16", title: "Ông ngoại chồng (vợ)", grandparent: true },
+        { num: "17", title: "Bà ngoại chồng (vợ)", grandparent: true },
+      ]);
+
+      // ===== SUBMIT =====
+      function submitForm() {
+        if (
+          !validateOtherField("danToc", "danTocKhac") ||
+          !validateOtherField("tonGiao", "tonGiaoKhac")
+        ) {
+          showSection(0);
+          showToast("⚠ Vui lòng điền thông tin bắt buộc ở Phần A");
+          return;
+        }
+        if (!document.getElementById("camDoan").checked) {
+          alert("Vui lòng xác nhận cam đoan trước khi nộp hồ sơ.");
+          return;
+        }
+        // Validate all family history timelines before submit
+        let histInvalid = false;
+        document
+          .querySelectorAll(".family-accordion[data-relationship]")
+          .forEach((acc) => {
+            const tbl = acc.querySelector(".timeline-table");
+            if (tbl && !validateFamHistory(acc)) histInvalid = true;
+          });
+        if (!validateSecB()) histInvalid = true;
+        if (!validateSecC()) histInvalid = true;
+        if (histInvalid) {
+          showToast(
+            "⚠ Quá trình lịch sử chưa liên tục — vui lòng kiểm tra lại trước khi nộp",
+          );
+          // Scroll to first invalid row
+          const firstInvalid = document.querySelector(
+            ".fhd-row-invalid, .tl-row-invalid",
+          );
+          if (firstInvalid)
+            firstInvalid.scrollIntoView({
+              behavior: "smooth",
+              block: "center",
+            });
+          return;
+        }
+        (async () => {
+          try {
+            showToast("⏳ Đang lưu và nộp hồ sơ…");
+
+            // Step 1: Save main profile fields (A)
+            const savedResp = await API.put(
+              "/profiles/my/",
+              _collectFormData(),
+            );
+            const savedData = savedResp?.data || savedResp || {};
+            if (savedData?.id) window._profileId = savedData.id;
+
+            // If still no profileId, try GET my profile to retrieve it
+            if (!window._profileId) {
+              const myP = await API.get("/profiles/my/");
+              const pd = myP?.data || myP || {};
+              if (pd?.id) window._profileId = pd.id;
+            }
+
+            if (!window._profileId) {
+              showToast("✗ Không xác định được hồ sơ, vui lòng thử lại.");
+              return;
+            }
+
+            // Step 2: Save all sub-sections B–J
+            await _saveAllSections(window._profileId);
+
+            // Step 3: Submit workflow
+            await API.post(`/profiles/${window._profileId}/workflow/`, {
+              action: "submit",
+            });
+            showToast(
+              "✅ Hồ sơ đã nộp thành công! Cán bộ sẽ liên hệ trong 3–5 ngày làm việc.",
+            );
+            await _loadMyProfile();
+          } catch (e) {
+            showToast("✗ Nộp hồ sơ thất bại: " + e.message);
+          }
+        })();
+      }
+
+      /* ═══════════════════════════════════════════════════════════════
+   FULL CRUD — Load + Save sections B/C/E/F/G/H/I from/to backend
+   Fixes: data lost on refresh, DOCX sections B–J empty
+═══════════════════════════════════════════════════════════════ */
+
+      // ── num → relationship (for family accordion annotation) ─────────
+      const _NUM_TO_REL = {
+        1: "cha_ruot",
+        2: "me_ruot",
+        4: "ong_noi",
+        5: "ba_noi",
+        6: "ong_ngoai",
+        7: "ba_ngoai",
+        8: "cha_chong_vo",
+        9: "me_chong_vo",
+        10: "vo_chong",
+        11: "con",
+        12: "con",
+        14: "ong_noi_chong_vo",
+        15: "ba_noi_chong_vo",
+        16: "ong_ngoai_chong_vo",
+        17: "ba_ngoai_chong_vo",
+      };
+      function _annotateAccordions() {
+        document.querySelectorAll(".family-accordion").forEach((acc) => {
+          if (acc.dataset.relationship) return;
+          const num = (acc.querySelector(".fam-num")?.textContent || "").trim();
+          let rel = _NUM_TO_REL[num];
+          if (!rel && num.startsWith("1.")) {
+            rel = num === "1.0" || num === "1" ? "cha_ruot" : "cha_duong";
+          }
+          if (!rel && num.startsWith("2.")) {
+            rel = num === "2.0" || num === "2" ? "me_ruot" : "me_ke";
+          }
+          if (!rel && num.startsWith("3.")) rel = "anh_chi_em_ruot";
+          if (!rel && num.startsWith("13.")) rel = "anh_chi_em_chong_vo";
+          if (rel) acc.dataset.relationship = rel;
+        });
+      }
+      _annotateAccordions();
+
+      // Server IDs loaded per section (to detect deletes)
+      const _srvIds = {
+        B: new Set(),
+        C: new Set(),
+        E: new Set(),
+        F: new Set(),
+        G: new Set(),
+        H: new Set(),
+      };
+
+      // ── Cell read helpers ────────────────────────────────────────────
+      function _getMmYr(td) {
+        return {
+          month: parseInt(td.querySelector(".mm-month")?.value) || null,
+          year: parseInt(td.querySelector(".mm-year")?.value) || null,
+        };
+      }
+      function _tdv(td) {
+        const ta = td.querySelector("textarea");
+        if (ta) return ta.value || "";
+        const i = td.querySelector("input[type=text],input:not([type])");
+        return i?.value || "";
+      }
+      function _mmCell(m, y) {
+        const opts = ["", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+          .map(
+            (v) =>
+              `<option value="${v}"${String(v) === String(m || "") ? "  selected" : ""}>${v || "MM"}</option>`,
+          )
+          .join("");
+        return (
+          `<div class="mmyyyy-wrap"><select class="mm-month">${opts}</select>` +
+          `<span class="mmyyyy-slash">/</span>` +
+          `<input class="mm-year" type="number" placeholder="YYYY" min="1900" max="2099" step="1" value="${y || ""}"></div>`
+        );
+      }
+
+      // ── Populate table from API rows ─────────────────────────────────
+      function _fillTbB(rows) {
+        const tb = document.getElementById("tbB-body");
+        if (!tb) return;
+        _srvIds.B.clear();
+        if (!rows || !rows.length) return;
+        tb.innerHTML = "";
+        rows.forEach((r) => {
+          _srvIds.B.add(String(r.id));
+          const tr = tb.insertRow();
+          tr.dataset.id = r.id;
+          tr.innerHTML =
+            `<td>${_mmCell(r.from_month, r.from_year)}</td>` +
+            `<td>${_mmCell(r.to_month, r.to_year)}</td>` +
+            `<td class="td-dienbien"><input type="text" value="${_esc(r.description || "")}"></td>` +
+            `<td><button class="del-btn" onclick="delRow(this)">✕</button></td>`;
+        });
+        tb.querySelectorAll(".td-dienbien").forEach((td) => {
+          if (!td.dataset.db) initDienBien(td);
+        });
+      }
+
+      function _fillTbC(rows) {
+        const tb = document.getElementById("tbC-body");
+        if (!tb || !rows || !rows.length) return;
+        _srvIds.C.clear();
+        tb.innerHTML = "";
+        rows.forEach((r) => {
+          _srvIds.C.add(String(r.id));
+          const isPresent = !!r.is_present;
+          const fromVal = _fmtMY(r.from_month, r.from_year);
+          const toVal = isPresent ? "" : _fmtMY(r.to_month, r.to_year);
+          const toDisabled = isPresent ? " disabled" : "";
+          const toPlaceholder = isPresent ? "Hiện tại" : "MM/YYYY";
+          const chk = isPresent ? " checked" : "";
+          const tr = tb.insertRow();
+          tr.dataset.id = r.id;
+          tr.innerHTML =
+            `<td><input class="fhd-input" type="text" placeholder="MM/YYYY" maxlength="7" value="${_esc(fromVal)}"></td>` +
+            `<td class="fhd-to-cell"><div class="fhd-to-inner"><input class="fhd-input fhd-to-txt" type="text" maxlength="7"${toDisabled} placeholder="${toPlaceholder}" value="${_esc(toVal)}"><label class="fhd-present-wrap" title="Đến nay"><input type="checkbox" class="fhd-present-chk"${chk} onchange="toggleFhdPresent(this)"> Nay</label></div></td>` +
+            `<td class="td-dienbien"><input type="text" value="${_esc(r.employer || "")}"></td>` +
+            `<td><input type="text" value="${_esc(r.job_title || "")}"></td>` +
+            `<td><button class="del-btn" onclick="delRow(this)">✕</button></td>`;
+        });
+        tb.querySelectorAll(".td-dienbien").forEach((td) => {
+          if (!td.dataset.db) initDienBien(td);
+        });
+        validateSecC();
+      }
+
+      function _fillTbE(rows) {
+        const tb = document.getElementById("tbE-body");
+        if (!tb || !rows || !rows.length) return;
+        _srvIds.E.clear();
+        tb.innerHTML = "";
+        rows.forEach((r) => {
+          _srvIds.E.add(String(r.id));
+          const tr = tb.insertRow();
+          tr.dataset.id = r.id;
+          tr.innerHTML =
+            `<td><input type="text" value="${_esc(r.school || "")}"></td>` +
+            `<td><input type="text" value="${_esc(r.major || "")}"></td>` +
+            `<td><input type="text" value="${_esc(r.period_text || "")}"></td>` +
+            `<td><input type="text" value="${_esc(r.certificate || "")}"></td>` +
+            `<td><button class="del-btn" onclick="delRow(this)">✕</button></td>`;
+        });
+      }
+
+      function _fillTbF(rows) {
+        const tb = document.getElementById("tbF-body");
+        if (!tb || !rows || !rows.length) return;
+        _srvIds.F.clear();
+        tb.innerHTML = "";
+        rows.forEach((r) => {
+          _srvIds.F.add(String(r.id));
+          const tr = tb.insertRow();
+          tr.dataset.id = r.id;
+          tr.innerHTML =
+            `<td><input type="text" value="${_esc(r.period_text || "")}"></td>` +
+            `<td><input type="text" value="${_esc(r.purpose || "")}"></td>` +
+            `<td><input type="text" value="${_esc(r.country || "")}"></td>` +
+            `<td><button class="del-btn" onclick="delRow(this)">✕</button></td>`;
+        });
+      }
+
+      function _fillTbAwards(tbId, rows, secKey) {
+        const tb = document.getElementById(tbId);
+        if (!tb || !rows || !rows.length) return;
+        _srvIds[secKey].clear();
+        tb.innerHTML = "";
+        rows.forEach((r) => {
+          _srvIds[secKey].add(String(r.id));
+          const per = r.issued_month
+            ? `${r.issued_month}/${r.issued_year || ""}`
+            : String(r.issued_year || "");
+          const tr = tb.insertRow();
+          tr.dataset.id = r.id;
+          tr.innerHTML =
+            `<td><input type="text" value="${_esc(per)}"></td>` +
+            `<td><input type="text" value="${_esc(r.content || "")}"></td>` +
+            `<td><input type="text" value="${_esc(r.level || "")}"></td>` +
+            `<td><button class="del-btn" onclick="delRow(this)">✕</button></td>`;
+        });
+      }
+
+      // ── Collect data from tables ─────────────────────────────────────
+      function _collB() {
+        return [...document.querySelectorAll("#tbB-body tr")].flatMap((tr) => {
+          const c = tr.cells;
+          if (!c || c.length < 4) return [];
+          const f = _getMmYr(c[0]),
+            t = _getMmYr(c[1]),
+            d = _tdv(c[2]);
+          if (!d.trim()) return [];
+          return [
+            {
+              id: tr.dataset.id || null,
+              entry_type: "self",
+              from_month: f.month,
+              from_year: f.year,
+              to_month: t.month,
+              to_year: t.year,
+              description: d,
+              sort_order: tr.rowIndex,
+            },
+          ];
+        });
+      }
+      function _collC() {
+        return [...document.querySelectorAll("#tbC-body tr")].flatMap((tr) => {
+          const c = tr.cells;
+          if (!c || c.length < 4) return [];
+          const fromVal = _getMMyyyy(c[0]) || "";
+          const toWrap = c[1]?.querySelector(".mmyyyy-wrap");
+          const toInput = c[1]?.querySelector(".fhd-to-txt");
+          const toVal = toWrap
+            ? _getMMyyyy(c[1])
+            : toInput?.value?.trim() || "";
+          const isPresent = !!c[1]?.querySelector(".fhd-present-chk")?.checked;
+          const emp = _tdv(c[2]);
+          const title = c.length > 4 ? _tdv(c[3]) : "";
+          if (!emp) return [];
+          const fp = _parseMY(fromVal);
+          const tp = isPresent ? null : _parseMY(toVal);
+          return [
+            {
+              id: tr.dataset.id || null,
+              from_year: fp?.year || null,
+              from_month: fp?.month || null,
+              to_year: tp?.year || null,
+              to_month: tp?.month || null,
+              is_present: isPresent,
+              employer: emp,
+              job_title: title || null,
+              sort_order: tr.rowIndex,
+            },
+          ];
+        });
+      }
+      function _collE() {
+        return [...document.querySelectorAll("#tbE-body tr")].flatMap((tr) => {
+          const c = tr.cells;
+          if (!c || c.length < 5) return [];
+          const s = _tdv(c[0]),
+            m = _tdv(c[1]),
+            p = _tdv(c[2]),
+            cert = _tdv(c[3]);
+          if (!s) return [];
+          return [
+            {
+              id: tr.dataset.id || null,
+              school: s,
+              major: m,
+              period_text: p,
+              certificate: cert,
+            },
+          ];
+        });
+      }
+      function _collF() {
+        return [...document.querySelectorAll("#tbF-body tr")].flatMap((tr) => {
+          const c = tr.cells;
+          if (!c || c.length < 4) return [];
+          const p = _tdv(c[0]),
+            pur = _tdv(c[1]),
+            cou = _tdv(c[2]);
+          if (!cou) return [];
+          return [
+            {
+              id: tr.dataset.id || null,
+              period_text: p,
+              purpose: pur,
+              country: cou,
+            },
+          ];
+        });
+      }
+      function _collAwards(tbodyId, type) {
+        return [...document.querySelectorAll(`#${tbodyId} tr`)].flatMap(
+          (tr) => {
+            const c = tr.cells;
+            if (!c || c.length < 4) return [];
+            const per = _tdv(c[0]),
+              cont = _tdv(c[1]),
+              lv = _tdv(c[2]);
+            if (!cont) return [];
+            let im = null,
+              iy = null;
+            const mm = per.match(/^(\d{1,2})\/(\d{4})/);
+            if (mm) {
+              im = parseInt(mm[1]);
+              iy = parseInt(mm[2]);
+            } else {
+              const y = parseInt(per);
+              if (y > 1900) iy = y;
+            }
+            return [
+              {
+                id: tr.dataset.id || null,
+                type,
+                issued_month: im,
+                issued_year: iy,
+                content: cont,
+                level: lv,
+              },
+            ];
+          },
+        );
+      }
+
+      // ── Smart sync: POST new, PATCH existing, DELETE removed ─────────
+      async function _syncSec(endpoint, srvIdSet, currentRows) {
+        const currentIds = new Set(
+          currentRows.filter((r) => r.id).map((r) => String(r.id)),
+        );
+        for (const id of srvIdSet) {
+          if (!currentIds.has(id)) {
+            try {
+              await API.del(`${endpoint}${id}/`);
+            } catch (e) {
+              console.warn("[SYNC DEL]", id, e.message);
+            }
+          }
+        }
+        for (const row of currentRows) {
+          const { id, ...data } = row;
+          try {
+            if (id) await API.patch(`${endpoint}${id}/`, data);
+            else await API.post(endpoint, data);
+          } catch (e) {
+            console.warn("[SYNC UPSERT]", e.message, row);
+          }
+        }
+      }
+
+      // ── Family accordion: read form fields ──────────────────────────
+      function _readAccordion(acc) {
+        const rel = acc.dataset.relationship;
+        if (!rel) return null;
+        const body = acc.querySelector(".family-body");
+        if (!body) return null;
+        const ni = body.querySelector('input[oninput*="updateFamName"]');
+        const fullName = (ni?.value || "").trim();
+        if (!fullName) return null;
+        let birthYear = null;
+        for (const inp of body.querySelectorAll('input[placeholder="YYYY"]')) {
+          if (
+            inp.closest(".timeline-table") ||
+            inp.closest('[id^="sibDeceased_"]')
+          )
+            continue;
+          const v = parseInt(inp.value);
+          if (v >= 1900 && v <= 2050) {
+            birthYear = v;
+            break;
+          }
+        }
+        const addrStreetInp = body.querySelector("input.fam-addr-street");
+        const addrHamletInp = body.querySelector("input.fam-addr-hamlet");
+        const addrStreet = (addrStreetInp?.value || "").trim();
+        const addrHamlet = (addrHamletInp?.value || "").trim();
+        const { provinceSelect: addrProvinceSel, wardSelect: addrWardSel } =
+          getFamilyCurrentLocationSelects(body) || {};
+        const addrProvince = addrProvinceSel
+          ? (addrProvinceSel.selectedOptions[0]?.text || "")
+              .replace(/^--.*--$/, "")
+              .trim()
+          : "";
+        const addrWard = addrWardSel
+          ? (addrWardSel.selectedOptions[0]?.text || "")
+              .replace(/^--.*--$/, "")
+              .trim()
+          : "";
+        const addr =
+          [addrStreet, addrHamlet, addrWard, addrProvince].filter(Boolean).join(", ") || null;
+        let occ = null;
+        body.querySelectorAll(".form-row").forEach((row) => {
+          const lbl = (row.querySelector("label")?.textContent || "")
+            .replace(/[✱*]/g, "")
+            .trim()
+            .toLowerCase();
+          if (lbl.includes("nghề nghiệp") && !occ) {
+            const i = row.querySelector("input[type=text],input:not([type])");
+            if (i) occ = i.value.trim() || null;
+          }
+        });
+        const pSel = body.querySelector(
+          'select[onchange*="toggleSiblingParty"],select[onchange*="famParty"],select[onchange*="gpParty"],select[onchange*="spouseParty"]',
+        );
+        const isParty = pSel ? pSel.value === "yes" : false;
+        let partyYear = null,
+          chiBoVal = null,
+          partyAwards = null,
+          partyYearsCount = null;
+        if (isParty) {
+          const pbox = body.querySelector(".party-detail-box");
+          if (pbox) {
+            const yi = pbox.querySelector('input[placeholder*="YYYY"]');
+            partyYear = parseInt(yi?.value) || null;
+            const ci = pbox.querySelector('input[placeholder*="Chi bộ"]');
+            chiBoVal = ci?.value.trim() || null;
+            const ai = pbox.querySelector('input[placeholder*="Huy hiệu"]');
+            partyAwards = ai?.value.trim() || null;
+            const yci = pbox.querySelector(
+              'input[type="number"][placeholder="0"]',
+            );
+            partyYearsCount = parseInt(yci?.value) || null;
+          }
+        }
+        const birthPlaceInp = body.querySelector(".fam-text-birth-place");
+        const birthPlace = (birthPlaceInp?.value || "").trim() || null;
+        const hometownInp = body.querySelector(".fam-text-hometown");
+        const hometown = (hometownInp?.value || "").trim() || null;
+        const religiousRankInp = body.querySelector("input.fam-religious-rank");
+        const religiousRankText =
+          (religiousRankInp?.value || "").trim() || null;
+        const ethnicSel = body.querySelector("select.fam-sel-ethnic");
+        const ethnicTxt = body.querySelector("input.fam-sel-ethnic-text");
+        let ethnicGroupText = null;
+        if (ethnicSel && ethnicSel.value === "Khác") {
+          const eRow = ethnicSel.closest(".form-row");
+          const khacInp = eRow?.querySelector(".fam-sel-khac-other");
+          ethnicGroupText = (khacInp?.value || "").trim() || "Khác";
+        } else {
+          ethnicGroupText =
+            (ethnicSel?.value || ethnicTxt?.value || "").trim() || null;
+        }
+        const religionSel = body.querySelector("select.fam-sel-religion");
+        const religionTxt = body.querySelector("input.fam-sel-religion-text");
+        let religionText = null;
+        if (religionSel && religionSel.value === "Khác") {
+          const rRow = religionSel.closest(".form-row");
+          const khacInp = rRow?.querySelector(".fam-sel-khac-other");
+          religionText = (khacInp?.value || "").trim() || "Khác";
+        } else {
+          religionText =
+            (religionSel?.value || religionTxt?.value || "").trim() || null;
+        }
+        const nationalityInp = body.querySelector(
+          "input.fam-nationality-input",
+        );
+        const nationality = (nationalityInp?.value || "").trim() || null;
+        // Gender
+        let gender = null;
+        body.querySelectorAll("select").forEach((s) => {
+          if (
+            ["Nam", "Nữ"].some((v) =>
+              [...s.options].find((o) => o.value === v || o.text === v),
+            )
+          ) {
+            if (s.value && s.value !== "--") gender = s.value;
+          }
+        });
+        // Deceased
+        const decChk = body.querySelector(".sib-deceased-chk");
+        const isDeceased = decChk ? decChk.checked : false;
+        let deceasedYear = null;
+        if (isDeceased) {
+          const num = (acc.querySelector(".fam-num")?.textContent || "").trim();
+          const decDiv = document.getElementById("sibDeceased_" + num);
+          if (decDiv) {
+            const dyInp = decDiv.querySelector('input[type="number"]');
+            deceasedYear = parseInt(dyInp?.value) || null;
+          }
+        }
+        const allSameRel = [
+          ...document.querySelectorAll(
+            `.family-accordion[data-relationship="${rel}"]`,
+          ),
+        ];
+        const accIdx = allSameRel.indexOf(acc);
+        // For siblings: sort_order = count of filled preceding siblings (not raw DOM index),
+        // so that adding a sibling via button while static slots are empty still saves
+        // sort_order=1 (not 3), keeping the data compact and near the top of the section.
+        const seqRels = new Set(["anh_chi_em_ruot", "anh_chi_em_chong_vo"]);
+        let sortOrder;
+        if (seqRels.has(rel)) {
+          sortOrder = allSameRel.slice(0, accIdx).filter((a) => {
+            const ni = a.querySelector('input[oninput*="updateFamName"]');
+            return (ni?.value || "").trim().length > 0;
+          }).length;
+        } else {
+          sortOrder = accIdx;
+        }
+        return {
+          id: acc.dataset.familyId || null,
+          relationship: rel,
+          sort_order: sortOrder >= 0 ? sortOrder : 0,
+          full_name: fullName,
+          birth_year: birthYear,
+          gender: gender,
+          birth_place: birthPlace,
+          hometown: hometown,
+          ethnic_group_text: ethnicGroupText,
+          religion_text: religionText,
+          religious_rank_text: religiousRankText,
+          current_address: isDeceased ? null : addr,
+          occupation: isDeceased ? null : occ,
+          nationality: nationality,
+          is_party_member: isParty,
+          party_join_year: partyYear,
+          party_chi_bo: chiBoVal,
+          party_awards_text: partyAwards,
+          party_years_count: partyYearsCount,
+          is_deceased: isDeceased,
+          deceased_year: deceasedYear,
+        };
+      }
+
+      function normalizeAddressValue(value) {
+        return (value || "")
+          .normalize("NFD")
+          .replace(/[̀-ͯ]/g, "")
+          .replace(/đ/g, "d")
+          .replace(/Đ/g, "D")
+          .replace(/[ -]/g, "")
+          .trim()
+          .toLowerCase();
+      }
+
+      function normalizeVietnameseText(value) {
+        return (value || "")
+          .normalize("NFD")
+          .replace(/[̀-ͯ]/g, "")
+          .replace(/đ/g, "d")
+          .replace(/Đ/g, "D")
+          .trim()
+          .toLowerCase();
+      }
+
+      function getFamilyCurrentLocationSelects(body) {
+        if (!body) return null;
+        const streetInput = body.querySelector("input.fam-addr-street");
+        if (!streetInput) return null;
+        const row = streetInput.closest(".form-row");
+        if (!row) return null;
+        const locRow = row.querySelector(".loc-row");
+        if (!locRow) return null;
+        const provinceSelect = locRow.querySelector("select[id^='sel_tinh_fam_']");
+        const wardSelect = locRow.querySelector("select[id^='sel_xa_fam_']");
+        if (!provinceSelect || !wardSelect) return null;
+        return { provinceSelect, wardSelect };
+      }
+
+      function findProvinceCodeByName(name) {
+        if (!name) return "";
+        const normalizedName = normalizeVietnameseText(name);
+        const province = provinceList.find((p) =>
+          normalizeVietnameseText(p.name) === normalizedName,
+        );
+        return province?.code || "";
+      }
+
+      async function setFamilyCurrentLocationFromAddress(body, combined) {
+        if (!combined) return;
+        const { provinceSelect, wardSelect } =
+          getFamilyCurrentLocationSelects(body) || {};
+        if (!provinceSelect || !wardSelect) return;
+        const parts = combined.split(/\s*,\s*/).filter(Boolean);
+        if (parts.length < 2) return;
+        const provinceText = parts[parts.length - 1];
+        const wardText = parts[parts.length - 2];
+        const provinceCode = findProvinceCodeByName(provinceText);
+        if (!provinceCode) return;
+        provinceSelect.value = provinceCode;
+        await onProvinceChange(provinceSelect, wardSelect);
+        const wardOption = [...wardSelect.options].find(
+          (opt) =>
+            normalizeVietnameseText(opt.textContent) ===
+            normalizeVietnameseText(wardText),
+        );
+        if (wardOption) {
+          wardSelect.value = wardOption.value;
+        }
+      }
+
+      // ── Family accordion: populate from API member ───────────────────
+      function _fillAccordion(acc, m) {
+        if (!m || !acc) return;
+        acc.dataset.familyId = String(m.id);
+        // Update the accordion title.
+        const titleEl = acc.querySelector(".fam-info strong");
+        if (titleEl) {
+          const rel = acc.dataset.relationship;
+          let newTitle = null;
+          if (rel === "cha_ruot" || rel === "cha_duong") {
+            const allFathers = [
+              ...document.querySelectorAll(
+                "#famBlocksFathers .family-accordion",
+              ),
+            ];
+            const idx = allFathers.indexOf(acc);
+            newTitle = idx === 0 ? "Cha ruột" : `Cha dượng ${idx}`;
+          } else if (rel === "me_ruot" || rel === "me_ke") {
+            const allMothers = [
+              ...document.querySelectorAll(
+                "#famBlocksMother .family-accordion",
+              ),
+            ];
+            const idx = allMothers.indexOf(acc);
+            newTitle = idx === 0 ? "Mẹ ruột" : `Mẹ kế ${idx}`;
+          } else if (
+            rel === "anh_chi_em_ruot" ||
+            rel === "anh_chi_em_chong_vo"
+          ) {
+            const allRel = [
+              ...document.querySelectorAll(
+                `.family-accordion[data-relationship="${rel}"]`,
+              ),
+            ];
+            const slotIdx = allRel.indexOf(acc);
+            if (slotIdx >= 0) {
+              if (rel === "anh_chi_em_ruot")
+                newTitle = `Anh/Chị/Em ruột thứ ${slotIdx + 1}`;
+              else newTitle = `Anh/Chị/Em chồng (vợ) thứ ${slotIdx + 1}`;
+            }
+          }
+          if (newTitle) titleEl.textContent = newTitle;
+        }
+        const body = acc.querySelector(".family-body");
+        if (!body) return;
+        const ni = body.querySelector('input[oninput*="updateFamName"]');
+        if (ni) {
+          ni.value = m.full_name || "";
+          ni.dispatchEvent(new Event("input"));
+        }
+        for (const inp of body.querySelectorAll('input[placeholder="YYYY"]')) {
+          if (
+            inp.closest(".timeline-table") ||
+            inp.closest('[id^="sibDeceased_"]')
+          )
+            continue;
+          if (!parseInt(inp.value)) {
+            inp.value = m.birth_year || "";
+            break;
+          }
+        }
+        // For child accordions: show over-18 fields when birth year >= 18 years ago
+        if (m.birth_year) {
+          const numEl = acc.querySelector(".fam-num");
+          const num = (numEl?.textContent || "").trim();
+          if (num && document.getElementById("childOver18_" + num)) {
+            checkChildAge(num, m.birth_year);
+          }
+        }
+        const addrStreetFill = body.querySelector("input.fam-addr-street");
+        const addrHamletFill = body.querySelector("input.fam-addr-hamlet");
+        if (addrStreetFill) {
+          const combined = m.current_address || "";
+          if (combined && addrHamletFill) {
+            const parts = combined.split(/\s*,\s*/).filter(Boolean);
+            let streetValue = combined;
+            let hamletValue = "";
+            if (parts.length >= 4) {
+              hamletValue = parts[parts.length - 3];
+              streetValue = parts.slice(0, parts.length - 3).join(", ");
+            } else if (parts.length === 3) {
+              streetValue = parts[0];
+              hamletValue = parts[1];
+            } else if (parts.length === 2) {
+              streetValue = parts[0];
+              hamletValue = parts[1];
+            }
+            addrStreetFill.value = streetValue;
+            addrHamletFill.value = hamletValue;
+            setFamilyCurrentLocationFromAddress(body, combined).catch(() => {});
+          } else {
+            addrStreetFill.value = combined;
+          }
+        }
+        const bpInp = body.querySelector(".fam-text-birth-place");
+        if (bpInp) {
+          bpInp.value = m.birth_place || "";
+          if (bpInp.tagName === "TEXTAREA") {
+            bpInp.style.height = "auto";
+            bpInp.style.height = bpInp.scrollHeight + "px";
+          }
+        }
+        const htInp = body.querySelector(".fam-text-hometown");
+        if (htInp) {
+          htInp.value = m.hometown || "";
+          if (htInp.tagName === "TEXTAREA") {
+            htInp.style.height = "auto";
+            htInp.style.height = htInp.scrollHeight + "px";
+          }
+        }
+        const rrInp = body.querySelector("input.fam-religious-rank");
+        if (rrInp) rrInp.value = m.religious_rank_text || "";
+        const ethSel = body.querySelector("select.fam-sel-ethnic");
+        if (ethSel && m.ethnic_group_text) {
+          ethSel.value = m.ethnic_group_text;
+          if (!ethSel.value) {
+            ethSel.value = "Khác";
+            const eRow = ethSel.closest(".form-row");
+            const khacInp = eRow?.querySelector(".fam-sel-khac-other");
+            if (khacInp) {
+              khacInp.value = m.ethnic_group_text;
+              khacInp.style.display = "block";
+            }
+          }
+        }
+        const ethTxtInp = body.querySelector("input.fam-sel-ethnic-text");
+        if (ethTxtInp) ethTxtInp.value = m.ethnic_group_text || "";
+        const relSel = body.querySelector("select.fam-sel-religion");
+        if (relSel && m.religion_text) {
+          relSel.value = m.religion_text;
+          if (!relSel.value) {
+            relSel.value = "Khác";
+            const rRow = relSel.closest(".form-row");
+            const khacInp = rRow?.querySelector(".fam-sel-khac-other");
+            if (khacInp) {
+              khacInp.value = m.religion_text;
+              khacInp.style.display = "block";
+            }
+          }
+        }
+        const relTxtInp = body.querySelector("input.fam-sel-religion-text");
+        if (relTxtInp) relTxtInp.value = m.religion_text || "";
+        const natInp = body.querySelector("input.fam-nationality-input");
+        if (natInp) natInp.value = m.nationality || "Việt Nam";
+        // Gender
+        if (m.gender) {
+          body.querySelectorAll("select").forEach((s) => {
+            if (
+              [...s.options].some((o) => o.value === "Nam" || o.text === "Nam")
+            ) {
+              s.value = m.gender;
+            }
+          });
+        }
+        // Deceased
+        const decChkFill = body.querySelector(".sib-deceased-chk");
+        if (decChkFill && m.is_deceased) {
+          decChkFill.checked = true;
+          const numEl2 = acc.querySelector(".fam-num");
+          const num2 = (numEl2?.textContent || "").trim();
+          if (num2) {
+            toggleSibDeceased(decChkFill, num2);
+            const decDiv2 = document.getElementById("sibDeceased_" + num2);
+            if (decDiv2 && m.deceased_year) {
+              const dyInp2 = decDiv2.querySelector('input[type="number"]');
+              if (dyInp2) dyInp2.value = m.deceased_year;
+            }
+          }
+        }
+        body.querySelectorAll(".form-row").forEach((row) => {
+          const lbl = (
+            row.querySelector("label")?.textContent || ""
+          ).toLowerCase();
+          if (lbl.includes("nghề nghiệp")) {
+            const i = row.querySelector("input[type=text],input:not([type])");
+            if (i && !i.value) i.value = m.occupation || "";
+          }
+        });
+        if (m.is_party_member) {
+          const pSel = body.querySelector(
+            'select[onchange*="toggleSiblingParty"],select[onchange*="famParty"],select[onchange*="gpParty"],select[onchange*="spouseParty"]',
+          );
+          if (pSel) {
+            pSel.value = "yes";
+            pSel.dispatchEvent(new Event("change"));
+          }
+          setTimeout(() => {
+            const pbox = body.querySelector(".party-detail-box");
+            if (pbox) {
+              if (m.party_join_year) {
+                const yi = pbox.querySelector('input[placeholder*="YYYY"]');
+                if (yi) yi.value = m.party_join_year;
+              }
+              if (m.party_chi_bo) {
+                const ci = pbox.querySelector('input[placeholder*="Chi bộ"]');
+                if (ci) ci.value = m.party_chi_bo;
+              }
+              if (m.party_awards_text) {
+                const ai = pbox.querySelector('input[placeholder*="Huy hiệu"]');
+                if (ai) ai.value = m.party_awards_text;
+              }
+              if (m.party_years_count) {
+                const yci = pbox.querySelector(
+                  'input[type="number"][placeholder="0"]',
+                );
+                if (yci) yci.value = m.party_years_count;
+              }
+            }
+          }, 50);
+        }
+      }
+
+      // ── Family history helpers ───────────────────────────────────────
+
+      // Parse "MM/YYYY" string → {month, year} or null
+      function _parseMY(str) {
+        if (!str) return null;
+        const s = String(str).trim();
+        const full = s.match(/^(\d{1,2})\/(\d{4})$/);
+        if (full) {
+          const m = parseInt(full[1]),
+            y = parseInt(full[2]);
+          if (m >= 1 && m <= 12 && y >= 1800 && y <= 2200)
+            return { month: m, year: y };
+          return null;
+        }
+        const yOnly = s.match(/^(\d{4})$/);
+        if (yOnly) {
+          const y = parseInt(yOnly[1]);
+          if (y >= 1800 && y <= 2200) return { month: null, year: y };
+        }
+        return null;
+      }
+
+      // Sort key: year*100 + (month||0)
+      function _myKey(month, year) {
+        if (!year) return null;
+        return year * 100 + (month || 0);
+      }
+
+      // Format to "MM/YYYY" or "YYYY"
+      function _fmtMY(month, year) {
+        if (!year) return "";
+        return month
+          ? String(month).padStart(2, "0") + "/" + year
+          : String(year);
+      }
+
+      // Sort key for NEXT month after (month, year)
+      function _nextMonthKey(month, year) {
+        if (!year) return null;
+        if (!month) return year * 100 + 1; // year-only: treat as Jan next year
+        const nm = month === 12 ? 1 : month + 1;
+        const ny = month === 12 ? year + 1 : year;
+        return ny * 100 + nm;
+      }
+
+      // Check continuity between end of row N and start of row N+1.
+      // Returns "ok" | "gap" | "overlap"
+      function _checkContinuity(prevTo, nextFrom) {
+        if (prevTo === null || nextFrom === null) return "ok";
+        if (nextFrom === prevTo) return "ok"; // same month: ok
+        if (
+          nextFrom ===
+          _nextMonthKey(
+            prevTo % 100 === 0 ? null : prevTo % 100,
+            Math.floor(prevTo / 100),
+          )
+        )
+          return "ok"; // adjacent month: ok
+        return nextFrom > prevTo ? "gap" : "overlap";
+      }
+
+      // Generic timeline continuity validator.
+      // tbodyId: tbody element id; errBarId: error bar div id;
+      // getFromTo(tr) → {fromKey, toKey, isPresent, isEmpty}
+      function _validateTimelineSection(tbodyId, errBarId, getFromTo) {
+        const tbody = document.getElementById(tbodyId);
+        const errBar = document.getElementById(errBarId);
+        if (!tbody) return true;
+        const rows = tbody.querySelectorAll("tr");
+        const errors = [];
+        let prevToKey = null;
+        let dataRowIdx = 0;
+        rows.forEach((tr) => {
+          tr.classList.remove("tl-row-invalid");
+          const { fromKey, toKey, isPresent, isEmpty, fromInvalid, toInvalid } =
+            getFromTo(tr);
+          if (isEmpty) return;
+          const rowNum = ++dataRowIdx;
+          let rowBad = false;
+          if (fromInvalid) {
+            errors.push(`Dòng ${rowNum}: "Từ" không hợp lệ — dùng MM/YYYY`);
+            rowBad = true;
+          }
+          if (toInvalid) {
+            errors.push(`Dòng ${rowNum}: "Đến" không hợp lệ — dùng MM/YYYY`);
+            rowBad = true;
+          }
+          if (fromKey !== null && toKey !== null && fromKey > toKey) {
+            errors.push(`Dòng ${rowNum}: "Từ" sau "Đến"`);
+            rowBad = true;
+          }
+          if (dataRowIdx > 1 && prevToKey !== null && fromKey !== null) {
+            const cont = _checkContinuity(prevToKey, fromKey);
+            if (cont === "gap") {
+              errors.push(
+                `Dòng ${rowNum}: Thời gian bị gián đoạn với dòng trên`,
+              );
+              rowBad = true;
+            }
+            if (cont === "overlap") {
+              errors.push(
+                `Dòng ${rowNum}: Thời gian bị chồng lấp với dòng trên`,
+              );
+              rowBad = true;
+            }
+          }
+          if (rowBad) tr.classList.add("tl-row-invalid");
+          prevToKey = isPresent ? null : toKey !== null ? toKey : fromKey;
+        });
+        if (errBar) {
+          if (errors.length) {
+            errBar.innerHTML = "⚠ " + errors.join("<br>⚠ ");
+            errBar.classList.add("visible");
+          } else {
+            errBar.innerHTML = "";
+            errBar.classList.remove("visible");
+          }
+        }
+        return errors.length === 0;
+      }
+
+      // Render one history row HTML (cells only, for innerHTML of <tr>)
+      function _famHistRowHtml(r) {
+        const fromMonth = r.from_month || "";
+        const fromYear = r.from_year || "";
+        const toMonth = r.to_month || "";
+        const toYear = r.to_year || "";
+        const isPresent = !!r.is_present;
+        const chk = isPresent ? " checked" : "";
+        const mmyyyyFrom = `<div class="mmyyyy-wrap"><select class="mm-month"><option value="">MM</option><option${fromMonth === 1 ? " selected" : ""}>1</option><option${fromMonth === 2 ? " selected" : ""}>2</option><option${fromMonth === 3 ? " selected" : ""}>3</option><option${fromMonth === 4 ? " selected" : ""}>4</option><option${fromMonth === 5 ? " selected" : ""}>5</option><option${fromMonth === 6 ? " selected" : ""}>6</option><option${fromMonth === 7 ? " selected" : ""}>7</option><option${fromMonth === 8 ? " selected" : ""}>8</option><option${fromMonth === 9 ? " selected" : ""}>9</option><option${fromMonth === 10 ? " selected" : ""}>10</option><option${fromMonth === 11 ? " selected" : ""}>11</option><option${fromMonth === 12 ? " selected" : ""}>12</option></select><span class="mmyyyy-slash">/</span><input class="mm-year" type="number" placeholder="YYYY" min="1900" max="2099" step="1" value="${fromYear}"></div>`;
+        const mmyyyyTo = `<div class="mmyyyy-wrap"><select class="mm-month"${isPresent ? " disabled" : ""}><option value="">MM</option><option${toMonth === 1 ? " selected" : ""}>1</option><option${toMonth === 2 ? " selected" : ""}>2</option><option${toMonth === 3 ? " selected" : ""}>3</option><option${toMonth === 4 ? " selected" : ""}>4</option><option${toMonth === 5 ? " selected" : ""}>5</option><option${toMonth === 6 ? " selected" : ""}>6</option><option${toMonth === 7 ? " selected" : ""}>7</option><option${toMonth === 8 ? " selected" : ""}>8</option><option${toMonth === 9 ? " selected" : ""}>9</option><option${toMonth === 10 ? " selected" : ""}>10</option><option${toMonth === 11 ? " selected" : ""}>11</option><option${toMonth === 12 ? " selected" : ""}>12</option></select><span class="mmyyyy-slash">/</span><input class="mm-year" type="number" placeholder="YYYY" min="1900" max="2099" step="1"${isPresent ? " disabled" : ""} value="${isPresent ? "" : toYear}"></div>`;
+        return (
+          `<td>${mmyyyyFrom}</td>` +
+          `<td class="fhd-to-cell"><div class="fhd-to-inner">${mmyyyyTo}` +
+          `<label class="fhd-present-wrap" title="Đến nay"><input type="checkbox" class="fhd-present-chk"${chk} onchange="toggleFhdPresent(this)"> Nay</label>` +
+          `</div></td>` +
+          `<td class="td-dienbien"><input type="text" value="${_esc(r.description || "")}"></td>` +
+          `<td><div class="row-act-wrap"><button class="ins-btn" onclick="insertRowAbove(this,'fam')" title="Chèn dòng trên">▲</button><button class="del-btn" onclick="delRow(this)">✕</button><button class="ins-btn" onclick="insertRowBelow(this,'fam')" title="Chèn dòng dưới">▼</button></div></td>`
+        );
+      }
+
+      // Toggle "Khác" text input for select fields
+      function toggleKhacInput(selectId, inputId) {
+        const sel = document.getElementById(selectId);
+        const inp = document.getElementById(inputId);
+        if (!sel || !inp) return;
+        inp.style.display = sel.value === "Khác" ? "block" : "none";
+        if (sel.value !== "Khác") inp.value = "";
+      }
+
+      // Toggle Đoàn TNCS fields based on radio selection
+      function toggleDoanFields() {
+        const isYes = document.querySelector(
+          'input[name="doanStatus"][value="yes"]',
+        )?.checked;
+        const fields = document.getElementById("doanFields");
+        if (fields) fields.style.display = isYes ? "grid" : "none";
+        if (!isYes) {
+          const d = document.getElementById("ngayVaoDoan");
+          const n = document.getElementById("noiVaoDoan");
+          if (d) d.value = "";
+          if (n) n.value = "";
+        }
+      }
+
+      // Toggle Present checkbox — disable/enable the To-date input
+      function toggleFhdPresent(chk) {
+        const inner = chk.closest(".fhd-to-inner");
+        if (!inner) return;
+
+        // Handle .mmyyyy-wrap rows (family history: cha/mẹ/ông bà/vợ chồng)
+        const mmWrap = inner.querySelector(".mmyyyy-wrap");
+        if (mmWrap) {
+          const monthSel = mmWrap.querySelector(".mm-month");
+          const yearInp = mmWrap.querySelector(".mm-year");
+          if (chk.checked) {
+            if (monthSel) {
+              monthSel.value = "";
+              monthSel.disabled = true;
+            }
+            if (yearInp) {
+              yearInp.value = "";
+              yearInp.disabled = true;
+            }
+          } else {
+            if (monthSel) monthSel.disabled = false;
+            if (yearInp) yearInp.disabled = false;
+          }
+          const acc =
+            chk.closest(".family-accordion") || chk.closest(".accordion");
+          if (acc) validateFamHistory(acc);
+          return;
+        }
+
+        // Handle .fhd-to-txt rows (section B, C, child forms)
+        const toInput = inner.querySelector(".fhd-to-txt");
+        if (!toInput) return;
+        if (chk.checked) {
+          toInput.value = "";
+          toInput.disabled = true;
+          toInput.placeholder = "Hiện tại";
+        } else {
+          toInput.disabled = false;
+          toInput.placeholder = "MM/YYYY";
+        }
+        const acc = chk.closest(".accordion");
+        if (acc) {
+          validateFamHistory(acc);
+          return;
+        }
+        const row = chk.closest("tr");
+        if (row?.parentElement?.id === "tbC-body") validateSecC();
+      }
+
+      // Validate timeline continuity — returns true if valid
+      function validateFamHistory(acc) {
+        const body = acc.querySelector(".family-body");
+        if (!body) return true;
+        const rows = body.querySelectorAll(".timeline-table tbody tr");
+        const errBar = body.querySelector(".fhd-error-bar");
+        const errors = [];
+        let prevToKey = null;
+        let dataRowIdx = 0;
+
+        rows.forEach((tr) => {
+          tr.classList.remove("fhd-row-invalid");
+          const isPresent =
+            !!tr.cells[1]?.querySelector(".fhd-present-chk")?.checked;
+          const descInput = tr.cells[2]?.querySelector("input,textarea");
+          const fromVal = _getMMyyyy(tr.cells[0]) || "";
+          const toWrap1 = tr.cells[1]?.querySelector(".mmyyyy-wrap");
+          const toTxt1 = tr.cells[1]?.querySelector(".fhd-to-txt");
+          const toVal = toWrap1
+            ? _getMMyyyy(tr.cells[1]) || ""
+            : toTxt1?.value?.trim() || "";
+          const descVal = descInput?.value?.trim() || "";
+          if (!fromVal && !toVal && !descVal && !isPresent) return;
+
+          const rowNum = dataRowIdx + 1;
+          dataRowIdx++;
+          const fromParsed = _parseMY(fromVal);
+          const toParsed = isPresent ? null : _parseMY(toVal);
+          let rowInvalid = false;
+
+          if (fromVal && !fromParsed) {
+            errors.push(
+              `Dòng ${rowNum}: "Từ" không hợp lệ — dùng MM/YYYY hoặc YYYY`,
+            );
+            rowInvalid = true;
+          }
+          if (!isPresent && toVal && !toParsed) {
+            errors.push(
+              `Dòng ${rowNum}: "Đến" không hợp lệ — dùng MM/YYYY hoặc YYYY`,
+            );
+            rowInvalid = true;
+          }
+          if (fromParsed && toParsed) {
+            const fk = _myKey(fromParsed.month, fromParsed.year);
+            const tk = _myKey(toParsed.month, toParsed.year);
+            if (fk > tk) {
+              errors.push(`Dòng ${rowNum}: "Từ" sau "Đến"`);
+              rowInvalid = true;
+            }
+          }
+          if (dataRowIdx > 1 && prevToKey !== null && fromParsed) {
+            const fk = _myKey(fromParsed.month, fromParsed.year);
+            const cont = _checkContinuity(prevToKey, fk);
+            if (cont !== "ok") {
+              const diff = cont === "gap" ? "bị gián đoạn" : "bị chồng lấp";
+              errors.push(`Dòng ${rowNum}: Thời gian ${diff} với dòng trên`);
+              rowInvalid = true;
+            }
+          }
+          if (rowInvalid) tr.classList.add("fhd-row-invalid");
+
+          if (isPresent) {
+            prevToKey = null;
+          } else if (toParsed) {
+            prevToKey = _myKey(toParsed.month, toParsed.year);
+          } else if (fromParsed) {
+            prevToKey = _myKey(fromParsed.month, fromParsed.year);
+          }
+        });
+
+        if (errBar) {
+          if (errors.length) {
+            errBar.innerHTML = "⚠ " + errors.join("<br>⚠ ");
+            errBar.classList.add("visible");
+          } else {
+            errBar.innerHTML = "";
+            errBar.classList.remove("visible");
+          }
+        }
+        return errors.length === 0;
+      }
+
+      // Section B (personal history) continuity validator
+      function validateSecB() {
+        return _validateTimelineSection("tbB-body", "errBarB", (tr) => {
+          const f = _getMmYr(tr.cells[0]);
+          const t = _getMmYr(tr.cells[1]);
+          const d = tr.cells[2] ? _tdv(tr.cells[2]) : "";
+          const isEmpty = !f.year && !t.year && !d;
+          const fromKey = f.year ? _myKey(f.month, f.year) : null;
+          const toKey = t.year ? _myKey(t.month, t.year) : null;
+          return {
+            fromKey,
+            toKey,
+            isPresent: false,
+            isEmpty,
+            fromInvalid: false,
+            toInvalid: false,
+          };
+        });
+      }
+
+      // Section C (work history) continuity validator
+      // Helper to extract month/year from mmyyyy-wrap structure
+      const _getMMyyyy = (cell) => {
+        if (!cell) return null;
+        const wrap = cell.querySelector(".mmyyyy-wrap");
+        if (!wrap) {
+          const input = cell.querySelector(".fhd-input");
+          return input?.value?.trim() || "";
+        }
+        const monthSel = wrap.querySelector(".mm-month");
+        const yearInput = wrap.querySelector(".mm-year");
+        const m = monthSel?.value?.trim() || "";
+        const y = yearInput?.value?.trim() || "";
+        if (!m && !y) return "";
+        if (m && y) return `${m}/${y}`;
+        if (y) return y;
+        return "";
+      };
+
+      function validateSecC() {
+        return _validateTimelineSection("tbC-body", "errBarC", (tr) => {
+          const fromVal = _getMMyyyy(tr.cells[0]) || "";
+          const toInput = tr.cells[1]?.querySelector(".fhd-to-txt");
+          const toWrap = tr.cells[1]?.querySelector(".mmyyyy-wrap");
+          const toVal = toWrap
+            ? _getMMyyyy(tr.cells[1])
+            : toInput?.value?.trim() || "";
+          const isPresent =
+            !!tr.cells[1]?.querySelector(".fhd-present-chk")?.checked;
+          const empInput = tr.cells[2]?.querySelector("textarea");
+          const empVal = empInput?.value?.trim() || "";
+          const isEmpty = !fromVal && !toVal && !empVal && !isPresent;
+          const fp = fromVal ? _parseMY(fromVal) : null;
+          const tp = !isPresent && toVal ? _parseMY(toVal) : null;
+          return {
+            fromKey: fp ? _myKey(fp.month, fp.year) : null,
+            toKey: tp ? _myKey(tp.month, tp.year) : null,
+            isPresent,
+            isEmpty,
+            fromInvalid: !!(fromVal && !fp),
+            toInvalid: !!(!isPresent && toVal && !tp),
+          };
+        });
+      }
+
+      function _readAccordionHistory(acc) {
+        const body = acc.querySelector(".family-body");
+        if (!body) return [];
+        const rows = [];
+        body.querySelectorAll(".timeline-table tbody tr").forEach((tr, idx) => {
+          const cells = tr.cells;
+          if (!cells || cells.length < 3) return;
+          const fromVal = _getMMyyyy(cells[0]) || "";
+          const toWrap = cells[1].querySelector(".mmyyyy-wrap");
+          const toInput = cells[1].querySelector(".fhd-to-txt");
+          const toVal = toWrap
+            ? _getMMyyyy(cells[1])
+            : toInput?.value?.trim() || "";
+          const isPresent =
+            !!cells[1].querySelector(".fhd-present-chk")?.checked;
+          const desc = _tdv(cells[2]);
+          if (!desc && !fromVal && !toVal && !isPresent) return;
+          const fp = _parseMY(fromVal);
+          const tp = isPresent ? null : _parseMY(toVal);
+          rows.push({
+            from_year: fp?.year || null,
+            from_month: fp?.month || null,
+            to_year: tp?.year || null,
+            to_month: tp?.month || null,
+            is_present: isPresent,
+            description: desc,
+            sort_order: idx,
+          });
+        });
+        return rows;
+      }
+
+      function _fillAccordionHistory(acc, histRows) {
+        if (!histRows || !histRows.length) return;
+        const body = acc.querySelector(".family-body");
+        if (!body) return;
+        const tbl = body.querySelector(".timeline-table tbody");
+        if (!tbl) return;
+        tbl.innerHTML = "";
+        const ids = [];
+        histRows.forEach((r) => {
+          if (r.id) ids.push(String(r.id));
+          const tr = tbl.insertRow();
+          if (r.id) tr.dataset.histId = r.id;
+          tr.innerHTML = _famHistRowHtml(r);
+        });
+        acc.dataset.famHistIds = JSON.stringify(ids);
+        // Initialize textarea expansion for description cells
+        tbl.querySelectorAll(".td-dienbien").forEach((td) => {
+          if (!td.dataset.db) initDienBien(td);
+        });
+        validateFamHistory(acc);
+      }
+
+      async function _saveFamHistory(profileId, famId, acc) {
+        validateFamHistory(acc); // update error bar but do not block save
+        const rows = _readAccordionHistory(acc);
+        const oldIds = JSON.parse(acc.dataset.famHistIds || "[]");
+        const base = `/timelines/${profileId}/history/`;
+        await Promise.all(
+          oldIds.map((id) => API.del(`${base}${id}/`).catch(() => {})),
+        );
+        const newIds = [];
+        for (const [i, hr] of rows.entries()) {
+          if (!hr.description) continue;
+          try {
+            const cr = await API.post(base, {
+              entry_type: "family",
+              family_member: famId,
+              from_year: hr.from_year || null,
+              from_month: hr.from_month || null,
+              to_year: hr.to_year || null,
+              to_month: hr.to_month || null,
+              is_present: hr.is_present || false,
+              description: hr.description,
+              sort_order: i,
+            });
+            if (cr?.id) newIds.push(String(cr.id));
+          } catch (e) {
+            console.warn("[FAM-HIST]", e.message);
+          }
+        }
+        acc.dataset.famHistIds = JSON.stringify(newIds);
+        return true;
+      }
+
+      // ── Load all sections (call after profile ID is known) ───────────
+      async function _loadAllSections(profileId) {
+        if (!profileId) return;
+        let famHistoryRows = [];
+        try {
+          const res = await API.get(`/timelines/${profileId}/all/`);
+          const d = (res && res.success !== undefined ? res.data : res) || {};
+          _fillTbB(d.history || []);
+          _fillTbC(d.work_history || []);
+          _fillTbE(d.education_history || d.education || []);
+          _fillTbF(d.overseas_travels || []);
+          _fillTbAwards("tbG-body", d.awards || [], "G");
+          _fillTbAwards("tbH-body", d.disciplines || [], "H");
+          famHistoryRows = d.family_history || [];
+          console.log(
+            "[LOAD] timelines:",
+            Object.fromEntries(
+              Object.entries(d).map(([k, v]) => [
+                k,
+                Array.isArray(v) ? v.length : "?",
+              ]),
+            ),
+          );
+        } catch (e) {
+          console.warn("[LOAD] timelines fail:", e.message);
+        }
+
+        try {
+          const res = await API.get(`/family/${profileId}/members/`);
+          const members = Array.isArray(res)
+            ? res
+            : res.data || res.results || [];
+          _annotateAccordions();
+          // ── Slot pre-creation ──────────────────────────────────────────────────
+          // Create slots for biological fathers
+          const chaRuotMembers = members.filter(
+            (m) => m.relationship === "cha_ruot",
+          );
+          const chaRuotNeeded = chaRuotMembers.length > 0 ? 1 : 0;
+          while (
+            document.querySelectorAll(
+              '.family-accordion[data-relationship="cha_ruot"]',
+            ).length < chaRuotNeeded
+          )
+            addFamFather(true);
+
+          // Create slots for stepfathers
+          const chaDuongMembers = members.filter(
+            (m) => m.relationship === "cha_duong",
+          );
+          const chaDuongNeeded =
+            chaDuongMembers.length > 0
+              ? Math.max(
+                  chaDuongMembers.length,
+                  Math.max(
+                    ...chaDuongMembers.map((m) => (m.sort_order ?? 0) + 1),
+                  ),
+                )
+              : 0;
+          while (
+            document.querySelectorAll(
+              '.family-accordion[data-relationship="cha_duong"]',
+            ).length < chaDuongNeeded
+          )
+            addFamFather(true);
+
+          // Create slots for biological mothers
+          const meRuotMembers = members.filter(
+            (m) => m.relationship === "me_ruot",
+          );
+          const meRuotNeeded = meRuotMembers.length > 0 ? 1 : 0;
+          while (
+            document.querySelectorAll(
+              '.family-accordion[data-relationship="me_ruot"]',
+            ).length < meRuotNeeded
+          )
+            addFamMother(true);
+
+          // Create slots for stepmothers
+          const meKeMembers = members.filter((m) => m.relationship === "me_ke");
+          const meKeNeeded =
+            meKeMembers.length > 0
+              ? Math.max(
+                  meKeMembers.length,
+                  Math.max(...meKeMembers.map((m) => (m.sort_order ?? 0) + 1)),
+                )
+              : 0;
+          while (
+            document.querySelectorAll(
+              '.family-accordion[data-relationship="me_ke"]',
+            ).length < meKeNeeded
+          )
+            addFamMother(true);
+
+          if (
+            chaRuotNeeded > 0 ||
+            chaDuongNeeded > 0 ||
+            meRuotNeeded > 0 ||
+            meKeNeeded > 0
+          )
+            _annotateAccordions();
+          // Siblings: only create as many slots as there are members — fill sequentially
+          // to avoid pushing extra slots past the static slots and near Vợ/Chồng.
+          const sibRuotMembers = members.filter(
+            (m) => m.relationship === "anh_chi_em_ruot",
+          );
+          const sibRuotNeeded = sibRuotMembers.length;
+          while (
+            document.querySelectorAll(
+              '.family-accordion[data-relationship="anh_chi_em_ruot"]',
+            ).length < sibRuotNeeded
+          )
+            addFamSibling(true);
+          const sibChongVoMembers = members.filter(
+            (m) => m.relationship === "anh_chi_em_chong_vo",
+          );
+          const sibChongVoNeeded = sibChongVoMembers.length;
+          while (
+            document.querySelectorAll(
+              '.family-accordion[data-relationship="anh_chi_em_chong_vo"]',
+            ).length < sibChongVoNeeded
+          )
+            addFamSiblingSpouse(true);
+          // Ensure all dynamically-created slots have data-relationship before filling.
+          _annotateAccordions();
+          // ── Fill accordions ────────────────────────────────────────────────────
+          // Group members by relationship, sorted by sort_order (relative order preserved).
+          // Father/Mother: sort_order-based fill (ensures cha dượng/mẹ kế go to exact slot).
+          // Siblings: sequential fill (compact — fills 3.1 then 3.2, never skips to 3.4).
+          const byRel = {};
+          members.forEach((m) =>
+            (byRel[m.relationship] = byRel[m.relationship] || []).push(m),
+          );
+          const seqFillRels = new Set([
+            "anh_chi_em_ruot",
+            "anh_chi_em_chong_vo",
+          ]);
+          Object.entries(byRel).forEach(([rel, relMs]) => {
+            relMs.sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
+            const accs = [
+              ...document.querySelectorAll(
+                `.family-accordion[data-relationship="${rel}"]`,
+              ),
+            ];
+            if (seqFillRels.has(rel)) {
+              // Sequential: fill from first free slot in order
+              let nextFreeIdx = 0;
+              for (const m of relMs) {
+                let target = accs.find(
+                  (a) => a.dataset.familyId === String(m.id),
+                );
+                if (!target) {
+                  while (
+                    nextFreeIdx < accs.length &&
+                    accs[nextFreeIdx].dataset.familyId
+                  )
+                    nextFreeIdx++;
+                  target = accs[nextFreeIdx];
+                  nextFreeIdx++;
+                }
+                if (target) {
+                  _fillAccordion(target, m);
+                  if (Array.isArray(m.history) && m.history.length > 0)
+                    _fillAccordionHistory(target, m.history);
+                }
+              }
+            } else {
+              // Sort-order-based: cha dượng (sort_order=1) must go to slot 1, etc.
+              for (const m of relMs) {
+                const sortIdx = m.sort_order ?? 0;
+                const accAtSortIdx = accs[sortIdx];
+                const target =
+                  accs.find((a) => a.dataset.familyId === String(m.id)) ||
+                  (accAtSortIdx && !accAtSortIdx.dataset.familyId
+                    ? accAtSortIdx
+                    : null) ||
+                  accs.find((a) => !a.dataset.familyId) ||
+                  accs[0];
+                if (target) {
+                  _fillAccordion(target, m);
+                  if (Array.isArray(m.history) && m.history.length > 0)
+                    _fillAccordionHistory(target, m.history);
+                }
+              }
+            }
+          });
+          console.log("[LOAD] family:", members.length, "members");
+        } catch (e) {
+          console.warn("[LOAD] family fail:", e.message);
+        }
+
+        // Populate family member history into their accordions
+        if (famHistoryRows.length) {
+          const histByFam = {};
+          famHistoryRows.forEach((h) => {
+            const k = String(h.family_member);
+            if (!histByFam[k]) histByFam[k] = [];
+            histByFam[k].push(h);
+          });
+          document
+            .querySelectorAll(".family-accordion[data-family-id]")
+            .forEach((acc) => {
+              const famId = acc.dataset.familyId;
+              if (famId && histByFam[famId])
+                _fillAccordionHistory(acc, histByFam[famId]);
+            });
+        }
+      }
+
+      // ── Save all sections ────────────────────────────────────────────
+      function _validateSiblings() {
+        const sibRels = ["anh_chi_em_ruot", "anh_chi_em_chong_vo"];
+        const warnings = [];
+        document
+          .querySelectorAll(".family-accordion[data-relationship]")
+          .forEach((acc) => {
+            const rel = acc.dataset.relationship;
+            if (!sibRels.includes(rel)) return;
+            const body = acc.querySelector(".family-body");
+            if (!body) return;
+            const numText = (
+              acc.querySelector(".fam-num")?.textContent || ""
+            ).trim();
+            const titleText = (
+              acc.querySelector(".fam-info strong")?.textContent || numText
+            ).trim();
+            const name = (
+              body.querySelector('input[oninput*="updateFamName"]')?.value || ""
+            ).trim();
+            const label = name || titleText;
+            const missing = [];
+            // Gender
+            let hasGender = false;
+            body.querySelectorAll("select").forEach((s) => {
+              if (
+                [...s.options].some(
+                  (o) => o.value === "Nam" || o.text === "Nam",
+                ) &&
+                s.value &&
+                s.value !== ""
+              )
+                hasGender = true;
+            });
+            if (!hasGender) missing.push("Giới tính");
+            // Birth year
+            const byInp = body.querySelector(
+              'input[placeholder="YYYY"][type="number"]',
+            );
+            if (!byInp || !byInp.value) missing.push("Năm sinh");
+            // Deceased check — skip address/occupation if deceased
+            const decChk = body.querySelector(".sib-deceased-chk");
+            if (!decChk?.checked) {
+              const addrInp = body.querySelector(
+                'input[placeholder*="Số nhà"]',
+              );
+              if (!addrInp || !addrInp.value.trim()) missing.push("Nơi ở");
+              const occInp = body.querySelector(
+                'input[placeholder*="Công nhân"]',
+              );
+              if (!occInp || !occInp.value.trim()) missing.push("Nghề nghiệp");
+            }
+            // Nationality
+            const natInp = body.querySelector("input.fam-nationality-input");
+            if (!natInp || !natInp.value.trim()) missing.push("Quốc tịch");
+            if (missing.length)
+              warnings.push(`${label}: thiếu ${missing.join(", ")}`);
+          });
+        if (warnings.length) {
+          console.warn("[SIB_VALID]", warnings);
+          showToast(
+            `⚠ ${warnings.length} anh/chị/em thiếu thông tin bắt buộc (xem chi tiết trong console).`,
+            4000,
+          );
+        }
+      }
+
+      async function _saveAllSections(profileId) {
+        if (!profileId) return;
+        const b = `/timelines/${profileId}/`;
+        await Promise.allSettled([
+          _syncSec(`${b}history/`, _srvIds.B, _collB()),
+          _syncSec(`${b}work/`, _srvIds.C, _collC()),
+          _syncSec(`${b}education/`, _srvIds.E, _collE()),
+          _syncSec(`${b}travel/`, _srvIds.F, _collF()),
+          _syncSec(`${b}awards/`, _srvIds.G, _collAwards("tbG-body", "award")),
+          _syncSec(
+            `${b}awards/`,
+            _srvIds.H,
+            _collAwards("tbH-body", "discipline"),
+          ),
+        ]);
+        _annotateAccordions();
+        _validateSiblings();
+        const fbase = `/family/${profileId}/members/`;
+        for (const acc of document.querySelectorAll(
+          ".family-accordion[data-relationship]",
+        )) {
+          const data = _readAccordion(acc);
+          if (!data) continue;
+          const { id, ...payload } = data;
+          if (!id) console.log("[FAM] POST payload:", JSON.stringify(payload));
+          try {
+            if (id) {
+              await API.patch(`${fbase}${id}/`, payload);
+            } else {
+              const cr = await API.post(fbase, payload);
+              if (cr?.id) acc.dataset.familyId = String(cr.id);
+            }
+          } catch (e) {
+            const errDetail = e.data?.error?.detail
+              ? JSON.stringify(e.data.error.detail)
+              : e.message;
+            console.warn("[FAM] save fail:", errDetail, payload);
+            const memberName = payload.full_name || "(không tên)";
+            showToast(`⚠ Lỗi lưu "${memberName}": ${e.message}`, 6000);
+          }
+          // Save family member history (quá trình lịch sử)
+          const famId = acc.dataset.familyId;
+          if (famId) {
+            await _saveFamHistory(profileId, parseInt(famId), acc);
+          }
+        }
+      }
+
+      // ===== DIỄN BIẾN EXPAND ON FOCUS =====
+      // ═══════════════════════════════════════════════════════════════
+      // EXPAND-ON-FOCUS — áp dụng cho mọi ô "description" trong
+      // tất cả .timeline-table (không cần thêm class hay sửa HTML)
+      // ═══════════════════════════════════════════════════════════════
+
+      function autoResize(ta) {
+        ta.style.height = "auto";
+        ta.style.height = Math.max(70, ta.scrollHeight) + "px";
+      }
+
+      // Gắn expand behavior vào 1 td (gọi được nhiều lần, idempotent)
+      function initDienBien(td) {
+        if (!td || td.dataset.db) return; // đã init rồi → bỏ qua
+        const inp = td.querySelector("input[type=text], input:not([type])");
+        if (!inp) return;
+        td.dataset.db = "1";
+        td.classList.add("td-dienbien");
+
+        // Replace input with always-visible auto-resize textarea
+        const ta = document.createElement("textarea");
+        ta.rows = 2;
+        ta.placeholder = inp.placeholder;
+        ta.value = inp.value;
+        ta.style.cssText =
+          "width:100%;resize:vertical;min-height:36px;box-sizing:border-box;overflow:hidden";
+        ta.addEventListener("input", () => autoResize(ta));
+        inp.replaceWith(ta);
+        autoResize(ta);
+      }
+
+      // Xác định cột "mô tả" (wide) của một timeline-table:
+      // cột không có style="width:..." trên <th> → đó là cột cần expand
+      function getWideColIndex(table) {
+        const ths = table.querySelectorAll("thead th");
+        for (let i = 0; i < ths.length; i++) {
+          const w = ths[i].getAttribute("style") || "";
+          if (!w.includes("width")) return i;
+        }
+        return -1;
+      }
+
+      // Áp dụng cho tất cả hàng hiện có trong table
+      function applyTableDienBien(table) {
+        const col = getWideColIndex(table);
+        if (col < 0) return;
+        table.querySelectorAll("tbody tr").forEach((row) => {
+          const td = row.cells[col];
+          if (td) initDienBien(td);
+        });
+      }
+
+      // Gọi 1 lần khi load xong + sau mỗi lần thêm hàng
+      function initAllDienBien() {
+        document
+          .querySelectorAll(".timeline-table")
+          .forEach(applyTableDienBien);
+      }
+
+      // Wrapper tiện lợi để gọi sau khi thêm hàng vào 1 table cụ thể
+      function refreshDienBien(table) {
+        if (table) applyTableDienBien(table);
+      }
+
+      // ===== INIT =====
+      buildDots();
+      updateProgress();
+      // initAllDienBien chạy sau khi toàn bộ DOM (kể cả family blocks) đã render
+      requestAnimationFrame(() => initAllDienBien());
+
+      // Auto-validate timelines when the user edits date inputs
+      document.addEventListener("input", (e) => {
+        const inp = e.target;
+        // Family history accordion
+        if (
+          inp.classList.contains("fhd-input") ||
+          inp.classList.contains("fhd-to-txt")
+        ) {
+          const acc = inp.closest(".accordion");
+          if (acc) {
+            validateFamHistory(acc);
+            return;
+          }
+          // Section C fhd-input (not inside accordion)
+          if (inp.closest("#tbC-body")) {
+            validateSecC();
+            return;
+          }
+        }
+        // Section B mm-year number input
+        if (inp.classList.contains("mm-year") && inp.closest("#tbB-body")) {
+          validateSecB();
+        }
+      });
+      // Section B mm-month select fires "change"
+      document.addEventListener("change", (e) => {
+        if (
+          e.target.classList.contains("mm-month") &&
+          e.target.closest("#tbB-body")
+        ) {
+          validateSecB();
+        }
+      });
+
+      // Gọi lại sau mỗi accordion mở để cover các table mới inject vào DOM
+      document.addEventListener("click", (e) => {
+        const head = e.target.closest(".family-head");
+        if (head) {
+          // Đợi DOM cập nhật rồi scan
+          setTimeout(() => initAllDienBien(), 50);
+        }
+        // Close member notif dropdown when clicking outside
+        if (
+          !e.target.closest("#memberNotifBtn") &&
+          !e.target.closest("#memberNotifDropdown")
+        ) {
+          const drop = document.getElementById("memberNotifDropdown");
+          if (drop) drop.style.display = "none";
+        }
+      });
+
+      // ===== ROLE SWITCH =====
+      function switchRole(role) {
+        const isAdmin = role === "admin";
+        document
+          .getElementById("btnRoleMember")
+          .classList.toggle("active", !isAdmin);
+        document
+          .getElementById("btnRoleAdmin")
+          .classList.toggle("active", isAdmin);
+        document
+          .getElementById("adminSideNav")
+          .classList.toggle("visible", isAdmin);
+        document
+          .getElementById("memberSideNav")
+          .classList.toggle("hidden", isAdmin);
+        document
+          .getElementById("memberProgressWrap")
+          .classList.toggle("hidden", isAdmin);
+        document.getElementById("memberMain").style.display = isAdmin
+          ? "none"
+          : "flex";
+        document.getElementById("adminMain").style.display = isAdmin
+          ? "flex"
+          : "none";
+        if (isAdmin && !document.getElementById("pgDashboard")) {
+          buildAdminUI();
+          setTimeout(updateAdminTabsVisibility, 50);
+        }
+      }
+
+      function buildAdminUI() {
+        const adminUser = API.currentUser?.() || {};
+        const adminName = _esc(
+          adminUser.full_name || adminUser.username || "Cán bộ hệ thống",
+        );
+        const adminRole = _esc(
+          adminUser.role_display || adminUser.role_name || "Cán bộ BXD Đảng",
+        );
+        const adminInitials = _esc(
+          (adminUser.full_name || adminUser.username || "CB")
+            .split(" ")
+            .map((w) => (w || "").trim()[0] || "")
+            .filter(Boolean)
+            .slice(-2)
+            .join("")
+            .toUpperCase() || "CB",
+        );
+        document.getElementById("adminMain").innerHTML = `
+
+  <!-- ADMIN HEADER: single row on desktop, two-row on mobile -->
+  <div class="admin-header" id="adminHeader">
+    <!-- Row 1: Logo + Tabs (desktop) + User -->
+    <div class="admin-topbar">
+      <div class="admin-topbar-info">
+        <div class="admin-topbar-title">Ban Xây dựng Đảng – Quản lý Lý lịch</div>
+        <div class="admin-topbar-sub">Xã Nhà Bè · Mẫu 2-KNĐ</div>
+      </div>
+      <!-- Desktop tabs (hidden on mobile, shown in tab strip) -->
+      <div class="admin-tabs" id="adminTabsDesktop">
+      <div class="admin-tab active" onclick="showAdminPageByName('pgDashboard')" data-page="pgDashboard">Dashboard</div>
+      <div class="admin-tab" onclick="showAdminPageByName('pgProfiles')" data-page="pgProfiles">Hồ sơ <span id="profilesTabBadgeDesktop" style="background:var(--crimson);color:#fff;font-size:8.5px;padding:0 4px;border-radius:5px;margin-left:4px;vertical-align:middle;line-height:15px;display:inline-block;font-weight:800;">—</span></div>
+      <div class="admin-tab" onclick="showAdminPageByName('pgVerify')" data-page="pgVerify">Xác minh</div>
+      <div class="admin-tab" onclick="showAdminPageByName('pgNotif')" data-page="pgNotif">Thông báo</div>
+      <div class="admin-tab" onclick="showAdminPageByName('pgAccount')" data-page="pgAccount">Cấp tài khoản</div>
+      <div class="admin-tab" onclick="showAdminPageByName('pgReport')" data-page="pgReport">Báo cáo</div>
+      <div class="admin-tab" onclick="showAdminPageByName('pgSettings')" data-page="pgSettings">Cài đặt</div>
+      </div>
+      <div class="admin-user">
+        <div class="admin-user-info">
+          <div class="admin-user-name">${adminName}</div>
+          <div class="admin-user-role">${adminRole}</div>
+        </div>
+        <div class="admin-avatar">${adminInitials}</div>
+      </div>
+    </div>
+    <!-- Row 2: Scrollable tab strip (shown on mobile/tablet) -->
+    <div class="admin-tabs-row" id="adminTabsMobile" style="display:none">
+      <div class="admin-tab active" onclick="showAdminPageByName('pgDashboard')" data-page="pgDashboard">Dashboard</div>
+      <div class="admin-tab" onclick="showAdminPageByName('pgProfiles')" data-page="pgProfiles">Hồ sơ <span id="profilesTabBadgeMobile" style="background:var(--crimson);color:#fff;font-size:8.5px;padding:0 4px;border-radius:5px;margin-left:4px;vertical-align:middle;line-height:15px;display:inline-block;font-weight:800;">—</span></div>
+      <div class="admin-tab" onclick="showAdminPageByName('pgVerify')" data-page="pgVerify">Xác minh</div>
+      <div class="admin-tab" onclick="showAdminPageByName('pgNotif')" data-page="pgNotif">Thông báo</div>
+      <div class="admin-tab" onclick="showAdminPageByName('pgAccount')" data-page="pgAccount">Cấp tài khoản</div>
+      <div class="admin-tab" onclick="showAdminPageByName('pgReport')" data-page="pgReport">Báo cáo</div>
+      <div class="admin-tab" onclick="showAdminPageByName('pgSettings')" data-page="pgSettings">Cài đặt</div>
+    </div>
+  </div>
+
+  <div class="admin-content">
+
+    <!-- ═══════════ DASHBOARD ═══════════ -->
+    <div class="admin-page active" id="pgDashboard">
+      <div class="admin-page-header">
+        <div>
+          <div class="admin-page-title">Tổng quan hồ sơ quần chúng</div>
+          <div class="admin-page-sub" id="dashSubtitle">Đang tải…</div>
+        </div>
+        <div class="admin-page-actions">
+          <button class="btn btn-ghost" onclick="exportProfiles()"><span style="font-size:11px">↓</span> Xuất Excel</button>
+          <button class="btn btn-primary" onclick="showAdminPageByName('pgAccount')">+ Cấp tài khoản</button>
+        </div>
+      </div>
+
+      <!-- KPI Grid -->
+      <div class="kpi-grid">
+        <div class="kpi-card red">
+          <div class="kpi-icon red">📋</div>
+          <div class="kpi-val" data-kpi="kpi-submitted" id="kpiValSubmitted">—</div>
+          <div class="kpi-label">Chờ thẩm định</div>
+          <div class="kpi-delta down">Cần thẩm định</div>
+        </div>
+        <div class="kpi-card blue">
+          <div class="kpi-icon blue">✏️</div>
+          <div class="kpi-val" data-kpi="kpi-draft" id="kpiValDraft">—</div>
+          <div class="kpi-label">Đang kê khai</div>
+          <div class="kpi-delta neu">Đang trong quá trình</div>
+        </div>
+        <div class="kpi-card warn">
+          <div class="kpi-icon warn">⚠️</div>
+          <div class="kpi-val" data-kpi="kpi-returned" id="kpiValReturned">—</div>
+          <div class="kpi-label">Yêu cầu bổ sung</div>
+          <div class="kpi-delta down">Cần xử lý</div>
+        </div>
+        <div class="kpi-card green">
+          <div class="kpi-icon green">✅</div>
+          <div class="kpi-val" data-kpi="kpi-completed" id="kpiValCompleted">—</div>
+          <div class="kpi-label">Hoàn thiện</div>
+          <div class="kpi-delta up">Hoàn tất quy trình</div>
+        </div>
+        <div class="kpi-card gold">
+          <div class="kpi-icon navy">👥</div>
+          <div class="kpi-val" data-kpi="kpi-total" id="kpiValTotal">—</div>
+          <div class="kpi-label">Tổng quần chúng</div>
+          <div class="kpi-delta neu">Đang theo dõi</div>
+        </div>
+      </div>
+
+      <!-- Main grid: activity + chart -->
+      <div class="dash-grid">
+        <div>
+          <div class="dash-section-label">Hoạt động gần đây</div>
+          <div class="card" style="margin-bottom:0">
+            <div id="activityLog">
+              <div style="text-align:center;padding:24px;color:var(--muted);font-size:12.5px">⏳ Đang tải hoạt động…</div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="dash-section-label">Phân bổ trạng thái</div>
+          <div class="card" style="margin-bottom:0">
+            <div class="card-body">
+              <div class="donut" id="dashDonut" style="background:conic-gradient(#2563EB 0% 25%,#C8102E 25% 50%,#B86800 50% 75%,#15803D 75% 100%)"></div>
+              <div>
+                <div class="legend-row"><div class="legend-dot" style="background:#2563EB"></div><span style="flex:1">Đang kê khai</span><strong id="kpi-draft">—</strong></div>
+                <div class="legend-row"><div class="legend-dot" style="background:#C8102E"></div><span style="flex:1">Chờ thẩm định</span><strong id="kpi-submitted">—</strong></div>
+                <div class="legend-row"><div class="legend-dot" style="background:#B86800"></div><span style="flex:1">Yêu cầu bổ sung</span><strong id="kpi-returned">—</strong></div>
+                <div class="legend-row"><div class="legend-dot" style="background:#15803D"></div><span style="flex:1">Hoàn thiện</span><strong id="kpi-completed">—</strong></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Urgent table -->
+      <div class="dash-section-label" style="margin-top:4px">Cần xử lý ngay</div>
+      <div class="card" style="margin-bottom:0">
+        <div class="card-head">
+          <div class="card-head-dot"></div>
+          <h3 id="urgentTitle">Cần xử lý ngay</h3>
+        </div>
+        <div class="profile-table-wrap">
+          <table class="profile-table">
+            <thead><tr>
+              <th>Họ và tên</th><th>Trạng thái</th><th>AI Score</th><th>Ngày nộp</th><th style="width:150px">Thao tác</th>
+            </tr></thead>
+            <tbody id="urgentTbody">
+              <tr><td colspan="5" style="text-align:center;padding:24px;color:var(--muted)">⏳ Đang tải…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════ PROFILES ═══════════ -->
+    <div class="admin-page" id="pgProfiles">
+      <div class="admin-page-header">
+        <div>
+          <div class="admin-page-title">Danh sách quần chúng</div>
+          <div class="admin-page-sub" id="profilesSubtitle">Đang tải…</div>
+        </div>
+        <div class="admin-page-actions">
+          <button class="btn btn-ghost" onclick="exportProfiles()"><span style="font-size:11px">↓</span> Xuất Excel</button>
+        </div>
+      </div>
+      <div class="filter-bar">
+        <div class="search-box"><span class="search-icon">🔍</span><input type="text" placeholder="Tìm theo họ tên, SĐT, CCCD…" oninput="filterProfiles(this.value)"></div>
+        <select class="filter-select" onchange="filterByStatus(this.value)">
+          <option value="">Tất cả trạng thái TK</option>
+          <option value="active">Hoạt động</option>
+          <option value="inactive">Bị khoá</option>
+        </select>
+      </div>
+      <div class="card" style="margin-bottom:0">
+        <div class="profile-table-wrap">
+          <table class="profile-table">
+            <thead><tr>
+              <th>Họ và tên</th><th>Số điện thoại</th><th>CCCD</th>
+              <th>Trạng thái TK</th><th>Hồ sơ</th><th>Ngày tạo</th><th style="width:120px">Thao tác</th>
+            </tr></thead>
+            <tbody id="profileTbody"></tbody>
+          </table>
+        </div>
+        <div class="table-footer">
+          <span id="profileCount">Hiển thị 0 / 0 quần chúng</span>
+          <div class="pagination">
+            <button class="page-btn">← Trước</button>
+            <button class="page-btn active">1</button>
+            <button class="page-btn">2</button>
+            <button class="page-btn">Sau →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════ VERIFY ═══════════ -->
+    <div class="admin-page" id="pgVerify">
+      <div class="admin-page-header">
+        <div>
+          <div class="admin-page-title">Theo dõi xác minh lý lịch</div>
+          <div class="admin-page-sub">Quản lý quy trình xét duyệt và xác minh hồ sơ quần chúng</div>
+        </div>
+      </div>
+      <div class="verify-stats-bar">
+        <div class="verify-stat-chip">
+          <div class="verify-stat-icon" style="background:var(--info-l)">📋</div>
+          <div><div class="verify-stat-val" id="vs-total">—</div><div class="verify-stat-lbl">Tổng yêu cầu</div></div>
+        </div>
+        <div class="verify-stat-chip">
+          <div class="verify-stat-icon" style="background:var(--warn-l)">⏳</div>
+          <div><div class="verify-stat-val" id="vs-pending" style="color:var(--warn)">—</div><div class="verify-stat-lbl">Chờ phản hồi</div></div>
+        </div>
+        <div class="verify-stat-chip">
+          <div class="verify-stat-icon" style="background:var(--success-l)">✅</div>
+          <div><div class="verify-stat-val" id="vs-received" style="color:var(--success)">—</div><div class="verify-stat-lbl">Đã nhận KQ</div></div>
+        </div>
+        <div class="verify-stat-chip">
+          <div class="verify-stat-icon" style="background:var(--crimson-xl)">⚠</div>
+          <div><div class="verify-stat-val" id="vs-overdue" style="color:var(--crimson)">—</div><div class="verify-stat-lbl">Quá hạn</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <div class="card-head-dot"></div>
+          <h3>Danh sách hồ sơ theo dõi xác minh</h3>
+          <div style="margin-left:auto">
+            <select class="filter-select" id="verifyStatusFilter" style="font-size:11.5px;padding:5px 26px 5px 10px;" onchange="_loadVerificationList()">
+              <option value="">Tất cả trạng thái</option>
+              <option value="draft">Đang kê khai</option>
+              <option value="submitted">Đã nộp</option>
+              <option value="pending">Đang xem xét</option>
+              <option value="under_review">Đang thẩm định</option>
+              <option value="approved">Đã phê duyệt</option>
+              <option value="verifying">Đang xác minh</option>
+              <option value="returned">Trả lại</option>
+              <option value="completed">Hoàn thiện</option>
+            </select>
+          </div>
+        </div>
+        <div class="profile-table-wrap">
+          <table class="profile-table">
+            <thead><tr>
+              <th>Quần chúng</th><th>Trạng thái hồ sơ</th>
+              <th>Ngày nộp</th><th>Cập nhật</th><th style="width:240px">Thao tác</th><th style="width:120px">Xuất Word</th>
+            </tr></thead>
+            <tbody id="verifyTbody">
+              <tr><td colspan="6" style="text-align:center;padding:24px;color:var(--muted)">⏳ Đang tải…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════ NOTIFICATIONS ═══════════ -->
+    <div class="admin-page" id="pgNotif">
+      <div class="admin-page-header">
+        <div>
+          <div class="admin-page-title">Trung tâm thông báo</div>
+          <div class="admin-page-sub">Quản lý và gửi thông báo đến quần chúng qua Zalo, SMS, Email</div>
+        </div>
+        <div class="admin-page-actions">
+          <button id="btnSendNotif" class="btn btn-primary" onclick="document.getElementById('notifModal').classList.add('open')">+ Gửi thông báo mới</button>
+        </div>
+      </div>
+      <div class="notif-stat-grid">
+        <div class="notif-stat-card">
+          <div class="notif-stat-num" id="ns-total" style="color:var(--navy)">—</div>
+          <div class="notif-stat-lbl">Tổng đã gửi hôm nay</div>
+        </div>
+        <div class="notif-stat-card">
+          <div class="notif-stat-num" id="ns-unread" style="color:var(--success)">—</div>
+          <div class="notif-stat-lbl">Chưa đọc</div>
+        </div>
+        <div class="notif-stat-card">
+          <div class="notif-stat-num" id="ns-batches" style="color:var(--warn)">—</div>
+          <div class="notif-stat-lbl">Đợt gửi gần đây</div>
+        </div>
+      </div>
+      <div class="notif-two-col" style="display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start">
+        <div>
+          <div class="dash-section-label">Lịch sử gửi gần đây</div>
+          <div class="card">
+            <div id="notifLog" style="padding:0">
+              <div style="text-align:center;padding:24px;color:var(--muted);font-size:12.5px">⏳ Đang tải…</div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="dash-section-label">Gửi hàng loạt nhanh</div>
+          <div class="card">
+            <div class="card-head"><div class="card-head-dot"></div><h3>Chọn nhóm nhận nhắc nhở</h3></div>
+            <div class="card-body">
+              <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px">
+                <label class="bulk-group-label"><input type="checkbox" style="width:auto;accent-color:var(--crimson)"><span style="flex:1">Chưa nộp <strong>&gt; 7 ngày</strong></span><span id="bulkCountLateSubmit" class="bulk-group-count" style="background:var(--crimson-xl);color:var(--crimson)">—</span></label>
+                <label class="bulk-group-label"><input type="checkbox" style="width:auto;accent-color:var(--crimson)"><span style="flex:1">Hồ sơ trả lại <strong>chưa cập nhật &gt; 3 ngày</strong></span><span id="bulkCountReturnedStale" class="bulk-group-count" style="background:var(--warn-l);color:var(--warn)">—</span></label>
+                <label class="bulk-group-label"><input type="checkbox" style="width:auto;accent-color:var(--crimson)"><span style="flex:1">Tài khoản mới <strong>chưa đăng nhập</strong></span><span id="bulkCountNewNoLogin" class="bulk-group-count" style="background:#F5F3FF;color:#6D28D9">—</span></label>
+              </div>
+              <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="sendBulkNotif()">📨 Gửi nhắc nhở hàng loạt</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════ ACCOUNT ═══════════ -->
+    <div class="admin-page" id="pgAccount">
+      <div class="admin-page-header">
+        <div>
+          <div class="admin-page-title">Cấp tài khoản cho quần chúng</div>
+          <div class="admin-page-sub">Tạo tài khoản kê khai điện tử và gửi thông tin đăng nhập</div>
+        </div>
+      </div>
+      <div class="account-two-col" style="display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start">
+        <div class="card">
+          <div class="card-head"><div class="card-head-dot"></div><h3 id="accStepTitle">Bước 1 – Thông tin định danh</h3></div>
+          <div class="card-body">
+            <div class="account-steps">
+              <div class="acc-step-item active" id="step1Indicator"><div class="acc-step-circle">1</div><div class="acc-step-label">Định danh</div></div>
+              <div class="acc-step-item" id="step2Indicator"><div class="acc-step-circle">2</div><div class="acc-step-label">Liên lạc</div></div>
+              <div class="acc-step-item" id="step3Indicator"><div class="acc-step-circle">3</div><div class="acc-step-label">Xác nhận</div></div>
+            </div>
+
+            <!-- STEP 1 -->
+            <div id="accStep1" class="acc-step-form">
+              <div class="form-row"><label>Họ và tên <span class="req">*</span></label><input type="text" id="accName" placeholder="Nguyễn Văn A"></div>
+              <div class="form-row"><label>Số CCCD <span class="req">*</span></label><input type="text" id="accCCCD" placeholder="0XX XXX XXXXXX" maxlength="12"></div>
+              <div class="form-row"><label>Ngày sinh <span class="req">*</span></label><input type="date" id="accDOB"></div>
+              <div class="form-row"><label>Số điện thoại <span class="req">*</span></label><input type="tel" id="accPhone" placeholder="Nhập số điện thoại"></div>
+              <div style="display:flex;gap:8px;padding-top:16px;border-top:1px solid var(--border-xl);margin-top:4px">
+                <button class="btn btn-ghost" style="flex:1;justify-content:center" onclick="resetAccForm()">Hủy</button>
+                <button class="btn btn-primary" style="flex:2;justify-content:center" onclick="goToAccStep(2)">Tiếp theo →</button>
+              </div>
+            </div>
+
+            <!-- STEP 2 -->
+            <div id="accStep2" class="acc-step-form" style="display:none">
+              <div class="form-row"><label>Email Gmail <span class="req">*</span></label><input type="email" id="accEmail" placeholder="example@gmail.com"></div>
+              <div class="form-row"><label>Mật khẩu khởi tạo</label><input type="text" value="Hệ thống tự tạo ngẫu nhiên và gửi qua Gmail" disabled></div>
+              <div class="form-row"><label>Kênh thông báo</label><div class="check-group"><label class="check-opt"><input type="checkbox" id="chkEmail" checked disabled> Gmail</label></div></div>
+              <div style="display:flex;gap:8px;padding-top:16px;border-top:1px solid var(--border-xl);margin-top:4px">
+                <button class="btn btn-ghost" style="flex:1;justify-content:center" onclick="goToAccStep(1)">← Quay lại</button>
+                <button class="btn btn-primary" style="flex:2;justify-content:center" onclick="goToAccStep(3)">Tiếp theo →</button>
+              </div>
+            </div>
+
+            <!-- STEP 3 -->
+            <div id="accStep3" class="acc-step-form" style="display:none">
+              <div style="background:#F4F6F9;border-radius:10px;padding:14px;margin-bottom:16px">
+                <div style="font-size:12px;font-weight:600;color:var(--muted);margin-bottom:10px;text-transform:uppercase">Thông tin xác nhận</div>
+                <div style="font-size:13px;line-height:1.6;color:var(--navy)">
+                  <div><strong>Họ tên:</strong> <span id="reviewName">—</span></div>
+                  <div><strong>CCCD:</strong> <span id="reviewCCCD">—</span></div>
+                  <div><strong>Ngày sinh:</strong> <span id="reviewDOB">—</span></div>
+                  <div><strong>Số điện thoại:</strong> <span id="reviewPhone">—</span></div>
+                  <div style="margin-top:8px"><strong>Email:</strong> <span id="reviewEmail">—</span></div>
+                  <div><strong>Mật khẩu khởi tạo:</strong> Hệ thống tạo ngẫu nhiên và gửi qua Gmail</div>
+                  <div><strong>Kênh thông báo:</strong> <span id="reviewChannels">—</span></div>
+                </div>
+              </div>
+              <div class="alert alert-info" style="font-size:12px;margin-bottom:14px">
+                ℹ Sau khi xác nhận, hệ thống sẽ tạo tài khoản và gửi thông tin đăng nhập qua Gmail.
+              </div>
+              <div style="display:flex;gap:8px;padding-top:16px;border-top:1px solid var(--border-xl);margin-top:4px">
+                <button class="btn btn-ghost" style="flex:1;justify-content:center" onclick="goToAccStep(2)">← Quay lại</button>
+                <button class="btn btn-primary" style="flex:2;justify-content:center" onclick="submitCreateAccount()">✓ Xác nhận & Cấp tài khoản</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="dash-section-label">Tài khoản cấp gần đây</div>
+          <div class="card">
+            <div class="profile-table-wrap">
+              <table class="profile-table">
+                <thead><tr><th>Họ tên</th><th>CCCD</th><th>Ngày cấp</th><th>Trạng thái</th></tr></thead>
+                <tbody id="recentAccountsTbody">
+                  <tr><td colspan="4" style="text-align:center;padding:20px;color:var(--muted)">⏳ Đang tải…</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════ SETTINGS / INTEGRATIONS ═══════════ -->
+    <div class="admin-page" id="pgSettings">
+      <div class="admin-page-header">
+        <div>
+          <div class="admin-page-title">Cài đặt & Tích hợp hệ thống</div>
+          <div class="admin-page-sub">Kết nối Zalo OA, SMS, AI và xuất văn bản chính thức</div>
+        </div>
+      </div>
+
+      <!-- Word Export has been moved to Verify page action column -->
+      <div class="dash-section-label">Xuất Văn bản Word</div>
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-body">
+          <div class="alert alert-info" style="margin:0">
+            ℹ Chức năng xuất Word đã được chuyển sang trang <strong>Theo dõi xác minh lý lịch</strong>.
+            Chỉ các hồ sơ ở trạng thái <strong>Hoàn thiện</strong> mới có nút xuất.
+          </div>
+        </div>
+      </div>
+
+      <!-- Integrations -->
+      <div class="dash-section-label">Tích hợp dịch vụ</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px">
+        <div class="integration-card">
+          <div class="integration-logo" style="background:#E8F5E9">💬</div>
+          <div style="flex:1">
+            <div style="font-weight:700;font-size:13px;color:var(--navy)">Zalo OA</div>
+            <div style="font-size:11.5px;color:var(--muted);margin-top:2px">Gửi thông báo qua Zalo Official Account</div>
+            <div style="margin-top:10px;display:flex;gap:6px">
+              <input type="text" placeholder="OA Access Token" style="flex:1;font-size:12px">
+              <button class="btn btn-primary" style="padding:7px 12px;font-size:12px">Kết nối</button>
+            </div>
+          </div>
+          <span class="integration-status-badge int-pending">Chưa kết nối</span>
+        </div>
+        <div class="integration-card">
+          <div class="integration-logo" style="background:#EFF6FF">📱</div>
+          <div style="flex:1">
+            <div style="font-weight:700;font-size:13px;color:var(--navy)">SMS Gateway</div>
+            <div style="font-size:11.5px;color:var(--muted);margin-top:2px">ESMS / Viettel SMS / BSMS</div>
+            <div style="margin-top:10px;display:flex;gap:6px">
+              <input type="text" placeholder="API Key" style="flex:1;font-size:12px">
+              <button class="btn btn-primary" style="padding:7px 12px;font-size:12px">Kết nối</button>
+            </div>
+          </div>
+          <span class="integration-status-badge int-pending">Chưa kết nối</span>
+        </div>
+        <div class="integration-card">
+          <div class="integration-logo" style="background:#F9F6FF">🤖</div>
+          <div style="flex:1">
+            <div style="font-weight:700;font-size:13px;color:var(--navy)">Gemini API</div>
+            <div style="font-size:11.5px;color:var(--muted);margin-top:2px">Google Gemini — AI kiểm tra hồ sơ tự động</div>
+            <div style="margin-top:10px;display:flex;gap:6px">
+              <input type="text" placeholder="Gemini API Key (AIza…)" style="flex:1;font-size:12px">
+              <button class="btn btn-primary" style="padding:7px 12px;font-size:12px">Kết nối</button>
+            </div>
+          </div>
+          <span class="integration-status-badge int-disabled">Tùy chọn</span>
+        </div>
+        <div class="integration-card">
+          <div class="integration-logo" style="background:#F0FDF4">🧠</div>
+          <div style="flex:1">
+            <div style="font-weight:700;font-size:13px;color:var(--navy)">ChatGPT / OpenAI</div>
+            <div style="font-size:11.5px;color:var(--muted);margin-top:2px">OpenAI GPT — AI soát lỗi và gợi ý điền mẫu</div>
+            <div style="margin-top:10px;display:flex;gap:6px">
+              <input type="text" placeholder="OpenAI API Key (sk-…)" style="flex:1;font-size:12px">
+              <button class="btn btn-primary" style="padding:7px 12px;font-size:12px">Kết nối</button>
+            </div>
+          </div>
+          <span class="integration-status-badge int-disabled">Tùy chọn</span>
+        </div>
+      </div>
+
+    </div>
+
+
+    <!-- ═══════════ PROFILE EDIT (DIRECT EDITING) ═══════════ -->
+    <div class="admin-page" id="pgProfileEdit">
+
+      <!-- Sticky action bar -->
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
+        <div>
+          <button class="btn btn-ghost" style="font-size:12px;padding:6px 12px" onclick="showAdminPageByName('pgVerify')">← Về danh sách</button>
+        </div>
+        <div id="editProfileBreadcrumb" style="font-size:12.5px;color:var(--muted)">
+          <span id="editProfileBreadcrumbLabel">Chỉnh sửa hồ sơ:</span> <strong id="editProfileTitle" style="color:var(--navy)">—</strong>
+        </div>
+        <div style="margin-left:auto;display:flex;gap:8px;flex-wrap:wrap;">
+          <div class="status-select-wrap">
+            <span style="font-size:11px;color:var(--muted);font-weight:600">Trạng thái:</span>
+            <select class="status-select" id="editStatusSelect" onchange="updateProfileStatus(this.value)">
+              <option value="draft">Đang kê khai</option>
+              <option value="submitted">Đã nộp</option>
+              <option value="pending">Đang xem xét</option>
+              <option value="under_review" selected>Đang thẩm định</option>
+              <option value="returned">Trả lại</option>
+              <option value="verifying">Đang xác minh</option>
+              <option value="approved">Đã phê duyệt</option>
+              <option value="completed">Hoàn thiện</option>
+              <option value="rejected">Từ chối</option>
+              <option value="withdrawn">Rút hồ sơ</option>
+            </select>
+          </div>
+          <button id="btnSaveAllEdits" class="btn btn-primary" style="font-size:12px" onclick="saveAllEdits()">💾 Lưu tất cả</button>
+        </div>
+      </div>
+
+      <!-- Review action bar — visible only for can_bo_bxd -->
+      <div id="reviewActionBar">
+        <div class="rab-title">🔍 Chế độ thẩm định — Dữ liệu hồ sơ ở trạng thái chỉ đọc. Thêm nhận xét tại từng phần rồi trả lại cho quần chúng sửa.</div>
+        <button class="btn" style="background:#ffeaa0;color:#7a4000;border:1.5px solid #d4a800;font-size:12px" onclick="saveFieldNotesOnly()">💾 Lưu nhận xét</button>
+        <button class="btn btn-primary" style="font-size:12px;background:var(--crimson)" onclick="openReturnModalFromReview()">↩ Trả lại hồ sơ</button>
+      </div>
+
+      <!-- Two-column: sidenav + main edit area -->
+      <div class="edit-layout" id="editLayout">
+
+        <!-- Section navigator -->
+        <div class="edit-sidenav" id="editSideNav">
+          <div class="edit-sidenav-title">Điều hướng phần</div>
+          <div class="edit-nav-item active" onclick="scrollToSection('esA')">A. Sơ lược lý lịch</div>
+          <div class="edit-nav-item" onclick="scrollToSection('esB')">B. Lịch sử bản thân</div>
+          <div class="edit-nav-item" onclick="scrollToSection('esC')">C. Trình độ & Công tác</div>
+          <div class="edit-nav-item" id="esD-nav" onclick="scrollToSection('esD')">D. Thành phần gia đình</div>
+          <div class="edit-nav-item" onclick="scrollToSection('esE')">E. Khen thưởng</div>
+          <div class="edit-nav-item" onclick="scrollToSection('esFT')">F. Đi nước ngoài</div>
+          <div class="edit-nav-item" onclick="scrollToSection('esH')">H. Kỷ luật</div>
+          <div class="edit-nav-item" onclick="scrollToSection('esJ')">J. Tự nhận xét</div>
+          <div class="edit-nav-item" onclick="scrollToSection('esK')">K. Cam đoan & Nộp</div>
+          <div class="edit-nav-item" onclick="scrollToSection('esG')">G. Lịch sử chỉnh sửa</div>
+          <div style="margin-top:16px;padding:0 16px;">
+            <div class="edit-sidenav-title" style="padding:0 0 8px">AI Score</div>
+            <div style="text-align:center;padding:10px 0">
+              <div style="font-size:28px;font-weight:800;color:var(--success)" id="editAIScore">—%</div>
+              <div style="font-size:10px;color:var(--hint);margin-top:2px">Độ hoàn thiện</div>
+            </div>
+            <div class="ai-score-bar" style="width:100%;height:6px;border-radius:4px;overflow:hidden;background:var(--border-l)">
+              <div id="editAIBar" style="height:100%;width:94%;background:var(--success);border-radius:4px;transition:width .6s"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Main editing area -->
+        <div class="edit-main" id="editMain">
+
+          <!-- A. Personal Info -->
+          <div class="editable-section" id="esA">
+            <div class="edit-sec-head">
+              <div class="card-head-dot"></div>
+              <h4>A. Sơ lược lý lịch</h4>
+              <div class="edit-sec-actions">
+                <button class="edit-btn flag-btn" onclick="toggleSectionFlag('esA','A. Sơ lược lý lịch')" title="Đánh dấu cần bổ sung">⚑ Gắn cờ</button>
+                <button class="edit-btn" onclick="toggleEdit('esA')">✏ Chỉnh sửa</button>
+              </div>
+            </div>
+            <div class="edit-sec-body">
+              <div class="field-correction-note" id="note-esA"></div>
+              <div class="field-row">
+                <div class="field-label">Họ và tên</div>
+                <div class="field-value" id="fv-esA-name">—</div>
+                <input class="field-input" id="fi-esA-name" value="" data-field="Họ và tên">
+              </div>
+              <div class="field-row">
+                <div class="field-label">Giới tính</div>
+                <div class="field-value" id="fv-esA-gender">—</div>
+                <select class="field-select-input" id="fi-esA-gender" data-field="Giới tính"><option value="">—</option><option value="female">Nữ</option><option value="male">Nam</option><option value="other">Khác</option></select>
+              </div>
+              <div class="field-row">
+                <div class="field-label">Ngày sinh</div>
+                <div class="field-value" id="fv-esA-dob">—</div>
+                <input class="field-input" id="fi-esA-dob" type="date" value="" data-field="Ngày sinh">
+              </div>
+              <div class="field-row">
+                <div class="field-label">Nơi sinh</div>
+                <div class="field-value" id="fv-esA-birthplace">—</div>
+                <input class="field-input" id="fi-esA-birthplace" value="" data-field="Nơi sinh">
+              </div>
+              <div class="field-row">
+                <div class="field-label">Quê quán</div>
+                <div class="field-value" id="fv-esA-hometown">—</div>
+                <input class="field-input" id="fi-esA-hometown" value="" data-field="Quê quán">
+              </div>
+              <div class="field-row">
+                <div class="field-label">Dân tộc</div>
+                <div class="field-value" id="fv-esA-ethnic">Kinh</div>
+                <select class="field-select-input" id="fi-esA-ethnic" data-field="Dân tộc"><option value="">—</option><option value="Kinh" selected>Kinh</option><option>Tày</option><option>Thái</option><option>Khmer</option><option>Khác</option></select>
+              </div>
+              <div class="field-row">
+                <div class="field-label">Tôn giáo</div>
+                <div class="field-value" id="fv-esA-religion">Không</div>
+                <select class="field-select-input" id="fi-esA-religion" data-field="Tôn giáo"><option value="">—</option><option value="Không" selected>Không</option><option>Phật giáo</option><option>Công giáo</option><option>Cao Đài</option><option>Tin Lành</option><option>Khác</option></select>
+              </div>
+              <div class="field-row">
+                <div class="field-label">Nơi thường trú</div>
+                <div class="field-value" id="fv-esA-address">—</div>
+                <input class="field-input" id="fi-esA-address" value="" data-field="Nơi thường trú">
+              </div>
+              <div class="field-row">
+                <div class="field-label">CCCD</div>
+                <div class="field-value" id="fv-esA-cccd">—</div>
+                <input class="field-input" id="fi-esA-cccd" value="" maxlength="12" data-field="CCCD" readonly style="background:#f5f5f5;color:#888;cursor:not-allowed" title="CCCD được lấy từ tài khoản. Chỉnh sửa trong mục Quản lý tài khoản.">
+              </div>
+              <div class="field-row">
+                <div class="field-label">Số điện thoại</div>
+                <div class="field-value" id="fv-esA-phone">—</div>
+                <input class="field-input" id="fi-esA-phone" value="" data-field="Số điện thoại">
+              </div>
+              <div class="field-row">
+                <div class="field-label">Email</div>
+                <div class="field-value empty" id="fv-esA-email">—</div>
+                <input class="field-input" id="fi-esA-email" placeholder="email@example.com" data-field="Email">
+              </div>
+              <div class="field-row">
+                <div class="field-label">Nghề nghiệp</div>
+                <div class="field-value" id="fv-esA-occupation">—</div>
+                <input class="field-input" id="fi-esA-occupation" value="" data-field="Nghề nghiệp">
+              </div>
+              <div class="field-row">
+                <div class="field-label">Nơi tạm trú</div>
+                <div class="field-value" id="fv-esA-temp-addr">—</div>
+                <input class="field-input" id="fi-esA-temp-addr" value="" data-field="Nơi tạm trú" placeholder="Để trống nếu không có">
+              </div>
+            </div>
+          </div>
+
+          <!-- B. Personal History Timeline -->
+          <div class="editable-section" id="esB">
+            <div class="edit-sec-head">
+              <div class="card-head-dot"></div>
+              <h4>B. Lịch sử bản thân (liên tục từ nhỏ đến nay)</h4>
+              <div class="edit-sec-actions">
+                <button class="edit-btn flag-btn" onclick="toggleSectionFlag('esB','B. Lịch sử bản thân')" title="Đánh dấu cần bổ sung">⚑ Gắn cờ</button>
+                <button class="edit-btn" onclick="toggleEdit('esB')">✏ Chỉnh sửa</button>
+              </div>
+            </div>
+            <div class="edit-sec-body">
+              <div class="field-correction-note" id="note-esB"></div>
+              <div id="timeline-esB">
+                <div style="text-align:center;padding:16px;color:var(--muted);font-size:12.5px">⏳ Đang tải lịch sử bản thân…</div>
+              </div>
+              <button class="add-row-btn" style="margin-top:8px" onclick="addHistoryRowB()">+ Thêm giai đoạn</button>
+            </div>
+          </div>
+
+          <!-- C. Education & Work -->
+          <div class="editable-section" id="esC">
+            <div class="edit-sec-head">
+              <div class="card-head-dot"></div>
+              <h4>C. Trình độ học vấn & Công tác</h4>
+              <div class="edit-sec-actions">
+                <button class="edit-btn flag-btn" onclick="toggleSectionFlag('esC','C. Trình độ')" title="Đánh dấu cần bổ sung">⚑ Gắn cờ</button>
+                <button class="edit-btn" onclick="toggleEdit('esC')">✏ Chỉnh sửa</button>
+              </div>
+            </div>
+            <div class="edit-sec-body">
+              <div class="field-correction-note" id="note-esC"></div>
+              <div class="field-row">
+                <div class="field-label">Trình độ GD phổ thông</div>
+                <div class="field-value" id="fv-esC-edu-gen">—</div>
+                <select class="field-select-input" id="fi-esC-edu-gen" data-field="Trình độ GD"><option value="">—</option><option>12/12</option><option>9/12</option><option>5/12</option></select>
+              </div>
+              <div class="field-row">
+                <div class="field-label">Trình độ chuyên môn</div>
+                <div class="field-value" id="fv-esC-edu-qual">—</div>
+                <input class="field-input" id="fi-esC-edu-qual" value="" data-field="Trình độ CM">
+              </div>
+              <div class="field-row">
+                <div class="field-label">Lý luận chính trị</div>
+                <div class="field-value" id="fv-esC-political">—</div>
+                <select class="field-select-input" id="fi-esC-political" data-field="LLCT"><option value="">—</option><option>Sơ cấp</option><option>Trung cấp</option><option>Cao cấp</option><option>Cử nhân</option></select>
+              </div>
+              <div class="field-row">
+                <div class="field-label">Ngoại ngữ</div>
+                <div class="field-value" id="fv-esC-foreign-lang">—</div>
+                <input class="field-input" id="fi-esC-foreign-lang" value="" data-field="Ngoại ngữ">
+              </div>
+              <div class="field-row">
+                <div class="field-label">Tin học</div>
+                <div class="field-value" id="fv-esC-it">—</div>
+                <input class="field-input" id="fi-esC-it" value="" data-field="Tin học">
+              </div>
+              <div class="field-row">
+                <div class="field-label">Vào Đoàn TNCS</div>
+                <div class="field-value" id="fv-esC-youth-union">—</div>
+                <input class="field-input" id="fi-esC-youth-union" value="" data-field="Vào Đoàn">
+              </div>
+              <div class="field-row">
+                <div class="field-label">Khoa học công nghệ</div>
+                <div class="field-value" id="fv-esC-sci-tech">—</div>
+                <input class="field-input" id="fi-esC-sci-tech" value="" data-field="KHCN" placeholder="Chứng chỉ KHCN, đổi mới sáng tạo…">
+              </div>
+              <div class="field-row">
+                <div class="field-label">Học vị cao nhất</div>
+                <div class="field-value" id="fv-esC-degree">—</div>
+                <input class="field-input" id="fi-esC-degree" value="" data-field="Học vị" placeholder="Thạc sĩ / Tiến sĩ…">
+              </div>
+              <div class="field-row">
+                <div class="field-label">Học hàm cao nhất</div>
+                <div class="field-value" id="fv-esC-acad-title">—</div>
+                <input class="field-input" id="fi-esC-acad-title" value="" data-field="Học hàm" placeholder="Phó Giáo sư / Giáo sư">
+              </div>
+              <div class="field-row">
+                <div class="field-label">Tiếng dân tộc</div>
+                <div class="field-value" id="fv-esC-ethnic-lang">—</div>
+                <input class="field-input" id="fi-esC-ethnic-lang" value="" data-field="Tiếng dân tộc" placeholder="Tên tiếng dân tộc thiểu số">
+              </div>
+              <!-- Work history (Part C: công tác, chức vụ đã qua) -->
+              <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border-xl)">
+                <div style="font-weight:600;font-size:12.5px;color:var(--text2);margin-bottom:8px">Những công tác, chức vụ đã qua (Phần C)</div>
+                <div id="timeline-esC">
+                  <div style="text-align:center;padding:16px;color:var(--muted);font-size:12.5px">⏳ Đang tải lịch sử công tác…</div>
+                </div>
+                <button class="add-row-btn" style="margin-top:8px" onclick="addWorkRowC()">+ Thêm công tác</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- D. Family Members -->
+          <div class="editable-section" id="esD">
+            <div class="edit-sec-head">
+              <div class="card-head-dot"></div>
+              <h4>D. Thành phần gia đình</h4>
+              <div class="edit-sec-actions">
+                <button class="edit-btn flag-btn" onclick="toggleSectionFlag('esD','D. Gia đình')" title="Đánh dấu cần bổ sung">⚑ Gắn cờ</button>
+                <button class="edit-btn" onclick="toggleEdit('esD')">✏ Chỉnh sửa</button>
+              </div>
+            </div>
+            <div class="edit-sec-body">
+              <div class="field-correction-note" id="note-esD"></div>
+              <div id="family-esD-body">
+                <div style="text-align:center;padding:16px;color:var(--muted);font-size:12.5px">⏳ Đang tải thành phần gia đình…</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- E. Rewards (maps from Public User Section G) -->
+          <div class="editable-section" id="esE">
+            <div class="edit-sec-head">
+              <div class="card-head-dot"></div>
+              <h4>E. Khen thưởng</h4>
+              <div class="edit-sec-actions">
+                <button class="edit-btn flag-btn" onclick="toggleSectionFlag('esE','E. Khen thưởng')">⚑ Gắn cờ</button>
+                <button class="edit-btn" onclick="toggleEdit('esE')">✏ Chỉnh sửa</button>
+              </div>
+            </div>
+            <div class="edit-sec-body">
+              <div class="field-correction-note" id="note-esE"></div>
+              <div id="timeline-esG">
+                <div style="text-align:center;padding:16px;color:var(--muted);font-size:12.5px">⏳ Đang tải khen thưởng…</div>
+              </div>
+              <button class="add-row-btn" style="margin-top:8px" onclick="addAwardRow('timeline-esG')">+ Thêm khen thưởng</button>
+            </div>
+          </div>
+
+          <!-- F. Foreign Travel (maps from Public User Section F) -->
+          <div class="editable-section" id="esFT">
+            <div class="edit-sec-head">
+              <div class="card-head-dot"></div>
+              <h4>F. Đi nước ngoài</h4>
+              <div class="edit-sec-actions">
+                <button class="edit-btn flag-btn" onclick="toggleSectionFlag('esFT','F. Đi nước ngoài')">⚑ Gắn cờ</button>
+                <button class="edit-btn" onclick="toggleEdit('esFT')">✏ Chỉnh sửa</button>
+              </div>
+            </div>
+            <div class="edit-sec-body">
+              <div class="field-correction-note" id="note-esFT"></div>
+              <div id="timeline-esF">
+                <div style="text-align:center;padding:16px;color:var(--muted);font-size:12.5px">⏳ Đang tải lịch sử đi nước ngoài…</div>
+              </div>
+              <button class="add-row-btn" style="margin-top:8px" onclick="addTravelRow('timeline-esF')">+ Thêm chuyến đi</button>
+            </div>
+          </div>
+
+          <!-- H. Discipline (maps from Public User Section H) -->
+          <div class="editable-section" id="esH">
+            <div class="edit-sec-head">
+              <div class="card-head-dot"></div>
+              <h4>H. Kỷ luật</h4>
+              <div class="edit-sec-actions">
+                <button class="edit-btn flag-btn" onclick="toggleSectionFlag('esH','H. Kỷ luật')">⚑ Gắn cờ</button>
+                <button class="edit-btn" onclick="toggleEdit('esH')">✏ Chỉnh sửa</button>
+              </div>
+            </div>
+            <div class="edit-sec-body">
+              <div class="field-correction-note" id="note-esH"></div>
+              <div id="timeline-esH">
+                <div style="text-align:center;padding:16px;color:var(--muted);font-size:12.5px">⏳ Đang tải kỷ luật…</div>
+              </div>
+              <button class="add-row-btn" style="margin-top:8px" onclick="addAwardRow('timeline-esH')">+ Thêm kỷ luật</button>
+            </div>
+          </div>
+
+          <!-- J. Self-Assessment -->
+          <div class="editable-section" id="esJ">
+            <div class="edit-sec-head">
+              <div class="card-head-dot"></div>
+              <h4>J. Tự nhận xét</h4>
+              <div class="edit-sec-actions">
+                <button class="edit-btn flag-btn" onclick="toggleSectionFlag('esJ','J. Tự nhận xét')">⚑ Gắn cờ</button>
+                <button class="edit-btn" onclick="toggleEdit('esJ')">✏ Chỉnh sửa</button>
+              </div>
+            </div>
+            <div class="edit-sec-body">
+              <div class="field-correction-note" id="note-esJ"></div>
+              <div class="field-row">
+                <div class="field-label">Tự đánh giá bản thân (≥ 200 chữ)</div>
+                <div class="field-value empty" id="fv-esJ-self">—</div>
+                <textarea class="field-textarea" id="fi-esJ-self" placeholder="Tự đánh giá về năng lực chính trị, đạo đức, công tác… (≥ 200 chữ)" data-field="Tự nhận xét"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- K. Commitment & Submission -->
+          <div class="editable-section" id="esK">
+            <div class="edit-sec-head">
+              <div class="card-head-dot"></div>
+              <h4>K. Cam đoan & Xác nhận</h4>
+              <div class="edit-sec-actions">
+                <button class="edit-btn flag-btn" onclick="toggleSectionFlag('esK','K. Cam đoan')">⚑ Gắn cờ</button>
+                <button class="edit-btn" onclick="toggleEdit('esK')">✏ Chỉnh sửa</button>
+              </div>
+            </div>
+            <div class="edit-sec-body">
+              <div class="field-correction-note" id="note-esK"></div>
+              <div style="background:var(--bg);border:1.5px dashed var(--border-m);border-radius:var(--r-sm);padding:12px;margin-bottom:12px;font-size:12px;color:var(--muted);line-height:1.5">
+                Tôi xác nhận rằng những thông tin khai trên là trung thực, chính xác. Tôi chịu trách nhiệm pháp lý nếu khai báo không trung thực. Tôi sẵn sàng tuân thủ Điều lệ Đảng Cộng sản Việt Nam.
+              </div>
+              <div class="field-row">
+                <div class="field-label">Họ tên người khai (ký tên)</div>
+                <div class="field-value" id="fv-esK-name">—</div>
+                <input class="field-input" id="fi-esK-name" placeholder="Họ và tên" data-field="Họ tên khai">
+              </div>
+              <div class="field-row">
+                <div class="field-label">Ngày ký cam đoan</div>
+                <div class="field-value" id="fv-esK-date">—</div>
+                <input class="field-input" id="fi-esK-date" type="date" data-field="Ngày ký">
+              </div>
+            </div>
+          </div>
+
+          <!-- F. Files -->
+          <div class="editable-section" id="esF">
+            <div class="edit-sec-head">
+              <div class="card-head-dot"></div>
+              <h4>F. Tài liệu đính kèm</h4>
+              <div class="edit-sec-actions"></div>
+            </div>
+            <div class="edit-sec-body">
+              <div class="field-correction-note" id="note-esF"></div>
+              <div id="files-esF-body" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px">
+                <div style="color:#A0AABF;font-size:13px;padding:8px 0">⏳ Đang tải…</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- G. Edit History -->
+          <div class="editable-section" id="esG">
+            <div class="edit-sec-head">
+              <div class="card-head-dot"></div>
+              <h4>G. Lịch sử chỉnh sửa</h4>
+            </div>
+            <div class="edit-sec-body" id="editHistoryBody">
+              <div style="text-align:center;padding:20px;color:var(--muted);font-size:12.5px">Lịch sử chỉnh sửa sẽ hiển thị tại đây.</div>
+            </div>
+          </div>
+
+        </div><!-- /edit-main -->
+      </div><!-- /edit-layout -->
+
+      <!-- Return Modal -->
+      <div class="modal-backdrop" id="returnModal">
+        <div class="modal-box" style="width:520px">
+          <div class="modal-head">
+            <h3>↩ Trả lại hồ sơ — Yêu cầu bổ sung</h3>
+            <button class="modal-close" onclick="closeReturnModal()">✕</button>
+          </div>
+          <div class="modal-body">
+            <div class="correction-request-panel">
+              <div class="crp-header">⚑ Các phần cần bổ sung / sửa lại</div>
+              <div class="crp-sections" id="flaggedSectionTags">
+              </div>
+              <div style="font-size:11.5px;color:var(--muted)">Chọn thêm phần cần sửa bên dưới, hoặc xóa các phần đã chọn.</div>
+            </div>
+            <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px">
+              <button class="edit-btn" onclick="addReturnSection('A. Sơ lược lý lịch')">+ A. Sơ lược</button>
+              <button class="edit-btn" onclick="addReturnSection('B. Lịch sử bản thân')">+ B. Lịch sử</button>
+              <button class="edit-btn" onclick="addReturnSection('C. Trình độ')">+ C. Trình độ</button>
+              <button class="edit-btn" onclick="addReturnSection('D. Gia đình')">+ D. Gia đình</button>
+              <button class="edit-btn" onclick="addReturnSection('E. Khen thưởng')">+ E. Khen thưởng</button>
+              <button class="edit-btn" onclick="addReturnSection('F. Đi nước ngoài')">+ F. Đi nước ngoài</button>
+              <button class="edit-btn" onclick="addReturnSection('H. Kỷ luật')">+ H. Kỷ luật</button>
+              <button class="edit-btn" onclick="addReturnSection('J. Tự nhận xét')">+ J. Tự nhận xét</button>
+              <button class="edit-btn" onclick="addReturnSection('K. Cam đoan')">+ K. Cam đoan</button>
+            </div>
+            <label style="font-size:12px;font-weight:600;color:var(--muted);display:block;margin-bottom:6px">Ghi chú gửi kèm cho Quần chúng <span style="color:var(--crimson)">*</span></label>
+            <textarea id="returnModalNote" rows="4" style="width:100%;border:1.5px solid var(--border);border-radius:var(--r-sm);padding:10px 12px;font-family:inherit;font-size:12.5px;resize:vertical;outline:none;transition:border-color .15s" placeholder="VD: Vui lòng bổ sung lịch sử công tác của cha ruột từ năm 2000 đến nay (Phần D). Ghi rõ làm gì, ở đâu…"></textarea>
+            <div style="margin-top:10px">
+              <label style="display:flex;align-items:center;gap:8px;font-size:12px;cursor:pointer">
+                <input type="checkbox" checked style="width:auto;accent-color:var(--crimson)"> Gửi thông báo Zalo OA ngay khi trả lại
+              </label>
+              <label style="display:flex;align-items:center;gap:8px;font-size:12px;cursor:pointer;margin-top:6px">
+                <input type="checkbox" style="width:auto;accent-color:var(--crimson)"> Gửi thêm SMS
+              </label>
+            </div>
+          </div>
+          <div class="modal-foot">
+            <button class="btn btn-ghost" onclick="closeReturnModal()">Hủy</button>
+            <button class="btn btn-primary" onclick="confirmReturnProfile()">↩ Xác nhận trả lại hồ sơ</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <!-- /pgProfileEdit -->
+    <!-- ═══════════ REPORT ═══════════ -->
+    <div class="admin-page" id="pgReport">
+      <div class="admin-page-header">
+        <div>
+          <div class="admin-page-title">Báo cáo & Thống kê</div>
+          <div class="admin-page-sub">Tổng hợp tiến độ xử lý hồ sơ theo tháng và theo khu vực</div>
+        </div>
+        <div class="admin-page-actions report-actions">
+          <select class="filter-select report-filter" id="reportPeriodSelect" onchange="_loadReportPage(this.value)">
+            <option value="">Đang tải...</option>
+          </select>
+          <button class="btn btn-ghost report-export-btn" id="reportExportBtn" onclick="exportReportExcel()">
+            <span style="font-size:13px;line-height:1">↓</span> Xuất báo cáo
+          </button>
+        </div>
+      </div>
+      <div class="chart-grid">
+        <div class="chart-card"><div class="chart-title" id="reportProgressTitle">Tiến độ xử lý hồ sơ</div>
+          <div class="bar-chart-row"><div class="bar-label">Đã nộp</div><div class="bar-track"><div class="bar-fill" id="reportBarSubmitted" style="width:0%;background:#2563EB"></div></div><div class="bar-val" id="reportValSubmitted">0</div></div>
+          <div class="bar-chart-row"><div class="bar-label">Đang xem xét</div><div class="bar-track"><div class="bar-fill" id="reportBarPending" style="width:0%;background:var(--warn)"></div></div><div class="bar-val" id="reportValPending">0</div></div>
+          <div class="bar-chart-row"><div class="bar-label">Đang xác minh</div><div class="bar-track"><div class="bar-fill" id="reportBarVerifying" style="width:0%;background:#7C3AED"></div></div><div class="bar-val" id="reportValVerifying">0</div></div>
+          <div class="bar-chart-row"><div class="bar-label">Đã phê duyệt</div><div class="bar-track"><div class="bar-fill" id="reportBarApproved" style="width:0%;background:var(--success)"></div></div><div class="bar-val" id="reportValApproved">0</div></div>
+          <div class="bar-chart-row"><div class="bar-label">Hoàn thiện</div><div class="bar-track"><div class="bar-fill" id="reportBarCompleted" style="width:0%;background:#0F766E"></div></div><div class="bar-val" id="reportValCompleted">0</div></div>
+        </div>
+        <div class="chart-card"><div class="chart-title" id="reportWardTitle">Phân bổ quần chúng theo khu vực</div>
+          <div class="bar-chart-row"><div class="bar-label" id="reportWardLabel1">—</div><div class="bar-track"><div class="bar-fill" id="reportWardBar1" style="width:0%;background:var(--crimson-m)"></div></div><div class="bar-val" id="reportWardVal1">0</div></div>
+          <div class="bar-chart-row"><div class="bar-label" id="reportWardLabel2">—</div><div class="bar-track"><div class="bar-fill" id="reportWardBar2" style="width:0%;background:#2563EB"></div></div><div class="bar-val" id="reportWardVal2">0</div></div>
+          <div class="bar-chart-row"><div class="bar-label" id="reportWardLabel3">—</div><div class="bar-track"><div class="bar-fill" id="reportWardBar3" style="width:0%;background:var(--gold-b)"></div></div><div class="bar-val" id="reportWardVal3">0</div></div>
+          <div class="bar-chart-row"><div class="bar-label" id="reportWardLabel4">—</div><div class="bar-track"><div class="bar-fill" id="reportWardBar4" style="width:0%;background:var(--success)"></div></div><div class="bar-val" id="reportWardVal4">0</div></div>
+          <div class="bar-chart-row"><div class="bar-label" id="reportWardLabel5">—</div><div class="bar-track"><div class="bar-fill" id="reportWardBar5" style="width:0%;background:var(--muted)"></div></div><div class="bar-val" id="reportWardVal5">0</div></div>
+        </div>
+        <div class="chart-card"><div class="chart-title" id="reportTimingTitle">Thời gian xử lý trung bình (ngày)</div>
+          <div class="bar-chart-row"><div class="bar-label">Kê khai → Nộp</div><div class="bar-track"><div class="bar-fill" id="reportTimeSubmit" style="width:0%;background:#2563EB"></div></div><div class="bar-val" id="reportTimeSubmitVal">0</div></div>
+          <div class="bar-chart-row"><div class="bar-label">Nộp → Phê duyệt</div><div class="bar-track"><div class="bar-fill" id="reportTimeApprove" style="width:0%;background:var(--success)"></div></div><div class="bar-val" id="reportTimeApproveVal">0</div></div>
+          <div class="bar-chart-row"><div class="bar-label">Phê duyệt → Xác minh</div><div class="bar-track"><div class="bar-fill" id="reportTimeVerify" style="width:0%;background:var(--warn)"></div></div><div class="bar-val" id="reportTimeVerifyVal">0</div></div>
+          <div class="bar-chart-row"><div class="bar-label">Xác minh → Hoàn thiện</div><div class="bar-track"><div class="bar-fill" id="reportTimeComplete" style="width:0%;background:#7C3AED"></div></div><div class="bar-val" id="reportTimeCompleteVal">0</div></div>
+          <div class="bar-chart-row"><div class="bar-label">Tổng trung bình</div><div class="bar-track"><div class="bar-fill" id="reportTimeTotal" style="width:0%;background:var(--navy)"></div></div><div class="bar-val" id="reportTimeTotalVal">0</div></div>
+        </div>
+        <div class="chart-card"><div class="chart-title" id="reportCompletionTitle">Tỷ lệ hoàn thiện hồ sơ</div>
+          <div id="reportCompletionGauge" style="position:relative;width:100px;height:100px;border-radius:50%;background:conic-gradient(var(--success) 0% 0%,var(--border) 0% 100%);margin:0 auto 12px;display:flex;align-items:center;justify-content:center;">
+            <div id="reportCompletionPct" style="width:68px;height:68px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:var(--navy);">0%</div>
+          </div>
+          <div id="reportCompletionText" style="text-align:center;font-size:12px;color:var(--muted);margin-bottom:12px;">0 / 0 hồ sơ đã hoàn thiện</div>
+          <div class="legend-row"><div class="legend-dot" style="background:var(--success)"></div><span style="flex:1;font-size:12px">Đã hoàn thiện</span><strong id="reportCompletionDone">0</strong></div>
+          <div class="legend-row"><div class="legend-dot" style="background:#2563EB"></div><span style="flex:1;font-size:12px">Đang xử lý</span><strong id="reportCompletionRunning">0</strong></div>
+          <div class="legend-row"><div class="legend-dot" style="background:var(--border)"></div><span style="flex:1;font-size:12px">Chưa bắt đầu</span><strong id="reportCompletionTodo">0</strong></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div class="card-head-dot"></div><h3>Bảng tổng hợp theo tháng</h3></div>
+        <div class="profile-table-wrap">
+          <table class="profile-table">
+            <thead><tr><th>Tháng</th><th>Đã nộp</th><th>Đang thẩm định</th><th>Đã phê duyệt</th><th>Hoàn thiện</th><th>Tỷ lệ HT</th></tr></thead>
+            <tbody id="reportMonthlyTbody">
+              <tr><td colspan="6" style="text-align:center;padding:24px;color:var(--muted)">⏳ Đang tải…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  </div>
+
+  <!-- Detail panel -->
+  <div class="detail-panel" id="detailPanel">
+    <div class="detail-panel-head">
+      <div><h3 id="detailName"></h3><div style="font-size:11px;color:rgba(255,255,255,.45);margin-top:2px" id="detailSub"></div></div>
+      <button class="close-panel" onclick="closeDetail()">✕</button>
+    </div>
+    <div class="detail-panel-body">
+      <div class="detail-info-grid">
+        <div class="detail-field"><div class="detail-field-lbl">Trạng thái</div><div id="dpStatus"></div></div>
+        <div class="detail-field"><div class="detail-field-lbl">AI Score</div><div class="detail-field-val" id="dpScore">—</div></div>
+        <div class="detail-field"><div class="detail-field-lbl">Ngày nộp</div><div class="detail-field-val" id="dpSubmittedAt">—</div></div>
+        <div class="detail-field"><div class="detail-field-lbl">ĐV phụ trách</div><div class="detail-field-val" id="dpOfficer">—</div></div>
+      </div>
+      <div class="detail-section-title">Kết quả kiểm tra AI</div>
+      <ul class="checklist">
+        <li><span style="color:#A0AABF">—</span> Chưa có kết quả kiểm tra AI cho hồ sơ này.</li>
+      </ul>
+      <div class="detail-section-title">Quy trình xử lý</div>
+      <div class="mini-timeline" id="dpTimeline">
+        <div style="color:#A0AABF;font-size:12px;padding:6px 0">Đang tải lịch sử…</div>
+      </div>
+      <div class="detail-section-title">Ghi chú thẩm định</div>
+      <textarea class="review-textarea" placeholder="Ghi chú nội bộ (chỉ cán bộ BXD Đảng xem)…"></textarea>
+      <div class="detail-section-title">Lý do trả lại (nếu có)</div>
+      <textarea class="review-textarea" id="returnReason" placeholder="Mô tả nội dung cần quần chúng bổ sung hoặc làm rõ…" rows="3"></textarea>
+    </div>
+    <div class="detail-panel-footer" style="flex-wrap:wrap;gap:6px;">
+      <button id="detailBtnReturn" class="btn btn-ghost" style="flex:1;min-width:80px" onclick="returnFromPanel()">↩ Trả lại</button>
+      <button class="btn" style="flex:1;min-width:80px;background:#2563EB;color:#fff" onclick="closeDetail();openProfileEdit(_currentDetailProfileId||document.getElementById('detailName').textContent)">✏ Chỉnh sửa</button>
+      <button id="detailBtnApprove" class="btn btn-primary" style="flex:2;min-width:100px" onclick="approveFromPanel()">✓ Duyệt</button>
+    </div>
+  </div>
+  <div id="overlay" onclick="closeDetail()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:99;"></div>
+  `;
+        // DOM built — data loads via showAdminPageById lazy-loading (no static profiles variable)
+      }
+
+      // ===== ADMIN PAGES =====
+      function showAdminPage(navEl) {
+        document
+          .querySelectorAll(".admin-nav .nav-item")
+          .forEach((n) => n.classList.remove("active"));
+        navEl.classList.add("active");
+        const pid = navEl.dataset.adminPage;
+        showAdminPageById(pid);
+      }
+
+      function showAdminPageByName(pid) {
+        // Permission guard
+        const permMap = {
+          pgAccount: "can_create_accounts",
+          pgNotif: "can_send_notifications",
+          pgReport: "can_view_reports",
+          pgVerify: "can_review_profiles",
+        };
+        if (
+          permMap[pid] &&
+          !_hasPermOrSuper(permMap[pid]) &&
+          !(pid === "pgVerify" && _hasPermOrSuper("can_approve_profiles"))
+        ) {
+          showToast("✗ Bạn không có quyền truy cập chức năng này.");
+          return;
+        }
+        document.querySelectorAll(".admin-nav .nav-item").forEach((n) => {
+          n.classList.toggle("active", n.dataset.adminPage === pid);
+        });
+        showAdminPageById(pid);
+        // sync top tabs
+        const tabMap = {
+          pgDashboard: 0,
+          pgProfiles: 1,
+          pgVerify: 2,
+          pgNotif: 3,
+          pgAccount: 4,
+          pgReport: 5,
+          pgSettings: 6,
+          pgProfileEdit: 1,
+        };
+        document
+          .querySelectorAll(".admin-tab")
+          .forEach((t, i) =>
+            t.classList.toggle("active", i === (tabMap[pid] ?? -1)),
+          );
+      }
+
+      function showAdminPageById(pid) {
+        // Sync ALL admin-tab elements (both desktop and mobile strip)
+        document.querySelectorAll(".admin-tab[data-page]").forEach((t) => {
+          t.classList.toggle("active", t.dataset.page === pid);
+        });
+        // Also sync legacy bottom tabs if present
+        document
+          .querySelectorAll(".admin-bottom-tab[data-page]")
+          .forEach((t) => {
+            t.classList.toggle("active", t.dataset.page === pid);
+          });
+        document
+          .querySelectorAll(".admin-page")
+          .forEach((p) => p.classList.toggle("active", p.id === pid));
+
+        // Lazy-load data per page
+        if (pid === "pgDashboard") {
+          _loadDashboard();
+        }
+        if (pid === "pgProfiles") {
+          _loadProfileList();
+        }
+        if (pid === "pgVerify") {
+          _loadVerificationList();
+        }
+        if (pid === "pgNotif") {
+          _loadNotifPage();
+        }
+        if (pid === "pgAccount") {
+          _loadRecentAccounts();
+        }
+        if (pid === "pgReport") {
+          _loadReportPage();
+        }
+      }
+
+      // ===== GLOBAL APP STATE — mirrors API data, replaces all mock arrays =====
+      window.appState = {
+        profiles: [], // mirrors _profilesCache — populated by _loadProfileList()
+        stats: {}, // KPI data from /profiles/dashboard/
+        notifications: [], // populated by _loadNotifPage()
+      };
+
+      // ===== PROFILE TABLE DATA — API-backed =====
+      let _profilesCache = [];
+      let _usersCache = [];
+      let _profilesTotal = 0;
+      let _profilesFilters = {
+        search: "",
+        status: "",
+        ordering: "-created_at",
+      };
+      let _wordExportCache = [];
+      let _currentDetailProfileId = null;
+      let _currentDetailUserId = null;
+
+      const statusMap = {
+        draft: { cls: "pill-draft", label: "Đang kê khai" },
+        submitted: { cls: "pill-pending", label: "Đã nộp" },
+        pending: { cls: "pill-pending", label: "Đang xem xét" },
+        under_review: { cls: "pill-verify", label: "Đang thẩm định" },
+        returned: { cls: "pill-return", label: "Trả lại" },
+        verifying: { cls: "pill-verify", label: "Đang xác minh" },
+        approved: { cls: "pill-done", label: "Đã phê duyệt" },
+        completed: { cls: "pill-done", label: "Hoàn thiện" },
+        rejected: { cls: "pill-new", label: "Từ chối" },
+        withdrawn: { cls: "pill-new", label: "Rút hồ sơ" },
+      };
+      const scoreColor = (s) =>
+        s >= 90
+          ? "var(--success)"
+          : s >= 70
+            ? "#2E75B6"
+            : s >= 50
+              ? "var(--warn)"
+              : "var(--red)";
+
+      async function _loadProfileList() {
+        const tb = document.getElementById("profileTbody");
+        if (!tb) return;
+        tb.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:28px;color:var(--muted)">⏳ Đang tải dữ liệu…</td></tr>`;
+        try {
+          const params = new URLSearchParams();
+          params.set("role__code", "quan_chung");
+          if (_profilesFilters.search)
+            params.set("search", _profilesFilters.search);
+          if (_profilesFilters.status)
+            params.set("status", _profilesFilters.status);
+          params.set("ordering", _profilesFilters.ordering || "-created_at");
+          const data = await API.get(`/auth/users/?${params}`);
+          _usersCache = data.results || [];
+          _profilesTotal = data.count || 0;
+          console.log("[API] users loaded", _usersCache.length);
+          renderProfiles(_usersCache);
+        } catch (e) {
+          tb.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:28px;color:var(--red)">✗ Lỗi tải dữ liệu: ${_esc(e.message)}</td></tr>`;
+          console.error("[API] User list failed:", e);
+        }
+      }
+
+      function renderProfiles(data) {
+        const tb = document.getElementById("profileTbody");
+        if (!tb) return;
+        const badgeDesktop = document.getElementById("profilesTabBadgeDesktop");
+        const badgeMobile = document.getElementById("profilesTabBadgeMobile");
+        if (badgeDesktop)
+          badgeDesktop.textContent = String(_profilesTotal || 0);
+        if (badgeMobile) badgeMobile.textContent = String(_profilesTotal || 0);
+        if (!data.length) {
+          tb.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:28px;color:var(--muted)">Không có quần chúng nào.</td></tr>`;
+          document.getElementById("profileCount").textContent =
+            "Hiển thị 0 / 0 quần chúng";
+          return;
+        }
+        tb.innerHTML = data
+          .map((u) => {
+            const accSt =
+              u.status === "active"
+                ? { cls: "pill-done", label: "Hoạt động" }
+                : { cls: "pill-draft", label: "Bị khoá" };
+            const profileSt = u.profile_status
+              ? statusMap[u.profile_status] || {
+                  cls: "pill-new",
+                  label: u.profile_status,
+                }
+              : null;
+            const created = u.created_at ? _fmtDate(u.created_at) : "—";
+            return `<tr>
+      <td><div class="name-cell">${_esc(u.full_name || "—")}</div><div class="sub-cell">${_esc(u.email || "")}</div></td>
+      <td style="font-size:12px;">${_esc(u.phone || "—")}</td>
+      <td style="font-size:12px;">${_esc(u.cccd || "—")}</td>
+      <td><span class="pill ${accSt.cls}">${accSt.label}</span></td>
+      <td>${profileSt ? `<span class="pill ${profileSt.cls}">${profileSt.label}</span>` : '<span style="font-size:11px;color:var(--hint)">—</span>'}</td>
+      <td style="font-size:12px;">${created}</td>
+      <td>
+        <button class="act-btn act-view" onclick="_openUserInfo(${u.id})">Xem thông tin</button>
+      </td>
+    </tr>`;
+          })
+          .join("");
+        document.getElementById("profileCount").textContent =
+          `Hiển thị ${data.length} / ${_profilesTotal} quần chúng`;
+        const sub = document.getElementById("profilesSubtitle");
+        if (sub)
+          sub.textContent = `${_profilesTotal} quần chúng đang được quản lý trong hệ thống`;
+      }
+
+      function filterProfiles(q) {
+        _profilesFilters.search = q;
+        _loadProfileList();
+      }
+
+      function filterByStatus(s) {
+        _profilesFilters.status = s;
+        _loadProfileList();
+      }
+
+      function toggleAll(cb) {
+        document
+          .querySelectorAll("#profileTbody input[type=checkbox]")
+          .forEach((c) => (c.checked = cb.checked));
+      }
+
+      // ===== DETAIL PANEL =====
+      async function openDetailById(profileId) {
+        _currentDetailProfileId = profileId;
+        document.getElementById("detailPanel").classList.add("open");
+        document.getElementById("overlay").style.display = "block";
+        document.getElementById("detailName").textContent = "…";
+        document.getElementById("detailSub").textContent = "Đang tải…";
+        document.getElementById("dpStatus").innerHTML =
+          '<span class="pill pill-draft">…</span>';
+        try {
+          const resp = await API.get(`/profiles/${profileId}/`);
+          const p = resp.data || resp;
+          _currentDetailUserId = p.user?.id || null;
+          document.getElementById("detailName").textContent =
+            p.full_name || "—";
+          const dob = p.dob ? p.dob.split("-").reverse().join("/") : "—";
+          document.getElementById("detailSub").textContent =
+            `${dob} · ${p.user?.phone || ""}`;
+          const st = statusMap[p.status] || {
+            cls: "pill-new",
+            label: p.status_display || p.status,
+          };
+          window._currentDetailStatus = p.status;
+          document.getElementById("dpStatus").innerHTML =
+            `<span class="pill ${st.cls}">${st.label}</span>`;
+          _syncDetailWorkflowButtons(p.status);
+          const dpScore = document.getElementById("dpScore");
+          if (dpScore) {
+            dpScore.textContent = p.ai_score > 0 ? p.ai_score + "%" : "—";
+            dpScore.style.color = p.ai_score > 0 ? scoreColor(p.ai_score) : "";
+          }
+          const dpSub = document.getElementById("dpSubmittedAt");
+          if (dpSub)
+            dpSub.textContent = p.submitted_at ? _fmtDate(p.submitted_at) : "—";
+          const dpOfficer = document.getElementById("dpOfficer");
+          if (dpOfficer)
+            dpOfficer.textContent = p.officer_in_charge_name || "—";
+          const rr = document.getElementById("returnReason");
+          if (rr && p.return_reason) rr.value = p.return_reason;
+
+          // Load workflow review history for the mini-timeline
+          try {
+            const revResp = await API.get(`/profiles/${profileId}/reviews/`);
+            const reviews = Array.isArray(revResp)
+              ? revResp
+              : revResp.results || revResp.data || [];
+            const tlEl = document.getElementById("dpTimeline");
+            if (tlEl && reviews.length) {
+              const actionLabel = {
+                submit: "Nộp hồ sơ",
+                approve: "Đã phê duyệt",
+                return: "Trả lại bổ sung",
+                reject: "Từ chối",
+                complete: "Hoàn thành",
+                withdraw: "Rút hồ sơ",
+                request_verify: "Yêu cầu xác minh",
+                start_review: "Bắt đầu thẩm định",
+                verify: "Đã xác minh",
+                archive: "Lưu trữ",
+              };
+              tlEl.innerHTML = reviews
+                .map((r, i) => {
+                  const d = r.created_at
+                    ? new Date(r.created_at).toLocaleDateString("vi-VN")
+                    : "—";
+                  return `<div class="mt-item"><div class="mt-dot ${i === 0 ? "done" : ""}"></div>
+            <div class="mt-label">${_esc(actionLabel[r.action] || r.action)}</div>
+            <div class="mt-date">${_esc(d)}</div></div>`;
+                })
+                .join("");
+            }
+          } catch (_) {}
+
+          // Update notif modal target
+          const nt = document.getElementById("notifTargetName");
+          const np = document.getElementById("notifTargetPhone");
+          if (nt) nt.textContent = p.full_name || "—";
+          if (np) np.textContent = p.user?.phone ? "– " + p.user.phone : "";
+          updateNotifPreview();
+        } catch (e) {
+          document.getElementById("detailName").textContent = "Lỗi tải hồ sơ";
+          showToast("✗ " + e.message);
+        }
+      }
+
+      function openDetail(name, dob, addr, status) {
+        const found = _profilesCache.find((p) => p.full_name === name);
+        if (found) {
+          openDetailById(found.id);
+          return;
+        }
+        document.getElementById("detailName").textContent = name;
+        document.getElementById("detailSub").textContent = dob + " · " + addr;
+        const st = statusMap[status] || { cls: "pill-new", label: status };
+        window._currentDetailStatus = status;
+        document.getElementById("dpStatus").innerHTML =
+          `<span class="pill ${st.cls}">${st.label}</span>`;
+        _syncDetailWorkflowButtons(status);
+        document.getElementById("detailPanel").classList.add("open");
+        document.getElementById("overlay").style.display = "block";
+      }
+
+      function closeDetail() {
+        document.getElementById("detailPanel").classList.remove("open");
+        document.getElementById("overlay").style.display = "none";
+        _currentDetailProfileId = null;
+        _currentDetailUserId = null;
+        window._currentDetailStatus = null;
+      }
+
+      function _syncDetailWorkflowButtons(status) {
+        const btnApprove = document.getElementById("detailBtnApprove");
+        const btnReturn = document.getElementById("detailBtnReturn");
+        if (!btnApprove || !btnReturn) return;
+
+        const canApprove =
+          _hasPermOrSuper("can_approve_profiles") &&
+          ["submitted", "pending", "under_review"].includes(status);
+        const canReturn =
+          (_hasPermOrSuper("can_review_profiles") ||
+            _hasPermOrSuper("can_approve_profiles")) &&
+          [
+            "draft",
+            "submitted",
+            "pending",
+            "under_review",
+            "verifying",
+            "returned",
+            "approved",
+          ].includes(status);
+
+        btnApprove.style.display = canApprove ? "" : "none";
+        btnReturn.style.display = canReturn ? "" : "none";
+
+        if (status === "submitted") btnApprove.textContent = "✓ Duyệt bước 1";
+        else if (status === "pending")
+          btnApprove.textContent = "✓ Duyệt bước 2";
+        else if (status === "under_review")
+          btnApprove.textContent = "✓ Duyệt bước 3";
+        else btnApprove.textContent = "✓ Duyệt";
+      }
+
+      async function approveFromPanel() {
+        const name = document.getElementById("detailName").textContent;
+        if (!_currentDetailProfileId) {
+          showToast("✗ Chưa xác định hồ sơ");
+          return;
+        }
+        if (
+          !["submitted", "pending", "under_review"].includes(
+            window._currentDetailStatus,
+          )
+        ) {
+          showToast("✗ Trạng thái hiện tại không thể duyệt");
+          return;
+        }
+        if (
+          !confirm(
+            `Xác nhận DUYỆT hồ sơ của ${name}?\nHồ sơ sẽ chuyển theo từng bước thẩm định theo quy trình.`,
+          )
+        )
+          return;
+        try {
+          const resp = await API.post(
+            `/profiles/${_currentDetailProfileId}/workflow/`,
+            {
+              action: "approve",
+              comment: "",
+            },
+          );
+          const profile = resp?.data || resp || {};
+          const nextStatus = profile.status || window._currentDetailStatus;
+          const st = statusMap[nextStatus] || {
+            cls: "pill-new",
+            label: profile.status_display || nextStatus || "—",
+          };
+          window._currentDetailStatus = nextStatus;
+          document.getElementById("dpStatus").innerHTML =
+            `<span class="pill ${st.cls}">${st.label}</span>`;
+          _syncDetailWorkflowButtons(nextStatus);
+          addActivity(
+            `✅ Đã duyệt hồ sơ <strong>${name}</strong> – trạng thái: ${st.label}`,
+          );
+          showToast(`✅ Đã duyệt ${name}`);
+          closeDetail();
+          _loadVerificationList();
+          _loadDashboard();
+        } catch (e) {
+          showToast("✗ " + e.message);
+        }
+      }
+
+      async function returnFromPanel() {
+        const reason = document.getElementById("returnReason")?.value || "";
+        const name = document.getElementById("detailName").textContent;
+        if (!_currentDetailProfileId) {
+          showToast("✗ Chưa xác định hồ sơ");
+          return;
+        }
+        if (
+          !["submitted", "pending", "under_review", "verifying"].includes(
+            window._currentDetailStatus,
+          )
+        ) {
+          showToast("✗ Trạng thái hiện tại không thể trả lại");
+          return;
+        }
+        if (!reason.trim()) {
+          alert("Vui lòng nhập lý do trả hồ sơ.");
+          return;
+        }
+        if (
+          !confirm(
+            `Trả hồ sơ ${name} với lý do:\n"${reason}"\n\nHệ thống sẽ thông báo cho quần chúng.`,
+          )
+        )
+          return;
+        try {
+          await API.post(`/profiles/${_currentDetailProfileId}/workflow/`, {
+            action: "return",
+            comment: reason,
+            return_reason: reason,
+          });
+          await _postCorrectionRequestIfAny(_currentDetailProfileId, reason);
+          // Send in-app notification to the user
+          if (_currentDetailUserId) {
+            try {
+              await API.post("/notifications/send/", {
+                recipient_id: _currentDetailUserId,
+                profile_id: _currentDetailProfileId,
+                channel: "in_app",
+                type: "profile_returned",
+                subject: "Hồ sơ bị trả lại",
+                body: `Hồ sơ của bạn đã bị trả lại với lý do: ${reason}`,
+              });
+            } catch (ne) {
+              console.warn(
+                "[notify] Failed to send return notification:",
+                ne.message,
+              );
+            }
+          }
+          addActivity(
+            `↩ Trả hồ sơ <strong>${name}</strong> – ${reason.substring(0, 60)}…`,
+          );
+          showToast(`↩ Đã trả hồ sơ ${name}`);
+          closeDetail();
+          _loadVerificationList();
+          _loadDashboard();
+        } catch (e) {
+          showToast("✗ " + e.message);
+        }
+      }
+
+      async function apiApproveProfile(id, name) {
+        if (!confirm(`Duyệt nhanh hồ sơ của ${name}?`)) return;
+        try {
+          const resp = await API.post(`/profiles/${id}/workflow/`, {
+            action: "approve",
+            comment: "",
+          });
+          const profile = resp?.data || resp || {};
+          const st = statusMap[profile.status] || {
+            cls: "pill-new",
+            label: profile.status_display || profile.status || "—",
+          };
+          showToast(`✅ Đã duyệt ${name}`);
+          addActivity(
+            `✅ Đã duyệt <strong>${name}</strong> – trạng thái: ${st.label}`,
+          );
+          _loadVerificationList();
+          _loadDashboard();
+        } catch (e) {
+          showToast("✗ " + e.message);
+        }
+      }
+
+      async function apiReturnProfile(id, name) {
+        const r = prompt(`Lý do trả lại hồ sơ ${name}:`);
+        if (!r) return;
+        try {
+          const resp = await API.post(`/profiles/${id}/workflow/`, {
+            action: "return",
+            comment: r,
+            return_reason: r,
+          });
+          await _postCorrectionRequestIfAny(id, r);
+          // Send in-app notification to profile owner
+          const profileData = resp?.data || resp;
+          const userId = profileData?.user?.id;
+          if (userId) {
+            try {
+              await API.post("/notifications/send/", {
+                recipient_id: userId,
+                profile_id: id,
+                channel: "in_app",
+                type: "profile_returned",
+                subject: "Hồ sơ bị trả lại",
+                body: `Hồ sơ của bạn đã bị trả lại với lý do: ${r}`,
+              });
+            } catch (ne) {
+              console.warn(
+                "[notify] Failed to send return notification:",
+                ne.message,
+              );
+            }
+          }
+          showToast(`↩ Đã trả hồ sơ ${name}`);
+          addActivity(`↩ Trả hồ sơ <strong>${name}</strong> – ${r}`);
+          _loadVerificationList();
+          _loadDashboard();
+        } catch (e) {
+          showToast("✗ " + e.message);
+        }
+      }
+
+      function approveProfile(name) {
+        const p = _profilesCache.find((x) => x.full_name === name);
+        if (p) apiApproveProfile(p.id, name);
+      }
+      function returnProfile(name) {
+        const p = _profilesCache.find((x) => x.full_name === name);
+        if (p) apiReturnProfile(p.id, name);
+      }
+
+      async function receiveVerify(name) {
+        const p = _profilesCache.find((x) => x.full_name === name);
+        if (!p) {
+          alert(`Đã ghi nhận kết quả xác minh cho ${name}.`);
+          return;
+        }
+        try {
+          await API.post(`/profiles/${p.id}/workflow/`, {
+            action: "complete",
+            comment: "Xác minh hoàn thành",
+          });
+          addActivity(
+            `📋 Nhận kết quả xác minh – hồ sơ <strong>${name}</strong>`,
+          );
+          showToast(` Hoàn thiện hồ sơ ${name}`);
+          _loadProfileList();
+        } catch (e) {
+          showToast("✗ " + e.message);
+        }
+      }
+
+      function viewVerifyResult(name) {
+        alert(
+          `Kết quả xác minh ${name}:\n✓ Xem chi tiết trong tab Xác minh của hồ sơ`,
+        );
+      }
+
+      function addActivity(html) {
+        const log = document.getElementById("activityLog");
+        if (!log) return;
+        const item = document.createElement("div");
+        item.className = "notif-item";
+        item.style.padding = "11px 18px";
+        item.innerHTML = `<div class="notif-icon" style="background:#EDFAF3;">◈</div><div><div class="notif-text">${html}</div><div class="notif-time">Vừa xong</div></div>`;
+        log.prepend(item);
+      }
+
+      function goToAccStep(step) {
+        // Validate current step before moving forward
+        if (step > 1) {
+          const name = document.getElementById("accName").value.trim();
+          const cccd = document.getElementById("accCCCD").value.trim();
+          const dob = document.getElementById("accDOB").value;
+          const phone = document.getElementById("accPhone").value.trim();
+
+          if (!name || !cccd || !dob || !phone) {
+            alert("Vui lòng điền đủ Họ tên, CCCD, Ngày sinh và Số điện thoại.");
+            return;
+          }
+          if (cccd.length !== 12) {
+            alert("CCCD phải có 12 ký tự");
+            return;
+          }
+        }
+        if (step > 2) {
+          const email = document.getElementById("accEmail").value.trim();
+          if (!email) {
+            alert("Vui lòng nhập email Gmail để nhận tài khoản.");
+            return;
+          }
+          if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            alert("Email không hợp lệ.");
+            return;
+          }
+        }
+
+        // Hide all steps
+        document.getElementById("accStep1").style.display = "none";
+        document.getElementById("accStep2").style.display = "none";
+        document.getElementById("accStep3").style.display = "none";
+
+        // Remove active class from all indicators
+        document.getElementById("step1Indicator").classList.remove("active");
+        document.getElementById("step2Indicator").classList.remove("active");
+        document.getElementById("step3Indicator").classList.remove("active");
+
+        // Show current step
+        if (step === 1) {
+          document.getElementById("accStep1").style.display = "block";
+          document.getElementById("step1Indicator").classList.add("active");
+          document.getElementById("accStepTitle").textContent =
+            "Bước 1 – Thông tin định danh";
+        } else if (step === 2) {
+          document.getElementById("accStep2").style.display = "block";
+          document.getElementById("step2Indicator").classList.add("active");
+          document.getElementById("accStepTitle").textContent =
+            "Bước 2 – Gmail nhận tài khoản";
+        } else if (step === 3) {
+          document.getElementById("accStep3").style.display = "block";
+          document.getElementById("step3Indicator").classList.add("active");
+          document.getElementById("accStepTitle").textContent =
+            "Bước 3 – Xác nhận thông tin";
+          updateAccReview();
+        }
+      }
+
+      function resetAccForm() {
+        if (!confirm("Hủy điền mẫu? Tất cả dữ liệu sẽ bị xóa.")) return;
+        document.getElementById("accName").value = "";
+        document.getElementById("accCCCD").value = "";
+        document.getElementById("accDOB").value = "";
+        document.getElementById("accPhone").value = "";
+        document.getElementById("accEmail").value = "";
+        document.getElementById("chkEmail").checked = true;
+        goToAccStep(1);
+      }
+
+      function updateAccReview() {
+        const name = document.getElementById("accName").value.trim();
+        const cccd = document.getElementById("accCCCD").value.trim();
+        const dob = document.getElementById("accDOB").value;
+        const phone = document.getElementById("accPhone").value.trim();
+        const email = document.getElementById("accEmail").value.trim();
+        const channels = [];
+        if (document.getElementById("chkEmail").checked) channels.push("Gmail");
+
+        document.getElementById("reviewName").textContent = name || "—";
+        document.getElementById("reviewCCCD").textContent = cccd || "—";
+        document.getElementById("reviewDOB").textContent = dob
+          ? new Date(dob).toLocaleDateString("vi-VN")
+          : "—";
+        document.getElementById("reviewPhone").textContent = phone || "—";
+        document.getElementById("reviewEmail").textContent = email || "—";
+        document.getElementById("reviewChannels").textContent = channels.length
+          ? channels.join(", ")
+          : "Không chọn";
+      }
+
+      async function submitCreateAccount() {
+        const name = document.getElementById("accName").value.trim();
+        const cccd = document.getElementById("accCCCD").value.trim();
+        const dob = document.getElementById("accDOB").value;
+        const phone = document.getElementById("accPhone").value.trim();
+        const email = document.getElementById("accEmail").value.trim();
+        const notify_email = document.getElementById("chkEmail").checked;
+
+        if (!email) {
+          showToast("✗ Vui lòng nhập Gmail để gửi thông tin đăng nhập");
+          return;
+        }
+
+        try {
+          showToast("⏳ Đang cấp tài khoản…");
+          await API.post("/auth/account-requests/", {
+            full_name: name,
+            cccd,
+            phone,
+            dob: dob,
+            email: email || undefined,
+            notify_email,
+          });
+          console.log("[DEBUG] account request created successfully");
+          showToast(`✅ Đã cấp tài khoản cho ${name}`);
+          addActivity(
+            `🔑 Cấp tài khoản mới cho <strong>${name}</strong> – CCCD ${cccd}`,
+          );
+          resetAccForm();
+          _loadRecentAccounts();
+        } catch (e) {
+          console.error("[DEBUG] account creation error:", e);
+          showToast(`✗ Tạo tài khoản thất bại: ${e.message}`);
+        }
+      }
+
+      function exportProfiles() {
+        const params = new URLSearchParams();
+        if (_profilesFilters.status)
+          params.set("status", _profilesFilters.status);
+        showToast("⏳ Đang xuất danh sách…");
+        API.get(`/reports/export/?format=excel&${params}`, { raw: true })
+          .then((res) =>
+            res.ok
+              ? res.blob()
+              : Promise.reject(new Error(`HTTP ${res.status}`)),
+          )
+          .then((blob) => {
+            downloadBlob(blob, "DanhSachHoSo.xlsx");
+            showToast("✅ Đã xuất danh sách");
+          })
+          .catch((e) => showToast(`✗ ${e.message}`));
+      }
+
+      function exportReportExcel() {
+        const select = document.getElementById("reportPeriodSelect");
+        const value = select?.value || "";
+        let year = new Date().getFullYear();
+        let month = null;
+        if (value) {
+          const parts = value.split("-");
+          year = parseInt(parts[0], 10) || year;
+          month = parts[1] ? parseInt(parts[1], 10) : null;
+        }
+
+        const payload = { year };
+        if (month) payload.month = month;
+
+        showToast("⏳ Đang xuất báo cáo Excel…");
+        API.post("/reports/export/excel/", payload, { raw: true })
+          .then((res) =>
+            res.ok
+              ? res.blob()
+              : Promise.reject(new Error(`HTTP ${res.status}`)),
+          )
+          .then((blob) => {
+            const suffix = month ? `_${String(month).padStart(2, "0")}` : "";
+            downloadBlob(blob, `BaoCao_${year}${suffix}.xlsx`);
+            showToast("✅ Đã xuất báo cáo");
+          })
+          .catch((e) => showToast(`✗ ${e.message}`));
+      }
+
+      // Init admin — load real data from API
+      _loadProfileList();
+
+      // ===== PARTY MEMBER TOGGLE =====
+      function toggleFamSelKhac(sel) {
+        const row = sel.closest(".form-row");
+        if (!row) return;
+        let inp = row.querySelector(".fam-sel-khac-other");
+        if (!inp) return;
+        inp.style.display = sel.value === "Khác" ? "block" : "none";
+        if (sel.value !== "Khác") inp.value = "";
+      }
+      function toggleSiblingParty(sel, boxId) {
+        const box = document.getElementById(boxId);
+        if (!box) return;
+        box.style.display = sel.value === "yes" ? "block" : "none";
+      }
+      function toggleSibDeceased(chk, num) {
+        const aliveDiv = document.getElementById("sibAlive_" + num);
+        const deceasedDiv = document.getElementById("sibDeceased_" + num);
+        if (aliveDiv) aliveDiv.style.display = chk.checked ? "none" : "";
+        if (deceasedDiv) deceasedDiv.style.display = chk.checked ? "" : "none";
+      }
+
+      // ===== OTHER OPTION TOGGLE =====
+      function toggleOther(selectId, inputId) {
+        const sel = document.getElementById(selectId);
+        const inp = document.getElementById(inputId);
+        const err = document.getElementById("err-" + inputId);
+        if (!sel || !inp) return;
+        const isOther = sel.value === "__other__";
+        inp.style.display = isOther ? "block" : "none";
+        if (!isOther) {
+          inp.value = "";
+          if (err) err.style.display = "none";
+          inp.classList.remove("val-err");
+        } else {
+          inp.focus();
+        }
+      }
+
+      function clearOtherErr(inp) {
+        const err = document.getElementById("err-" + inp.id);
+        if (err) err.style.display = "none";
+        inp.classList.remove("val-err");
+        if (inp.value.trim()) inp.classList.add("val-ok");
+      }
+
+      // Returns the effective value for a select that may have an "other" input
+      function getOtherFieldValue(selectId, inputId) {
+        const sel = document.getElementById(selectId);
+        if (!sel) return "";
+        if (sel.value === "__other__") {
+          const inp = document.getElementById(inputId);
+          return inp ? inp.value.trim() : "";
+        }
+        return sel.value;
+      }
+
+      // Validates "other" fields — returns true if valid
+      function validateOtherField(selectId, inputId) {
+        const sel = document.getElementById(selectId);
+        if (!sel || sel.value !== "__other__") return true;
+        const inp = document.getElementById(inputId);
+        const err = document.getElementById("err-" + inputId);
+        if (!inp || inp.value.trim() !== "") return true;
+        inp.classList.add("val-err");
+        if (err) err.style.display = "flex";
+        inp.focus();
+        return false;
+      }
+
+      // ===== MM/YYYY PICKER HANDLER =====
+      (function () {
+        const CUR_YEAR = new Date().getFullYear();
+
+        function getWrap(el) {
+          return el.closest(".mmyyyy-wrap");
+        }
+
+        // Returns 'MM/YYYY' string or '' if incomplete
+        function getValue(wrap) {
+          const m = wrap.querySelector(".mm-month").value;
+          const y = wrap.querySelector(".mm-year").value.trim();
+          if (!m || !y) return "";
+          const mm = String(m).padStart(2, "0");
+          return mm + "/" + y;
+        }
+
+        function validate(wrap) {
+          const m = parseInt(wrap.querySelector(".mm-month").value, 10);
+          const y = parseInt(wrap.querySelector(".mm-year").value, 10);
+          wrap.classList.remove("mm-err", "mm-ok");
+          // Empty = neutral
+          if (
+            !wrap.querySelector(".mm-month").value &&
+            !wrap.querySelector(".mm-year").value
+          )
+            return true;
+          // Partial
+          if (
+            !wrap.querySelector(".mm-month").value ||
+            !wrap.querySelector(".mm-year").value
+          ) {
+            wrap.classList.add("mm-err");
+            return false;
+          }
+          if (isNaN(m) || m < 1 || m > 12) {
+            wrap.classList.add("mm-err");
+            return false;
+          }
+          if (isNaN(y) || y < 1900 || y > CUR_YEAR) {
+            wrap.classList.add("mm-err");
+            return false;
+          }
+          wrap.classList.add("mm-ok");
+          return true;
+        }
+
+        // Enforce year bounds while typing
+        document.addEventListener("input", function (e) {
+          const el = e.target;
+          if (
+            !el.classList.contains("mm-year") &&
+            !el.classList.contains("mm-month")
+          )
+            return;
+          const wrap = getWrap(el);
+          if (!wrap) return;
+          if (el.classList.contains("mm-year")) {
+            // Strip non-digits, cap at 4 chars
+            el.value = el.value.replace(/\D/g, "").slice(0, 4);
+          }
+          // Live validate once both have values
+          const m = wrap.querySelector(".mm-month").value;
+          const y = wrap.querySelector(".mm-year").value;
+          if (m && y.length === 4) validate(wrap);
+          else wrap.classList.remove("mm-err", "mm-ok");
+        });
+
+        document.addEventListener(
+          "blur",
+          function (e) {
+            const el = e.target;
+            if (
+              !el.classList.contains("mm-year") &&
+              !el.classList.contains("mm-month")
+            )
+              return;
+            const wrap = getWrap(el);
+            if (wrap) validate(wrap);
+          },
+          true,
+        );
+      })();
+
+      // Public helper: get MM/YYYY value from a wrap element by its first td
+      function getMMyyyy(wrap) {
+        if (!wrap) return "";
+        const m = wrap.querySelector(".mm-month").value;
+        const y = wrap.querySelector(".mm-year").value.trim();
+        if (!m || !y) return "";
+        return String(m).padStart(2, "0") + "/" + y;
+      }
+
+      // ===== FAMILY HISTORY MODE TOGGLE (Năm ↔ Tháng/Năm) =====
+      function setHistMode(btn, mode) {
+        // Toggle button states
+        const bar = btn.closest(".hist-mode-toggle");
+        bar
+          .querySelectorAll(".hist-mode-btn")
+          .forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+
+        // Find the nearest timeline-table sibling (after the mode-bar wrapper)
+        const modeBar = btn.closest(".hist-mode-bar");
+        let tbl = modeBar.nextElementSibling;
+        // tbl should be the .timeline-table
+        if (!tbl || !tbl.classList.contains("timeline-table")) return;
+
+        if (mode === "mm") {
+          tbl.classList.add("mode-mm");
+        } else {
+          tbl.classList.remove("mode-mm");
+        }
+      }
+
+      // ═══════════════════════════════════════════════════════
+      //  ADMIN DIRECT PROFILE EDITING
+      // ═══════════════════════════════════════════════════════
+
+      let currentEditProfile = { name: "", score: 94 };
+      let editHistoryLog = []; // [{field, oldVal, newVal, by, ts}]
+      let flaggedSections = new Set();
+      let _flagSectionNotes = {};
+      let _adminTlSrvIds = new Set();
+      let _adminWorkSrvIds = new Set();
+      const _EDIT_SECTION_LABEL = {
+        // Section-level keys
+        esA: "A. Sơ lược lý lịch",
+        esB: "B. Lịch sử bản thân",
+        "esC-work": "C. Lịch sử công tác",
+        esC: "C. Trình độ & Công tác",
+        esD: "D. Gia đình",
+        esE: "E. Khen thưởng",
+        esFT: "F. Đi nước ngoài",
+        esF: "F. Tài liệu",
+        esH: "H. Kỷ luật",
+        esJ: "J. Tự nhận xét",
+        esK: "K. Cam đoan",
+        // Per-field keys → section labels (for return modal grouping)
+        "fi-esA-name": "A. Họ và tên",
+        "fi-esA-gender": "A. Giới tính",
+        "fi-esA-dob": "A. Ngày sinh",
+        "fi-esA-birthplace": "A. Nơi sinh",
+        "fi-esA-hometown": "A. Quê quán",
+        "fi-esA-ethnic": "A. Dân tộc",
+        "fi-esA-religion": "A. Tôn giáo",
+        "fi-esA-address": "A. Nơi thường trú",
+        "fi-esA-cccd": "A. CCCD",
+        "fi-esA-phone": "A. Điện thoại",
+        "fi-esA-email": "A. Email",
+        "fi-esA-occupation": "A. Nghề nghiệp",
+        "fi-esA-temp-addr": "A. Nơi tạm trú",
+        "fi-esC-edu-gen": "C. Trình độ phổ thông",
+        "fi-esC-edu-qual": "C. Trình độ chuyên môn",
+        "fi-esC-political": "C. Lý luận chính trị",
+        "fi-esC-foreign-lang": "C. Ngoại ngữ",
+        "fi-esC-it": "C. Tin học",
+        "fi-esC-youth-union": "C. Vào Đoàn",
+        "fi-esC-sci-tech": "C. Khoa học công nghệ",
+        "fi-esC-degree": "C. Học vị",
+        "fi-esC-acad-title": "C. Học hàm",
+        "fi-esC-ethnic-lang": "C. Tiếng dân tộc",
+        "fi-esJ-self": "J. Tự nhận xét",
+        "fi-esK-name": "K. Họ tên cam đoan",
+        "fi-esK-date": "K. Ngày ký cam đoan",
+      };
+
+      // Open the edit page for a given profile (by ID preferred)
+      async function openProfileEdit(nameOrId, score, status) {
+        showAdminPageByName("pgProfileEdit");
+        const t = document.getElementById("editProfileTitle");
+        if (t) t.textContent = "⏳";
+
+        // Resolve ID: check if it's a number or find in cache
+        let profileId = null;
+        if (
+          typeof nameOrId === "number" ||
+          (typeof nameOrId === "string" && /^\d+$/.test(nameOrId))
+        ) {
+          profileId = +nameOrId;
+        } else {
+          const cached = _profilesCache.find((p) => p.full_name === nameOrId);
+          profileId = cached?.id || _currentDetailProfileId || null;
+        }
+
+        if (profileId) {
+          try {
+            const resp = await API.get(`/profiles/${profileId}/`);
+            const p = resp.data || resp;
+            currentEditProfile = {
+              id: p.id,
+              name: p.full_name || "",
+              score: p.ai_score || 0,
+              status: p.status || "draft",
+            };
+            _restoreFlagDraftForProfile(p.id);
+
+            if (t) t.textContent = p.full_name || "—";
+            const sc = document.getElementById("editAIScore");
+            if (sc) sc.textContent = (p.ai_score || 0) + "%";
+            const ab = document.getElementById("editAIBar");
+            if (ab) ab.style.width = (p.ai_score || 0) + "%";
+            const ss = document.getElementById("editStatusSelect");
+            if (ss) ss.value = p.status || "draft";
+
+            // Populate Section A fields
+            const setFv = (id, val, displayVal) => {
+              const fv = document.getElementById(`fv-${id}`);
+              const fi = document.getElementById(`fi-${id}`);
+              if (fv) fv.textContent = displayVal || val || "—";
+              if (fi) fi.value = val || "";
+            };
+            setFv("esA-name", p.full_name);
+            const genderLabel = { male: "Nam", female: "Nữ", other: "Khác" };
+            setFv("esA-gender", p.gender, genderLabel[p.gender]);
+            setFv(
+              "esA-dob",
+              p.dob,
+              p.dob ? p.dob.split("-").reverse().join("/") : "",
+            );
+            setFv("esA-birthplace", p.birth_place_detail);
+            setFv("esA-hometown", p.hometown_detail);
+            setFv("esA-address", p.current_address);
+            setFv("esA-phone", p.user?.phone);
+            // Ethnic / religion (text or FK)
+            const ethnicName =
+              p.ethnic_group_name || p.ethnic_group_other || "Kinh";
+            setFv("esA-ethnic", ethnicName);
+            const relName = p.religion_name || p.religion_other || "Không";
+            setFv("esA-religion", relName);
+
+            // Section A — additional fields
+            setFv("esA-cccd", p.cccd || p.user?.cccd);
+            setFv("esA-email", p.user?.email);
+            setFv("esA-occupation", p.occupation);
+            setFv("esA-temp-addr", p.temporary_address);
+
+            // Section C — education & qualifications
+            setFv("esC-edu-gen", p.general_edu_level);
+            setFv("esC-edu-qual", p.edu_specialization || p.highest_degree);
+            setFv("esC-political", p.political_level_detail);
+            const flStr =
+              p.foreign_languages ||
+              (p.foreign_language_name
+                ? p.foreign_language_level
+                  ? `${p.foreign_language_name} ${p.foreign_language_level}`
+                  : p.foreign_language_name
+                : "");
+            setFv("esC-foreign-lang", flStr);
+            setFv("esC-it", p.it_level);
+            const yuDate = p.youth_union_date
+              ? p.youth_union_date.slice(0, 7).split("-").reverse().join("/")
+              : "";
+            setFv(
+              "esC-youth-union",
+              [yuDate, p.youth_union_place].filter(Boolean).join(" – "),
+            );
+            setFv("esC-sci-tech", p.science_tech_qualifications);
+            setFv("esC-degree", p.highest_degree);
+            setFv("esC-acad-title", p.academic_title);
+            setFv("esC-ethnic-lang", p.ethnic_language);
+
+            // Reset AI check results for new profile
+            aiCheckData = [];
+
+            // Load Section B (personal history), Section D (family), Section F (files) in parallel
+            const [tlRes, famRes, filesRes] = await Promise.allSettled([
+              API.get(`/timelines/${profileId}/all/`),
+              API.get(`/family/${profileId}/members/`),
+              API.get(`/uploads/files/?profile_id=${profileId}`),
+            ]);
+
+            // Render Section B — personal history rows
+            const tlBody = document.getElementById("timeline-esB");
+            if (tlBody && tlRes.status === "fulfilled") {
+              const d = tlRes.value;
+              const rows = Array.isArray(d)
+                ? d
+                : d?.data?.history || d?.history || [];
+              _adminTlSrvIds = new Set(
+                rows.map((r) => String(r.id)).filter(Boolean),
+              );
+              if (rows.length) {
+                tlBody.innerHTML = rows
+                  .map((r) => {
+                    const fromVal = r.from_month
+                      ? `${String(r.from_month).padStart(2, "0")}/${r.from_year || ""}`
+                      : r.from_year
+                        ? String(r.from_year)
+                        : "";
+                    const toVal = r.is_present
+                      ? ""
+                      : r.to_month
+                        ? `${String(r.to_month).padStart(2, "0")}/${r.to_year || ""}`
+                        : r.to_year
+                          ? String(r.to_year)
+                          : "";
+                    const toDisabled = r.is_present ? " disabled" : "";
+                    const presentChk = r.is_present ? " checked" : "";
+                    return `<div class="timeline-edit-row" data-id="${_esc(String(r.id || ""))}">
+              <input value="${_esc(fromVal)}" placeholder="Từ (MM/YYYY)">
+              <input value="${_esc(toVal)}" placeholder="Đến (MM/YYYY)"${toDisabled}>
+              <label style="display:flex;align-items:center;gap:3px;font-size:11px;white-space:nowrap;cursor:pointer;padding-top:8px"><input type="checkbox"${presentChk} onchange="const t=this.closest('.timeline-edit-row').querySelectorAll('input')[1];t.disabled=this.checked;if(this.checked)t.value=''"> Hiện tại</label>
+              <textarea placeholder="Diễn biến: Học gì / Làm gì, ở đâu (tên đơn vị, địa chỉ) + Nơi sinh sống…">${_esc(r.description || r.content || "")}</textarea>
+              <button class="del-row-btn" onclick="delTimelineRow(this)" style="margin-top:6px">✕</button>
+            </div>`;
+                  })
+                  .join("");
+                // Auto-expand all textareas to show full content without scrolling
+                tlBody.querySelectorAll("textarea").forEach((ta) => {
+                  ta.style.height = "auto";
+                  ta.style.height = ta.scrollHeight + "px";
+                });
+              } else {
+                tlBody.innerHTML =
+                  '<div style="color:#A0AABF;font-size:13px;padding:8px 0">Chưa có dữ liệu lịch sử.</div>';
+              }
+            }
+
+            // Render Section C — work history
+            if (tlRes.status === "fulfilled") {
+              const d = tlRes.value;
+              const tld = d?.data || d || {};
+
+              // Section C — công tác chức vụ
+              const workBody = document.getElementById("timeline-esC");
+              if (workBody) {
+                const works = tld.work_history || [];
+                _adminWorkSrvIds = new Set(
+                  works.map((r) => String(r.id)).filter(Boolean),
+                );
+                if (works.length) {
+                  workBody.innerHTML = works
+                    .map((r) => {
+                      const _fm = (m, y) =>
+                        m
+                          ? `${String(m).padStart(2, "0")}/${y || ""}`
+                          : y
+                            ? String(y)
+                            : "";
+                      const fromStr = _fm(r.from_month, r.from_year);
+                      const toStr = r.is_present
+                        ? "Nay"
+                        : _fm(r.to_month, r.to_year);
+                      const periodStr =
+                        r.period_text ||
+                        (fromStr && toStr
+                          ? `${fromStr}–${toStr}`
+                          : fromStr || toStr || "");
+                      return `<div class="timeline-edit-row" data-id="${_esc(String(r.id || ""))}">
+                      <input value="${_esc(periodStr)}" placeholder="Từ–Đến (MM/YYYY–MM/YYYY)">
+                      <textarea placeholder="Làm việc gì, ở đâu (tên đơn vị, địa chỉ + nơi sinh sống)">${_esc(r.employer || "")}</textarea>
+                      <input value="${_esc(r.job_title || "")}" placeholder="Chức vụ">
+                      <button class="del-row-btn" onclick="this.closest('.timeline-edit-row').remove()" style="margin-top:6px">✕</button>
+                    </div>`;
+                    })
+                    .join("");
+                  // Auto-expand all textareas to show full content without scrolling
+                  workBody.querySelectorAll("textarea").forEach((ta) => {
+                    ta.style.height = "auto";
+                    ta.style.height = ta.scrollHeight + "px";
+                  });
+                } else {
+                  workBody.innerHTML =
+                    '<div style="color:#A0AABF;font-size:13px;padding:8px 0">Chưa có dữ liệu.</div>';
+                }
+              }
+
+              // Section E — học tập đào tạo
+              const eduBody = document.getElementById("timeline-esE");
+              if (eduBody) {
+                const edus = tld.education_history || [];
+                eduBody.innerHTML = edus.length
+                  ? edus
+                      .map(
+                        (
+                          r,
+                        ) => `<div class="timeline-edit-row" data-id="${_esc(String(r.id || ""))}">
+                    <input value="${_esc(r.school || "")}" placeholder="Trường">
+                    <input value="${_esc(r.period_text || "")}" placeholder="Thời gian">
+                    <input value="${_esc(r.certificate || "")}" placeholder="Bằng cấp">
+                    <button class="del-row-btn" onclick="this.closest('.timeline-edit-row').remove()">✕</button>
+                  </div>`,
+                      )
+                      .join("")
+                  : '<div style="color:#A0AABF;font-size:13px;padding:8px 0">Chưa có dữ liệu.</div>';
+              }
+
+              // Section F — đi nước ngoài
+              const travelBody = document.getElementById("timeline-esF");
+              if (travelBody) {
+                const travels = tld.overseas_travels || [];
+                travelBody.innerHTML = travels.length
+                  ? travels
+                      .map(
+                        (
+                          r,
+                        ) => `<div class="timeline-edit-row" data-id="${_esc(String(r.id || ""))}">
+                    <input value="${_esc(r.period_text || "")}" placeholder="Thời gian">
+                    <input value="${_esc(r.purpose || "")}" placeholder="Mục đích">
+                    <input value="${_esc(r.country || "")}" placeholder="Quốc gia">
+                    <button class="del-row-btn" onclick="this.closest('.timeline-edit-row').remove()">✕</button>
+                  </div>`,
+                      )
+                      .join("")
+                  : '<div style="color:#A0AABF;font-size:13px;padding:8px 0">Chưa có dữ liệu.</div>';
+              }
+
+              // Section G — khen thưởng
+              const awardsBody = document.getElementById("timeline-esG");
+              if (awardsBody) {
+                const awards = tld.awards || [];
+                awardsBody.innerHTML = awards.length
+                  ? awards
+                      .map((r) => {
+                        const per = r.issued_month
+                          ? `${r.issued_month}/${r.issued_year || ""}`
+                          : String(r.issued_year || "");
+                        return `<div class="timeline-edit-row" data-id="${_esc(String(r.id || ""))}">
+                        <input value="${_esc(per)}" placeholder="Thời gian (tháng/năm)">
+                        <input value="${_esc(r.content || "")}" placeholder="Nội dung khen thưởng">
+                        <input value="${_esc(r.level || "")}" placeholder="Cấp">
+                        <button class="del-row-btn" onclick="this.closest('.timeline-edit-row').remove()">✕</button>
+                      </div>`;
+                      })
+                      .join("")
+                  : '<div style="color:#A0AABF;font-size:13px;padding:8px 0">Chưa có dữ liệu.</div>';
+              }
+
+              // Section H — kỷ luật
+              const discBody = document.getElementById("timeline-esH");
+              if (discBody) {
+                const discs = tld.disciplines || [];
+                discBody.innerHTML = discs.length
+                  ? discs
+                      .map((r) => {
+                        const per = r.issued_month
+                          ? `${r.issued_month}/${r.issued_year || ""}`
+                          : String(r.issued_year || "");
+                        return `<div class="timeline-edit-row" data-id="${_esc(String(r.id || ""))}">
+                        <input value="${_esc(per)}" placeholder="Thời gian (tháng/năm)">
+                        <input value="${_esc(r.content || "")}" placeholder="Nội dung kỷ luật">
+                        <input value="${_esc(r.level || "")}" placeholder="Mức kỷ luật">
+                        <button class="del-row-btn" onclick="this.closest('.timeline-edit-row').remove()">✕</button>
+                      </div>`;
+                      })
+                      .join("")
+                  : '<div style="color:#A0AABF;font-size:13px;padding:8px 0">Chưa có dữ liệu.</div>';
+              }
+            }
+
+            // Render Section D — family members table (view + edit modes)
+            const _famRelMap = {
+              cha_ruot: "Cha ruột",
+              cha_duong: "Cha dượng",
+              me_ruot: "Mẹ ruột",
+              me_ke: "Mẹ kế",
+              ong_noi: "Ông nội",
+              ba_noi: "Bà nội",
+              ong_ngoai: "Ông ngoại",
+              ba_ngoai: "Bà ngoại",
+              vo_chong: "Vợ/Chồng",
+              con: "Con",
+              anh_chi_em_ruot: "Anh/Chị/Em ruột",
+              cha_chong_vo: "Cha chồng/vợ",
+              me_chong_vo: "Mẹ chồng/vợ",
+              anh_chi_em_chong_vo: "Anh/Chị/Em chồng/vợ",
+              ong_noi_chong_vo: "Ông nội chồng/vợ",
+              ba_noi_chong_vo: "Bà nội chồng/vợ",
+              ong_ngoai_chong_vo: "Ông ngoại chồng/vợ",
+              ba_ngoai_chong_vo: "Bà ngoại chồng/vợ",
+            };
+            window._esDMembers = [];
+            function _renderFamTableView(members) {
+              const famBody = document.getElementById("family-esD-body");
+              if (!famBody) return;
+              window._esDMembers = members;
+              if (!members.length) {
+                famBody.innerHTML =
+                  '<div style="color:#A0AABF;font-size:13px;padding:8px 0">Chưa có thành viên gia đình.</div>';
+                return;
+              }
+              const LS = 'style="color:#718096;font-size:11px"';
+              const mkHist = (history) => {
+                if (!history?.length) return "";
+                const rows = history
+                  .map((h) => {
+                    const fm = h.from_month
+                      ? `${String(h.from_month).padStart(2, "0")}/${h.from_year || ""}`
+                      : h.from_year || "";
+                    const to = h.is_present
+                      ? "Hiện tại"
+                      : h.to_month
+                        ? `${String(h.to_month).padStart(2, "0")}/${h.to_year || ""}`
+                        : h.to_year || "";
+                    return `<tr><td style="padding:2px 6px;white-space:nowrap;border:1px solid #E2E8F0">${_esc(fm)}</td><td style="padding:2px 6px;white-space:nowrap;border:1px solid #E2E8F0">${_esc(to)}</td><td style="padding:2px 6px;border:1px solid #E2E8F0">${_esc(h.description || "")}</td></tr>`;
+                  })
+                  .join("");
+                return `<div style="margin-top:8px"><div style="font-size:11px;font-weight:600;color:#718096;margin-bottom:3px">Quá trình lịch sử</div><table style="width:100%;font-size:11px;border-collapse:collapse"><thead><tr style="background:#F7FAFC"><th style="padding:2px 6px;text-align:left;width:90px;border:1px solid #E2E8F0">Từ</th><th style="padding:2px 6px;text-align:left;width:90px;border:1px solid #E2E8F0">Đến</th><th style="padding:2px 6px;text-align:left;border:1px solid #E2E8F0">Nội dung</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+              };
+              famBody.innerHTML = members
+                .map((m) => {
+                  const rel = _esc(
+                    _famRelMap[m.relationship] || m.relationship || "",
+                  );
+                  const genderTxt =
+                    m.gender === "male"
+                      ? "Nam"
+                      : m.gender === "female"
+                        ? "Nữ"
+                        : m.gender || "";
+                  const fv = (label, val) =>
+                    val
+                      ? `<div><span ${LS}>${label}:</span> ${_esc(String(val))}</div>`
+                      : "";
+                  const fvW = (label, val) =>
+                    val
+                      ? `<div style="grid-column:span 2"><span ${LS}>${label}:</span> ${_esc(String(val))}</div>`
+                      : "";
+                  return `<div style="border:1px solid #E2E8F0;border-radius:6px;padding:12px 14px;margin-bottom:10px;font-size:12px">
+                  <div style="font-weight:700;color:#2D3748;margin-bottom:8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                    <span style="background:#EBF4FF;color:#3B82F6;padding:2px 8px;border-radius:4px;font-size:11px">${rel}</span>
+                    ${_esc(m.full_name || "—")}
+                    ${m.is_deceased ? '<span style="color:#E53E3E;font-size:11px">(Đã mất)</span>' : ""}
+                  </div>
+                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:3px 16px">
+                    ${fv("Giới tính", genderTxt)}
+                    ${fv("Năm sinh", m.birth_year)}
+                    ${fvW("Nơi sinh", m.birth_place)}
+                    ${fvW("Quê quán", m.hometown)}
+                    ${fv("Dân tộc", m.ethnic_group_text)}
+                    ${fv("Tôn giáo", m.religion_text)}
+                    ${m.religious_rank_text ? fv("Chức sắc tôn giáo", m.religious_rank_text) : ""}
+                    ${fvW("Nơi ở hiện tại", m.current_address)}
+                    ${fv("Nghề nghiệp", m.occupation)}
+                    ${["anh_chi_em_ruot", "anh_chi_em_chong_vo"].includes(m.relationship) ? fv("Quốc tịch", m.nationality || "Việt Nam") : ""}
+                    ${fv("Nơi làm việc", m.workplace)}
+                    ${fvW("Chức danh/Chức vụ", m.job_title)}
+                    ${m.is_deceased ? fv("Năm mất", m.deceased_year) + fv("Nguyên nhân mất", m.deceased_cause) : ""}
+                    ${fvW("Trường học", m.child_school)}
+                  </div>
+                  ${
+                    m.is_party_member
+                      ? `<div style="margin-top:8px;padding:6px 10px;background:#F0FFF4;border-radius:4px">
+                    <div style="font-weight:600;color:#276749;margin-bottom:4px">Đảng viên</div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:3px 16px">
+                      ${fv("Ngày vào Đảng", m.party_join_date)}
+                      ${fv("Nơi vào Đảng", m.party_join_place)}
+                      ${fv("Chi bộ/Đảng bộ", m.party_chi_bo)}
+                      ${fv("Khen thưởng/Huy hiệu", m.party_awards_text)}
+                      ${m.party_years_count ? `<div><span ${LS}>Tuổi Đảng:</span> ${m.party_years_count} năm</div>` : ""}
+                    </div>
+                  </div>`
+                      : '<div style="margin-top:6px;color:#718096;font-size:11.5px">Không phải đảng viên</div>'
+                  }
+                  ${m.notes ? `<div style="margin-top:6px"><span ${LS}>Ghi chú:</span> ${_esc(m.notes)}</div>` : ""}
+                  ${mkHist(m.history)}
+                </div>`;
+                })
+                .join("");
+            }
+            function _renderFamTableEdit(members) {
+              const famBody = document.getElementById("family-esD-body");
+              if (!famBody) return;
+              if (!members.length) {
+                famBody.innerHTML =
+                  '<div style="color:#A0AABF;font-size:13px;padding:8px 0">Chưa có thành viên gia đình.</div>';
+                return;
+              }
+              const IS =
+                'style="width:100%;border:1px solid #CBD5E0;border-radius:3px;padding:3px 5px;font-size:11.5px;box-sizing:border-box"';
+              const LS =
+                'style="color:#718096;font-size:11px;display:block;margin-bottom:2px"';
+              const mkHist = (history) => {
+                if (!history?.length) return "";
+                const rows = history
+                  .map((h) => {
+                    const fm = h.from_month
+                      ? `${String(h.from_month).padStart(2, "0")}/${h.from_year || ""}`
+                      : h.from_year || "";
+                    const to = h.is_present
+                      ? "Hiện tại"
+                      : h.to_month
+                        ? `${String(h.to_month).padStart(2, "0")}/${h.to_year || ""}`
+                        : h.to_year || "";
+                    return `<tr><td style="padding:2px 6px;white-space:nowrap;border:1px solid #E2E8F0">${_esc(fm)}</td><td style="padding:2px 6px;white-space:nowrap;border:1px solid #E2E8F0">${_esc(to)}</td><td style="padding:2px 6px;border:1px solid #E2E8F0">${_esc(h.description || "")}</td></tr>`;
+                  })
+                  .join("");
+                return `<div style="margin-top:8px"><div style="font-size:11px;font-weight:600;color:#718096;margin-bottom:3px">Quá trình lịch sử (chỉ xem)</div><table style="width:100%;font-size:11px;border-collapse:collapse"><thead><tr style="background:#F7FAFC"><th style="padding:2px 6px;text-align:left;width:90px;border:1px solid #E2E8F0">Từ</th><th style="padding:2px 6px;text-align:left;width:90px;border:1px solid #E2E8F0">Đến</th><th style="padding:2px 6px;text-align:left;border:1px solid #E2E8F0">Nội dung</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+              };
+              famBody.innerHTML = members
+                .map((m) => {
+                  const rel = _esc(
+                    _famRelMap[m.relationship] || m.relationship || "",
+                  );
+                  const partyChecked = m.is_party_member ? " checked" : "";
+                  const deceasedChecked = m.is_deceased ? " checked" : "";
+                  const partyDisplay = m.is_party_member ? "grid" : "none";
+                  const deceasedDisplay = m.is_deceased ? "grid" : "none";
+                  return `<div style="border:1px solid #E2E8F0;border-radius:6px;padding:12px 14px;margin-bottom:10px;font-size:12px" data-fam-id="${m.id}">
+                  <div style="font-weight:700;color:#2D3748;margin-bottom:8px">
+                    <span style="background:#FEF9EC;color:#B7791F;padding:2px 8px;border-radius:4px;font-size:11px">${rel}</span>
+                  </div>
+                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px 16px">
+                    <div><label ${LS}>Họ và tên</label><input ${IS} data-field="full_name" value="${_esc(m.full_name || "")}"></div>
+                    <div><label ${LS}>Giới tính</label><select ${IS} data-field="gender"><option value="">-- Chọn --</option><option value="male" ${m.gender === "male" ? "selected" : ""}>Nam</option><option value="female" ${m.gender === "female" ? "selected" : ""}>Nữ</option><option value="other" ${m.gender === "other" ? "selected" : ""}>Khác</option></select></div>
+                    <div><label ${LS}>Năm sinh</label><input ${IS} type="number" data-field="birth_year" value="${m.birth_year || ""}"></div>
+                    <div style="grid-column:span 2"><label ${LS}>Nơi sinh</label><input ${IS} data-field="birth_place" value="${_esc(m.birth_place || "")}"></div>
+                    <div style="grid-column:span 2"><label ${LS}>Quê quán</label><input ${IS} data-field="hometown" value="${_esc(m.hometown || "")}"></div>
+                    <div><label ${LS}>Dân tộc</label><input ${IS} data-field="ethnic_group_text" value="${_esc(m.ethnic_group_text || "")}"></div>
+                    <div><label ${LS}>Tôn giáo</label><input ${IS} data-field="religion_text" value="${_esc(m.religion_text || "")}"></div>
+                    <div style="grid-column:span 2"><label ${LS}>Chức sắc tôn giáo</label><input ${IS} data-field="religious_rank_text" value="${_esc(m.religious_rank_text || "")}"></div>
+                    <div style="grid-column:span 2"><label ${LS}>Nơi ở hiện tại</label><input ${IS} data-field="current_address" value="${_esc(m.current_address || "")}"></div>
+                    <div><label ${LS}>Nghề nghiệp</label><input ${IS} data-field="occupation" value="${_esc(m.occupation || "")}"></div>
+                    ${["anh_chi_em_ruot", "anh_chi_em_chong_vo"].includes(m.relationship) ? `<div><label ${LS}>Quốc tịch</label><input ${IS} data-field="nationality" value="${_esc(m.nationality || "Việt Nam")}"></div>` : ""}
+                    <div><label ${LS}>Nơi làm việc</label><input ${IS} data-field="workplace" value="${_esc(m.workplace || "")}"></div>
+                    <div style="grid-column:span 2"><label ${LS}>Chức danh/Chức vụ</label><input ${IS} data-field="job_title" value="${_esc(m.job_title || "")}"></div>
+                    <div style="grid-column:span 2"><label ${LS}>Trường học (nếu là con dưới 18)</label><input ${IS} data-field="child_school" value="${_esc(m.child_school || "")}"></div>
+                    <div style="grid-column:span 2"><label ${LS}>Ghi chú</label><input ${IS} data-field="notes" value="${_esc(m.notes || "")}"></div>
+                  </div>
+                  <div style="margin-top:8px;display:flex;gap:16px;flex-wrap:wrap">
+                    <label style="display:flex;align-items:center;gap:4px;font-size:12px;cursor:pointer">
+                      <input type="checkbox" data-field="is_deceased"${deceasedChecked} onchange="this.closest('[data-fam-id]').querySelector('.fam-deceased-extra').style.display=this.checked?'grid':'none'">
+                      Đã mất
+                    </label>
+                    <label style="display:flex;align-items:center;gap:4px;font-size:12px;cursor:pointer">
+                      <input type="checkbox" data-field="is_party_member"${partyChecked} onchange="this.closest('[data-fam-id]').querySelector('.fam-party-extra').style.display=this.checked?'grid':'none'">
+                      Là Đảng viên
+                    </label>
+                  </div>
+                  <div class="fam-deceased-extra" style="display:${deceasedDisplay};grid-template-columns:1fr 1fr;gap:6px 16px;margin-top:6px;padding:8px 10px;background:#FFF5F5;border-radius:4px">
+                    <div><label ${LS}>Năm mất</label><input ${IS} type="number" data-field="deceased_year" value="${m.deceased_year || ""}"></div>
+                    <div><label ${LS}>Nguyên nhân mất</label><input ${IS} data-field="deceased_cause" value="${_esc(m.deceased_cause || "")}"></div>
+                  </div>
+                  <div class="fam-party-extra" style="display:${partyDisplay};grid-template-columns:1fr 1fr;gap:6px 16px;margin-top:6px;padding:8px 10px;background:#F0FFF4;border-radius:4px">
+                    <div><label ${LS}>Ngày vào Đảng</label><input ${IS} data-field="party_join_date" value="${_esc(m.party_join_date || "")}"></div>
+                    <div><label ${LS}>Nơi vào Đảng</label><input ${IS} data-field="party_join_place" value="${_esc(m.party_join_place || "")}"></div>
+                    <div><label ${LS}>Chi bộ/Đảng bộ</label><input ${IS} data-field="party_chi_bo" value="${_esc(m.party_chi_bo || "")}"></div>
+                    <div><label ${LS}>Khen thưởng/Huy hiệu</label><input ${IS} data-field="party_awards_text" value="${_esc(m.party_awards_text || "")}"></div>
+                    <div><label ${LS}>Số năm tuổi Đảng</label><input ${IS} type="number" data-field="party_years_count" value="${m.party_years_count || ""}"></div>
+                  </div>
+                  ${mkHist(m.history)}
+                </div>`;
+                })
+                .join("");
+            }
+            const famBody = document.getElementById("family-esD-body");
+            if (famBody && famRes.status === "fulfilled") {
+              const members = Array.isArray(famRes.value)
+                ? famRes.value
+                : famRes.value?.data || famRes.value?.results || [];
+              _renderFamTableView(members);
+            }
+            // Expose family renderers for section D inline edit toggle
+            window._renderFamTableView = _renderFamTableView;
+            window._renderFamTableEdit = _renderFamTableEdit;
+
+            // Render Section F — attached files
+            const filesBody = document.getElementById("files-esF-body");
+            if (filesBody && filesRes.status === "fulfilled") {
+              const files = Array.isArray(filesRes.value)
+                ? filesRes.value
+                : filesRes.value?.data || filesRes.value?.results || [];
+              const mimeIcon = (mime) =>
+                mime?.startsWith("image")
+                  ? "🖼"
+                  : mime === "application/pdf"
+                    ? "📄"
+                    : "📎";
+              const fmtSize = (bytes) =>
+                bytes < 1024 * 1024
+                  ? `${(bytes / 1024).toFixed(0)} KB`
+                  : `${(bytes / 1024 / 1024).toFixed(1)} MB`;
+              filesBody.innerHTML =
+                (files.length
+                  ? files
+                      .map(
+                        (f) => `
+          <div style="border:1px solid var(--border);border-radius:var(--r-sm);padding:10px 12px;display:flex;align-items:center;gap:8px;font-size:12px">
+            <span style="font-size:20px">${mimeIcon(f.mime_type)}</span>
+            <div>
+              <div style="font-weight:600;color:var(--navy)">${_esc(f.original_name)}</div>
+              <div style="color:var(--hint);font-size:10.5px">${_esc(f.category || "")} · ${fmtSize(f.file_size || 0)}</div>
+            </div>
+            <span class="pill pill-done" style="font-size:9px;margin-left:auto">OK</span>
+          </div>`,
+                      )
+                      .join("")
+                  : "") +
+                `<div style="border:2px dashed var(--border);border-radius:var(--r-sm);padding:10px 12px;display:flex;align-items:center;gap:8px;font-size:12px;color:var(--hint);cursor:pointer" onclick="showToast('Tính năng upload đang phát triển')">
+            <span style="font-size:18px">＋</span><div>Thêm tài liệu</div>
+          </div>`;
+            }
+
+            // Section J — Self-assessment
+            const fiJ = document.getElementById("fi-esJ-self");
+            if (fiJ) fiJ.value = p.self_assessment_text || "";
+            const fvJ = document.getElementById("fv-esJ-self");
+            if (fvJ)
+              fvJ.textContent = p.self_assessment_text
+                ? p.self_assessment_text.substring(0, 50) +
+                  (p.self_assessment_text.length > 50 ? "…" : "")
+                : "—";
+
+            // Section K — Commitment & declaration
+            const fiKName = document.getElementById("fi-esK-name");
+            if (fiKName)
+              fiKName.value = p.declaration_name || p.full_name || "";
+            const fvKName = document.getElementById("fv-esK-name");
+            if (fvKName)
+              fvKName.textContent = p.declaration_name || p.full_name || "—";
+
+            const declDate = p.declaration_date || "";
+            const fiKDate = document.getElementById("fi-esK-date");
+            if (fiKDate) fiKDate.value = declDate;
+            const fvKDate = document.getElementById("fv-esK-date");
+            if (fvKDate)
+              fvKDate.textContent = declDate
+                ? declDate.split("-").reverse().join("/")
+                : "—";
+
+            // pgProfileEdit is always review-only — no one edits citizen data directly
+            await _enterAdminReviewMode(profileId);
+
+            return;
+          } catch (e) {
+            showToast("✗ Lỗi tải hồ sơ: " + e.message);
+          }
+        }
+
+        // Fallback: use provided params
+        currentEditProfile = {
+          name: nameOrId || "",
+          score: score || 0,
+          status: status || "under_review",
+        };
+        if (t) t.textContent = nameOrId || "—";
+        const ss = document.getElementById("editStatusSelect");
+        if (ss) ss.value = status || "under_review";
+      }
+
+      // Scroll to a section within the edit page
+      function scrollToSection(id) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.scrollIntoView({ behavior: "smooth", block: "start" });
+        // Update active nav
+        document
+          .querySelectorAll(".edit-nav-item")
+          .forEach((n) => n.classList.remove("active"));
+        const navItems = document.querySelectorAll(".edit-nav-item");
+        const secIds = [
+          "esA",
+          "esB",
+          "esC",
+          "esD",
+          "esE",
+          "esFT",
+          "esH",
+          "esJ",
+          "esK",
+          "esF",
+          "esG",
+        ];
+        const idx = secIds.indexOf(id);
+        if (navItems[idx]) navItems[idx].classList.add("active");
+      }
+
+      function _collectEsDFamilyRows() {
+        return [
+          ...document.querySelectorAll("#family-esD-body [data-fam-id]"),
+        ].map((card) => {
+          const payload = {};
+          card
+            .querySelectorAll(
+              "input[data-field], select[data-field], textarea[data-field]",
+            )
+            .forEach((inp) => {
+              const key = inp.dataset.field;
+              if (!key) return;
+              if (inp.type === "checkbox") {
+                payload[key] = inp.checked;
+              } else if (
+                key === "birth_year" ||
+                key === "deceased_year" ||
+                key === "party_years_count"
+              ) {
+                const n = parseInt(inp.value, 10);
+                payload[key] = Number.isFinite(n) ? n : null;
+              } else {
+                payload[key] = (inp.value || "").trim();
+              }
+            });
+          return {
+            id: card.dataset.famId,
+            payload,
+          };
+        });
+      }
+
+      async function _saveEsDFamilyEdits() {
+        const profileId = currentEditProfile?.id;
+        if (!profileId) throw new Error("Không tìm thấy ID hồ sơ");
+        const rows = _collectEsDFamilyRows();
+        const base = `/family/${profileId}/members/`;
+        await Promise.all(
+          rows.map((r) => API.patch(`${base}${r.id}/`, r.payload)),
+        );
+
+        const byId = new Map(rows.map((r) => [String(r.id), r.payload]));
+        window._esDMembers = (window._esDMembers || []).map((m) => {
+          const patch = byId.get(String(m.id));
+          return patch ? { ...m, ...patch } : m;
+        });
+        if (typeof window._renderFamTableView === "function") {
+          window._renderFamTableView(window._esDMembers || []);
+        }
+      }
+
+      // ── Review-mode helpers ──────────────────────────────────────────
+
+      let _fieldNotes = {};
+      let _reviewProfileId = null;
+
+      function _isReviewMode() {
+        return document
+          .getElementById("pgProfileEdit")
+          ?.classList.contains("review-locked");
+      }
+
+      // Reset pgProfileEdit back to full admin-edit state (called before entering any mode)
+      function _resetPgProfileEditMode() {
+        const pg = document.getElementById("pgProfileEdit");
+        if (!pg) return;
+        pg.classList.remove("review-locked");
+        // Restore edit + row buttons
+        pg.querySelectorAll(".edit-btn, .add-row-btn, .del-row-btn").forEach(
+          (b) => {
+            b.style.display = "";
+          },
+        );
+        // Re-enable inputs (skip those that were originally disabled/readonly in HTML)
+        pg.querySelectorAll(
+          ".field-input, .field-select-input, .field-textarea",
+        ).forEach((el) => {
+          if (el.dataset.reviewDisabled) {
+            el.disabled = false;
+            el.readOnly = false;
+            delete el.dataset.reviewDisabled;
+          }
+          el.style.pointerEvents = "";
+          el.style.background = "";
+          el.style.cursor = "";
+        });
+        // Show save btn + status select
+        const saveBtn = document.getElementById("btnSaveAllEdits");
+        if (saveBtn) saveBtn.style.display = "";
+        const sw = pg.querySelector(".status-select-wrap");
+        if (sw) sw.style.display = "";
+        // Hide review action bar
+        document.getElementById("reviewActionBar")?.classList.remove("visible");
+        // Clean up injected note areas
+        pg.querySelectorAll(".fn-field-note").forEach((el) => el.remove());
+        pg.querySelectorAll(".field-row.row-has-note").forEach((r) =>
+          r.classList.remove("row-has-note"),
+        );
+      }
+
+      // Enter review-only mode for can_bo_bxd — direct DOM manipulation for reliability
+      async function _enterAdminReviewMode(profileId) {
+        _reviewProfileId = profileId;
+        const pg = document.getElementById("pgProfileEdit");
+        if (!pg) return;
+
+        // Clean slate first
+        _resetPgProfileEditMode();
+        pg.classList.add("review-locked");
+
+        // ── Breadcrumb ──
+        const lbl = document.getElementById("editProfileBreadcrumbLabel");
+        if (lbl) lbl.textContent = "Thẩm định hồ sơ:";
+
+        // ── Hide save btn + status select, show review action bar ──
+        const saveBtn = document.getElementById("btnSaveAllEdits");
+        if (saveBtn) saveBtn.style.display = "none";
+        const sw = pg.querySelector(".status-select-wrap");
+        if (sw) sw.style.display = "none";
+        document.getElementById("reviewActionBar")?.classList.add("visible");
+
+        // Hide "Trả lại" button if officer lacks review/approve permissions
+        const rabReturnBtn = document.querySelector(
+          "#reviewActionBar .btn-primary",
+        );
+        if (rabReturnBtn)
+          rabReturnBtn.style.display =
+            _hasPermOrSuper("can_review_profiles") ||
+            _hasPermOrSuper("can_approve_profiles")
+              ? ""
+              : "none";
+
+        // ── Physically hide ALL "Chỉnh sửa" edit buttons (not relying on CSS) ──
+        pg.querySelectorAll(".edit-btn:not(.flag-btn)").forEach((btn) => {
+          btn.style.display = "none";
+        });
+        // Hide add / delete row buttons
+        pg.querySelectorAll(".add-row-btn, .del-row-btn").forEach((btn) => {
+          btn.style.display = "none";
+        });
+
+        // ── Disable ALL field inputs at attribute level ──
+        pg.querySelectorAll(
+          ".field-input, .field-select-input, .field-textarea",
+        ).forEach((el) => {
+          if (!el.disabled && !el.readOnly) {
+            el.dataset.reviewDisabled = "1"; // track so we can restore
+            el.disabled = true;
+          }
+          el.style.pointerEvents = "none";
+          el.style.background = "#f0f3f7";
+          el.style.cursor = "not-allowed";
+        });
+
+        // ── Inject per-field note areas under every .field-row ──
+        pg.querySelectorAll(".field-row").forEach((row) => {
+          const inp = row.querySelector(
+            ".field-input[id], .field-select-input[id], .field-textarea[id]",
+          );
+          if (!inp) return;
+          const fieldKey = inp.id;
+          const fieldLabel = inp.dataset.field || fieldKey;
+          const nd = document.createElement("div");
+          nd.className = "fn-field-note";
+          nd.dataset.fieldKey = fieldKey;
+          nd.innerHTML =
+            `<div class="fn-field-note-label">💬 Góp ý: ${_esc(fieldLabel)}</div>` +
+            `<textarea class="fn-field-note-ta" placeholder="Nhập góp ý để quần chúng chỉnh sửa…" rows="2"></textarea>`;
+          row.appendChild(nd);
+        });
+
+        // ── Section-level notes for timeline / table sections ──
+        [
+          { key: "esB", label: "B. Lịch sử bản thân", secId: "esB" },
+          { key: "esC-work", label: "C. Lịch sử công tác", secId: "esC" },
+          { key: "esD", label: "D. Thành phần gia đình", secId: "esD" },
+          { key: "esE", label: "E. Khen thưởng", secId: "esE" },
+          { key: "esFT", label: "F. Đi nước ngoài", secId: "esFT" },
+          { key: "esH", label: "H. Kỷ luật", secId: "esH" },
+        ].forEach(({ key, label, secId }) => {
+          const sec = document.getElementById(secId);
+          if (!sec) return;
+          const body = sec.querySelector(".edit-sec-body");
+          if (!body) return;
+          const nd = document.createElement("div");
+          nd.className = "fn-field-note fn-section-note";
+          nd.dataset.fieldKey = key;
+          nd.innerHTML =
+            `<div class="fn-field-note-label">💬 Góp ý: ${label}</div>` +
+            `<textarea class="fn-field-note-ta" placeholder="Nhập góp ý cho phần này để quần chúng chỉnh sửa…" rows="2"></textarea>`;
+          body.insertBefore(nd, body.firstElementChild);
+        });
+
+        // ── Load and populate existing notes ──
+        try {
+          const resp = await API.get(`/profiles/${profileId}/field-notes/`);
+          const notes = Array.isArray(resp) ? resp : resp.data || [];
+          _fieldNotes = {};
+          notes.forEach((n) => {
+            _fieldNotes[n.field_key] = n.note;
+          });
+
+          pg.querySelectorAll(".fn-field-note[data-field-key]").forEach(
+            (nd) => {
+              const note = _fieldNotes[nd.dataset.fieldKey];
+              if (!note) return;
+              const ta = nd.querySelector(".fn-field-note-ta");
+              if (ta) {
+                ta.value = note;
+                ta.classList.add("has-content");
+              }
+              nd.classList.add("has-note");
+              nd.closest(".field-row")?.classList.add("row-has-note");
+            },
+          );
+        } catch (e) {
+          console.warn("[REVIEW] load notes fail:", e.message);
+        }
+      }
+
+      function _toggleNoteArea() {} // no-op kept for safety
+
+      // Collect all per-field note textareas → [{field_key, note}]
+      function _collectFieldNotes() {
+        const notes = [];
+        document
+          .querySelectorAll("#pgProfileEdit .fn-field-note[data-field-key]")
+          .forEach((nd) => {
+            const key = nd.dataset.fieldKey;
+            const ta = nd.querySelector(".fn-field-note-ta");
+            const note = ta?.value?.trim() || "";
+            if (key) notes.push({ field_key: key, note });
+          });
+        return notes;
+      }
+
+      // Save notes to API (without returning)
+      async function saveFieldNotesOnly() {
+        const id = _reviewProfileId || currentEditProfile?.id;
+        if (!id) {
+          showToast("⚠ Không xác định được hồ sơ");
+          return;
+        }
+        try {
+          const notes = _collectFieldNotes().filter((n) => n.note);
+          await API.post(`/profiles/${id}/field-notes/`, notes);
+          showToast("✅ Đã lưu nhận xét");
+        } catch (e) {
+          showToast("✗ Lưu nhận xét thất bại: " + e.message);
+        }
+      }
+
+      // Open the return modal, pre-saving notes
+      async function openReturnModalFromReview() {
+        // Save notes first
+        const id = _reviewProfileId || currentEditProfile?.id;
+        if (id) {
+          try {
+            const notes = _collectFieldNotes().filter((n) => n.note);
+            if (notes.length)
+              await API.post(`/profiles/${id}/field-notes/`, notes);
+          } catch (_) {}
+        }
+        // Pre-populate flaggedSections Set from field notes so the return modal shows them
+        flaggedSections.clear();
+        _collectFieldNotes()
+          .filter((n) => n.note)
+          .forEach((n) => {
+            const lbl = _EDIT_SECTION_LABEL?.[n.field_key] || n.field_key;
+            flaggedSections.add(lbl);
+          });
+        openReturnModal();
+      }
+
+      // Toggle inline edit mode for a section
+      async function toggleEdit(secId) {
+        if (_isReviewMode()) return; // review mode: editing blocked — officer uses per-field notes
+        const sec = document.getElementById(secId);
+        if (!sec) return;
+        const isEditing = sec.classList.toggle("editing");
+        const btn = sec.querySelector(".edit-btn:not(.flag-btn)");
+        if (btn) btn.textContent = isEditing ? "✓ Lưu phần này" : "✏ Chỉnh sửa";
+
+        // Section D uses a custom editable table, not field-input/field-value pairs.
+        if (secId === "esD") {
+          if (isEditing) {
+            if (typeof window._renderFamTableEdit === "function") {
+              window._renderFamTableEdit(window._esDMembers || []);
+            }
+            return;
+          }
+          try {
+            await _saveEsDFamilyEdits();
+            showToast("✅ Đã lưu thay đổi phần D");
+          } catch (e) {
+            showToast("✗ Lưu phần D thất bại: " + e.message);
+            sec.classList.add("editing");
+            if (btn) btn.textContent = "✓ Lưu phần này";
+          }
+          return;
+        }
+
+        if (!isEditing) {
+          // Save changes: collect all modified fields in this section
+          sec
+            .querySelectorAll(".field-input, .field-select-input")
+            .forEach((inp) => {
+              const field = inp.dataset.field;
+              if (!field) return;
+              const newVal = inp.value.trim();
+              const display = inp.previousElementSibling;
+              if (display && display.classList.contains("field-value")) {
+                const oldVal = display.textContent.trim();
+                if (oldVal !== newVal && newVal) {
+                  display.textContent = newVal;
+                  display.classList.remove("empty");
+                  logEdit(field, oldVal, newVal);
+                }
+              }
+            });
+          showToast("✅ Đã lưu thay đổi phần " + secId.replace("es", ""));
+        }
+      }
+
+      // Log an edit to history
+      function logEdit(field, oldVal, newVal) {
+        const u = API.currentUser();
+        const byName = u?.full_name || u?.username || u?.email || "Cán bộ";
+        const initials =
+          byName
+            .split(" ")
+            .map((w) => w[0] || "")
+            .filter(Boolean)
+            .slice(-2)
+            .join("")
+            .toUpperCase() || "CB";
+        const now = new Date();
+        const ts =
+          now.toLocaleDateString("vi-VN") +
+          " " +
+          now.toLocaleTimeString("vi-VN", {
+            hour: "2-digit",
+            minute: "2-digit",
+          });
+        editHistoryLog.unshift({ field, oldVal, newVal, by: byName, ts });
+
+        const body = document.getElementById("editHistoryBody");
+        if (!body) return;
+        const item = document.createElement("div");
+        item.className = "edit-history-item";
+        item.style.animation = "secIn .2s ease";
+        item.innerHTML = `
+    <div class="edit-hist-avatar">${_esc(initials)}</div>
+    <div class="edit-hist-body">
+      <div class="edit-hist-what">${_esc(byName)}</div>
+      <div class="edit-hist-change">
+        <span>Cập nhật: <strong>${_esc(field)}</strong></span>
+        <span class="edit-hist-old">${_esc(oldVal || "(trống)")}</span>→<span class="edit-hist-new">${_esc(newVal)}</span>
+      </div>
+      <div class="edit-hist-time">${_esc(ts)}</div>
+    </div>`;
+        body.prepend(item);
+      }
+
+      // Save all open editing sections at once
+      async function saveAllEdits() {
+        if (_isReviewMode()) {
+          // Officers use notes-only workflow
+          await saveFieldNotesOnly();
+          return;
+        }
+        const id = currentEditProfile.id;
+        if (!id) {
+          showToast("⚠ Không tìm thấy ID hồ sơ");
+          return;
+        }
+        try {
+          // Collect Section A + C + J + K changed fields
+          const fieldMap = {
+            "esA-name": "full_name",
+            "esA-gender": "gender",
+            "esA-dob": "dob",
+            "esA-birthplace": "birth_place_detail",
+            "esA-hometown": "hometown_detail",
+            "esA-address": "current_address",
+            "esA-occupation": "occupation",
+            "esA-temp-addr": "temporary_address",
+            "esC-edu-gen": "general_edu_level",
+            "esC-edu-qual": "edu_specialization",
+            "esC-political": "political_level_detail",
+            "esC-foreign-lang": "foreign_languages",
+            "esC-it": "it_level",
+            "esC-sci-tech": "science_tech_qualifications",
+            "esC-degree": "highest_degree",
+            "esC-acad-title": "academic_title",
+            "esC-ethnic-lang": "ethnic_language",
+            "esJ-self": "self_assessment_text",
+            "esK-name": "declaration_name",
+            "esK-date": "declaration_date",
+          };
+          const payload = {};
+          Object.entries(fieldMap).forEach(([fid, apiKey]) => {
+            const fi = document.getElementById(`fi-${fid}`);
+            if (fi) payload[apiKey] = fi.value.trim() || null;
+          });
+
+          // Collect Section B timeline rows
+          const _parseMY = (str) => {
+            if (!str) return { month: null, year: null };
+            const m = /^(\d{1,2})\/(\d{4})$/.exec(str.trim());
+            if (m)
+              return { month: parseInt(m[1], 10), year: parseInt(m[2], 10) };
+            const y = /^(\d{4})$/.exec(str.trim());
+            if (y) return { month: null, year: parseInt(y[1], 10) };
+            return { month: null, year: null };
+          };
+          const tlRows = [];
+          document
+            .querySelectorAll("#timeline-esB .timeline-edit-row")
+            .forEach((row) => {
+              const inputs = row.querySelectorAll("input");
+              // inputs[0]=from, inputs[1]=to, inputs[2]=is_present checkbox
+              // description is now a <textarea> (fallback to inputs[3] for old rows)
+              const ta = row.querySelector("textarea");
+              const desc = (ta ? ta.value : inputs[3]?.value || "").trim();
+              if (!desc) return;
+              const isPresent = inputs[2]?.checked || false;
+              const from = _parseMY(inputs[0]?.value);
+              const to = isPresent
+                ? { month: null, year: null }
+                : _parseMY(inputs[1]?.value);
+              tlRows.push({
+                id: row.dataset.id || null,
+                from_month: from.month,
+                from_year: from.year,
+                to_month: to.month,
+                to_year: to.year,
+                is_present: isPresent,
+                description: desc,
+                profile: id,
+              });
+            });
+
+          // Collect other timeline sections from admin edit rows
+          const _collectAdminTimeline = (containerId) => {
+            const rows = [];
+            document
+              .querySelectorAll(`#${containerId} .timeline-edit-row`)
+              .forEach((row) => {
+                // Collect ordered values: inputs + textareas in DOM order
+                const children = [...row.querySelectorAll("input, textarea")];
+                if (!children.length) return;
+                const vals = children.map((el) => el.value.trim());
+                if (vals.some((v) => v))
+                  rows.push({ id: row.dataset.id || null, _vals: vals });
+              });
+            return rows;
+          };
+          const workRows = _collectAdminTimeline("timeline-esC")
+            .map((r) => {
+              const period = r._vals[0] || "";
+              const parts = period.split(/\s*[–\-]\s*/);
+              const from = _parseMY(parts[0]);
+              const isNay = /nay/i.test(parts[1] || "");
+              const to = isNay
+                ? { month: null, year: null }
+                : _parseMY(parts[1]);
+              return {
+                id: period ? r.id : null,
+                period_text: period || null,
+                from_month: from.month,
+                from_year: from.year,
+                to_month: to?.month || null,
+                to_year: to?.year || null,
+                is_present: isNay,
+                employer: r._vals[1] || "",
+                job_title: r._vals[2] || null,
+              };
+            })
+            .filter((r) => r.employer);
+          const eduRows = _collectAdminTimeline("timeline-esE")
+            .map((r) => ({
+              id: r.id,
+              school: r._vals[0] || "",
+              period_text: r._vals[1] || null,
+              certificate: r._vals[2] || null,
+            }))
+            .filter((r) => r.school);
+          const travelRows = _collectAdminTimeline("timeline-esF")
+            .map((r) => ({
+              id: r.id,
+              period_text: r._vals[0] || null,
+              purpose: r._vals[1] || null,
+              country: r._vals[2] || "",
+            }))
+            .filter((r) => r.country);
+          const _parseAdminAward = (containerId, type) => {
+            return _collectAdminTimeline(containerId)
+              .map((r) => {
+                const per = r._vals[0] || "";
+                const mm = per.match(/^(\d{1,2})\/(\d{4})/);
+                return {
+                  id: r.id,
+                  type,
+                  issued_month: mm ? parseInt(mm[1]) : null,
+                  issued_year: mm
+                    ? parseInt(mm[2])
+                    : parseInt(per) > 1900
+                      ? parseInt(per)
+                      : null,
+                  content: r._vals[1] || "",
+                  level: r._vals[2] || null,
+                };
+              })
+              .filter((r) => r.content);
+          };
+          const awardRows = _parseAdminAward("timeline-esG", "award");
+          const disciplineRows = _parseAdminAward("timeline-esH", "discipline");
+
+          if (document.getElementById("esD")?.classList.contains("editing")) {
+            await _saveEsDFamilyEdits();
+          }
+
+          await Promise.allSettled([
+            API.patch(`/profiles/${id}/`, payload),
+            _syncSec(`/timelines/${id}/history/`, _adminTlSrvIds, tlRows),
+            _syncSec(`/timelines/${id}/work/`, _adminWorkSrvIds, workRows),
+            eduRows.length > 0 &&
+              _syncSec(`/timelines/${id}/education/`, new Set(), eduRows),
+            travelRows.length > 0 &&
+              _syncSec(`/timelines/${id}/travel/`, new Set(), travelRows),
+            awardRows.length > 0 &&
+              _syncSec(`/timelines/${id}/awards/`, new Set(), awardRows),
+            disciplineRows.length > 0 &&
+              _syncSec(`/timelines/${id}/awards/`, new Set(), disciplineRows),
+          ]);
+
+          // Sync correction flags to backend right on Save so applicant can see them immediately.
+          await _syncCorrectionsFromCurrentFlags(id);
+
+          document
+            .querySelectorAll(".editable-section.editing")
+            .forEach((sec) => {
+              sec.classList.remove("editing");
+              const btn = sec.querySelector(".edit-btn:not(.flag-btn)");
+              if (btn) btn.textContent = "✏ Chỉnh sửa";
+            });
+          showToast("✅ Đã lưu tất cả thay đổi vào hệ thống");
+          addActivity(
+            `💾 Cán bộ đã chỉnh sửa hồ sơ <strong>${currentEditProfile.name}</strong>`,
+          );
+        } catch (e) {
+          showToast("✗ Lỗi lưu: " + e.message);
+        }
+      }
+
+      async function _syncCorrectionsFromCurrentFlags(profileId, overallNote) {
+        if (!profileId) return;
+        const items = [...flaggedSections].map((sectionLabel) => ({
+          section: sectionLabel,
+          field_name: null,
+          description:
+            _flagSectionNotes[sectionLabel] ||
+            `Yêu cầu bổ sung ${sectionLabel}`,
+        }));
+        if (!items.length) return;
+        try {
+          await API.post("/exports/corrections/", {
+            profile: profileId,
+            overall_note: overallNote || "Yêu cầu bổ sung hồ sơ",
+            items,
+          });
+          console.log(
+            "[CORRECTION DEBUG] Synced correction flags on save. profile:",
+            profileId,
+            "items:",
+            items.length,
+          );
+        } catch (e) {
+          console.warn(
+            "[CORRECTION DEBUG] Sync correction on save failed:",
+            e.message,
+          );
+        }
+      }
+
+      // Toggle flag on a section
+      function toggleSectionFlag(secId, label) {
+        const sec = document.getElementById(secId);
+        if (!sec) return;
+        sec.dataset.correctionLabel =
+          label || _EDIT_SECTION_LABEL[secId] || secId;
+        const btn = sec.querySelector(".flag-btn");
+        const note = document.getElementById("note-" + secId);
+
+        if (sec.classList.contains("has-correction")) {
+          // Un-flag
+          sec.classList.remove("has-correction");
+          if (btn) {
+            btn.textContent = "⚑ Gắn cờ";
+            btn.classList.remove("active-flag");
+          }
+          if (note) {
+            note.classList.remove("visible");
+          }
+          flaggedSections.delete(label);
+          delete _flagSectionNotes[label];
+        } else {
+          // Flag — prompt for note
+          const noteText =
+            prompt("Ghi chú yêu cầu bổ sung cho phần này (tuỳ chọn):") || "";
+          sec.classList.add("has-correction");
+          if (btn) {
+            btn.textContent = "⚑ Đã gắn cờ";
+            btn.classList.add("active-flag");
+          }
+          if (note) {
+            note.textContent = noteText || "Phần này cần xem lại / bổ sung.";
+            note.classList.add("visible");
+          }
+          flaggedSections.add(label);
+          _flagSectionNotes[label] =
+            noteText || "Phần này cần xem lại / bổ sung.";
+        }
+        // Update sidenav badge
+        document.querySelectorAll(".edit-nav-item").forEach((n) => {
+          if (n.textContent.includes(label.split(".")[0]))
+            n.classList.toggle("has-issue", flaggedSections.has(label));
+        });
+        _persistFlagDraftForCurrentProfile();
+      }
+
+      function _persistFlagDraftForCurrentProfile() {
+        const pid = currentEditProfile?.id;
+        console.log("[CORRECTION DEBUG] Persisting flags for profile:", pid);
+        if (!pid) {
+          console.log(
+            "[CORRECTION DEBUG] No current profile ID, skipping persist",
+          );
+          return;
+        }
+        const items = [...flaggedSections].map((s) => ({
+          section: s,
+          description: _flagSectionNotes[s] || `Yêu cầu bổ sung ${s}`,
+        }));
+        const key = `profile_flag_draft_${pid}`;
+        console.log("[CORRECTION DEBUG] Flagged sections:", [
+          ...flaggedSections,
+        ]);
+        console.log("[CORRECTION DEBUG] Draft items to persist:", items);
+
+        if (!items.length) {
+          localStorage.removeItem(key);
+          console.log(
+            "[CORRECTION DEBUG] No items, cleared localStorage key:",
+            key,
+          );
+          return;
+        }
+        localStorage.setItem(key, JSON.stringify(items));
+        console.log(
+          "[CORRECTION DEBUG] ✓ Saved to localStorage:",
+          key,
+          "with",
+          items.length,
+          "items",
+        );
+      }
+
+      function _consumeFlagDraft(profileId) {
+        const key = `profile_flag_draft_${profileId}`;
+        console.log("[CORRECTION DEBUG] Consuming draft from key:", key);
+        let items = [];
+        try {
+          const stored = localStorage.getItem(key);
+          console.log("[CORRECTION DEBUG] localStorage value:", stored);
+          items = JSON.parse(stored || "[]");
+          if (!Array.isArray(items)) items = [];
+        } catch (e) {
+          console.error(
+            "[CORRECTION DEBUG] Failed to parse draft JSON:",
+            e.message,
+          );
+          items = [];
+        }
+        console.log("[CORRECTION DEBUG] Parsed items:", items);
+        localStorage.removeItem(key);
+        console.log(
+          "[CORRECTION DEBUG] ✓ Consumed and deleted draft from localStorage:",
+          key,
+        );
+        return items;
+      }
+
+      function _getFlagDraft(profileId) {
+        const key = `profile_flag_draft_${profileId}`;
+        try {
+          const items = JSON.parse(localStorage.getItem(key) || "[]");
+          return Array.isArray(items) ? items : [];
+        } catch {
+          return [];
+        }
+      }
+
+      function _restoreFlagDraftForProfile(profileId) {
+        flaggedSections = new Set();
+        _flagSectionNotes = {};
+
+        // Reset all UI state first
+        document.querySelectorAll(".editable-section").forEach((sec) => {
+          sec.classList.remove("has-correction");
+          const btn = sec.querySelector(".flag-btn");
+          if (btn) {
+            btn.textContent = "⚑ Gắn cờ";
+            btn.classList.remove("active-flag");
+          }
+          const sid = sec.id;
+          const note = document.getElementById("note-" + sid);
+          if (note) {
+            note.classList.remove("visible");
+            note.textContent = "";
+          }
+        });
+        document
+          .querySelectorAll(".edit-nav-item")
+          .forEach((n) => n.classList.remove("has-issue"));
+
+        const items = _getFlagDraft(profileId);
+        items.forEach((it) => {
+          const label = String(it.section || "").trim();
+          if (!label) return;
+          const secId = Object.keys(_EDIT_SECTION_LABEL).find(
+            (k) => _EDIT_SECTION_LABEL[k] === label,
+          );
+          if (!secId) return;
+          const sec = document.getElementById(secId);
+          if (!sec) return;
+          const btn = sec.querySelector(".flag-btn");
+          const note = document.getElementById("note-" + secId);
+
+          sec.classList.add("has-correction");
+          sec.dataset.correctionLabel = label;
+          if (btn) {
+            btn.textContent = "⚑ Đã gắn cờ";
+            btn.classList.add("active-flag");
+          }
+          if (note) {
+            note.textContent =
+              it.description || "Phần này cần xem lại / bổ sung.";
+            note.classList.add("visible");
+          }
+          flaggedSections.add(label);
+          _flagSectionNotes[label] =
+            it.description || "Phần này cần xem lại / bổ sung.";
+        });
+
+        document.querySelectorAll(".edit-nav-item").forEach((n) => {
+          const prefix = n.textContent.split(".")[0];
+          if ([...flaggedSections].some((s) => s.startsWith(prefix + "."))) {
+            n.classList.add("has-issue");
+          }
+        });
+      }
+
+      async function _postCorrectionRequestIfAny(profileId, overallNote) {
+        console.log(
+          "[CORRECTION DEBUG] Starting _postCorrectionRequestIfAny for profile:",
+          profileId,
+        );
+        const draftItems = _consumeFlagDraft(profileId);
+        console.log("[CORRECTION DEBUG] Draft items consumed:", draftItems);
+        console.log(
+          "[CORRECTION DEBUG] Number of flagged sections:",
+          draftItems.length,
+        );
+
+        if (!draftItems.length) {
+          console.log(
+            "[CORRECTION DEBUG] No draft items, skipping correction post",
+          );
+          return;
+        }
+
+        try {
+          const payload = {
+            profile: profileId,
+            overall_note: overallNote || "Yêu cầu bổ sung hồ sơ",
+            items: draftItems.map((it) => ({
+              section: it.section,
+              field_name: null,
+              description: it.description || overallNote || "Yêu cầu bổ sung",
+            })),
+          };
+          console.log(
+            "[CORRECTION DEBUG] Posting correction request with payload:",
+            JSON.stringify(payload, null, 2),
+          );
+
+          const result = await API.post("/exports/corrections/", payload);
+          console.log(
+            "[CORRECTION DEBUG] ✓ Correction request created successfully:",
+            result,
+          );
+        } catch (e) {
+          console.error(
+            "[CORRECTION DEBUG] ✗ Create correction request failed:",
+            {
+              message: e.message,
+              status: e.status,
+              response: e.response,
+              stack: e.stack,
+            },
+          );
+        }
+      }
+
+      // Timeline row management
+      function addHistoryRowB() {
+        const cont = document.getElementById("timeline-esB");
+        if (!cont) return;
+        const row = document.createElement("div");
+        row.className = "timeline-edit-row";
+        row.innerHTML = `<input placeholder="Từ (MM/YYYY)"><input placeholder="Đến (MM/YYYY)"><label style="display:flex;align-items:center;gap:3px;font-size:11px;white-space:nowrap;cursor:pointer;padding-top:8px"><input type="checkbox" onchange="const t=this.closest('.timeline-edit-row').querySelectorAll('input')[1];t.disabled=this.checked;if(this.checked)t.value=''"> Hiện tại</label><textarea rows="3" placeholder="Diễn biến: Học gì / Làm gì, ở đâu (tên đơn vị, địa chỉ) + Nơi sinh sống…"></textarea><button class="del-row-btn" onclick="delTimelineRow(this)" style="margin-top:6px">✕</button>`;
+        cont.appendChild(row);
+        row.querySelector("input").focus();
+      }
+      function addWorkRowC() {
+        const cont = document.getElementById("timeline-esC");
+        if (!cont) return;
+        const row = document.createElement("div");
+        row.className = "timeline-edit-row";
+        row.innerHTML = `<input placeholder="Từ–Đến (MM/YYYY–MM/YYYY)"><textarea rows="3" placeholder="Làm việc gì, ở đâu (tên đơn vị, địa chỉ + nơi sinh sống)"></textarea><input placeholder="Chức vụ"><button class="del-row-btn" onclick="this.closest('.timeline-edit-row').remove()" style="margin-top:6px">✕</button>`;
+        cont.appendChild(row);
+        row.querySelector("input").focus();
+      }
+      function addTimelineRow(containerId) {
+        const cont = document.getElementById(containerId);
+        if (!cont) return;
+        const row = document.createElement("div");
+        row.className = "timeline-edit-row";
+        row.innerHTML = `<input placeholder="Từ (năm)"><input placeholder="Đến (năm)"><input placeholder="Diễn biến, nơi sinh sống…"><button class="del-row-btn" onclick="delTimelineRow(this)">✕</button>`;
+        cont.appendChild(row);
+        row.querySelector("input").focus();
+      }
+
+      function addAwardRow(containerId) {
+        const cont = document.getElementById(containerId);
+        if (!cont) return;
+        const row = document.createElement("div");
+        row.className = "timeline-edit-row";
+        row.innerHTML = `<input placeholder="Thời gian (tháng/năm)"><input placeholder="Nội dung"><input placeholder="Cấp"><button class="del-row-btn" onclick="this.closest('.timeline-edit-row').remove()">✕</button>`;
+        cont.appendChild(row);
+        row.querySelector("input").focus();
+      }
+
+      function addTravelRow(containerId) {
+        const cont = document.getElementById(containerId);
+        if (!cont) return;
+        const row = document.createElement("div");
+        row.className = "timeline-edit-row";
+        row.innerHTML = `<input placeholder="Thời gian (tháng/năm)"><input placeholder="Mục đích"><input placeholder="Quốc gia"><button class="del-row-btn" onclick="this.closest('.timeline-edit-row').remove()">✕</button>`;
+        cont.appendChild(row);
+        row.querySelector("input").focus();
+      }
+
+      function delTimelineRow(btn) {
+        const row = btn.closest(".timeline-edit-row");
+        if (row) {
+          row.style.opacity = "0";
+          row.style.transform = "translateX(-8px)";
+          setTimeout(() => row.remove(), 220);
+        }
+      }
+
+      // Status update
+      async function updateProfileStatus(val) {
+        const id = currentEditProfile.id;
+        if (!id) {
+          showToast("⚠ Không tìm thấy ID hồ sơ");
+          return;
+        }
+        try {
+          await API.patch(`/profiles/${id}/`, { status: val });
+          currentEditProfile.status = val;
+          showToast("✅ Trạng thái hồ sơ đã cập nhật");
+          addActivity(
+            `🔄 Cập nhật trạng thái hồ sơ <strong>${currentEditProfile.name}</strong> → ${val}`,
+          );
+        } catch (e) {
+          showToast("✗ Lỗi cập nhật trạng thái: " + e.message);
+        }
+      }
+
+      // Return modal
+      function openReturnModal() {
+        // Populate flagged sections
+        const tags = document.getElementById("flaggedSectionTags");
+        if (tags) {
+          tags.innerHTML = [...flaggedSections]
+            .map(
+              (s) =>
+                `<span class="crp-section-tag">${s} <span class="tag-remove" onclick="removeReturnTag(this,'${s}')">✕</span></span>`,
+            )
+            .join("");
+        }
+        document.getElementById("returnModal").classList.add("open");
+      }
+
+      function closeReturnModal() {
+        document.getElementById("returnModal").classList.remove("open");
+      }
+
+      function addReturnSection(label) {
+        if (flaggedSections.has(label)) return;
+        flaggedSections.add(label);
+        if (!_flagSectionNotes[label]) {
+          _flagSectionNotes[label] = `Yêu cầu bổ sung ${label}`;
+        }
+        const tags = document.getElementById("flaggedSectionTags");
+        if (tags) {
+          const tag = document.createElement("span");
+          tag.className = "crp-section-tag";
+          tag.innerHTML = `${label} <span class="tag-remove" onclick="removeReturnTag(this,'${label}')">✕</span>`;
+          tags.appendChild(tag);
+        }
+        _persistFlagDraftForCurrentProfile();
+      }
+
+      function removeReturnTag(el, label) {
+        flaggedSections.delete(label);
+        delete _flagSectionNotes[label];
+        el.closest(".crp-section-tag").remove();
+        _persistFlagDraftForCurrentProfile();
+      }
+
+      function _buildCorrectionItemsFromFlags() {
+        console.log(
+          "[CORRECTION DEBUG] Building correction items from flags...",
+        );
+        const items = [];
+        const flaggedEls = document.querySelectorAll(
+          ".editable-section.has-correction",
+        );
+        console.log(
+          "[CORRECTION DEBUG] Found .editable-section.has-correction elements:",
+          flaggedEls.length,
+        );
+
+        flaggedEls.forEach((sec) => {
+          const secId = sec.id;
+          const noteEl = document.getElementById("note-" + secId);
+          const noteText = (noteEl?.textContent || "").trim();
+          const sectionLabel =
+            sec.dataset.correctionLabel || _EDIT_SECTION_LABEL[secId] || secId;
+          console.log("[CORRECTION DEBUG] Section:", {
+            secId,
+            sectionLabel,
+            hasNote: !!noteText,
+            notePreview: noteText.substring(0, 50),
+          });
+          items.push({
+            section: sectionLabel,
+            field_name: null,
+            description: noteText || `Yêu cầu bổ sung ${sectionLabel}`,
+          });
+        });
+
+        console.log(
+          "[CORRECTION DEBUG] Built",
+          items.length,
+          "correction items:",
+          items,
+        );
+        return items;
+      }
+
+      async function confirmReturnProfile() {
+        const note = document.getElementById("returnModalNote").value;
+        if (!note.trim()) {
+          showToast("⚠ Vui lòng nhập ghi chú yêu cầu bổ sung");
+          return;
+        }
+        if (!currentEditProfile.id) {
+          showToast("⚠ Không tìm thấy hồ sơ để trả lại");
+          return;
+        }
+        const items = _buildCorrectionItemsFromFlags();
+        try {
+          await API.post(`/profiles/${currentEditProfile.id}/workflow/`, {
+            action: "return",
+            comment: note,
+            return_reason: note,
+          });
+
+          // Notify applicant in-app about returned profile
+          try {
+            const pResp = await API.get(`/profiles/${currentEditProfile.id}/`);
+            const profileObj = pResp.data || pResp;
+            const recipientId = profileObj?.user?.id;
+            if (recipientId) {
+              await API.post("/notifications/send/", {
+                recipient_id: recipientId,
+                profile_id: currentEditProfile.id,
+                channel: "in_app",
+                type: "profile_returned",
+                subject: "Hồ sơ bị trả lại",
+                body: `Hồ sơ của bạn đã bị trả lại với lý do: ${note}`,
+              });
+            }
+          } catch (ne) {
+            console.warn(
+              "[notify] Failed to send return notification:",
+              ne.message,
+            );
+          }
+
+          if (items.length) {
+            await API.post("/exports/corrections/", {
+              profile: currentEditProfile.id,
+              overall_note: note,
+              items,
+            });
+          }
+
+          closeReturnModal();
+          showToast(`✅ Đã trả lại hồ sơ ${currentEditProfile.name}`);
+          addActivity(
+            `↩ Trả lại hồ sơ <strong>${currentEditProfile.name}</strong> – ${[...flaggedSections].join(", ")}`,
+          );
+          const ss = document.getElementById("editStatusSelect");
+          if (ss) ss.value = "returned";
+          _loadVerificationList();
+          setTimeout(() => showAdminPageByName("pgVerify"), 900);
+        } catch (e) {
+          showToast("✗ " + (e.message || "Lỗi trả hồ sơ"));
+        }
+      }
+
+      // Open edit from profile table "Chỉnh sửa" button
+      function editProfileDirect(name, score, status) {
+        openProfileEdit(name, score, status);
+      }
+
+      // ===== ADMIN CORRECTION MODE =====
+      let adminCorrectionSections = [];
+
+      function toggleCorrectionSection(label, sectionName) {
+        const cb = label.querySelector("input[type=checkbox]");
+        const idx = adminCorrectionSections.indexOf(sectionName);
+        if (cb.checked) {
+          if (idx === -1) adminCorrectionSections.push(sectionName);
+          label.style.borderColor = "var(--crimson)";
+          label.style.background = "var(--crimson-xl)";
+        } else {
+          if (idx > -1) adminCorrectionSections.splice(idx, 1);
+          label.style.borderColor = "";
+          label.style.background = "";
+        }
+      }
+
+      function sendCorrectionRequest() {
+        if (!adminCorrectionSections.length) {
+          showToast("⚠ Chọn ít nhất một phần cần bổ sung");
+          return;
+        }
+        showToast("✅ Đã gửi yêu cầu bổ sung cho Quần chúng qua Zalo/SMS");
+        adminCorrectionSections = [];
+      }
+
+      function exitAdminReview() {
+        switchRole("admin");
+        document.getElementById("adminCorrectionBar").style.display = "none";
+      }
+
+      function saveAdminCorrections() {
+        showToast("✅ Đã lưu ghi chú thẩm định");
+      }
+
+      // ═══════════════════════════════════════════════════════════════════
+      //  REAL DOCX EXPORT ENGINE — Mẫu 2-KNĐ
+      //  Builds valid .docx (OOXML) in-browser using JSZip
+      // ═══════════════════════════════════════════════════════════════════
+
+      // WORD_EXPORT_PROFILES now points to live API cache — no static data
+      const WORD_EXPORT_PROFILES_get = () =>
+        _wordExportCache.length
+          ? _wordExportCache
+          : _profilesCache.length
+            ? _profilesCache
+            : [];
+      // Alias for legacy references in export functions
+      Object.defineProperty(window, "WORD_EXPORT_PROFILES", {
+        get: WORD_EXPORT_PROFILES_get,
+      });
+
+      async function _loadWordExportProfiles() {
+        try {
+          const data = await API.get(
+            "/profiles/?page_size=200&ordering=-created_at",
+          );
+          _wordExportCache = data.results || [];
+          return _wordExportCache;
+        } catch (e) {
+          console.warn("[API] word export profiles load failed:", e.message);
+          _wordExportCache = [];
+          return [];
+        }
+      }
+
+      async function filterWordExportList(val) {
+        const search = (
+          val ||
+          document.getElementById("wordExportSearch")?.value ||
+          ""
+        ).toLowerCase();
+        const status = document.getElementById("wordExportStatus")?.value || "";
+        const list = document.getElementById("wordExportList");
+        if (!list) return;
+        list.innerHTML = "";
+        if (!_wordExportCache.length) {
+          await _loadWordExportProfiles();
+        }
+        // Map API fields to export list format
+        const source = (
+          _wordExportCache.length ? _wordExportCache : _profilesCache
+        ).map((p) => ({
+          id: p.id,
+          name: p.full_name,
+          score: p.ai_score || 0,
+          status: p.status,
+          dob: p.dob ? p.dob.split("-").reverse().join("/") : "—",
+          addr: p.user_phone || "",
+          cccd: p.profile_number || "",
+        }));
+        // Allow exporting draft as well for temporary workflow.
+        const allowedStatuses = [
+          "draft",
+          "submitted",
+          "verifying",
+          "approved",
+          "completed",
+        ];
+        source
+          .filter(
+            (p) =>
+              allowedStatuses.includes(p.status) &&
+              (!search || p.name.toLowerCase().includes(search)) &&
+              (!status || p.status === status),
+          )
+          .forEach((p) => {
+            const row = document.createElement("div");
+            row.style.cssText =
+              "background:#fff;border:1px solid var(--border);border-radius:var(--r-sm);padding:11px 16px;display:flex;align-items:center;gap:12px;transition:box-shadow .15s;";
+            row.onmouseenter = () => (row.style.boxShadow = "var(--s-sm)");
+            row.onmouseleave = () => (row.style.boxShadow = "");
+            // Use the global statusMap for consistent labels across the app
+            const st = statusMap[p.status] || {
+              cls: "pill-new",
+              label: p.status,
+            };
+            row.innerHTML = `
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:700;font-size:13px;color:var(--navy)">${p.name}</div>
+          <div style="font-size:11px;color:var(--hint);margin-top:2px">${p.dob} · CCCD ${p.cccd} · AI ${p.score}%</div>
+        </div>
+        <span class="pill ${st.cls}" style="font-size:10px;flex-shrink:0">${st.label}</span>
+        <div style="display:flex;gap:6px;flex-shrink:0">
+          <button class="btn btn-ghost" style="padding:6px 12px;font-size:12px;${_hasPermOrSuper("can_export_word") ? "" : "display:none"}" onclick="exportSingleWord('${p.name}',${p.id})">
+            📄 Xuất .docx
+          </button>
+        </div>`;
+            list.appendChild(row);
+          });
+        if (list.children.length === 0) {
+          list.innerHTML =
+            '<div style="text-align:center;padding:24px;color:var(--hint);font-size:13px">Không tìm thấy hồ sơ phù hợp</div>';
+        }
+      }
+
+      // ── Progress helpers ──────────────────────────────────────────────────
+      function showExportProgress(label, pct) {
+        const bar = document.getElementById("exportProgressBar");
+        const lbl = document.getElementById("exportProgressLabel");
+        const fill = document.getElementById("exportProgressFill");
+        if (!bar) return;
+        bar.style.display = "block";
+        if (lbl) lbl.textContent = label;
+        if (fill) fill.style.width = pct + "%";
+      }
+
+      function hideExportProgress() {
+        const bar = document.getElementById("exportProgressBar");
+        if (bar) bar.style.display = "none";
+      }
+
+      // ── Tiny OOXML builder ────────────────────────────────────────────────
+
+      function esc(s) {
+        return String(s || "")
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;");
+      }
+
+      function makeRun(text, opts = {}) {
+        const rpr = [];
+        if (opts.bold) rpr.push("<w:b/><w:bCs/>");
+        if (opts.italic) rpr.push("<w:i/><w:iCs/>");
+        if (opts.color) rpr.push(`<w:color w:val="${opts.color}"/>`);
+        if (opts.size)
+          rpr.push(
+            `<w:sz w:val="${opts.size}"/><w:szCs w:val="${opts.size}"/>`,
+          );
+        rpr.push(
+          '<w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:cs="Times New Roman"/>',
+        );
+        const hasSpace = text !== text.trim();
+        const preserve = hasSpace ? ' xml:space="preserve"' : "";
+        return `<w:r><w:rPr>${rpr.join("")}</w:rPr><w:t${preserve}>${esc(text)}</w:t></w:r>`;
+      }
+
+      function makePara(runs, opts = {}) {
+        const ppr = [];
+        if (opts.align) ppr.push(`<w:jc w:val="${opts.align}"/>`);
+        if (opts.spaceBefore || opts.spaceAfter)
+          ppr.push(
+            `<w:spacing${opts.spaceBefore ? ' w:before="' + opts.spaceBefore + '"' : ""}${opts.spaceAfter ? ' w:after="' + opts.spaceAfter + '"' : ""}/>`,
+          );
+        return `<w:p><w:pPr>${ppr.join("")}</w:pPr>${runs}</w:p>`;
+      }
+
+      const BDR = (c = "BFBFBF", sz = 4) =>
+        `<w:top w:val="single" w:sz="${sz}" w:space="0" w:color="${c}"/><w:left w:val="single" w:sz="${sz}" w:space="0" w:color="${c}"/><w:bottom w:val="single" w:sz="${sz}" w:space="0" w:color="${c}"/><w:right w:val="single" w:sz="${sz}" w:space="0" w:color="${c}"/>`;
+      const CM = `<w:top w:w="80" w:type="dxa"/><w:left w:w="120" w:type="dxa"/><w:bottom w:w="80" w:type="dxa"/><w:right w:w="120" w:type="dxa"/>`;
+      const CM_S = `<w:top w:w="60" w:type="dxa"/><w:left w:w="120" w:type="dxa"/><w:bottom w:w="60" w:type="dxa"/><w:right w:w="80" w:type="dxa"/>`;
+      const TW = 9638;
+
+      function headerBand(text) {
+        // Blue header matching sample format: #1F4E79 background, white bold text
+        return `<w:tbl><w:tblPr><w:tblW w:w="${TW}" w:type="dxa"/><w:tblBorders>${BDR("1F4E79", 6)}</w:tblBorders></w:tblPr><w:tblGrid><w:gridCol w:w="${TW}"/></w:tblGrid>
+  <w:tr><w:tc><w:tcPr><w:tcW w:w="${TW}" w:type="dxa"/><w:tcBorders>${BDR("1F4E79", 6)}</w:tcBorders><w:shd w:val="clear" w:color="auto" w:fill="1F4E79"/><w:tcMar><w:top w:w="100" w:type="dxa"/><w:left w:w="200" w:type="dxa"/><w:bottom w:w="100" w:type="dxa"/><w:right w:w="120" w:type="dxa"/></w:tcMar></w:tcPr>
+  ${makePara(makeRun(text, { bold: true, color: "FFFFFF", size: 26 }), { spaceBefore: 20, spaceAfter: 20 })}
+  </w:tc></w:tr></w:tbl>`;
+      }
+
+      function hintBand(text) {
+        // Yellow hint box with left border accent - matching sample
+        return `<w:tbl><w:tblPr><w:tblW w:w="${TW}" w:type="dxa"/></w:tblPr><w:tblGrid><w:gridCol w:w="${TW}"/></w:tblGrid>
+  <w:tr><w:tc><w:tcPr><w:tcW w:w="${TW}" w:type="dxa"/><w:tcBorders><w:top w:val="single" w:sz="4" w:space="0" w:color="BFBFBF"/><w:left w:val="single" w:sz="20" w:space="0" w:color="E6AE00"/><w:bottom w:val="single" w:sz="4" w:space="0" w:color="BFBFBF"/><w:right w:val="single" w:sz="4" w:space="0" w:color="BFBFBF"/></w:tcBorders><w:shd w:val="clear" w:color="auto" w:fill="FFF2CC"/><w:tcMar><w:top w:w="70" w:type="dxa"/><w:left w:w="160" w:type="dxa"/><w:bottom w:w="70" w:type="dxa"/><w:right w:w="100" w:type="dxa"/></w:tcMar></w:tcPr>
+  ${makePara(makeRun(text, { italic: true, color: "7F6000", size: 18 }), { spaceBefore: 20, spaceAfter: 20 })}
+  </w:tc></w:tr></w:tbl>`;
+      }
+
+      function fieldRow(label, value) {
+        // Label column width: 2800, Value column width: calculated
+        const lw = 2800,
+          vw = TW - 2800;
+        return `<w:tr>
+    <w:tc><w:tcPr><w:tcW w:w="${lw}" w:type="dxa"/><w:tcBorders>${BDR()}</w:tcBorders><w:shd w:val="clear" w:color="auto" w:fill="F2F2F2"/><w:tcMar><w:top w:w="60" w:type="dxa"/><w:left w:w="120" w:type="dxa"/><w:bottom w:w="60" w:type="dxa"/><w:right w:w="80" w:type="dxa"/></w:tcMar></w:tcPr>${makePara(makeRun(label, { bold: true, size: 18 }), { spaceBefore: 20, spaceAfter: 20 })}</w:tc>
+    <w:tc><w:tcPr><w:tcW w:w="${vw}" w:type="dxa"/><w:tcBorders>${BDR()}</w:tcBorders><w:tcMar><w:top w:w="60" w:type="dxa"/><w:left w:w="120" w:type="dxa"/><w:bottom w:w="60" w:type="dxa"/><w:right w:w="80" w:type="dxa"/></w:tcMar></w:tcPr>${makePara(makeRun(value || "", { size: 18 }), { spaceBefore: 20, spaceAfter: 20 })}</w:tc>
+  </w:tr>`;
+      }
+
+      function fieldTable(rows) {
+        return `<w:tbl><w:tblPr><w:tblW w:w="${TW}" w:type="dxa"/><w:tblBorders>${BDR()}</w:tblBorders></w:tblPr><w:tblGrid><w:gridCol w:w="2800"/><w:gridCol w:w="${TW - 2800}"/></w:tblGrid>${rows}</w:tbl>`;
+      }
+
+      function historyTable(entries) {
+        // Column widths: From | To | Events+Residence
+        const fw = 1500,
+          tw = 1500,
+          dw = 6638;
+        const cols = `<w:gridCol w:w="${fw}"/><w:gridCol w:w="${tw}"/><w:gridCol w:w="${dw}"/>`;
+        const hdr = `<w:tr>
+    <w:tc><w:tcPr><w:tcW w:w="${fw}" w:type="dxa"/><w:tcBorders>${BDR()}</w:tcBorders><w:shd w:val="clear" w:color="auto" w:fill="F2F2F2"/><w:tcMar><w:top w:w="60" w:type="dxa"/><w:left w:w="120" w:type="dxa"/><w:bottom w:w="60" w:type="dxa"/><w:right w:w="80" w:type="dxa"/></w:tcMar></w:tcPr>${makePara(makeRun("Từ tháng/năm", { bold: true, size: 18 }))}</w:tc>
+    <w:tc><w:tcPr><w:tcW w:w="${tw}" w:type="dxa"/><w:tcBorders>${BDR()}</w:tcBorders><w:shd w:val="clear" w:color="auto" w:fill="F2F2F2"/><w:tcMar><w:top w:w="60" w:type="dxa"/><w:left w:w="120" w:type="dxa"/><w:bottom w:w="60" w:type="dxa"/><w:right w:w="80" w:type="dxa"/></w:tcMar></w:tcPr>${makePara(makeRun("Đến tháng/năm", { bold: true, size: 18 }))}</w:tc>
+    <w:tc><w:tcPr><w:tcW w:w="${dw}" w:type="dxa"/><w:tcBorders>${BDR()}</w:tcBorders><w:shd w:val="clear" w:color="auto" w:fill="F2F2F2"/><w:tcMar><w:top w:w="60" w:type="dxa"/><w:left w:w="120" w:type="dxa"/><w:bottom w:w="60" w:type="dxa"/><w:right w:w="80" w:type="dxa"/></w:tcMar></w:tcPr>${makePara(makeRun("Làm gì, ở đâu (ghi rõ nơi sinh sống)", { bold: true, size: 18 }))}</w:tc>
+  </w:tr>`;
+        const drows = (entries || [])
+          .map((e) => {
+            // Support both legacy {from, to, desc} and API {from_month, from_year, to_month, to_year, is_present, description}
+            const fromStr = e.from || _fmtMY(e.from_month, e.from_year) || "";
+            const toStr = e.is_present
+              ? "Nay"
+              : e.to || _fmtMY(e.to_month, e.to_year) || "";
+            const descStr = e.desc || e.description || "";
+            return `<w:tr>
+    <w:tc><w:tcPr><w:tcW w:w="${fw}" w:type="dxa"/><w:tcBorders>${BDR()}</w:tcBorders><w:tcMar><w:top w:w="60" w:type="dxa"/><w:left w:w="120" w:type="dxa"/><w:bottom w:w="60" w:type="dxa"/><w:right w:w="80" w:type="dxa"/></w:tcMar></w:tcPr>${makePara(makeRun(fromStr, { size: 18 }))}</w:tc>
+    <w:tc><w:tcPr><w:tcW w:w="${tw}" w:type="dxa"/><w:tcBorders>${BDR()}</w:tcBorders><w:tcMar><w:top w:w="60" w:type="dxa"/><w:left w:w="120" w:type="dxa"/><w:bottom w:w="60" w:type="dxa"/><w:right w:w="80" w:type="dxa"/></w:tcMar></w:tcPr>${makePara(makeRun(toStr, { size: 18 }))}</w:tc>
+    <w:tc><w:tcPr><w:tcW w:w="${dw}" w:type="dxa"/><w:tcBorders>${BDR()}</w:tcBorders><w:tcMar><w:top w:w="60" w:type="dxa"/><w:left w:w="120" w:type="dxa"/><w:bottom w:w="60" w:type="dxa"/><w:right w:w="80" w:type="dxa"/></w:tcMar></w:tcPr>${makePara(makeRun(descStr, { size: 18 }))}</w:tc>
+  </w:tr>`;
+          })
+          .join("");
+        return `<w:tbl><w:tblPr><w:tblW w:w="${TW}" w:type="dxa"/><w:tblBorders>${BDR()}</w:tblBorders></w:tblPr><w:tblGrid>${cols}</w:tblGrid>${hdr}${drows}</w:tbl>`;
+      }
+
+      function memberSection(label, m) {
+        if (!m) return "";
+        let rows =
+          fieldRow("Họ và tên:", m.name) +
+          fieldRow("Năm sinh:", m.birthYear || "");
+        if (m.birthPlace !== undefined)
+          rows += fieldRow("Nơi sinh:", m.birthPlace || "");
+        rows +=
+          fieldRow("Quê quán:", m.hometown || "") +
+          fieldRow("Dân tộc:", m.ethnic || "") +
+          fieldRow("Tôn giáo:", m.religion || "") +
+          fieldRow("Nơi cư trú:", m.residence || "") +
+          fieldRow("Nghề nghiệp:", m.occupation || "");
+        if (m.marriageDate)
+          rows += fieldRow("Ngày lập gia đình:", m.marriageDate);
+        return `${makePara(makeRun(label, { bold: true, size: 20 }), { spaceBefore: 160, spaceAfter: 80 })}${fieldTable(rows)}${makePara(makeRun("Quá trình lịch sử:", { bold: true, size: 20 }), { spaceBefore: 80, spaceAfter: 60 })}${historyTable(m.history)}`;
+      }
+
+      function sp(n = 1) {
+        return `<w:p><w:pPr><w:spacing w:before="${n * 60}" w:after="${n * 60}"/></w:pPr></w:p>`;
+      }
+
+      // ── Build DOCX body XML from profile data ─────────────────────────────
+      function buildDocxBody(p) {
+        const pHist = p.personalHistory || [
+          { from: "…", to: "…", desc: "(Chưa kê khai)" },
+        ];
+        const wHist = p.workHistory || [
+          { from: "…", to: "…", desc: "(Chưa kê khai)", pos: "" },
+        ];
+
+        let body = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:document xmlns:wpc="http://schemas.microsoft.com/office/word/2010/wordprocessingCanvas" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:wp14="http://schemas.microsoft.com/office/word/2010/wordprocessingDrawing" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" xmlns:w10="urn:schemas-microsoft-com:office:word" xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:w14="http://schemas.microsoft.com/office/word/2010/wordml" xmlns:w15="http://schemas.microsoft.com/office/word/2012/wordml" xmlns:wne="http://schemas.microsoft.com/office/word/2006/wordml" mc:Ignorable="w14 w15 wp14"><w:body>`;
+
+        // Title - Improved formatting to match sample
+        body += makePara(
+          makeRun("ĐẢNG CỘNG SẢN VIỆT NAM", { bold: true, size: 24 }),
+          { align: "center", spaceAfter: 120 },
+        );
+        body += makePara(
+          makeRun("Mẫu 2-KNĐ", { bold: true, size: 24, color: "C00000" }),
+          { align: "center", spaceBefore: 200, spaceAfter: 80 },
+        );
+        body += makePara(
+          makeRun("LÝ LỊCH CỦA NGƯỜI XIN VÀO ĐẢNG", { bold: true, size: 36 }),
+          { align: "center", spaceBefore: 300, spaceAfter: 100 },
+        );
+        body += makePara(
+          makeRun("(Prototype – Phiên bản kê khai điện tử)", {
+            italic: true,
+            size: 20,
+            color: "808080",
+          }),
+          { align: "center", spaceBefore: 100, spaceAfter: 400 },
+        );
+
+        // PHẦN A
+        body += headerBand("PHẦN A – SƠ LƯỢC LÝ LỊCH") + sp();
+        body += hintBand(
+          "Ghi đúng họ, chữ đệm và tên theo giấy khai sinh, bằng chữ IN HOA.",
+        );
+        body += fieldTable(
+          fieldRow(
+            "01. Họ và tên khai sinh (IN HOA):",
+            (p.fullName || "").toUpperCase(),
+          ) +
+            fieldRow(
+              "02. Họ và tên thường dùng:",
+              p.fullNameUsual || p.fullName || "",
+            ) +
+            fieldRow(
+              "03. Ngày sinh / Giới tính:",
+              `${p.dob || ""} | Giới tính: ${p.gender || ""}`,
+            ) +
+            fieldRow("05. Nơi đăng ký khai sinh:", p.birthPlace || "") +
+            fieldRow("06. Quê quán:", p.hometown || "") +
+            fieldRow(
+              "07a. Nơi thường trú:",
+              p.permanentResidence || p.addr || "",
+            ) +
+            fieldRow(
+              "07b. Nơi tạm trú:",
+              p.temporaryResidence || "(Không có)",
+            ) +
+            fieldRow(
+              "08. Dân tộc / 09. Tôn giáo:",
+              `${p.ethnic || "Kinh"} / ${p.religion || "Không"}`,
+            ) +
+            fieldRow("10. Nghề nghiệp hiện nay:", p.occupation || "") +
+            fieldRow("11a. Giáo dục phổ thông:", p.eduLevel || "") +
+            fieldRow("11b. Chuyên môn nghiệp vụ:", p.eduSpecialty || "") +
+            fieldRow("11f. Lý luận chính trị:", p.politicalLevel || "") +
+            fieldRow("11g. Ngoại ngữ:", p.foreignLang || "") +
+            fieldRow("11h. Tin học:", p.ict || "") +
+            fieldRow("12. Vào Đoàn TNCS HCM:", p.youthUnion || "") +
+            fieldRow(
+              "13. Người giới thiệu vào Đảng:",
+              "(Cán bộ BXD Đảng điền sau)",
+            ),
+        );
+
+        // PHẦN B
+        body +=
+          sp(3) +
+          headerBand("PHẦN B – LỊCH SỬ BẢN THÂN (từ khi sinh đến nay)") +
+          sp();
+        body += hintBand(
+          "Ghi rõ TỪ tháng/năm – ĐẾN tháng/năm: làm gì, ở đâu, nơi sinh sống. Giai đoạn LIÊN TỤC.",
+        );
+        body += historyTable(pHist);
+
+        // PHẦN C
+        body +=
+          sp(3) + headerBand("PHẦN C – NHỮNG CÔNG TÁC, CHỨC VỤ ĐÃ QUA") + sp();
+        body += hintBand(
+          "Khai từ khi vào học đại học/cao đẳng hoặc bắt đầu đi làm. Quá trình LIÊN TỤC với Phần B.",
+        );
+        body += historyTable(wHist, true);
+
+        // PHẦN D, E, F, G, H (compact)
+        body +=
+          sp(3) + headerBand("PHẦN D – ĐẶC ĐIỂM LỊCH SỬ CHÍNH TRỊ") + sp();
+        body += fieldTable(
+          fieldRow("Đặc điểm chính trị:", p.politicalHistory || "Không có"),
+        );
+
+        body += sp(3) + headerBand("PHẦN E – ĐÀO TẠO, BỒI DƯỠNG ĐÃ QUA") + sp();
+        const tCols = [3000, 2638, 2000, 2000];
+        const tHdr = `<w:tr>${["Tên trường", "Ngành học / Tên lớp", "Từ – đến tháng/năm", "Văn bằng, chứng chỉ"].map((t, i) => `<w:tc><w:tcPr><w:tcW w:w="${tCols[i]}" w:type="dxa"/><w:tcBorders>${BDR()}</w:tcBorders><w:shd w:val="clear" w:color="auto" w:fill="F2F2F2"/><w:tcMar><w:top w:w="60" w:type="dxa"/><w:left w:w="120" w:type="dxa"/><w:bottom w:w="60" w:type="dxa"/><w:right w:w="80" w:type="dxa"/></w:tcMar></w:tcPr>${makePara(makeRun(t, { bold: true, size: 18 }))}</w:tc>`).join("")}</w:tr>`;
+        const tRows = (
+          p.trainingCourses || [{ school: "", major: "", period: "", cert: "" }]
+        )
+          .map(
+            (r) =>
+              `<w:tr>${[r.school, r.major, r.period, r.cert].map((t, i) => `<w:tc><w:tcPr><w:tcW w:w="${tCols[i]}" w:type="dxa"/><w:tcBorders>${BDR()}</w:tcBorders><w:tcMar><w:top w:w="60" w:type="dxa"/><w:left w:w="120" w:type="dxa"/><w:bottom w:w="60" w:type="dxa"/><w:right w:w="80" w:type="dxa"/></w:tcMar></w:tcPr>${makePara(makeRun(t || "", { size: 18 }))}</w:tc>`).join("")}</w:tr>`,
+          )
+          .join("");
+        body += `<w:tbl><w:tblPr><w:tblW w:w="${TW}" w:type="dxa"/><w:tblBorders>${BDR()}</w:tblBorders></w:tblPr><w:tblGrid>${tCols.map((w) => `<w:gridCol w:w="${w}"/>`).join("")}</w:tblGrid>${tHdr}${tRows}</w:tbl>`;
+
+        body += sp(3) + headerBand("PHẦN F – ĐI NƯỚC NGOÀI") + sp();
+        body += hintBand(
+          "Chỉ kê khai chuyến đi từ 3 tháng trở lên. Không kê khai du lịch ngắn ngày.",
+        );
+        body += historyTable(
+          p.overseas || [{ from: "Không có", to: "", desc: "" }],
+        );
+
+        body += sp(3) + headerBand("PHẦN G – KHEN THƯỞNG") + sp();
+        body += fieldTable(
+          fieldRow(
+            "Khen thưởng:",
+            p.awards && p.awards.length
+              ? p.awards.map((a) => a.desc).join("; ")
+              : "Không có",
+          ),
+        );
+
+        body += sp(3) + headerBand("PHẦN H – KỶ LUẬT") + sp();
+        body += fieldTable(
+          fieldRow(
+            "Kỷ luật:",
+            p.disciplines && p.disciplines.length
+              ? p.disciplines.map((d) => d.desc).join("; ")
+              : "Không có",
+          ),
+        );
+
+        // PHẦN I
+        body += sp(3) + headerBand("PHẦN I – HOÀN CẢNH GIA ĐÌNH") + sp();
+        body += hintBand(
+          "Cha mẹ ruột, chồng (vợ): khai liên tục theo năm. Năm cuối GĐ trước = năm đầu GĐ sau.",
+        );
+
+        if (p.father) body += memberSection("1. Cha ruột", p.father);
+        if (p.mother) body += memberSection("2. Mẹ ruột", p.mother);
+
+        body += makePara(
+          makeRun("3. Anh, chị, em ruột (kê khai từng người)", {
+            bold: true,
+            size: 20,
+          }),
+          { spaceBefore: 160, spaceAfter: 80 },
+        );
+        (p.siblings || []).forEach((s, i) => {
+          body += makePara(
+            makeRun(`3.${i + 1}. Anh/Chị/Em ruột thứ ${i + 1}`, {
+              bold: true,
+              size: 20,
+            }),
+            { spaceBefore: 80, spaceAfter: 60 },
+          );
+          body += fieldTable(
+            fieldRow("Họ và tên:", s.name) +
+              fieldRow("Năm sinh:", s.birthYear || "") +
+              fieldRow("Nơi cư trú:", s.residence || "") +
+              fieldRow("Nghề nghiệp hiện nay:", s.occupation || "") +
+              fieldRow("Là Đảng viên ĐCS Việt Nam:", s.isParty || "Không"),
+          );
+        });
+        if (!(p.siblings || []).length)
+          body += fieldTable(
+            fieldRow("Anh/Chị/Em ruột:", "(Không có hoặc chưa kê khai)"),
+          );
+
+        (p.grandparents || []).forEach((gp) => {
+          body += memberSection(gp.label, gp);
+        });
+
+        if (p.spouse) {
+          body +=
+            sp(2) +
+            makePara(
+              makeRun("Mục 8–10: Chỉ kê khai nếu đã lập gia đình.", {
+                bold: true,
+                size: 18,
+              }),
+              { spaceBefore: 100, spaceAfter: 60 },
+            );
+          body += memberSection("10. Chồng / Vợ", p.spouse);
+        }
+
+        body += makePara(
+          makeRun("11–12. Con ruột (kê khai từng con)", {
+            bold: true,
+            size: 20,
+          }),
+          { spaceBefore: 160, spaceAfter: 80 },
+        );
+        (p.children || []).forEach((ch, i) => {
+          body += fieldTable(
+            fieldRow(`Con thứ ${i + 1} – Họ và tên:`, ch.name) +
+              fieldRow("Năm sinh:", ch.birthYear || "") +
+              fieldRow("Nơi ở hiện nay:", ch.residence || "") +
+              fieldRow("Hiện là:", ch.status || ""),
+          );
+        });
+        if (!(p.children || []).length)
+          body += fieldTable(
+            fieldRow("Con:", "(Không có hoặc chưa đủ tuổi kê khai)"),
+          );
+
+        // PHẦN J
+        body += sp(3) + headerBand("PHẦN J – TỰ NHẬN XÉT") + sp();
+        body += hintBand(
+          "Ghi ưu điểm, khuyết điểm về: phẩm chất chính trị, đạo đức lối sống, năng lực, quan hệ quần chúng. Tối thiểu 200 từ.",
+        );
+        body += `<w:tbl><w:tblPr><w:tblW w:w="${TW}" w:type="dxa"/><w:tblBorders>${BDR()}</w:tblBorders></w:tblPr><w:tblGrid><w:gridCol w:w="${TW}"/></w:tblGrid><w:tr><w:tc><w:tcPr><w:tcW w:w="${TW}" w:type="dxa"/><w:tcBorders>${BDR()}</w:tcBorders><w:tcMar><w:top w:w="120" w:type="dxa"/><w:left w:w="160" w:type="dxa"/><w:bottom w:w="120" w:type="dxa"/><w:right w:w="120" w:type="dxa"/></w:tcMar></w:tcPr>${makePara(makeRun(p.selfReview || "(Chưa kê khai)"))}</w:tc></w:tr></w:tbl>`;
+
+        // CAM ĐOAN
+        body += sp(3) + headerBand("CAM ĐOAN VÀ KÝ TÊN") + sp();
+        body += `<w:tbl><w:tblPr><w:tblW w:w="${TW}" w:type="dxa"/><w:tblBorders>${BDR()}</w:tblBorders></w:tblPr><w:tblGrid><w:gridCol w:w="${TW}"/></w:tblGrid><w:tr><w:tc><w:tcPr><w:tcW w:w="${TW}" w:type="dxa"/><w:tcBorders>${BDR()}</w:tcBorders><w:tcMar>${CM}</w:tcMar></w:tcPr>${makePara(makeRun("Tôi cam đoan đã khai đầy đủ, rõ ràng, trung thực và chịu trách nhiệm trước Đảng.", { bold: true }), { align: "center", spaceBefore: 60, spaceAfter: 80 })}${makePara(makeRun("......., ngày .... tháng .... năm 20....."), { align: "center" })}${makePara(makeRun("Ký tên", { bold: true }), { align: "center", spaceBefore: 200, spaceAfter: 20 })}${makePara(makeRun("(" + esc(p.fullNameUsual || p.fullName || "") + ")"), { align: "center", spaceBefore: 200, spaceAfter: 40 })}</w:tc></w:tr></w:tbl>`;
+
+        // CHỨNG NHẬN
+        body += sp(2) + headerBand("CHỨNG NHẬN CỦA CẤP ỦY CƠ SỞ") + sp();
+        body += `<w:tbl><w:tblPr><w:tblW w:w="${TW}" w:type="dxa"/><w:tblBorders>${BDR()}</w:tblBorders></w:tblPr><w:tblGrid><w:gridCol w:w="${TW}"/></w:tblGrid><w:tr><w:tc><w:tcPr><w:tcW w:w="${TW}" w:type="dxa"/><w:tcBorders>${BDR()}</w:tcBorders><w:tcMar>${CM}</w:tcMar></w:tcPr>${makePara(makeRun("Đảng ủy/chi ủy cơ sở ghi sau khi thẩm tra xác minh xong."))}${sp(4)}${makePara(makeRun("......., ngày .... tháng .... năm 20....."), { align: "right" })}${makePara(makeRun("TM. Cấp ủy cơ sở / Bí thư", { bold: true }), { align: "center" })}${makePara(makeRun("(Ký, ghi họ và tên, đóng dấu)"), { align: "center", spaceAfter: 80 })}</w:tc></w:tr></w:tbl>`;
+
+        // Section properties
+        body += `<w:sectPr><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="1134" w:right="1134" w:bottom="1134" w:left="1701" w:header="720" w:footer="720" w:gutter="0"/></w:sectPr>`;
+        body += "</w:body></w:document>";
+        return body;
+      }
+
+      // ── OOXML package builder ─────────────────────────────────────────────
+      function buildDocxPackage(docXml) {
+        if (typeof JSZip === "undefined") return null;
+        const zip = new JSZip();
+        zip.file(
+          "[Content_Types].xml",
+          `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/><Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/><Override PartName="/word/settings.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.settings+xml"/></Types>`,
+        );
+        zip.file(
+          "_rels/.rels",
+          `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>`,
+        );
+        zip.file(
+          "word/_rels/document.xml.rels",
+          `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/settings" Target="settings.xml"/></Relationships>`,
+        );
+        zip.file("word/document.xml", docXml);
+        zip.file(
+          "word/styles.xml",
+          `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:docDefaults><w:rPrDefault><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:cs="Times New Roman"/><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr></w:rPrDefault></w:docDefaults></w:styles>`,
+        );
+        zip.file(
+          "word/settings.xml",
+          `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:settings xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:compat/></w:settings>`,
+        );
+        return zip.generateAsync({
+          type: "blob",
+          mimeType:
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+          compression: "DEFLATE",
+          compressionOptions: { level: 6 },
+        });
+      }
+
+      // ── Download helper ───────────────────────────────────────────────────
+      function downloadBlob(blob, filename) {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = filename;
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(url), 3000);
+      }
+
+      // buildProfileDataForExport — removed (batch export now calls Django backend directly)
+
+      // ── Public export functions — use Django backend ──────────────────────
+      async function exportSingleWord(name, id) {
+        // Resolve profile ID from cache or direct id param
+        const profileId =
+          id ||
+          _profilesCache.find((p) => p.full_name === name)?.id ||
+          _currentDetailProfileId;
+        if (!profileId) {
+          showToast("✗ Không tìm thấy hồ sơ để xuất");
+          return;
+        }
+        return exportWordAPI(profileId, null);
+      }
+
+      async function exportWordBatch() {
+        if (typeof JSZip === "undefined") {
+          showToast("⚠ JSZip chưa tải.");
+          return;
+        }
+        if (!_wordExportCache.length) await _loadWordExportProfiles();
+        if (!_wordExportCache.length) {
+          showToast("⚠ Không có hồ sơ nào để xuất.");
+          return;
+        }
+
+        const allowedStatuses = [
+          "draft",
+          "submitted",
+          "verifying",
+          "approved",
+          "completed",
+        ];
+        const exportableProfiles = _wordExportCache.filter((p) =>
+          allowedStatuses.includes(p.status),
+        );
+        if (!exportableProfiles.length) {
+          showToast("⚠ Không có hồ sơ phù hợp để xuất.");
+          return;
+        }
+
+        const btn = document.getElementById("bulkExportBtn");
+        if (btn) {
+          btn.disabled = true;
+          btn.innerHTML = "⏳ Đang xuất…";
+        }
+
+        const zipOut = new JSZip();
+        const total = exportableProfiles.length;
+        let ok = 0;
+
+        showExportProgress("Đang xuất hàng loạt từ server…", 5);
+
+        for (let i = 0; i < total; i++) {
+          const p = exportableProfiles[i];
+          showExportProgress(
+            `Đang tạo hồ sơ ${i + 1}/${total}: ${p.full_name}…`,
+            Math.round(5 + 85 * (i / total)),
+          );
+          try {
+            const res = await API.post(
+              `/exports/word/${p.id}/`,
+              { template_name: "Mẫu 2-KNĐ" },
+              { raw: true },
+            );
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            const buf = await res.arrayBuffer();
+            const safeName = (p.full_name || `profile_${p.id}`).replace(
+              /[^\wÀ-ỹ]/g,
+              "_",
+            );
+            zipOut.file(`LyLich_Mau2KND/${safeName}_Mau2KND.docx`, buf);
+            ok++;
+          } catch (e) {
+            console.error(`[EXPORT] batch error – ${p.full_name}:`, e);
+          }
+        }
+
+        showExportProgress(`Đang nén ${ok} file vào ZIP…`, 93);
+        const zipBlob = await zipOut.generateAsync({
+          type: "blob",
+          compression: "DEFLATE",
+        });
+        showExportProgress("Xong!", 100);
+        await new Promise((r) => setTimeout(r, 300));
+        hideExportProgress();
+
+        downloadBlob(zipBlob, "LyLich_Mau2KND_HangLoat.zip");
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = "<span>📦</span> Xuất tất cả (ZIP)";
+        }
+        const skipped = total - ok;
+        showToast(
+          `✅ Đã xuất ${ok}/${total} hồ sơ vào ZIP${skipped ? ` (${skipped} lỗi — xem console)` : ""}`,
+        );
+        addActivity?.(
+          `📦 Xuất hàng loạt ${ok}/${total} hồ sơ → LyLich_Mau2KND_HangLoat.zip`,
+        );
+      }
+
+      // ===== INTEGRATION CONNECT =====
+      /* ─────────────────────────────────────────────────────────────────────────
+   JWT AUTHENTICATION LAYER  ·  Mẫu 2-KNĐ  ·  Ban Xây dựng Đảng
+   ─────────────────────────────────────────────────────────────────────────
+   BASE URL logic:
+     1. localStorage['api_base']  → manual override (dev/testing)
+     2. Live Server / file://     → auto-point to Django :8000
+     3. Same-origin               → /api/v1 (production)
+   Token lifecycle:
+     • login()      → stores access + refresh in localStorage
+     • request()    → attaches Authorization: Bearer <access>
+     • 401 received → auto-refresh → retry original request
+     • refresh fail → clear storage → show login modal
+   Debug logging controlled by localStorage['api_debug'] = '1'
+───────────────────────────────────────────────────────────────────────── */
+
+      // ── Standalone helpers (globally accessible) ─────────────────────────────
+      const getAccessToken = () => localStorage.getItem("access_token");
+      const getRefreshToken = () => localStorage.getItem("refresh_token");
+
+      function _getUserRoleCode(user) {
+        if (!user) return null;
+        if (typeof user.role === "string") return user.role;
+        if (user.role && typeof user.role === "object")
+          return user.role.code || user.role.role_code || null;
+        return user.role_code || user.roleCode || null;
+      }
+
+      const API = (() => {
+        // ── Base URL detection ───────────────────────────────────────────────
+        function _detectBase() {
+          const manual = localStorage.getItem("api_base");
+          if (manual) return manual;
+          // Live Server (port 5500) or file:// → point to Django
+          const { protocol, hostname, port } = location;
+          if (protocol === "file:" || port === "5500" || port === "5501") {
+            return "http://127.0.0.1:8000/api/v1";
+          }
+          // Production environment
+          if (hostname === "14.224.210.210" || hostname === "lylich.gov.vn") {
+            return "http://14.224.210.210:8003/api/v1";
+          }
+          return "/api/v1";
+        }
+        const BASE = _detectBase();
+
+        // ── Debug logger ─────────────────────────────────────────────────────
+        const DEBUG = () => localStorage.getItem("api_debug") === "1";
+        const log = (...args) => {
+          if (DEBUG()) console.log("[API]", ...args);
+        };
+
+        // ── Token helpers ────────────────────────────────────────────────────
+        const token = {
+          access: () => {
+            const t = localStorage.getItem("access_token");
+            // Guard: never return the literal string "undefined" or "null"
+            return t && t !== "undefined" && t !== "null" ? t : null;
+          },
+          refresh: () => {
+            const t = localStorage.getItem("refresh_token");
+            return t && t !== "undefined" && t !== "null" ? t : null;
+          },
+          set: (accessTok, refreshTok) => {
+            if (accessTok) localStorage.setItem("access_token", accessTok);
+            if (refreshTok) localStorage.setItem("refresh_token", refreshTok);
+            log(
+              "Tokens updated. Access token:",
+              accessTok ? accessTok.slice(0, 20) + "…" : "none",
+            );
+          },
+          clear: () => {
+            localStorage.removeItem("access_token");
+            localStorage.removeItem("refresh_token");
+            localStorage.removeItem("api_user");
+            log("Tokens cleared.");
+          },
+        };
+
+        // ── Refresh flow (promise-locked — no parallel refreshes) ────────────
+        let _refreshing = null;
+
+        async function _doRefresh() {
+          const refreshTok = token.refresh();
+          if (!refreshTok) throw new Error("no_refresh_token");
+
+          log("Refreshing token…");
+          const res = await fetch(`${BASE}/auth/token/refresh/`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ refresh: refreshTok }),
+          });
+
+          if (!res.ok) {
+            const body = await res.text().catch(() => "");
+            log("Refresh failed:", res.status, body);
+            throw new Error("refresh_failed");
+          }
+
+          const resp = await res.json();
+          // Response shape: { success: true, data: { access, refresh? } }
+          const data = resp.data || resp; // handle both wrapped and raw (future-proof)
+          if (!data.access) {
+            log("Refresh response missing access token. Full response:", resp);
+            throw new Error("refresh_response_invalid");
+          }
+          // SimpleJWT returns new access; optionally new refresh (ROTATE_REFRESH_TOKENS=True)
+          token.set(data.access, data.refresh || undefined);
+          log(
+            "Token refreshed successfully. New access token:",
+            data.access.slice(0, 20) + "…",
+          );
+          console.log("[AUTH] TOKEN REFRESHED. New access =", data.access);
+          return data.access;
+        }
+
+        async function _refreshTokens() {
+          if (_refreshing) {
+            log("Refresh already in-flight, awaiting existing promise…");
+            return _refreshing;
+          }
+          _refreshing = _doRefresh().finally(() => {
+            _refreshing = null;
+          });
+          return _refreshing;
+        }
+
+        // ── Core fetch wrapper ───────────────────────────────────────────────
+        async function request(
+          path,
+          {
+            method = "GET",
+            body,
+            headers = {},
+            retry = true,
+            raw = false,
+          } = {},
+        ) {
+          const h = { "Content-Type": "application/json", ...headers };
+
+          // Attach token only when one actually exists (never send "Bearer undefined")
+          const accessTok = token.access();
+          if (accessTok) {
+            h["Authorization"] = `Bearer ${accessTok}`;
+            log(`Access token:`, accessTok.slice(0, 20) + "…");
+          } else {
+            log(`No access token — sending unauthenticated request to ${path}`);
+          }
+
+          const opts = { method, headers: h };
+          if (body !== undefined)
+            opts.body = typeof body === "string" ? body : JSON.stringify(body);
+
+          log(`→ ${method} ${BASE}${path}`);
+          let res = await fetch(`${BASE}${path}`, opts);
+          log(`← ${res.status} ${method} ${path}`);
+
+          // ── Auto-refresh on 401 ──────────────────────────────────────────
+          if (res.status === 401 && retry && token.refresh()) {
+            try {
+              await _refreshTokens();
+              const newToken = token.access();
+              if (newToken) h["Authorization"] = `Bearer ${newToken}`;
+              log("Retrying original request…", method, path);
+              res = await fetch(`${BASE}${path}`, { ...opts, headers: h });
+              log(`← ${res.status} ${method} ${path} (after retry)`);
+            } catch (refreshErr) {
+              log("Refresh failed, clearing session:", refreshErr.message);
+              token.clear();
+              _showLoginModal();
+              throw new Error("session_expired");
+            }
+          }
+
+          // ── Still 401 after retry → force re-login ───────────────────────
+          if (res.status === 401) {
+            log("Still 401 after retry — forcing re-login.");
+            token.clear();
+            _showLoginModal();
+            throw new Error("unauthorized");
+          }
+
+          if (raw) return res;
+
+          const text = await res.text();
+          const json = text ? JSON.parse(text) : {};
+          if (!res.ok) {
+            const msg =
+              json.error?.message ||
+              json.detail ||
+              json.message ||
+              (typeof json.error === "string" ? json.error : null) ||
+              (json.non_field_errors && json.non_field_errors[0]) ||
+              JSON.stringify(json) ||
+              `HTTP ${res.status}`;
+            throw Object.assign(new Error(msg), {
+              status: res.status,
+              data: json,
+            });
+          }
+          return json;
+        }
+
+        const get = (p, opts) => request(p, { ...opts, method: "GET" });
+        const post = (p, b, opts) =>
+          request(p, { ...opts, method: "POST", body: b });
+        const put = (p, b, opts) =>
+          request(p, { ...opts, method: "PUT", body: b });
+        const patch = (p, b, opts) =>
+          request(p, { ...opts, method: "PATCH", body: b });
+        const del = (p, opts) => request(p, { ...opts, method: "DELETE" });
+
+        // ── Auth ─────────────────────────────────────────────────────────────
+        async function login(phone, password) {
+          log("Attempting login for phone:", phone);
+          // Response shape: { success: true, data: { access, refresh, user: {...} } }
+          const resp = await post(
+            "/auth/login/",
+            { phone, password },
+            { retry: false },
+          );
+          const tokens = resp.data; // unwrap envelope
+
+          if (!tokens || !tokens.access || !tokens.refresh) {
+            console.error(
+              "[API] Login response missing tokens. Full response:",
+              resp,
+            );
+            throw new Error("Phản hồi đăng nhập không hợp lệ — thiếu token.");
+          }
+
+          // Requirement 1 — store both tokens explicitly
+          localStorage.setItem("access_token", tokens.access);
+          localStorage.setItem("refresh_token", tokens.refresh);
+
+          const user = tokens.user || {};
+          const roleCode = _getUserRoleCode(user);
+          localStorage.setItem(
+            "api_user",
+            JSON.stringify({
+              id: user.id,
+              name: user.full_name,
+              role: roleCode,
+              role_code: roleCode,
+              phone: user.phone,
+              is_superuser: user.is_superuser || false,
+              permissions: user.permissions || undefined,
+            }),
+          );
+
+          log(
+            "Login successful. User:",
+            user.full_name,
+            "| Role:",
+            user.role?.code,
+          );
+          log("Access token:", tokens.access.slice(0, 20) + "…");
+          log("Refresh token:", tokens.refresh.slice(0, 20) + "…");
+          console.log("[AUTH] ACCESS TOKEN =", tokens.access);
+          return tokens;
+        }
+
+        async function logout() {
+          log("Logging out…");
+          const refreshTok = token.refresh();
+          if (refreshTok) {
+            try {
+              await post(
+                "/auth/logout/",
+                { refresh: refreshTok },
+                { retry: false },
+              );
+              log("Server-side logout OK.");
+            } catch (e) {
+              log("Server logout failed (ignored):", e.message);
+            }
+          }
+          token.clear();
+          log("Logout complete.");
+        }
+
+        function currentUser() {
+          try {
+            return JSON.parse(localStorage.getItem("api_user") || "null");
+          } catch {
+            return null;
+          }
+        }
+
+        // ── Enable/disable debug logging from console ─────────────────────────
+        function enableDebug() {
+          localStorage.setItem("api_debug", "1");
+          console.log("[API] Debug logging ENABLED");
+        }
+        function disableDebug() {
+          localStorage.removeItem("api_debug");
+          console.log("[API] Debug logging DISABLED");
+        }
+
+        log(`API client ready. BASE=${BASE}`);
+
+        // ── Public surface ────────────────────────────────────────────────────
+        return {
+          get,
+          post,
+          put,
+          patch,
+          del,
+          login,
+          logout,
+          currentUser,
+          token,
+          BASE,
+          enableDebug,
+          disableDebug,
+        };
+      })();
+
+      /* ─────────────────────────────────────────────────────────────────────────
+   LOGIN MODAL (injected at runtime)
+───────────────────────────────────────────────────────────────────────── */
+      function _injectLoginModal() {
+        if (document.getElementById("apiLoginModal")) return;
+        const m = document.createElement("div");
+        m.id = "apiLoginModal";
+        m.style.cssText =
+          "position:fixed;inset:0;z-index:9999;background:rgba(12,27,46,.7);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)";
+        m.innerHTML = `
+    <div style="background:#fff;border-radius:14px;padding:32px 36px;width:360px;box-shadow:0 24px 64px rgba(12,27,46,.22);font-family:inherit">
+      <div style="text-align:center;margin-bottom:24px">
+        <div style="font-size:28px;margin-bottom:8px">🛡</div>
+        <div style="font-size:17px;font-weight:800;color:#0C1B2E">Đăng nhập hệ thống</div>
+        <div style="font-size:12px;color:#5C6B84;margin-top:4px">Mẫu 2-KNĐ · Ban Xây dựng Đảng</div>
+      </div>
+      <div id="loginErr" style="display:none;background:#FEF2F2;border:1px solid rgba(139,0,0,.2);color:#8B0000;padding:8px 12px;border-radius:7px;font-size:12px;margin-bottom:12px"></div>
+      <label style="font-size:11.5px;font-weight:600;color:#243347;display:block;margin-bottom:4px">Số điện thoại</label>
+      <input id="loginPhone" type="tel" placeholder="0912345678"
+        style="width:100%;padding:10px 12px;border:1.5px solid #CDD4E0;border-radius:8px;font-family:inherit;font-size:13px;margin-bottom:12px;outline:none"
+        onfocus="this.style.borderColor='#8B0000'" onblur="this.style.borderColor='#CDD4E0'">
+      <label style="font-size:11.5px;font-weight:600;color:#243347;display:block;margin-bottom:4px">Mật khẩu</label>
+      <input id="loginPass" type="password" placeholder="••••••••"
+        style="width:100%;padding:10px 12px;border:1.5px solid #CDD4E0;border-radius:8px;font-family:inherit;font-size:13px;margin-bottom:20px;outline:none"
+        onfocus="this.style.borderColor='#8B0000'" onblur="this.style.borderColor='#CDD4E0'"
+        onkeydown="if(event.key==='Enter') _submitLogin()">
+      <button id="loginBtn" onclick="_submitLogin()"
+        style="width:100%;padding:11px;background:#8B0000;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:background .15s"
+        onmouseover="this.style.background='#6B0000'" onmouseout="this.style.background='#8B0000'">
+        Đăng nhập
+      </button>
+      <div style="text-align:center;margin-top:14px;font-size:11px;color:#8A99B0">
+        Liên hệ cán bộ BXD Đảng nếu quên mật khẩu
+      </div>
+    </div>`;
+        document.body.appendChild(m);
+      }
+
+      function _showLoginModal() {
+        _injectLoginModal();
+        document.getElementById("apiLoginModal").style.display = "flex";
+      }
+
+      function _hideLoginModal() {
+        const m = document.getElementById("apiLoginModal");
+        if (m) m.style.display = "none";
+      }
+
+      async function _submitLogin() {
+        const phone = document.getElementById("loginPhone").value.trim();
+        const pass = document.getElementById("loginPass").value;
+        const err = document.getElementById("loginErr");
+        const btn = document.getElementById("loginBtn");
+        if (!phone || !pass) {
+          err.textContent = "Vui lòng nhập đầy đủ thông tin.";
+          err.style.display = "block";
+          return;
+        }
+        err.style.display = "none";
+        btn.disabled = true;
+        btn.textContent = "Đang đăng nhập…";
+        try {
+          const data = await API.login(phone, pass);
+          _hideLoginModal();
+          _onLoginSuccess(data);
+        } catch (e) {
+          err.textContent =
+            e.message === "unauthorized"
+              ? "Sai số điện thoại hoặc mật khẩu."
+              : e.message || "Lỗi đăng nhập.";
+          err.style.display = "block";
+        } finally {
+          btn.disabled = false;
+          btn.textContent = "Đăng nhập";
+        }
+      }
+
+      function _onLoginSuccess(data) {
+        const user = API.currentUser();
+        if (!user) return;
+        const roleCode = _getUserRoleCode(user);
+
+        // Normalize old session shapes where role might be stored as object
+        if (user.role !== roleCode || user.role_code !== roleCode) {
+          localStorage.setItem(
+            "api_user",
+            JSON.stringify({ ...user, role: roleCode, role_code: roleCode }),
+          );
+        }
+
+        // Update sidebar user display (both admin and member sidebars)
+        document.querySelectorAll(".sidebar-user-name").forEach((el) => {
+          el.textContent = user.name || user.phone;
+        });
+        document.querySelectorAll(".sidebar-user-role").forEach((el) => {
+          el.textContent =
+            roleCode === "admin"
+              ? "Quản trị viên"
+              : roleCode === "can_bo_bxd"
+                ? "Cán bộ BXD Đảng"
+                : "Quần chúng";
+        });
+        document.querySelectorAll(".sidebar-avatar").forEach((el) => {
+          el.textContent = (user.name || "U")
+            .split(" ")
+            .map((p) => p[0])
+            .slice(-2)
+            .join("")
+            .toUpperCase();
+        });
+        // Store roleCode globally for use in other functions
+        window.appState = window.appState || {};
+        window.appState.roleCode = roleCode;
+
+        // Hide/show admin-only navigation tabs based on role
+        const adminOnlyTabs = [
+          "navAdmin",
+          "navProfiles",
+          "navAccounts",
+          "navVerify",
+          "navParty",
+          "navReports",
+          "navSettings",
+        ];
+        adminOnlyTabs.forEach((tabId) => {
+          const tab = document.getElementById(tabId);
+          if (tab) {
+            tab.style.display = roleCode === "quan_chung" ? "none" : "flex";
+          }
+        });
+
+        // Hide role toggle button for regular users to prevent switching to admin UI
+        const btnRoleAdmin = document.getElementById("btnRoleAdmin");
+        if (btnRoleAdmin) {
+          btnRoleAdmin.style.display =
+            roleCode === "quan_chung" ? "none" : "inline-block";
+        }
+        // Hide "Quần chúng" tab for officer/admin users
+        const btnRoleMember = document.getElementById("btnRoleMember");
+        if (btnRoleMember) {
+          btnRoleMember.style.display =
+            roleCode === "quan_chung" ? "inline-block" : "none";
+        }
+
+        // Route by role (only quần chúng uses /profiles/my/)
+        if (user.is_superuser) {
+          // Redirect to Django admin via session-creation endpoint (avoids CORS cookie issues)
+          const _adminBase = API.BASE.replace(/\/api\/v1\/?$/, "");
+          const _tok = API.token.access();
+          window.location.href = `${_adminBase}/api/v1/auth/admin-session/?token=${encodeURIComponent(_tok)}`;
+          return;
+        } else if (roleCode === "quan_chung") {
+          switchRole("member");
+          _loadMyProfile();
+          _loadNotificationStats();
+          _loadNotificationList();
+          _checkMemberNotifBadge();
+        } else {
+          switchRole("admin");
+          _applyAdminPermissions();
+          _loadDashboard();
+          _loadNotificationStats();
+          _loadNotificationList();
+          _loadProfileList();
+        }
+        showToast(
+          `✓ Đăng nhập thành công · Xin chào ${user.name || user.phone}`,
+        );
+      }
+
+      // Returns true if current user is superuser OR has the given permission.
+      // If no permissions key stored (old session), officers get full access.
+      function _hasPermOrSuper(permName) {
+        const u = API.currentUser();
+        if (!u) return false;
+        if (u.is_superuser) return true;
+        if (u.permissions === undefined || u.permissions === null) return true;
+        return !!u.permissions[permName];
+      }
+
+      function _applyAdminPermissions() {
+        const u = API.currentUser();
+        if (!u) return;
+        const isSuperuser = !!u.is_superuser;
+
+        // Map: page id → permission key (null = always visible)
+        const pagePerms = {
+          pgAccount: "can_create_accounts",
+          pgNotif: "can_send_notifications",
+          pgReport: "can_view_reports",
+          pgVerify: null, // checked separately (review OR approve)
+        };
+
+        // Helper to show/hide a page's tab in sidebar + top nav
+        function setPageVisible(pageId, visible) {
+          // Sidebar
+          const sideItem = document.querySelector(
+            `[data-admin-page="${pageId}"]`,
+          );
+          if (sideItem) sideItem.style.display = visible ? "" : "none";
+          // Top nav (desktop + mobile)
+          document.querySelectorAll(`[data-page="${pageId}"]`).forEach((el) => {
+            el.style.display = visible ? "" : "none";
+          });
+        }
+
+        setPageVisible("pgAccount", _hasPermOrSuper("can_create_accounts"));
+        setPageVisible("pgNotif", _hasPermOrSuper("can_send_notifications"));
+        setPageVisible("pgReport", _hasPermOrSuper("can_view_reports"));
+        setPageVisible(
+          "pgVerify",
+          _hasPermOrSuper("can_review_profiles") ||
+            _hasPermOrSuper("can_approve_profiles"),
+        );
+
+        // "Gửi thông báo" button on notification page
+        const btnSendNotif = document.getElementById("btnSendNotif");
+        if (btnSendNotif)
+          btnSendNotif.style.display = _hasPermOrSuper("can_send_notifications")
+            ? ""
+            : "none";
+      }
+
+      /* ─────────────────────────────────────────────────────────────────────────
+   DASHBOARD — live KPI & activity feed
+───────────────────────────────────────────────────────────────────────── */
+      async function _loadDashboard() {
+        try {
+          const resp = await API.get("/profiles/dashboard/");
+          const data = resp.data || resp; // unwrap { success, data } envelope
+          const kpi = data.kpi || {};
+          window.appState.stats = kpi;
+          console.log("[API] dashboard loaded", kpi);
+
+          // Dashboard subtitle
+          const sub = document.getElementById("dashSubtitle");
+          if (sub) {
+            const now = new Date().toLocaleDateString("vi-VN");
+            sub.textContent = `Cập nhật: ${now} · ${kpi.total || 0} quần chúng đang được theo dõi`;
+          }
+
+          // KPI cards — backend returns flat keys in kpi object
+          const kpiMap = {
+            "kpi-total": kpi.total,
+            "kpi-submitted": kpi.submitted,
+            "kpi-pending": kpi.pending,
+            "kpi-under-review": kpi.under_review,
+            "kpi-returned": kpi.returned,
+            "kpi-approved": kpi.approved,
+            "kpi-verifying": kpi.verifying,
+            "kpi-completed": kpi.completed,
+            "kpi-rejected": kpi.rejected,
+            "kpi-draft": kpi.draft,
+            "kpi-ai-avg": kpi.avg_ai_score,
+          };
+          Object.entries(kpiMap).forEach(([id, val]) => {
+            if (val === undefined) return;
+            // Update by id
+            const byId = document.getElementById(id);
+            if (byId) byId.textContent = val;
+            // Update by data-kpi (KPI cards use this attribute)
+            document.querySelectorAll(`[data-kpi="${id}"]`).forEach((el) => {
+              el.textContent = val;
+            });
+          });
+
+          // Donut chart update
+          const donutTotals = {
+            draft: kpi.draft || 0,
+            submitted: kpi.submitted || 0,
+            returned: kpi.returned || 0,
+            completed: kpi.completed || 0,
+          };
+          const donutTotal =
+            Object.values(donutTotals).reduce((a, b) => a + b, 0) || 1;
+          const donutColors = {
+            draft: "#2563EB",
+            submitted: "#C8102E",
+            returned: "#B86800",
+            completed: "#15803D",
+          };
+          let pct = 0;
+          const stops = Object.entries(donutTotals).map(([k, count]) => {
+            const p = (count / donutTotal) * 100;
+            const stop = `${donutColors[k]} ${pct.toFixed(1)}% ${(pct + p).toFixed(1)}%`;
+            pct += p;
+            return stop;
+          });
+          const donutEl = document.getElementById("dashDonut");
+          if (donutEl)
+            donutEl.style.background = `conic-gradient(${stops.join(",")})`;
+
+          // Activity feed from recent profile reviews
+          const recentActivity = data.recent_activity;
+          const feed = document.getElementById("activityLog");
+          if (feed && Array.isArray(recentActivity)) {
+            const actionIcon = {
+              submit: "📋",
+              return: "↩",
+              approve: "✅",
+              reject: "✗",
+              request_verify: "📨",
+              complete: "✓",
+              note: "📝",
+            };
+            feed.innerHTML = recentActivity.length
+              ? recentActivity
+                  .slice(0, 8)
+                  .map(
+                    (act) => `
+          <div class="activity-item">
+            <div class="activity-icon" style="background:var(--info-l)">${actionIcon[act.action] || "📋"}</div>
+            <div class="activity-body">
+              <div class="activity-text">${_esc((act.profile_name || "") + (act.action ? " – " + _actionLabel(act.action) : ""))}</div>
+              <div class="activity-time">${_fmtDate(act.created_at)}</div>
+            </div>
+          </div>`,
+                  )
+                  .join("")
+              : '<div style="text-align:center;padding:24px;color:var(--muted);font-size:12.5px">Chưa có hoạt động nào.</div>';
+          }
+
+          // Urgent profiles table
+          const urgent = data.urgent_profiles;
+          const urgentTbody = document.getElementById("urgentTbody");
+          if (urgentTbody) {
+            if (!Array.isArray(urgent) || !urgent.length) {
+              urgentTbody.innerHTML =
+                '<tr><td colspan="5" style="text-align:center;padding:20px;color:var(--muted)">Không có hồ sơ cần xử lý.</td></tr>';
+            } else {
+              const title = document.getElementById("urgentTitle");
+              if (title)
+                title.textContent = `${urgent.length} hồ sơ cần xử lý ngay`;
+              urgentTbody.innerHTML = urgent
+                .map((p) => {
+                  const st = statusMap[p.status] || {
+                    cls: "pill-new",
+                    label: p.status_display || p.status,
+                  };
+                  const score =
+                    p.ai_score > 0
+                      ? `<div class="ai-score" style="color:${scoreColor(p.ai_score)}">${p.ai_score}% <div class="ai-score-bar"><div class="ai-score-fill" style="width:${p.ai_score}%;background:${scoreColor(p.ai_score)}"></div></div></div>`
+                      : "—";
+                  const canAct =
+                    _hasPermOrSuper("can_approve_profiles") &&
+                    ["submitted", "pending", "under_review"].includes(p.status);
+                  return `<tr>
+            <td><div class="name-cell">${_esc(p.full_name)}</div></td>
+            <td><span class="pill ${st.cls}">${st.label}</span></td>
+            <td>${score}</td>
+            <td style="font-size:12px;white-space:nowrap">—</td>
+            <td>
+              <button class="act-btn act-view" onclick="openDetailById(${p.id})">Xem ▸</button>
+              ${canAct ? `<button class="act-btn act-approve" onclick="apiApproveProfile(${p.id},'${_esc(p.full_name)}')">Duyệt</button>` : ""}
+            </td>
+          </tr>`;
+                })
+                .join("");
+            }
+          }
+        } catch (e) {
+          console.warn("[API] dashboard load failed:", e.message);
+        }
+      }
+
+      function _daysBetween(start, end) {
+        if (!start || !end) return null;
+        const s = new Date(start);
+        const e = new Date(end);
+        if (Number.isNaN(s.getTime()) || Number.isNaN(e.getTime())) return null;
+        return Math.max(0, (e - s) / 86400000);
+      }
+
+      function _formatReportMonth(year, month) {
+        return `${month}/${year}`;
+      }
+
+      function _monthKeyFromDate(value) {
+        const d = new Date(value);
+        if (Number.isNaN(d.getTime())) return "";
+        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+      }
+
+      function _setBar(id, val, max) {
+        const bar = document.getElementById(id);
+        if (!bar) return;
+        const pct = max > 0 ? Math.round((val / max) * 100) : 0;
+        bar.style.width = `${Math.min(100, pct)}%`;
+      }
+
+      function _setText(id, text) {
+        const el = document.getElementById(id);
+        if (el) el.textContent = text;
+      }
+
+      async function _loadReportPage(periodValue = "") {
+        const periodSelect = document.getElementById("reportPeriodSelect");
+        const monthlyBody = document.getElementById("reportMonthlyTbody");
+        if (monthlyBody) {
+          monthlyBody.innerHTML =
+            '<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--muted)">⏳ Đang tải báo cáo…</td></tr>';
+        }
+        try {
+          const [dashResp, profilesResp] = await Promise.all([
+            API.get("/reports/dashboard/"),
+            API.get("/profiles/?page_size=500&ordering=-created_at"),
+          ]);
+          const dash = dashResp.data || dashResp;
+          const counts = dash.counts || {};
+          const trend = Array.isArray(dash.trend) ? dash.trend : [];
+          const profiles = profilesResp.results || [];
+
+          if (periodSelect && trend.length) {
+            const currentValue =
+              periodValue ||
+              periodSelect.value ||
+              `${trend[trend.length - 1].year}-${String(trend[trend.length - 1].month).padStart(2, "0")}`;
+            periodSelect.innerHTML = trend
+              .map((r) => {
+                const v = `${r.year}-${String(r.month).padStart(2, "0")}`;
+                return `<option value="${v}">${_formatReportMonth(r.year, r.month)}</option>`;
+              })
+              .join("");
+            periodSelect.value = trend.some(
+              (r) =>
+                `${r.year}-${String(r.month).padStart(2, "0")}` ===
+                currentValue,
+            )
+              ? currentValue
+              : `${trend[trend.length - 1].year}-${String(trend[trend.length - 1].month).padStart(2, "0")}`;
+          }
+
+          const selected =
+            (periodSelect && periodSelect.value) || periodValue || "";
+          let monthly = trend;
+          if (selected) {
+            const [year, month] = selected.split("-");
+            try {
+              const monthlyResp = await API.get(
+                `/reports/monthly/?year=${year}${month ? `&month=${parseInt(month, 10)}` : ""}`,
+              );
+              monthly = Array.isArray(monthlyResp.data || monthlyResp)
+                ? monthlyResp.data || monthlyResp
+                : trend;
+            } catch {}
+          }
+
+          const scopedProfiles = selected
+            ? profiles.filter(
+                (p) =>
+                  _monthKeyFromDate(p.created_at) === selected ||
+                  _monthKeyFromDate(p.submitted_at) === selected,
+              )
+            : profiles;
+
+          const statusCounts = scopedProfiles.reduce((acc, p) => {
+            acc[p.status] = (acc[p.status] || 0) + 1;
+            return acc;
+          }, {});
+
+          const submitted = statusCounts.submitted || 0;
+          const pending = statusCounts.pending || 0;
+          const verifying = statusCounts.verifying || 0;
+          const approved = statusCounts.approved || 0;
+          const completed = statusCounts.completed || 0;
+          const draft = statusCounts.draft || 0;
+          const total = scopedProfiles.length || counts.total || 0;
+          const running = Math.max(0, total - completed - draft);
+          const maxStatus = Math.max(
+            submitted,
+            pending,
+            verifying,
+            approved,
+            completed,
+            1,
+          );
+
+          const progressTitle = document.getElementById("reportProgressTitle");
+          if (progressTitle && selected)
+            progressTitle.textContent = `Phân bổ trạng thái hồ sơ (${selected.replace("-", "/")})`;
+          _setText("reportValSubmitted", submitted);
+          _setText("reportValPending", pending);
+          _setText("reportValVerifying", verifying);
+          _setText("reportValApproved", approved);
+          _setText("reportValCompleted", completed);
+          _setBar("reportBarSubmitted", submitted, maxStatus);
+          _setBar("reportBarPending", pending, maxStatus);
+          _setBar("reportBarVerifying", verifying, maxStatus);
+          _setBar("reportBarApproved", approved, maxStatus);
+          _setBar("reportBarCompleted", completed, maxStatus);
+
+          const wards = scopedProfiles.reduce((acc, p) => {
+            const label =
+              p.current_ward_name || p.current_address || "Chưa rõ khu vực";
+            acc[label] = (acc[label] || 0) + 1;
+            return acc;
+          }, {});
+          const topWards = Object.entries(wards)
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 5);
+          const wardMax = topWards.reduce(
+            (m, [, count]) => Math.max(m, count),
+            1,
+          );
+          const wardIds = [1, 2, 3, 4, 5];
+          wardIds.forEach((idx, i) => {
+            const row = topWards[i];
+            _setText(`reportWardLabel${idx}`, row ? row[0] : "—");
+            _setText(`reportWardVal${idx}`, row ? row[1] : 0);
+            _setBar(`reportWardBar${idx}`, row ? row[1] : 0, wardMax);
+          });
+
+          const submitDays = scopedProfiles
+            .map((p) => _daysBetween(p.created_at, p.submitted_at))
+            .filter((v) => v !== null);
+          const approveDays = scopedProfiles
+            .map((p) => _daysBetween(p.submitted_at, p.approved_at))
+            .filter((v) => v !== null);
+          const completeDays = scopedProfiles
+            .map((p) => _daysBetween(p.approved_at, p.completed_at))
+            .filter((v) => v !== null);
+          const totalDays = scopedProfiles
+            .map((p) => _daysBetween(p.created_at, p.completed_at))
+            .filter((v) => v !== null);
+          const avg = (arr) =>
+            arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : 0;
+          const avgSubmit = avg(submitDays);
+          const avgApprove = avg(approveDays);
+          const avgComplete = avg(completeDays);
+          const avgTotal = avg(totalDays);
+          const timeMax = Math.max(
+            avgSubmit,
+            avgApprove,
+            avgComplete,
+            avgTotal,
+            1,
+          );
+
+          _setText(
+            "reportTimeSubmitVal",
+            avgSubmit ? avgSubmit.toFixed(1) : "0",
+          );
+          _setText(
+            "reportTimeApproveVal",
+            avgApprove ? avgApprove.toFixed(1) : "0",
+          );
+          _setText(
+            "reportTimeVerifyVal",
+            avgComplete ? avgComplete.toFixed(1) : "0",
+          );
+          _setText(
+            "reportTimeCompleteVal",
+            avgComplete ? avgComplete.toFixed(1) : "0",
+          );
+          _setText("reportTimeTotalVal", avgTotal ? avgTotal.toFixed(1) : "0");
+          _setBar("reportTimeSubmit", avgSubmit, timeMax);
+          _setBar("reportTimeApprove", avgApprove, timeMax);
+          _setBar("reportTimeVerify", avgComplete, timeMax);
+          _setBar("reportTimeComplete", avgComplete, timeMax);
+          _setBar("reportTimeTotal", avgTotal, timeMax);
+
+          const pct = total ? Math.round((completed / total) * 100) : 0;
+          const gauge = document.getElementById("reportCompletionGauge");
+          const pctEl = document.getElementById("reportCompletionPct");
+          if (gauge)
+            gauge.style.background = `conic-gradient(var(--success) 0% ${pct}%, var(--border) ${pct}% 100%)`;
+          if (pctEl) pctEl.textContent = `${pct}%`;
+          _setText(
+            "reportCompletionText",
+            `${completed} / ${total} hồ sơ đã hoàn thiện`,
+          );
+          _setText("reportCompletionDone", completed);
+          _setText("reportCompletionRunning", running);
+          _setText("reportCompletionTodo", draft);
+
+          if (monthlyBody) {
+            const rowsMap = scopedProfiles.reduce((acc, p) => {
+              const monthKey = _monthKeyFromDate(
+                p.created_at || p.submitted_at,
+              );
+              if (!monthKey) return acc;
+              if (!acc[monthKey]) {
+                acc[monthKey] = {
+                  monthKey,
+                  submitted: 0,
+                  verifying: 0,
+                  approved: 0,
+                  completed: 0,
+                  total: 0,
+                };
+              }
+              const bucket = acc[monthKey];
+              bucket.total += 1;
+              if (bucket[p.status] !== undefined) bucket[p.status] += 1;
+              return acc;
+            }, {});
+            const rows = Object.values(rowsMap).sort((a, b) =>
+              b.monthKey.localeCompare(a.monthKey),
+            );
+            monthlyBody.innerHTML = rows.length
+              ? rows
+                  .map((row) => {
+                    const rowPct = row.total
+                      ? Math.round((row.completed / row.total) * 100)
+                      : 0;
+                    return `<tr>
+          <td>${_formatReportMonth(row.monthKey.split("-")[0], row.monthKey.split("-")[1])}</td>
+          <td>${row.submitted || 0}</td>
+          <td>${row.verifying || 0}</td>
+          <td>${row.approved || 0}</td>
+          <td>${row.completed || 0}</td>
+          <td><span style="color:var(--success);font-weight:700">${rowPct}%</span></td>
+        </tr>`;
+                  })
+                  .join("")
+              : '<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--muted)">Chưa có dữ liệu báo cáo.</td></tr>';
+          }
+        } catch (e) {
+          if (monthlyBody) {
+            monthlyBody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--red)">✗ Lỗi: ${_esc(e.message)}</td></tr>`;
+          }
+          console.warn("[API] report load failed:", e.message);
+        }
+      }
+
+      /* ─────────────────────────────────────────────────────────────────────────
+   MEMBER NOTIFICATION BELL (quan_chung)
+───────────────────────────────────────────────────────────────────────── */
+      async function _checkMemberNotifBadge() {
+        try {
+          const resp = await API.get("/notifications/stats/");
+          const data = resp.data || resp;
+          const unread = data.unread_count ?? 0;
+          const badge = document.getElementById("memberNotifBadge");
+          if (badge) {
+            badge.textContent = unread > 0 ? unread : "";
+            badge.style.display = unread > 0 ? "" : "none";
+          }
+        } catch {}
+      }
+
+      async function _toggleMemberNotif() {
+        const drop = document.getElementById("memberNotifDropdown");
+        if (!drop) return;
+        const isOpen = drop.style.display !== "none";
+        drop.style.display = isOpen ? "none" : "block";
+        if (!isOpen) await _loadMemberNotifList();
+      }
+
+      async function _loadMemberNotifList() {
+        const list = document.getElementById("memberNotifList");
+        if (!list) return;
+        list.innerHTML =
+          '<div style="padding:12px 14px;color:var(--muted)">⏳ Đang tải…</div>';
+        try {
+          const data = await API.get("/notifications/?page_size=15");
+          const items = data.results || [];
+          if (!items.length) {
+            list.innerHTML =
+              '<div style="padding:16px 14px;color:var(--muted);text-align:center">Không có thông báo nào.</div>';
+            return;
+          }
+          list.innerHTML = items
+            .map((n) => {
+              const time = n.created_at ? _fmtDate(n.created_at) : "";
+              const isUnread = !n.is_read;
+              const iconMap = {
+                profile_returned: "↩",
+                profile_approved: "✅",
+                profile_submitted: "📤",
+                account_created: "👤",
+                correction_request: "✏",
+              };
+              const icon = iconMap[n.type] || "🔔";
+              return `<div onclick="_markMemberNotifRead(${n.id}, this)" style="padding:10px 14px;border-bottom:1px solid var(--border-xl);cursor:pointer;background:${isUnread ? "#EFF6FF" : "#fff"};display:flex;gap:10px;align-items:flex-start" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='${isUnread ? "#EFF6FF" : "#fff"}"'>
+      <div style="font-size:18px;line-height:1.2">${icon}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:12.5px;font-weight:${isUnread ? "700" : "500"};color:var(--navy)">${_esc(n.subject || n.type || "Thông báo")}</div>
+        <div style="font-size:11.5px;color:var(--muted);margin-top:2px;word-break:break-word">${_esc(n.body || "")}</div>
+        <div style="font-size:10.5px;color:var(--hint);margin-top:4px">${time}</div>
+      </div>
+      ${isUnread ? '<div style="width:7px;height:7px;border-radius:50%;background:var(--crimson);flex-shrink:0;margin-top:4px"></div>' : ""}
+    </div>`;
+            })
+            .join("");
+          // Refresh badge count
+          _checkMemberNotifBadge();
+        } catch (e) {
+          list.innerHTML = `<div style="padding:12px 14px;color:var(--red)">✗ Lỗi: ${_esc(e.message)}</div>`;
+        }
+      }
+
+      async function _markMemberNotifRead(id, el) {
+        try {
+          await API.post(`/notifications/${id}/read/`);
+          if (el) {
+            el.style.background = "#fff";
+            const badge = el.querySelector('div[style*="border-radius:50%"]');
+            if (badge) badge.remove();
+          }
+          _checkMemberNotifBadge();
+        } catch {}
+      }
+
+      async function _markAllMemberNotifRead() {
+        try {
+          await API.post("/notifications/read-all/");
+          document.getElementById("memberNotifDropdown").style.display = "none";
+          _checkMemberNotifBadge();
+          showToast("✅ Đã đánh dấu tất cả là đã đọc");
+        } catch (e) {
+          showToast("✗ " + e.message);
+        }
+      }
+
+      /* ─────────────────────────────────────────────────────────────────────────
+   NOTIFICATIONS — stats badge
+───────────────────────────────────────────────────────────────────────── */
+      async function _loadNotificationStats() {
+        try {
+          const resp = await API.get("/notifications/stats/");
+          const data = resp.data || resp; // unwrap { success, data } envelope
+          const unread = data.unread_count ?? 0;
+          document
+            .querySelectorAll(".nav-badge, [data-notif-badge]")
+            .forEach((el) => {
+              el.textContent = unread > 0 ? unread : "";
+              el.style.display = unread > 0 ? "" : "none";
+            });
+        } catch {}
+      }
+
+      // Load notification page (stats + history log)
+      async function _loadNotifPage() {
+        try {
+          const resp = await API.get("/notifications/stats/");
+          const data = resp.data || resp;
+          const $ = (id) => document.getElementById(id);
+          if ($("ns-total"))
+            $("ns-total").textContent = data.total_sent_today ?? "—";
+          if ($("ns-unread"))
+            $("ns-unread").textContent = data.unread_count ?? "—";
+          if ($("ns-batches"))
+            $("ns-batches").textContent = (data.recent_batches || []).length;
+        } catch {}
+
+        const log = document.getElementById("notifLog");
+        if (!log) return;
+        try {
+          const data = await API.get("/notifications/?page_size=20");
+          const items = data.results || [];
+          window.appState.notifications = items;
+          console.log("[API] notifications loaded", items.length);
+          if (!items.length) {
+            log.innerHTML =
+              '<div style="text-align:center;padding:24px;color:var(--muted);font-size:12.5px">Chưa có thông báo nào.</div>';
+            return;
+          }
+          const chCls = {
+            zalo: "notif-channel-zalo",
+            sms: "notif-channel-sms",
+            email: "notif-channel-email",
+          };
+          const chLabel = { zalo: "Zalo OA", sms: "SMS", email: "Email" };
+          log.innerHTML = items
+            .map((n) => {
+              const ch = n.channel || "sms";
+              const sent = n.sent_status === "sent" || n.is_read;
+              return `<div class="notif-log-item">
+        <div class="notif-log-icon" style="background:var(--success-l)">✅</div>
+        <div class="notif-log-body">
+          <div class="notif-log-name">${_esc(n.profile_name || n.subject || "—")}</div>
+          <div class="notif-log-desc">${_esc((n.body || n.subject || "").substring(0, 60))}</div>
+          <div class="notif-log-meta">
+            <span class="notif-channel-badge ${chCls[ch] || "notif-channel-sms"}">${chLabel[ch] || ch}</span>
+            <span class="notif-time-badge">${_fmtDate(n.sent_at || n.created_at)}</span>
+          </div>
+        </div>
+        <div class="notif-log-status"><span class="pill ${sent ? "pill-done" : "pill-pending"}" style="font-size:10px">${sent ? "Đã gửi" : "Đang xử lý"}</span></div>
+      </div>`;
+            })
+            .join("");
+        } catch (e) {
+          console.warn("[API] notif log failed:", e.message);
+        }
+      }
+
+      // Kept as no-op for backward compat (dashboard now uses _loadDashboard activity feed)
+      function _loadNotificationList() {}
+
+      async function _markNotifRead(id, el) {
+        try {
+          await API.post(`/notifications/${id}/read/`, {});
+          if (el) el.style.opacity = "0.6";
+          _loadNotificationStats();
+        } catch {}
+      }
+
+      /* ─────────────────────────────────────────────────────────────────────────
+   VERIFICATION LIST
+───────────────────────────────────────────────────────────────────────── */
+      async function _loadVerificationList() {
+        const tbody = document.getElementById("verifyTbody");
+        if (!tbody) return;
+        tbody.innerHTML =
+          '<tr><td colspan="5" style="text-align:center;padding:24px;color:var(--muted)">⏳ Đang tải…</td></tr>';
+        try {
+          // Load stats
+          const statsResp = await API.get("/verification/stats/");
+          const stats = statsResp.data || statsResp;
+          const $ = (id) => document.getElementById(id);
+          if ($("vs-total")) $("vs-total").textContent = stats.total ?? "—";
+          if ($("vs-pending"))
+            $("vs-pending").textContent = stats.pending ?? "—";
+          if ($("vs-received"))
+            $("vs-received").textContent = stats.received ?? "—";
+          if ($("vs-overdue"))
+            $("vs-overdue").textContent = stats.overdue ?? "—";
+
+          // Load users, profiles and verifications in parallel
+          const statusFilter =
+            document.getElementById("verifyStatusFilter")?.value || "";
+          const profileParams = new URLSearchParams({
+            page_size: "100",
+            ordering: "-updated_at",
+          });
+          if (statusFilter) profileParams.set("status", statusFilter);
+
+          const [usersData, profData, verifyData] = await Promise.all([
+            API.get(
+              "/auth/users/?role__code=quan_chung&page_size=300&ordering=-created_at",
+            ),
+            API.get(`/profiles/?${profileParams}`),
+            API.get("/verification/?page_size=200"),
+          ]);
+
+          const users = usersData.results || [];
+          const profiles = profData.results || [];
+          const verifications = verifyData.results || [];
+
+          // Keep profile cache as true profile list so legacy lookups use profile.id, not user.id.
+          _profilesCache = profiles;
+
+          // Index verifications by profile id (most recent per profile)
+          const verifyMap = {};
+          verifications.forEach((v) => {
+            if (!verifyMap[v.profile] || v.id > verifyMap[v.profile].id)
+              verifyMap[v.profile] = v;
+          });
+
+          // Map profile by phone to align with user list serializer fields.
+          const profileByPhone = {};
+          profiles.forEach((p) => {
+            if (p.user_phone) profileByPhone[p.user_phone] = p;
+          });
+
+          // Always show full user list; if a status filter is selected, keep rows with matching profiles only.
+          const displayUsers = statusFilter
+            ? users.filter((u) => {
+                const p = profileByPhone[u.phone];
+                return p && p.status === statusFilter;
+              })
+            : users;
+
+          console.log("[API] verify users loaded", displayUsers.length);
+
+          if (!displayUsers.length) {
+            tbody.innerHTML =
+              '<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--muted)">Chưa có hồ sơ nào cần theo dõi.</td></tr>';
+            return;
+          }
+
+          tbody.innerHTML = displayUsers
+            .map((u) => {
+              const p = profileByPhone[u.phone] || null;
+              const st = p
+                ? statusMap[p.status] || {
+                    cls: "pill-new",
+                    label: p.status_display || p.status,
+                  }
+                : { cls: "pill-new", label: "Chưa tạo hồ sơ" };
+              const canApprove =
+                _hasPermOrSuper("can_approve_profiles") &&
+                !!p &&
+                ["submitted", "pending", "under_review"].includes(p.status);
+              const canReturn =
+                (_hasPermOrSuper("can_review_profiles") ||
+                  _hasPermOrSuper("can_approve_profiles")) &&
+                !!p &&
+                [
+                  "draft",
+                  "submitted",
+                  "pending",
+                  "under_review",
+                  "verifying",
+                ].includes(p.status);
+              const v = p ? verifyMap[p.id] : null;
+              const canConfirmVerify = !!p && p.status === "approved" && !v;
+              const canComplete = !!p && p.status === "verifying";
+              const safeName = _esc(p?.full_name || u.full_name || "—");
+              const updated = p?.updated_at ? _fmtDate(p.updated_at) : "—";
+              const submitted = p?.submitted_at
+                ? _fmtDate(p.submitted_at)
+                : p?.created_at
+                  ? _fmtDate(p.created_at)
+                  : "—";
+              const canExportWord =
+                _hasPermOrSuper("can_export_word") &&
+                !!p &&
+                p.status === "completed";
+              return `<tr>
+        <td><div class="name-cell">${safeName}</div><div class="sub-cell">${_esc(u.phone || "")}</div></td>
+        <td><span class="pill ${st.cls}">${st.label}</span></td>
+        <td style="font-size:12px;white-space:nowrap">${submitted}</td>
+        <td style="font-size:12px;white-space:nowrap">${updated}</td>
+        <td style="white-space:nowrap;display:flex;gap:4px;flex-wrap:wrap;padding:6px 8px">
+          ${canReturn ? `<button class="act-btn act-return" title="Trả lại hồ sơ" onclick="apiReturnProfile(${p.id},'${safeName}')">↩</button>` : ""}
+          ${p ? `<button class="act-btn act-view" title="Xem và chỉnh sửa" onclick="openDetailById(${p.id})">Xem</button>` : `<button class="act-btn act-view" title="Xem thông tin user" onclick="_openUserInfo(${u.id})">Xem</button>`}
+          ${canApprove ? `<button class="act-btn act-approve" title="Duyệt hồ sơ" onclick="apiApproveProfile(${p.id},'${safeName}')">✓ Duyệt</button>` : ""}
+          ${canConfirmVerify ? `<button class="act-btn act-view" style="background:#EEF6FF;color:#1d4ed8" title="Xác nhận yêu cầu xác minh" onclick="_confirmVerifyRequest(${p.id},'${safeName}')">Xác nhận YC</button>` : ""}
+          ${canComplete ? `<button class="act-btn act-approve" style="background:#ECFDF5;color:#065f46" title="Hoàn thiện hồ sơ" onclick="_completeProfile(${p.id},'${safeName}')"> Hoàn thiện</button>` : ""}
+        </td>
+        <td style="padding:6px 8px;white-space:nowrap">
+          ${canExportWord ? `<button class="act-btn act-view" title="Xuất Word" onclick="exportWordAPI(${p.id})">📄 Xuất</button>` : `<span style="font-size:11px;color:var(--hint)">Chưa đủ điều kiện</span>`}
+        </td>
+      </tr>`;
+            })
+            .join("");
+        } catch (e) {
+          tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--red)">✗ Lỗi: ${_esc(e.message)}</td></tr>`;
+        }
+      }
+
+      async function _getVerificationDetail(id) {
+        const resp = await API.get(`/verification/${id}/`);
+        return resp.data || resp;
+      }
+
+      async function _sendVerificationReminder(id, urgent) {
+        try {
+          const payload = urgent
+            ? {
+                channel: "email",
+                note: "Nhắc khẩn: yêu cầu phản hồi xác minh sớm.",
+              }
+            : { channel: "email", note: "Nhắc lại yêu cầu xác minh." };
+          await API.post(`/verification/${id}/remind/`, payload);
+          showToast(urgent ? "✅ Đã gửi nhắc khẩn" : "✅ Đã gửi nhắc lại");
+          _loadVerificationList();
+        } catch (e) {
+          showToast("✗ " + (e.message || "Lỗi gửi nhắc"));
+        }
+      }
+
+      async function _openVerificationDetail(id) {
+        const modal = document.getElementById("verifyDetailModal");
+        const body = document.getElementById("verifyDetailBody");
+        if (!modal || !body) return;
+        modal.classList.add("open");
+        body.innerHTML = "⏳ Đang tải...";
+
+        try {
+          const v = await _getVerificationDetail(id);
+          const sent = v.sent_date
+            ? v.sent_date.split("-").reverse().join("/")
+            : "—";
+          const deadline = v.deadline
+            ? v.deadline.split("-").reverse().join("/")
+            : "—";
+          const reminded = v.last_reminded_at
+            ? _fmtDate(v.last_reminded_at)
+            : "Chưa có";
+          const status = _esc(v.status_display || v.status || "—");
+          body.innerHTML = `
+      <div style="display:grid;grid-template-columns:170px 1fr;gap:8px 14px">
+        <div style="color:var(--muted)">Quần chúng:</div><div><strong>${_esc(v.profile_name || "—")}</strong></div>
+        <div style="color:var(--muted)">Đơn vị xác minh:</div><div>${_esc(v.agency_name || "—")}</div>
+        <div style="color:var(--muted)">Trạng thái:</div><div>${status}</div>
+        <div style="color:var(--muted)">Ngày gửi:</div><div>${sent}</div>
+        <div style="color:var(--muted)">Hạn phản hồi:</div><div>${deadline}</div>
+        <div style="color:var(--muted)">Số lần nhắc:</div><div>${v.reminder_count ?? 0}</div>
+        <div style="color:var(--muted)">Nhắc gần nhất:</div><div>${_esc(reminded)}</div>
+        <div style="color:var(--muted)">Nội dung:</div><div style="white-space:pre-wrap">${_esc(v.content || "—")}</div>
+      </div>
+    `;
+        } catch (e) {
+          body.innerHTML = `<div style="color:var(--red)">✗ Không tải được chi tiết: ${_esc(e.message || "Lỗi không xác định")}</div>`;
+        }
+      }
+
+      async function _openVerificationResult(id) {
+        const modal = document.getElementById("verifyDetailModal");
+        const body = document.getElementById("verifyDetailBody");
+        if (!modal || !body) return;
+        modal.classList.add("open");
+        body.innerHTML = "⏳ Đang tải kết quả...";
+
+        try {
+          const v = await _getVerificationDetail(id);
+          const receivedAt = v.received_at ? _fmtDate(v.received_at) : "—";
+          const completedAt = v.completed_at ? _fmtDate(v.completed_at) : "—";
+          const resultText = (v.result_summary || "").trim();
+
+          body.innerHTML = `
+      <div style="padding:10px 12px;background:#F6FAFF;border:1px solid #D7E8FF;border-radius:8px;margin-bottom:12px">
+        <div style="font-size:12px;color:var(--muted);margin-bottom:4px">Quần chúng</div>
+        <div style="font-size:14px;font-weight:700;color:var(--navy)">${_esc(v.profile_name || "—")}</div>
+      </div>
+      <div style="display:grid;grid-template-columns:170px 1fr;gap:8px 14px">
+        <div style="color:var(--muted)">Trạng thái hiện tại:</div><div>${_esc(v.status_display || v.status || "—")}</div>
+        <div style="color:var(--muted)">Đã nhận kết quả lúc:</div><div>${_esc(receivedAt)}</div>
+        <div style="color:var(--muted)">Hoàn tất lúc:</div><div>${_esc(completedAt)}</div>
+        <div style="color:var(--muted)">Kết luận xác minh:</div>
+        <div style="white-space:pre-wrap">${_esc(resultText || 'Chưa có nội dung kết quả. Cán bộ có thể nhấn "Nhận KQ" để cập nhật trước.')}</div>
+      </div>
+    `;
+        } catch (e) {
+          body.innerHTML = `<div style="color:var(--red)">✗ Không tải được kết quả: ${_esc(e.message || "Lỗi không xác định")}</div>`;
+        }
+      }
+
+      async function _receiveVerify(id) {
+        try {
+          const summary = prompt(
+            "Nhập tóm tắt kết quả xác minh (có thể để trống):",
+            "",
+          );
+          if (summary === null) return;
+          await API.post(`/verification/${id}/received/`, {
+            result_summary: summary || "",
+          });
+          showToast("✅ Đã ghi nhận kết quả xác minh");
+          _loadVerificationList();
+        } catch (e) {
+          showToast("✗ " + e.message);
+        }
+      }
+
+      async function _completeProfile(id, name) {
+        if (
+          !confirm(
+            `Xác nhận hoàn thiện hồ sơ "${name}"?\nHồ sơ sẽ chuyển sang trạng thái Hoàn thiện và có thể xuất Word.`,
+          )
+        )
+          return;
+        try {
+          await API.post(`/profiles/${id}/workflow/`, {
+            action: "complete",
+            comment: "Hoàn thiện hồ sơ sau xác minh",
+          });
+          showToast(` Hồ sơ ${name} đã Hoàn thiện — có thể xuất Word`);
+          addActivity(` Hoàn thiện hồ sơ <strong>${name}</strong>`);
+          _loadVerificationList();
+          _loadDashboard();
+        } catch (e) {
+          showToast("✗ " + e.message);
+        }
+      }
+
+      async function _loadProfilesForVerify() {
+        try {
+          const select = document.getElementById("verifyProfileSelect");
+          if (!select) return;
+          // Load profiles that are submitted (for verification)
+          const data = await API.get("/profiles/?page_size=100");
+          const profiles = data.results || [];
+          select.innerHTML =
+            '<option value="">-- Chọn quần chúng --</option>' +
+            profiles
+              .map(
+                (p) =>
+                  `<option value="${p.id}">${p.full_name} (${p.user_phone})</option>`,
+              )
+              .join("");
+        } catch (e) {
+          console.error("Failed to load profiles:", e);
+          const select = document.getElementById("verifyProfileSelect");
+          if (select)
+            select.innerHTML = '<option value="">⚠ Lỗi tải danh sách</option>';
+        }
+      }
+
+      async function submitCreateVerify() {
+        const profileId = document.getElementById("verifyProfileSelect").value;
+        const content = document.getElementById("verifyContent").value.trim();
+        const deadline = document.getElementById("verifyDeadline").value;
+        const urgency = document.getElementById("verifyUrgency").value;
+
+        if (!profileId) {
+          showToast("⚠ Vui lòng chọn quần chúng");
+          return;
+        }
+        if (!content) {
+          showToast("⚠ Vui lòng nhập nội dung xác minh");
+          return;
+        }
+        if (!deadline) {
+          showToast("⚠ Vui lòng chọn hạn xác minh");
+          return;
+        }
+
+        try {
+          const payload = {
+            profile: parseInt(profileId),
+            agency_name: "Ban Xây dựng Đảng",
+            agency_contact: "",
+            content: content,
+            urgency: urgency,
+            deadline: deadline,
+            status: "pending",
+            sent_date: new Date().toISOString().split("T")[0],
+          };
+
+          await API.post("/verification/", payload);
+          showToast("✅ Đã tạo yêu cầu xác minh");
+          document.getElementById("verifyCreateModal").classList.remove("open");
+          // Reset form
+          document.getElementById("verifyProfileSelect").value = "";
+          document.getElementById("verifyContent").value = "";
+          document.getElementById("verifyDeadline").value = "";
+          document.getElementById("verifyUrgency").value = "normal";
+          // Reload list
+          _loadVerificationList();
+        } catch (e) {
+          showToast("✗ " + (e.message || "Lỗi tạo yêu cầu"));
+        }
+      }
+
+      /* ─────────────────────────────────────────────────────────────────────────
+   RECENT ACCOUNTS
+───────────────────────────────────────────────────────────────────────── */
+      async function _loadRecentAccounts() {
+        const tbody = document.getElementById("recentAccountsTbody");
+        if (!tbody) return;
+        try {
+          const data = await API.get(
+            "/auth/account-requests/?ordering=-created_at&page_size=5",
+          );
+          const items = data.results || [];
+          console.log("[API] recent account requests loaded", items.length);
+          if (!items.length) {
+            tbody.innerHTML =
+              '<tr><td colspan="4" style="text-align:center;padding:16px;color:var(--muted)">Chưa có yêu cầu cấp tài khoản nào.</td></tr>';
+            return;
+          }
+          const reqStatus = {
+            pending: { cls: "pill-pending", label: "Chờ xử lý" },
+            created: { cls: "pill-done", label: "Đã tạo" },
+            failed: { cls: "pill-return", label: "Thất bại" },
+            cancelled: { cls: "pill-new", label: "Đã hủy" },
+          };
+          tbody.innerHTML = items
+            .map((u) => {
+              const created = u.created_at ? _fmtDate(u.created_at) : "—";
+              const st = reqStatus[u.status] || {
+                cls: "pill-new",
+                label: u.status_display || u.status || "—",
+              };
+              return `<tr>
+        <td><div class="name-cell">${_esc(u.full_name || "—")}</div></td>
+        <td style="font-size:11.5px">${_esc(u.cccd || "—")}</td>
+        <td style="font-size:11.5px;white-space:nowrap">${created}</td>
+        <td><span class="pill ${st.cls}">${st.label}</span></td>
+      </tr>`;
+            })
+            .join("");
+        } catch (e) {
+          tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:16px;color:var(--red)">✗ ${_esc(e.message)}</td></tr>`;
+        }
+      }
+
+      /* ─────────────────────────────────────────────────────────────────────────
+   USER INFO MODAL
+───────────────────────────────────────────────────────────────────────── */
+      async function _openUserInfo(userId) {
+        const modal = document.getElementById("userInfoModal");
+        const body = document.getElementById("userInfoBody");
+        if (!modal || !body) return;
+        modal.classList.add("open");
+        body.innerHTML = "⏳ Đang tải thông tin...";
+        try {
+          const resp = await API.get(`/auth/users/${userId}/`);
+          const u = resp.data || resp;
+          const created = u.created_at ? _fmtDate(u.created_at) : "—";
+          const lastLogin = u.last_login_at
+            ? _fmtDate(u.last_login_at)
+            : "Chưa đăng nhập";
+          const accSt = u.status === "active" ? "✅ Hoạt động" : "🔒 Bị khoá";
+          const profileStLabel = u.profile_status
+            ? statusMap[u.profile_status]?.label || u.profile_status
+            : "Chưa có hồ sơ";
+          body.innerHTML = `
+      <div style="display:grid;grid-template-columns:150px 1fr;gap:10px 16px;font-size:13px">
+        <div style="color:var(--muted)">Họ và tên:</div><div><strong>${_esc(u.full_name || "—")}</strong></div>
+        <div style="color:var(--muted)">Số điện thoại:</div><div>${_esc(u.phone || "—")}</div>
+        <div style="color:var(--muted)">Email:</div><div>${_esc(u.email || "—")}</div>
+        <div style="color:var(--muted)">CCCD:</div><div>${_esc(u.cccd || "—")}</div>
+        <div style="color:var(--muted)">Trạng thái TK:</div><div>${accSt}</div>
+        <div style="color:var(--muted)">Trạng thái hồ sơ:</div><div>${_esc(profileStLabel)}</div>
+        <div style="color:var(--muted)">Ngày tạo TK:</div><div>${created}</div>
+        <div style="color:var(--muted)">Đăng nhập gần nhất:</div><div>${_esc(lastLogin)}</div>
+      </div>`;
+        } catch (e) {
+          body.innerHTML = `<div style="color:var(--red)">✗ Không tải được thông tin: ${_esc(e.message)}</div>`;
+        }
+      }
+
+      /* ─────────────────────────────────────────────────────────────────────────
+   CONFIRM VERIFY REQUEST (per profile on verify page)
+───────────────────────────────────────────────────────────────────────── */
+      async function _confirmVerifyRequest(profileId, profileName) {
+        const content = prompt(
+          `Nhập nội dung xác minh cho hồ sơ "${profileName}":\n(Để trống để dùng nội dung mặc định)`,
+          "Xác minh lý lịch nhân thân và quá trình công tác",
+        );
+        if (content === null) return; // user cancelled
+        const deadline = prompt(
+          "Nhập hạn xác minh (YYYY-MM-DD):",
+          new Date(Date.now() + 30 * 86400000).toISOString().split("T")[0],
+        );
+        if (!deadline) return;
+        try {
+          await API.post(`/profiles/${profileId}/workflow/`, {
+            action: "request_verify",
+            comment: "Tạo yêu cầu xác minh",
+          });
+          await API.post("/verification/", {
+            profile: profileId,
+            agency_name: "Ban Xây dựng Đảng",
+            agency_contact: "",
+            content:
+              content || "Xác minh lý lịch nhân thân và quá trình công tác",
+            urgency: "normal",
+            deadline: deadline,
+            status: "pending",
+            sent_date: new Date().toISOString().split("T")[0],
+          });
+          showToast(`✅ Đã tạo yêu cầu xác minh cho ${profileName}`);
+          addActivity(
+            `📨 Yêu cầu xác minh hồ sơ <strong>${profileName}</strong>`,
+          );
+          _loadVerificationList();
+          _loadDashboard();
+        } catch (e) {
+          showToast("✗ " + (e.message || "Lỗi tạo yêu cầu"));
+        }
+      }
+
+      /* ─────────────────────────────────────────────────────────────────────────
+   MEMBER — load own profile into form fields
+───────────────────────────────────────────────────────────────────────── */
+      async function _loadMemberCorrectionHints(profileId, profileStatus) {
+        console.log(
+          "[CORRECTION DEBUG] Starting _loadMemberCorrectionHints for profile:",
+          profileId,
+          "status:",
+          profileStatus,
+        );
+
+        // Clear previous markers
+        document
+          .querySelectorAll(".member-correction-note")
+          .forEach((el) => el.remove());
+        document
+          .querySelectorAll(".section.has-correction")
+          .forEach((sec) => sec.classList.remove("has-correction"));
+        const oldSummary = document.getElementById("memberCorrectionSummary");
+        if (oldSummary) oldSummary.remove();
+
+        if (!profileId) {
+          console.log("[CORRECTION DEBUG] Not loading - missing profileId");
+          return { sections: [], overallNote: "" };
+        }
+
+        try {
+          console.log(
+            "[CORRECTION DEBUG] Fetching corrections from: /exports/corrections/?profile_id=" +
+              profileId,
+          );
+          const resp = await API.get(
+            `/exports/corrections/?profile_id=${profileId}`,
+          );
+          console.log("[CORRECTION DEBUG] API response:", resp);
+
+          const reqListRaw =
+            resp.results || resp.data?.results || resp.data || [];
+          const reqs = Array.isArray(reqListRaw) ? reqListRaw : [];
+          console.log(
+            "[CORRECTION DEBUG] Total correction requests found:",
+            reqs.length,
+          );
+          console.log(
+            "[CORRECTION DEBUG] All requests statuses:",
+            reqs.map((r) => ({ id: r.id, status: r.status })),
+          );
+
+          const sortedReqs = [...reqs].sort((a, b) => {
+            const ta = new Date(a?.created_at || 0).getTime() || 0;
+            const tb = new Date(b?.created_at || 0).getTime() || 0;
+            if (tb !== ta) return tb - ta;
+            return (b?.id || 0) - (a?.id || 0);
+          });
+
+          const activeReq =
+            sortedReqs.find((r) =>
+              ["open", "in_progress"].includes(r.status),
+            ) || sortedReqs[0];
+
+          if (!activeReq) {
+            console.log(
+              "[CORRECTION DEBUG] No active correction request found",
+            );
+            return { sections: [], overallNote: "" };
+          }
+
+          console.log(
+            "[CORRECTION DEBUG] Using correction request:",
+            activeReq.id,
+            "status:",
+            activeReq.status,
+          );
+          console.log(
+            "[CORRECTION DEBUG] Items in this request:",
+            activeReq.items,
+          );
+
+          const secMap = {
+            A: "secA",
+            B: "secB",
+            C: "secC",
+            D: "secD",
+            E: "secE",
+            F: "secF",
+            G: "secG",
+            H: "secH",
+            I: "secI",
+            J: "secJ",
+            K: "secK",
+          };
+
+          const secNames = (activeReq.items || [])
+            .map((it) => (it.section || "").trim())
+            .filter(Boolean);
+
+          console.log(
+            "[CORRECTION DEBUG] Flagged sections to display:",
+            secNames,
+          );
+
+          function _extractSectionCode(rawSection) {
+            const txt = String(rawSection || "").trim();
+            if (!txt) return "";
+
+            // Common forms: "B. Lịch sử...", "Phần B", "section B"
+            let m = txt.match(/^(?:phần\s*)?([A-K])(?:\b|\.|\)|:|-)/i);
+            if (m) return m[1].toUpperCase();
+
+            // Embedded forms: "... Phần B ..."
+            m = txt.match(/\bphần\s+([A-K])\b/i);
+            if (m) return m[1].toUpperCase();
+
+            // ID-like forms: secB / esB
+            m = txt.match(/\b(?:sec|es)\s*([A-K])\b/i);
+            if (m) return m[1].toUpperCase();
+
+            // Last fallback: single standalone letter token
+            m = txt.match(/\b([A-K])\b/i);
+            return m ? m[1].toUpperCase() : "";
+          }
+
+          // Per-section note blocks
+          (activeReq.items || []).forEach((it) => {
+            const sectionCode = _extractSectionCode(it.section);
+            const secId = secMap[sectionCode];
+            console.log(
+              "[CORRECTION DEBUG] Processing item section:",
+              it.section,
+              "-> sectionCode:",
+              sectionCode,
+              "-> secId:",
+              secId,
+            );
+
+            if (!secId) {
+              console.log(
+                "[CORRECTION DEBUG] ⚠ No secId mapping for sectionCode:",
+                sectionCode,
+              );
+              return;
+            }
+
+            const sec = document.getElementById(secId);
+            console.log(
+              "[CORRECTION DEBUG] Section element found:",
+              !!sec,
+              "for id:",
+              secId,
+            );
+
+            if (!sec) {
+              console.log(
+                "[CORRECTION DEBUG] ✗ Cannot find section element with id:",
+                secId,
+              );
+              return;
+            }
+
+            sec.classList.add("has-correction");
+            const host = sec.querySelector(".section-header") || sec;
+            const note = document.createElement("div");
+            note.className = "member-correction-note";
+            note.style.cssText =
+              "margin-top:10px;padding:8px 12px;border-left:3px solid var(--crimson);background:#fff7f7;color:#8B0000;border-radius:8px;font-size:12.5px;line-height:1.45";
+            note.innerHTML = `<strong>Yêu cầu bổ sung:</strong> ${_esc(it.description || activeReq.overall_note || "Vui lòng bổ sung theo hướng dẫn")}`;
+            host.appendChild(note);
+            console.log(
+              "[CORRECTION DEBUG] ✓ Rendered correction note in section:",
+              secId,
+            );
+          });
+
+          console.log(
+            "[CORRECTION DEBUG] ✓ Correction hints loaded successfully",
+          );
+
+          return {
+            sections: secNames,
+            overallNote:
+              activeReq.overall_note ||
+              "Vui lòng cập nhật theo yêu cầu và nộp lại hồ sơ.",
+          };
+        } catch (e) {
+          console.error("[CORRECTION DEBUG] ✗ Correction hints load failed:", {
+            message: e.message,
+            status: e.status,
+            response: e.response,
+            stack: e.stack,
+          });
+          return { sections: [], overallNote: "" };
+        }
+      }
+
+      function _renderReturnedBanner(reason, correctionData) {
+        const old = document.getElementById("returnBanner");
+        if (old) old.remove();
+        if (!reason) return;
+        const box = document.createElement("div");
+        box.id = "returnBanner";
+        box.className = "return-hero";
+        const sections = correctionData?.sections || [];
+        box.innerHTML = `
+          <div class="return-hero-head">
+            <div class="return-hero-icon">↩</div>
+            <div class="return-hero-title">Hồ sơ đã bị trả lại, vui lòng bổ sung theo yêu cầu</div>
+          </div>
+          <div class="return-hero-body">
+            <div class="return-hero-note"><strong>Lý do từ cán bộ:</strong> ${_esc(reason)}</div>
+            ${correctionData?.overallNote ? `<div class="return-hero-note" style="margin-top:8px"><strong>Ghi chú bổ sung:</strong> ${_esc(correctionData.overallNote)}</div>` : ""}
+            ${sections.length ? `<div class="return-hero-sections">${sections.map((s) => `<span class="return-hero-chip">${_esc(s)}</span>`).join("")}</div>` : ""}
+          </div>`;
+        document.querySelector("#memberMain .content")?.prepend(box);
+      }
+
+      async function _loadMyProfile() {
+        try {
+          const resp = await API.get("/profiles/my/");
+          const p = resp.data || resp;
+          if (!p.id) return;
+          window._profileId = p.id;
+
+          // Route: if profile is submitted/under review/approved → show view panel
+          const FORM_STATUSES = ["draft", "returned"];
+          if (!FORM_STATUSES.includes(p.status)) {
+            _switchToViewMode();
+            await _renderProfileView(p);
+            return;
+          }
+
+          // Otherwise show the normal editable form
+          _switchToFormMode();
+
+          // ── Section A: Sơ lược lý lịch ─────────────────────────────────
+          _setVal("hoTen", p.full_name);
+          _setVal("hoTenKhac", p.full_name_other);
+          _setVal("ngaySinh", _isoToDMY(p.dob));
+          _setVal("queQuan", p.hometown_detail);
+          _setVal("noiO", p.current_address);
+          _setVal("birthPlaceDetail", p.birth_place_detail);
+          _setVal("ngheNghiep", p.occupation);
+          _setVal("trinhDoVanHoa", p.general_edu_level);
+          // If edu level not a standard option, treat as "Khác"
+          const vanHoaSel = document.getElementById("trinhDoVanHoa");
+          if (p.general_edu_level && vanHoaSel && !vanHoaSel.value) {
+            vanHoaSel.value = "Khác";
+            _setVal("trinhDoVanHoaKhac", p.general_edu_level);
+            const kv = document.getElementById("trinhDoVanHoaKhac");
+            if (kv) kv.style.display = "block";
+          }
+          _setVal("trinhDoChuyenMon", p.edu_specialization);
+          _setVal("trinhDoLyLuan", p.political_level_detail);
+          _setVal("tinHoc", p.it_level);
+          // If IT level not a standard option, treat as "Khác"
+          const tinHocSel = document.getElementById("tinHoc");
+          if (p.it_level && tinHocSel && !tinHocSel.value) {
+            tinHocSel.value = "Khác";
+            _setVal("tinHocKhac", p.it_level);
+            const kt = document.getElementById("tinHocKhac");
+            if (kt) kt.style.display = "block";
+          }
+          // Youth union radio
+          const hasDoan = !!(p.youth_union_date || p.youth_union_place);
+          const doanYesRadio = document.querySelector(
+            'input[name="doanStatus"][value="yes"]',
+          );
+          const doanNoRadio = document.querySelector(
+            'input[name="doanStatus"][value="no"]',
+          );
+          if (doanYesRadio) doanYesRadio.checked = hasDoan;
+          if (doanNoRadio) doanNoRadio.checked = !hasDoan;
+          toggleDoanFields();
+          _setVal("ngayVaoDoan", _isoToDMY(p.youth_union_date));
+          _setVal("noiVaoDoan", p.youth_union_place);
+          _setVal("tuNhanXet", p.self_assessment_text);
+          _setVal("lichSuChinhTri", p.political_history_text);
+          _setVal("khoaHocCongNghe", p.science_tech_qualifications);
+          _setVal("hocViCaoNhat", p.highest_degree);
+          _setVal("hocHamCaoNhat", p.academic_title);
+          _setVal("tiengDanToc", p.ethnic_language);
+          _setVal("tamTru", p.temporary_address);
+          _setVal("ngayVaoDang1", _isoToDMY(p.rejoin_first_party_join_date));
+          _setVal("noiVaoDang1", p.rejoin_first_party_join_place);
+          _setVal("ngayChinhThuc1", _isoToDMY(p.rejoin_first_official_date));
+
+          // Ethnic group
+          const ethnicText =
+            p.ethnic_group_other ||
+            (p.ethnic_group_detail && p.ethnic_group_detail.name) ||
+            "";
+          if (ethnicText) {
+            const danTocEl = document.getElementById("danToc");
+            if (danTocEl) {
+              const found = [...danTocEl.options].find(
+                (o) => o.value === ethnicText || o.text === ethnicText,
+              );
+              if (found) {
+                danTocEl.value = found.value;
+              } else {
+                danTocEl.value = "__other__";
+                _setVal("danTocKhac", ethnicText);
+                const k = document.getElementById("danTocKhac");
+                if (k) k.style.display = "";
+              }
+            }
+          }
+
+          // Religion
+          const religionText =
+            p.religion_other ||
+            (p.religion_detail && p.religion_detail.name) ||
+            "";
+          if (religionText) {
+            const tonGiaoEl = document.getElementById("tonGiao");
+            if (tonGiaoEl) {
+              const found = [...tonGiaoEl.options].find(
+                (o) => o.value === religionText || o.text === religionText,
+              );
+              if (found) {
+                tonGiaoEl.value = found.value;
+                toggleChucSac();
+              } else {
+                tonGiaoEl.value = "__other__";
+                _setVal("tonGiaoKhac", religionText);
+                const k = document.getElementById("tonGiaoKhac");
+                if (k) k.style.display = "";
+                toggleChucSac();
+              }
+            }
+          }
+          _setVal("chucSac", p.religious_title);
+          if (p.religious_title) {
+            const cs = document.getElementById("chucSac");
+            if (cs) cs.style.display = "";
+          }
+
+          // Foreign language: split stored "name level" back to inputs
+          if (p.foreign_languages) {
+            const parts = p.foreign_languages.split(/\s+/);
+            const levelKeywords = [
+              "A1",
+              "A2",
+              "B1",
+              "B2",
+              "C1",
+              "C2",
+              "Đại học",
+            ];
+            const lastPart = parts[parts.length - 1];
+            if (levelKeywords.includes(lastPart)) {
+              _setVal("ngoaiNgu", parts.slice(0, -1).join(" "));
+              _setVal("trinhDoNgoaiNgu", lastPart);
+            } else {
+              _setVal("ngoaiNgu", p.foreign_languages);
+            }
+          }
+
+          // Gender radio
+          if (p.gender) {
+            const r = document.querySelector(
+              `input[name="gioiTinh"][value="${p.gender}"]`,
+            );
+            if (r) r.checked = true;
+          }
+
+          // Cập nhật header topbar với tên động
+          updateTopbarName(p.full_name || "Chưa nhập tên", p.status || "draft");
+
+          // Return banner is rendered after loading correction hints
+          await _loadAllSections(p.id);
+          const correctionData = await _loadMemberCorrectionHints(
+            p.id,
+            p.status,
+          );
+          if (p.status === "returned") {
+            _renderReturnedBanner(
+              p.return_reason || "Hồ sơ cần bổ sung.",
+              correctionData,
+            );
+            // Show per-section field notes from officer
+            await _showCitizenFieldNotes(p.id);
+          }
+        } catch (e) {
+          console.warn("[API] my profile load failed:", e.message);
+        }
+      }
+
+      // ===== TOPBAR NAME UPDATE =====
+      // ===== PROFILE VIEW MODE =====
+
+      // Map: admin field key → citizen form input ID (or null to fall back to section)
+      const _FIELD_KEY_TO_CITIZEN_INPUT = {
+        "fi-esA-name": "hoTen",
+        "fi-esA-dob": "ngaySinh",
+        "fi-esA-birthplace": "birthPlaceDetail",
+        "fi-esA-hometown": "queQuan",
+        "fi-esA-address": "noiO",
+        "fi-esA-temp-addr": "tamTru",
+        // fields without a single citizen input fall back to their section
+        "fi-esA-gender": null,
+        "fi-esA-ethnic": null,
+        "fi-esA-religion": null,
+        "fi-esA-cccd": null,
+        "fi-esA-phone": null,
+        "fi-esA-email": null,
+        "fi-esA-occupation": null,
+        // Section C fields → section secC
+        "fi-esC-edu-gen": null,
+        "fi-esC-edu-qual": null,
+        "fi-esC-political": null,
+        "fi-esC-foreign-lang": null,
+        "fi-esC-it": null,
+        "fi-esC-youth-union": null,
+        "fi-esC-sci-tech": null,
+        "fi-esC-degree": null,
+        "fi-esC-acad-title": null,
+        "fi-esC-ethnic-lang": null,
+        // Section J
+        "fi-esJ-self": null,
+        // Section K
+        "fi-esK-name": null,
+        "fi-esK-date": null,
+      };
+      // Map: admin field key → fallback citizen section ID
+      const _FIELD_KEY_TO_CITIZEN_SEC = {
+        // per-field esA keys with no direct input → secA
+        "fi-esA-gender": "secA",
+        "fi-esA-ethnic": "secA",
+        "fi-esA-religion": "secA",
+        "fi-esA-cccd": "secA",
+        "fi-esA-phone": "secA",
+        "fi-esA-email": "secA",
+        "fi-esA-occupation": "secA",
+        // section-level table notes
+        esB: "secB",
+        "esC-work": "secC",
+        esD: "secD",
+        esE: "secG",
+        esFT: "secF",
+        esH: "secH",
+        // section C fields
+        "fi-esC-edu-gen": "secC",
+        "fi-esC-edu-qual": "secC",
+        "fi-esC-political": "secC",
+        "fi-esC-foreign-lang": "secC",
+        "fi-esC-it": "secC",
+        "fi-esC-youth-union": "secC",
+        "fi-esC-sci-tech": "secC",
+        "fi-esC-degree": "secC",
+        "fi-esC-acad-title": "secC",
+        "fi-esC-ethnic-lang": "secC",
+        // J / K
+        "fi-esJ-self": "secJ",
+        "fi-esK-name": "secK",
+        "fi-esK-date": "secK",
+      };
+
+      async function _showCitizenFieldNotes(profileId) {
+        // Remove old banners
+        document
+          .querySelectorAll(".citizen-note-banner, .citizen-field-note-banner")
+          .forEach((el) => el.remove());
+        document
+          .querySelectorAll(".section.has-admin-note")
+          .forEach((el) => el.classList.remove("has-admin-note"));
+
+        try {
+          const resp = await API.get(`/profiles/${profileId}/field-notes/`);
+          const notes = Array.isArray(resp) ? resp : resp.data || [];
+
+          notes.forEach((n) => {
+            if (!n.note || n.resolved) return;
+            const key = n.field_key;
+            const citizenInputId = _FIELD_KEY_TO_CITIZEN_INPUT[key];
+            const citizenSecId = _FIELD_KEY_TO_CITIZEN_SEC[key] || null;
+
+            if (citizenInputId) {
+              // Show banner next to the specific citizen form input
+              const inp = document.getElementById(citizenInputId);
+              if (!inp) return;
+              const banner = document.createElement("div");
+              banner.className = "citizen-field-note-banner visible";
+              banner.innerHTML =
+                `<span class="cfnb-icon">💬</span>` +
+                `<span><strong>Góp ý BXĐ:</strong> ${_esc(n.note)}</span>`;
+              // Inject after the input (or its form-row if available)
+              const formRow = inp.closest(".form-row");
+              if (formRow) formRow.after(banner);
+              else inp.after(banner);
+              // Highlight the input's form-row
+              if (formRow) formRow.classList.add("citizen-has-note");
+              // Mark parent section
+              const sec = inp.closest(".section");
+              if (sec) sec.classList.add("has-admin-note");
+            } else if (citizenSecId) {
+              // Section-level banner
+              const sec = document.getElementById(citizenSecId);
+              if (!sec) return;
+              sec.classList.add("has-admin-note");
+              // Check if a banner for this section already exists; append note to it
+              let banner = sec.querySelector(".citizen-note-banner");
+              if (!banner) {
+                banner = document.createElement("div");
+                banner.className = "citizen-note-banner visible";
+                banner.innerHTML = `<div class="cnb-body"></div>`;
+                const header = sec.querySelector(".section-header");
+                if (header) header.after(banner);
+                else sec.prepend(banner);
+              }
+              const body = banner.querySelector(".cnb-body");
+              if (body) {
+                const item = document.createElement("div");
+                item.className = "cnb-item";
+                item.innerHTML = `<span class="cfnb-icon">💬</span><span>${_esc(n.note)}</span>`;
+                body.appendChild(item);
+              }
+            }
+          });
+        } catch (e) {
+          console.warn("[CITIZEN NOTES] load fail:", e.message);
+        }
+      }
+      function _switchToFormMode() {
+        const m = document.querySelector("#memberMain main");
+        if (m) m.style.display = "";
+        document.getElementById("profileViewPanel").classList.remove("active");
+        document.getElementById("memberSideNav").classList.remove("viewmode");
+        const progressWrap = document.getElementById("memberProgressWrap");
+        if (progressWrap) progressWrap.style.display = "";
+        document.querySelector(".topbar-actions").style.display = "";
+      }
+      function _switchToViewMode() {
+        const m = document.querySelector("#memberMain main");
+        if (m) m.style.display = "none";
+        document.getElementById("profileViewPanel").classList.add("active");
+        document.getElementById("memberSideNav").classList.add("viewmode");
+        const progressWrap = document.getElementById("memberProgressWrap");
+        if (progressWrap) progressWrap.style.display = "none";
+        document.querySelector(".topbar-actions").style.display = "none";
+      }
+      const _PV_STATUS_CONFIG = {
+        submitted: {
+          icon: "📤",
+          cls: "s-submitted",
+          title: "Hồ sơ đã được nộp thành công",
+          desc: "Cán bộ Ban XD Đảng sẽ xem xét hồ sơ trong 3–5 ngày làm việc.",
+        },
+        pending: {
+          icon: "🔍",
+          cls: "s-pending",
+          title: "Đang chờ xem xét",
+          desc: "Hồ sơ đang trong hàng đợi, cán bộ chưa bắt đầu thẩm định.",
+        },
+        under_review: {
+          icon: "📑",
+          cls: "s-under_review",
+          title: "Đang được thẩm định",
+          desc: "Cán bộ đang kiểm tra chi tiết hồ sơ của bạn.",
+        },
+        verifying: {
+          icon: "🏛",
+          cls: "s-verifying",
+          title: "Đang xác minh",
+          desc: "Cơ quan xác minh đang xử lý. Chờ kết quả từ Ban XD Đảng.",
+        },
+        approved: {
+          icon: "✅",
+          cls: "s-approved",
+          title: "Hồ sơ đã được phê duyệt",
+          desc: "Chúc mừng! Hồ sơ đã được Ban XD Đảng chấp thuận.",
+        },
+        completed: {
+          icon: "🎉",
+          cls: "s-completed",
+          title: "Hồ sơ đã hoàn thiện",
+          desc: "Quá trình kê khai lý lịch đã hoàn tất.",
+        },
+        rejected: {
+          icon: "❌",
+          cls: "s-rejected",
+          title: "Hồ sơ bị từ chối",
+          desc: "Hồ sơ không đủ điều kiện. Liên hệ cán bộ để biết thêm chi tiết.",
+        },
+      };
+      const _PV_WORKFLOW_STEPS = [
+        { key: "draft", label: "Kê khai", icon: "✏" },
+        { key: "submitted", label: "Đã nộp", icon: "📤" },
+        { key: "under_review", label: "Thẩm định", icon: "📑" },
+        { key: "approved", label: "Phê duyệt", icon: "✅" },
+        { key: "verifying", label: "Xác minh", icon: "🏛" },
+        { key: "completed", label: "Hoàn thiện", icon: "🎉" },
+      ];
+      const _PV_STEP_ORDER = _PV_WORKFLOW_STEPS.map((s) => s.key);
+      async function _renderProfileView(p) {
+        const cfg = _PV_STATUS_CONFIG[p.status] || {
+          icon: "📄",
+          cls: "",
+          title: _statusLabel(p.status),
+          desc: "",
+        };
+        const banner = document.getElementById("pvStatusBanner");
+        banner.className = "pv-status-banner " + cfg.cls;
+        document.getElementById("pvStatusIcon").textContent = cfg.icon;
+        document.getElementById("pvStatusTitle").textContent = cfg.title;
+        document.getElementById("pvStatusDesc").textContent = cfg.desc;
+        const actEl = document.getElementById("pvStatusActions");
+        actEl.innerHTML = "";
+        const wfCard = document.getElementById("pvWorkflowCard");
+        if (wfCard) wfCard.style.display = "none";
+        const retCard = document.getElementById("pvReturnCard");
+        if (p.status === "returned" && p.return_reason) {
+          document.getElementById("pvReturnReason").textContent =
+            p.return_reason;
+          retCard.style.display = "";
+        } else {
+          retCard.style.display = "none";
+        }
+        const _pv = (id, val) => {
+          const el = document.getElementById("pv-" + id);
+          if (!el) return;
+          if (val) {
+            el.textContent = val;
+            el.classList.remove("empty");
+          } else {
+            el.textContent = "Chưa nhập";
+            el.classList.add("empty");
+          }
+        };
+        _pv("full_name", p.full_name);
+        _pv("dob", p.dob ? p.dob.split("-").reverse().join("/") : "");
+        _pv(
+          "gender",
+          p.gender === "male"
+            ? "Nam"
+            : p.gender === "female"
+              ? "Nữ"
+              : p.gender === "other"
+                ? "Khác"
+                : "",
+        );
+        _pv(
+          "ethnic_group",
+          p.ethnic_group_other ||
+            (p.ethnic_group_detail && p.ethnic_group_detail.name) ||
+            "",
+        );
+        _pv(
+          "religion",
+          p.religion_other ||
+            (p.religion_detail && p.religion_detail.name) ||
+            "",
+        );
+        _pv("birth_place_detail", p.birth_place_detail);
+        _pv("hometown_detail", p.hometown_detail);
+        _pv("current_address", p.current_address);
+        _pv("occupation", p.occupation);
+        _pv("general_edu_level", p.general_edu_level);
+        _pv("edu_specialization", p.edu_specialization);
+        _pv("political_level_detail", p.political_level_detail);
+        _pv("foreign_languages", p.foreign_languages);
+        _pv(
+          "youth_union_date",
+          p.youth_union_date
+            ? p.youth_union_date.split("-").reverse().join("/")
+            : "",
+        );
+        _pv("youth_union_place", p.youth_union_place);
+        _pv("full_name_other", p.full_name_other);
+        _pv("temporary_address", p.temporary_address);
+        _pv("workplace", p.workplace);
+        _pv("job_title", p.job_title);
+        _pv("it_level", p.it_level);
+        _pv("ethnic_language", p.ethnic_language);
+        _pv("highest_degree", p.highest_degree);
+        _pv("academic_title", p.academic_title);
+        _pv("science_tech_qualifications", p.science_tech_qualifications);
+        _pv("religious_title", p.religious_title);
+        _pv(
+          "rejoin_first_party_join_date",
+          p.rejoin_first_party_join_date
+            ? p.rejoin_first_party_join_date.split("-").reverse().join("/")
+            : "",
+        );
+        _pv("rejoin_first_party_join_place", p.rejoin_first_party_join_place);
+        _pv(
+          "rejoin_first_official_date",
+          p.rejoin_first_official_date
+            ? p.rejoin_first_official_date.split("-").reverse().join("/")
+            : "",
+        );
+        let tlData = {},
+          famData = [];
+        try {
+          const r = await API.get(`/timelines/${p.id}/all/`);
+          tlData = (r && r.success !== undefined ? r.data : r) || {};
+        } catch (e) {}
+        try {
+          const r = await API.get(`/family/${p.id}/members/`);
+          famData = Array.isArray(r) ? r : r.data || r.results || [];
+        } catch (e) {}
+
+        const _num = (v) => String(v || "").trim();
+        const _period = (it) => {
+          if (it.period_text) return _esc(it.period_text);
+          const fm = _num(it.from_month),
+            fy = _num(it.from_year),
+            tm = _num(it.to_month),
+            ty = _num(it.to_year);
+          const from = fm || fy ? `${fm || "--"}/${fy || "----"}` : "";
+          const to = it.is_present
+            ? "Nay"
+            : tm || ty
+              ? `${tm || "--"}/${ty || "----"}`
+              : "";
+          if (from && to) return `${from} - ${to}`;
+          return from || to || "";
+        };
+        const _li = (arr, mapFn, emptyText = "Chưa nhập") => {
+          if (!arr || !arr.length)
+            return `<div class="pv-sec-empty">${emptyText}</div>`;
+          return `<ul class="pv-sec-list">${arr.map((x) => `<li>${mapFn(x)}</li>`).join("")}</ul>`;
+        };
+        const history = tlData.history || [];
+        const work = tlData.work_history || [];
+        const edu = tlData.education_history || [];
+        const travel = tlData.overseas_travels || [];
+        const awards = tlData.awards || [];
+        const disciplines = tlData.disciplines || [];
+
+        document.getElementById("pvSectionsSummary").innerHTML = [
+          `<div class="pv-sec-block"><div class="pv-sec-head"><div class="pv-sec-badge">B</div><div class="pv-sec-title">Lịch sử bản thân</div></div>${_li(history, (h) => `${_period(h) ? `<strong>${_period(h)}</strong>: ` : ""}${_esc(h.description || "")}${h.location ? ` (Địa điểm: ${_esc(h.location)})` : ""}`)}</div>`,
+          `<div class="pv-sec-block"><div class="pv-sec-head"><div class="pv-sec-badge">C</div><div class="pv-sec-title">Công tác</div></div>${_li(work, (w) => `${_period(w) ? `<strong>${_period(w)}</strong>: ` : ""}${_esc(w.employer || "—")}${w.job_title ? ` – ${_esc(w.job_title)}` : ""}${w.location ? ` (${_esc(w.location)})` : ""}${w.notes ? `; ${_esc(w.notes)}` : ""}`)}</div>`,
+          `<div class="pv-sec-block"><div class="pv-sec-head"><div class="pv-sec-badge">D</div><div class="pv-sec-title">Đặc điểm lịch sử</div></div>${p.political_history_text ? `<div style="font-size:12.5px;line-height:1.5">${_esc(p.political_history_text)}</div>` : `<div class="pv-sec-empty">Chưa nhập</div>`}</div>`,
+          `<div class="pv-sec-block"><div class="pv-sec-head"><div class="pv-sec-badge">E</div><div class="pv-sec-title">Đào tạo, bồi dưỡng</div></div>${_li(edu, (e) => `${_period(e) ? `<strong>${_period(e)}</strong>: ` : ""}${_esc(e.school || "—")}${e.major ? ` - ${_esc(e.major)}` : ""}${e.edu_level ? ` (${_esc(e.edu_level)})` : ""}${e.certificate ? `, ${_esc(e.certificate)}` : ""}${e.location ? `, ${_esc(e.location)}` : ""}`)}</div>`,
+          `<div class="pv-sec-block"><div class="pv-sec-head"><div class="pv-sec-badge">F</div><div class="pv-sec-title">Đi nước ngoài</div></div>${_li(travel, (t) => `${_period(t) ? `<strong>${_period(t)}</strong>: ` : ""}${_esc(t.country || "—")}${t.purpose ? ` - ${_esc(t.purpose)}` : ""}${t.sponsoring_org ? ` (Cơ quan: ${_esc(t.sponsoring_org)})` : ""}`)}</div>`,
+          `<div class="pv-sec-block"><div class="pv-sec-head"><div class="pv-sec-badge">G</div><div class="pv-sec-title">Khen thưởng</div></div>${_li(awards, (a) => `${a.issued_month || "--"}/${a.issued_year || "----"}: ${_esc(a.content || "")}${a.level ? ` (Cấp: ${_esc(a.level)})` : ""}${a.issuer ? ` - ${_esc(a.issuer)}` : ""}`)}</div>`,
+          `<div class="pv-sec-block"><div class="pv-sec-head"><div class="pv-sec-badge">H</div><div class="pv-sec-title">Kỷ luật</div></div>${_li(disciplines, (d) => `${d.issued_month || "--"}/${d.issued_year || "----"}: ${_esc(d.content || "")}${d.level ? ` (Mức: ${_esc(d.level)})` : ""}${d.issuer ? ` - ${_esc(d.issuer)}` : ""}`)}</div>`,
+          `<div class="pv-sec-block"><div class="pv-sec-head"><div class="pv-sec-badge">I</div><div class="pv-sec-title">Hoàn cảnh gia đình</div></div>${
+            famData.length
+              ? famData
+                  .map((f) => {
+                    const lines = [];
+                    if (f.birth_year) lines.push(`Năm sinh: ${f.birth_year}`);
+                    if (f.birth_place)
+                      lines.push(`Nơi sinh: ${_esc(f.birth_place)}`);
+                    if (f.hometown) lines.push(`Quê quán: ${_esc(f.hometown)}`);
+                    if (f.ethnic_group_text)
+                      lines.push(`Dân tộc: ${_esc(f.ethnic_group_text)}`);
+                    if (f.religion_text)
+                      lines.push(`Tôn giáo: ${_esc(f.religion_text)}`);
+                    if (f.occupation)
+                      lines.push(`Nghề nghiệp: ${_esc(f.occupation)}`);
+                    if (f.relationship === "anh_chi_em_ruot")
+                      lines.push(
+                        `Quốc tịch: ${_esc(f.nationality || "Việt Nam")}`,
+                      );
+                    if (f.workplace)
+                      lines.push(`Nơi làm việc: ${_esc(f.workplace)}`);
+                    if (f.current_address)
+                      lines.push(`Nơi ở: ${_esc(f.current_address)}`);
+                    if (f.is_deceased) {
+                      const d = [`Đã mất`];
+                      if (f.deceased_year) d.push(`năm ${f.deceased_year}`);
+                      if (f.deceased_cause)
+                        d.push(`(${_esc(f.deceased_cause)})`);
+                      lines.push(d.join(" "));
+                    }
+                    const partyLine = f.is_party_member
+                      ? [
+                          `Đảng viên`,
+                          f.party_join_year
+                            ? `Năm vào Đảng: ${f.party_join_year}`
+                            : "",
+                          f.party_join_date
+                            ? `Ngày chính thức: ${_esc(f.party_join_date)}`
+                            : "",
+                          f.party_join_place
+                            ? `tại ${_esc(f.party_join_place)}`
+                            : "",
+                          f.party_chi_bo
+                            ? `Chi bộ/Đảng bộ: ${_esc(f.party_chi_bo)}`
+                            : "",
+                          f.party_awards_text
+                            ? `Khen thưởng/Huy hiệu: ${_esc(f.party_awards_text)}`
+                            : "",
+                          f.party_years_count
+                            ? `Số năm tuổi Đảng: ${f.party_years_count}`
+                            : "",
+                        ]
+                          .filter(Boolean)
+                          .join(" | ")
+                      : "Không phải đảng viên";
+                    lines.push(partyLine);
+                    if (f.notes) lines.push(`Ghi chú: ${_esc(f.notes)}`);
+                    const histHtml = (f.history || []).length
+                      ? `<div style="margin-top:4px;margin-left:12px"><em style="font-size:11px;color:var(--muted)">Quá trình lịch sử:</em><ul style="margin:2px 0 0 16px;padding:0;font-size:11px">${(
+                          f.history || []
+                        )
+                          .map((h) => {
+                            const fm = h.from_month
+                              ? `${String(h.from_month).padStart(2, "0")}/${h.from_year || ""}`
+                              : h.from_year || "";
+                            const to = h.is_present
+                              ? "Nay"
+                              : h.to_month
+                                ? `${String(h.to_month).padStart(2, "0")}/${h.to_year || ""}`
+                                : h.to_year || "";
+                            return `<li>${fm && to ? `<strong>${fm}–${to}</strong>: ` : ""}${_esc(h.description || "")}</li>`;
+                          })
+                          .join("")}</ul></div>`
+                      : "";
+                    return `<li><strong>${_esc(f.relationship_display || f.relationship || "")}:</strong> ${_esc(f.full_name || "")}<br><span style="font-size:11px;color:var(--muted)">${lines.join(" · ")}</span>${histHtml}</li>`;
+                  })
+                  .join("")
+              : `<div class="pv-sec-empty">Chưa nhập</div>`
+          }</div>`,
+          `<div class="pv-sec-block"><div class="pv-sec-head"><div class="pv-sec-badge">J</div><div class="pv-sec-title">Tự nhận xét</div></div>${p.self_assessment_text ? `<div style="font-size:12.5px;line-height:1.5">${_esc(p.self_assessment_text)}</div>` : `<div class="pv-sec-empty">Chưa nhập</div>`}</div>`,
+        ].join("");
+        try {
+          const rev = await API.get(`/profiles/${p.id}/reviews/`);
+          const reviews = Array.isArray(rev)
+            ? rev
+            : rev.data || rev.results || [];
+          const tlEl = document.getElementById("pvTimeline");
+          if (!reviews.length) {
+            tlEl.innerHTML =
+              '<div style="color:var(--hint);font-size:12.5px">Chưa có lịch sử xét duyệt.</div>';
+          } else {
+            const dotCls = {
+              submit: "submit",
+              approve: "approve",
+              return: "return",
+              reject: "reject",
+              start_review: "review",
+              request_verify: "verify",
+              complete: "complete",
+            };
+            tlEl.innerHTML =
+              '<div class="pv-timeline">' +
+              reviews
+                .slice(0, 20)
+                .map((r) => {
+                  const dc = dotCls[r.action] || "review";
+                  const ts = r.created_at ? _fmtDate(r.created_at) : "";
+                  const who =
+                    r.reviewer_name ||
+                    (r.reviewer && r.reviewer.full_name) ||
+                    "Hệ thống";
+                  const note = r.comment
+                    ? `<div class="pv-tl-note">${_esc(r.comment)}</div>`
+                    : "";
+                  return `<div class="pv-tl-item"><div class="pv-tl-dot ${dc}">📌</div><div class="pv-tl-content"><div class="pv-tl-action">${_esc(_actionLabel(r.action) || r.action)}</div><div class="pv-tl-by">${_esc(who)}</div><div class="pv-tl-time">${ts}</div>${note}</div></div>`;
+                })
+                .join("") +
+              "</div>";
+          }
+        } catch (e) {
+          document.getElementById("pvTimeline").innerHTML =
+            '<div style="color:var(--hint);font-size:12px">Không tải được lịch sử.</div>';
+        }
+        updateTopbarName(p.full_name || "Chưa nhập tên", p.status);
+      }
+      async function _switchToFormModeAndReload() {
+        _switchToFormMode();
+        try {
+          const p = await API.get("/profiles/my/");
+          if (!p.id) return;
+          window._profileId = p.id;
+          _setVal("hoTen", p.full_name);
+          _setVal("hoTenKhac", p.full_name_other);
+          _setVal("ngaySinh", _isoToDMY(p.dob));
+          _setVal("queQuan", p.hometown_detail);
+          _setVal("noiO", p.current_address);
+          _setVal("birthPlaceDetail", p.birth_place_detail);
+          _setVal("ngheNghiep", p.occupation);
+          _setVal("trinhDoVanHoa", p.general_edu_level);
+          const vanHoaSel2 = document.getElementById("trinhDoVanHoa");
+          if (p.general_edu_level && vanHoaSel2 && !vanHoaSel2.value) {
+            vanHoaSel2.value = "Khác";
+            _setVal("trinhDoVanHoaKhac", p.general_edu_level);
+            const kv2 = document.getElementById("trinhDoVanHoaKhac");
+            if (kv2) kv2.style.display = "block";
+          }
+          _setVal("trinhDoChuyenMon", p.edu_specialization);
+          _setVal("trinhDoLyLuan", p.political_level_detail);
+          _setVal("tinHoc", p.it_level);
+          const tinHocSel2 = document.getElementById("tinHoc");
+          if (p.it_level && tinHocSel2 && !tinHocSel2.value) {
+            tinHocSel2.value = "Khác";
+            _setVal("tinHocKhac", p.it_level);
+            const kt2 = document.getElementById("tinHocKhac");
+            if (kt2) kt2.style.display = "block";
+          }
+          const hasDoan2 = !!(p.youth_union_date || p.youth_union_place);
+          const doanYesR2 = document.querySelector(
+            'input[name="doanStatus"][value="yes"]',
+          );
+          const doanNoR2 = document.querySelector(
+            'input[name="doanStatus"][value="no"]',
+          );
+          if (doanYesR2) doanYesR2.checked = hasDoan2;
+          if (doanNoR2) doanNoR2.checked = !hasDoan2;
+          toggleDoanFields();
+          _setVal("ngayVaoDoan", _isoToDMY(p.youth_union_date));
+          _setVal("noiVaoDoan", p.youth_union_place);
+          _setVal("tuNhanXet", p.self_assessment_text);
+          _setVal("lichSuChinhTri", p.political_history_text);
+          _setVal("khoaHocCongNghe", p.science_tech_qualifications);
+          _setVal("hocViCaoNhat", p.highest_degree);
+          _setVal("hocHamCaoNhat", p.academic_title);
+          _setVal("tiengDanToc", p.ethnic_language);
+          _setVal("tamTru", p.temporary_address);
+          _setVal("ngayVaoDang1", _isoToDMY(p.rejoin_first_party_join_date));
+          _setVal("noiVaoDang1", p.rejoin_first_party_join_place);
+          _setVal("ngayChinhThuc1", _isoToDMY(p.rejoin_first_official_date));
+          // Ethnic group
+          const ethnicText2 =
+            p.ethnic_group_other ||
+            (p.ethnic_group_detail && p.ethnic_group_detail.name) ||
+            "";
+          if (ethnicText2) {
+            const danTocEl2 = document.getElementById("danToc");
+            if (danTocEl2) {
+              const found = [...danTocEl2.options].find(
+                (o) => o.value === ethnicText2 || o.text === ethnicText2,
+              );
+              if (found) {
+                danTocEl2.value = found.value;
+              } else {
+                danTocEl2.value = "__other__";
+                _setVal("danTocKhac", ethnicText2);
+                const k = document.getElementById("danTocKhac");
+                if (k) k.style.display = "";
+              }
+            }
+          }
+          // Religion
+          const religionText2 =
+            p.religion_other ||
+            (p.religion_detail && p.religion_detail.name) ||
+            "";
+          if (religionText2) {
+            const tonGiaoEl2 = document.getElementById("tonGiao");
+            if (tonGiaoEl2) {
+              const found = [...tonGiaoEl2.options].find(
+                (o) => o.value === religionText2 || o.text === religionText2,
+              );
+              if (found) {
+                tonGiaoEl2.value = found.value;
+                toggleChucSac();
+              } else {
+                tonGiaoEl2.value = "__other__";
+                _setVal("tonGiaoKhac", religionText2);
+                const k = document.getElementById("tonGiaoKhac");
+                if (k) k.style.display = "";
+                toggleChucSac();
+              }
+            }
+          }
+          _setVal("chucSac", p.religious_title);
+          if (p.religious_title) {
+            const cs = document.getElementById("chucSac");
+            if (cs) cs.style.display = "";
+          }
+          // Foreign language
+          if (p.foreign_languages) {
+            const parts = p.foreign_languages.split(/\s+/);
+            const lvls = ["A1", "A2", "B1", "B2", "C1", "C2", "Đại học"];
+            const last = parts[parts.length - 1];
+            if (lvls.includes(last)) {
+              _setVal("ngoaiNgu", parts.slice(0, -1).join(" "));
+              _setVal("trinhDoNgoaiNgu", last);
+            } else {
+              _setVal("ngoaiNgu", p.foreign_languages);
+            }
+          }
+          if (p.gender) {
+            const r = document.querySelector(
+              `input[name="gioiTinh"][value="${p.gender}"]`,
+            );
+            if (r) r.checked = true;
+          }
+          updateTopbarName(p.full_name || "Chưa nhập tên", p.status);
+          if (p.status === "returned" && p.return_reason) {
+            const b =
+              document.getElementById("returnBanner") ||
+              (() => {
+                const d = document.createElement("div");
+                d.id = "returnBanner";
+                d.style.cssText =
+                  "background:#FEF2F2;border:1px solid rgba(139,0,0,.2);color:#8B0000;padding:10px 16px;border-radius:8px;margin:12px 0;font-size:13px";
+                document.querySelector("#memberMain main")?.prepend(d);
+                return d;
+              })();
+            b.innerHTML = `<strong>↩ Hồ sơ bị trả lại:</strong> ${_esc(p.return_reason)}`;
+          }
+          await _loadAllSections(p.id);
+        } catch (e) {
+          console.warn("[switchToForm]", e.message);
+        }
+      }
+      async function _exportMyDocx(profileId) {
+        try {
+          showToast("⏳ Đang tạo file DOCX…");
+          const base =
+            localStorage.getItem("api_base") ||
+            (location.protocol === "file:" ||
+            location.port === "5500" ||
+            location.port === "5501"
+              ? "http://127.0.0.1:8000/api/v1"
+              : location.hostname === "14.224.210.210"
+                ? "http://14.224.210.210:8003/api/v1"
+                : "/api/v1");
+          const tok = localStorage.getItem("access_token");
+          const resp = await fetch(`${base}/exports/word/${profileId}/`, {
+            method: "POST",
+            headers: {
+              Authorization: "Bearer " + tok,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ template_name: "Mẫu 2-KNĐ" }),
+          });
+          if (!resp.ok)
+            throw new Error("Lỗi tạo DOCX (HTTP " + resp.status + ")");
+          const blob = await resp.blob();
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = "SoYeuLyLich.docx";
+          a.click();
+          URL.revokeObjectURL(url);
+          showToast("✅ Tải file DOCX thành công");
+        } catch (e) {
+          showToast("✗ " + e.message);
+        }
+      }
+      // ===== END PROFILE VIEW MODE =====
+
+      // ===== TOPBAR NAME UPDATE =====
+      function updateTopbarName(name, status) {
+        const nameEl = document.getElementById("topbarName");
+        const statusEl = document.getElementById("topbarStatus");
+        if (nameEl) nameEl.textContent = name || "Chưa nhập tên";
+        if (statusEl) {
+          statusEl.className = `status-badge status-${status || "draft"}`;
+          statusEl.textContent = _statusLabel(status);
+        }
+      }
+
+      // Event listener để cập nhật tên realtime khi nhập
+      document.addEventListener("DOMContentLoaded", function () {
+        const hoTenInput = document.getElementById("hoTen");
+        if (hoTenInput) {
+          hoTenInput.addEventListener("input", function () {
+            const name = this.value.trim() || "Chưa nhập tên";
+            updateTopbarName(name, "draft");
+          });
+        }
+      });
+
+      // Expand _collectFormData to send all editable fields
+      function _collectFormData() {
+        const genderEl = document.querySelector(
+          'input[name="gioiTinh"]:checked',
+        );
+        // Ethnic group: use text value from select, fallback to free-text input
+        const danTocEl = document.getElementById("danToc");
+        const danTocKhacEl = document.getElementById("danTocKhac");
+        let ethnicVal =
+          danTocEl?.value === "__other__"
+            ? danTocKhacEl?.value?.trim() || undefined
+            : danTocEl?.value?.trim() || undefined;
+
+        // Religion: use text value from select, fallback to free-text
+        const tonGiaoEl = document.getElementById("tonGiao");
+        const tonGiaoKhacEl = document.getElementById("tonGiaoKhac");
+        let religionVal =
+          tonGiaoEl?.value === "__other__"
+            ? tonGiaoKhacEl?.value?.trim() || undefined
+            : tonGiaoEl?.value?.trim() || undefined;
+
+        // Foreign language: combine name + level (handle "Khác")
+        const ngoaiNguEl = document.getElementById("ngoaiNgu");
+        const trinhDoNgoaiNguEl = document.getElementById("trinhDoNgoaiNgu");
+        const trinhDoNgoaiNguKhacEl = document.getElementById(
+          "trinhDoNgoaiNguKhac",
+        );
+        const ngoaiNguName = ngoaiNguEl?.value?.trim() || "";
+        const ngoaiNguLevelRaw = trinhDoNgoaiNguEl?.value?.trim() || "";
+        const ngoaiNguLevel =
+          ngoaiNguLevelRaw === "Khác"
+            ? trinhDoNgoaiNguKhacEl?.value?.trim() || ""
+            : ngoaiNguLevelRaw;
+        const foreignLangVal = ngoaiNguName
+          ? ngoaiNguLevel
+            ? `${ngoaiNguName} ${ngoaiNguLevel}`
+            : ngoaiNguName
+          : undefined;
+
+        // Edu level: handle "Khác"
+        const trinhDoVanHoaEl = document.getElementById("trinhDoVanHoa");
+        const trinhDoVanHoaKhacEl =
+          document.getElementById("trinhDoVanHoaKhac");
+        const generalEduVal =
+          trinhDoVanHoaEl?.value === "Khác"
+            ? trinhDoVanHoaKhacEl?.value?.trim() || "Khác"
+            : trinhDoVanHoaEl?.value || undefined;
+
+        // IT level: handle "Khác"
+        const tinHocEl = document.getElementById("tinHoc");
+        const tinHocKhacEl = document.getElementById("tinHocKhac");
+        const itLevelVal =
+          tinHocEl?.value === "Khác"
+            ? tinHocKhacEl?.value?.trim() || "Khác"
+            : tinHocEl?.value || undefined;
+
+        // Youth union: check radio
+        const doanYes =
+          document.querySelector('input[name="doanStatus"][value="yes"]')
+            ?.checked !== false;
+        const youthUnionDate = doanYes
+          ? _parseDMY(document.getElementById("ngayVaoDoan")?.value) || null
+          : null;
+        const youthUnionPlace = doanYes
+          ? document.getElementById("noiVaoDoan")?.value?.trim() || null
+          : null;
+
+        return {
+          full_name:
+            document.getElementById("hoTen")?.value?.trim() || undefined,
+          full_name_other:
+            document.getElementById("hoTenKhac")?.value?.trim() || undefined,
+          dob:
+            _parseDMY(document.getElementById("ngaySinh")?.value) || undefined,
+          gender: genderEl?.value || undefined,
+          ethnic_group_other: ethnicVal,
+          religion_other: religionVal,
+          religious_title:
+            document.getElementById("chucSac")?.value?.trim() || undefined,
+          birth_place_detail:
+            document.getElementById("birthPlaceDetail")?.value?.trim() ||
+            undefined,
+          hometown_detail:
+            document.getElementById("queQuan")?.value?.trim() || undefined,
+          current_address:
+            document.getElementById("noiO")?.value?.trim() || undefined,
+          occupation:
+            document.getElementById("ngheNghiep")?.value?.trim() || undefined,
+          edu_specialization:
+            document.getElementById("trinhDoChuyenMon")?.value?.trim() ||
+            undefined,
+          political_level_detail:
+            document.getElementById("trinhDoLyLuan")?.value || undefined,
+          foreign_languages: foreignLangVal,
+          it_level: itLevelVal,
+          youth_union_date: youthUnionDate,
+          youth_union_place: youthUnionPlace,
+          general_edu_level: generalEduVal,
+          self_assessment_text:
+            document.getElementById("tuNhanXet")?.value || undefined,
+          political_history_text:
+            document.getElementById("lichSuChinhTri")?.value?.trim() ||
+            undefined,
+          science_tech_qualifications:
+            document.getElementById("khoaHocCongNghe")?.value?.trim() ||
+            undefined,
+          highest_degree:
+            document.getElementById("hocViCaoNhat")?.value || undefined,
+          academic_title:
+            document.getElementById("hocHamCaoNhat")?.value || undefined,
+          ethnic_language:
+            document.getElementById("tiengDanToc")?.value?.trim() || undefined,
+          temporary_address:
+            document.getElementById("tamTru")?.value?.trim() || undefined,
+          rejoin_first_party_join_date:
+            _parseDMY(document.getElementById("ngayVaoDang1")?.value) || null,
+          rejoin_first_party_join_place:
+            document.getElementById("noiVaoDang1")?.value?.trim() || null,
+          rejoin_first_official_date:
+            _parseDMY(document.getElementById("ngayChinhThuc1")?.value) || null,
+        };
+      }
+
+      /* ─────────────────────────────────────────────────────────────────────────
+   SAVE DRAFT — wire up the "Lưu nháp" button
+───────────────────────────────────────────────────────────────────────── */
+      async function saveDraftAPI() {
+        const roleCode = _getUserRoleCode(API.currentUser());
+        const payload = _collectFormData();
+        try {
+          showToast("↑ Đang lưu…");
+
+          let savedData = null;
+          if (roleCode === "quan_chung") {
+            // Applicant keeps using /profiles/my/.
+            const savedResp = await API.put("/profiles/my/", payload);
+            savedData = savedResp?.data || savedResp || {};
+          } else {
+            // Officer/Admin: create or update draft directly in profiles list.
+            if (window._profileId) {
+              const updated = await API.patch(
+                `/profiles/${window._profileId}/`,
+                payload,
+              );
+              savedData = updated?.data || updated || {};
+            } else {
+              const created = await API.post("/profiles/", payload);
+              savedData = created?.data || created || {};
+            }
+          }
+
+          if (savedData?.id) window._profileId = savedData.id;
+
+          if (window._profileId) {
+            await _saveAllSections(window._profileId);
+            // Reload sections so row IDs are refreshed — prevents duplicate
+            // POSTs on subsequent saves for rows that were just created.
+            await _loadAllSections(window._profileId);
+          }
+
+          // Keep officer/admin list in sync immediately after saving draft.
+          if (
+            roleCode !== "quan_chung" &&
+            typeof _loadProfileList === "function"
+          ) {
+            _loadProfileList();
+          }
+
+          showToast("✓ Đã lưu – " + new Date().toLocaleTimeString("vi-VN"));
+        } catch (e) {
+          showToast("✗ Lưu thất bại: " + e.message);
+        }
+      }
+
+      // _collectFormData defined above in _loadMyProfile section
+
+      /* ─────────────────────────────────────────────────────────────────────────
+   WORD EXPORT — call backend instead of client-side JSZip build
+───────────────────────────────────────────────────────────────────────── */
+      async function exportWordAPI(profileId, sections) {
+        profileId = profileId || window._profileId;
+        if (!profileId) {
+          showToast("✗ Chưa xác định hồ sơ");
+          return;
+        }
+        try {
+          showToast("⏳ Đang tạo file Word…");
+          const res = await API.post(
+            `/exports/word/${profileId}/`,
+            { sections: sections || null, template_name: "Mẫu 2-KNĐ" },
+            { raw: true },
+          );
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          const blob = await res.blob();
+          const cd = res.headers.get("content-disposition") || "";
+          const fn =
+            (cd.match(/filename="?([^";\n]+)"?/) || [])[1] ||
+            `SoYeuLyLich_${profileId}.docx`;
+          downloadBlob(blob, fn);
+          showToast("✓ Đã xuất Word thành công");
+        } catch (e) {
+          showToast("✗ Xuất Word thất bại: " + e.message);
+        }
+      }
+
+      /* ─────────────────────────────────────────────────────────────────────────
+   NOTIFICATION SEND — wire up the send button
+───────────────────────────────────────────────────────────────────────── */
+      async function sendNotificationAPI(profileId, templateKey, channel) {
+        try {
+          await API.post("/notifications/send/", {
+            profile_id: profileId,
+            template_code: templateKey,
+            channel: channel || "app",
+          });
+          showToast("📨 Đã gửi thông báo thành công");
+          _loadNotificationStats();
+        } catch (e) {
+          showToast("✗ Gửi thất bại: " + e.message);
+        }
+      }
+
+      /* ─────────────────────────────────────────────────────────────────────────
+   WORKFLOW ACTION — approve / reject / return
+───────────────────────────────────────────────────────────────────────── */
+      async function workflowAction(profileId, action, note) {
+        try {
+          await API.post(`/profiles/${profileId}/workflow/`, {
+            action,
+            note: note || "",
+          });
+          showToast(`✓ Hồ sơ: ${_actionLabel(action)}`);
+          _loadDashboard();
+        } catch (e) {
+          showToast("✗ " + e.message);
+        }
+      }
+
+      /* ─────────────────────────────────────────────────────────────────────────
+   LOGOUT
+───────────────────────────────────────────────────────────────────────── */
+      async function apiLogout() {
+        await API.logout();
+        showToast("Đã đăng xuất");
+        setTimeout(_showLoginModal, 600);
+      }
+
+      /* ─────────────────────────────────────────────────────────────────────────
+   HELPERS
+───────────────────────────────────────────────────────────────────────── */
+      function _esc(s) {
+        return String(s || "")
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;");
+      }
+      function _setVal(id, v) {
+        const el = document.getElementById(id);
+        if (el && v != null) el.value = v;
+      }
+      function _fmtDate(iso) {
+        if (!iso) return "";
+        try {
+          return new Date(iso).toLocaleString("vi-VN", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+          });
+        } catch {
+          return iso;
+        }
+      }
+      // Convert dd/mm/yyyy text to yyyy-mm-dd ISO (returns null if invalid)
+      function _parseDMY(str) {
+        if (!str) return null;
+        const m = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/.exec(str.trim());
+        if (!m) return null;
+        return `${m[3]}-${m[2].padStart(2, "0")}-${m[1].padStart(2, "0")}`;
+      }
+      // Convert yyyy-mm-dd ISO to dd/mm/yyyy display
+      function _isoToDMY(iso) {
+        if (!iso) return "";
+        const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(iso);
+        return m ? `${m[3]}/${m[2]}/${m[1]}` : iso;
+      }
+      function _statusLabel(s) {
+        return (
+          {
+            draft: "Đang kê khai", // Match backend model
+            submitted: "Đã nộp", // Match backend model
+            pending: "Đang xem xét", // Match backend model
+            under_review: "Đang thẩm định", // Match backend model
+            returned: "Trả lại", // Match backend model
+            verifying: "Đang xác minh", // Match backend model
+            approved: "Đã phê duyệt", // Match backend model
+            completed: "Hoàn thiện", // Match backend model
+            rejected: "Từ chối", // Match backend model
+            withdrawn: "Rút hồ sơ", // Match backend model
+          }[s] || s
+        );
+      }
+      function _actionLabel(a) {
+        return (
+          {
+            approve: "Đã phê duyệt",
+            reject: "Từ chối",
+            return: "Trả lại",
+            submit: "Đã nộp",
+            start_review: "Bắt đầu thẩm định",
+            verify: "Đã xác minh",
+            archive: "Đã lưu trữ",
+          }[a] || a
+        );
+      }
+
+      /* ─────────────────────────────────────────────────────────────────────────
+   BOOT — run on DOMContentLoaded
+   If a valid access token exists → silently restore session.
+   Otherwise → show login modal.
+───────────────────────────────────────────────────────────────────────── */
+      document.addEventListener("DOMContentLoaded", () => {
+        const user = API.currentUser();
+        const accessToken = API.token.access();
+        if (user && accessToken) {
+          // Fetch fresh permissions from server before restoring session
+          API.get("/auth/me/")
+            .then((resp) => {
+              const fresh = resp.data || resp;
+              const stored = API.currentUser() || {};
+              localStorage.setItem(
+                "api_user",
+                JSON.stringify({
+                  ...stored,
+                  is_superuser: fresh.is_superuser || false,
+                  permissions: fresh.permissions || stored.permissions,
+                }),
+              );
+            })
+            .catch(() => {
+              // Token expired or network error — proceed with cached user
+            })
+            .finally(() => {
+              const currentUser = API.currentUser();
+              if (currentUser && currentUser.is_superuser) {
+                // Superuser: show login form with a shortcut to Django admin
+                // Don't auto-redirect — user may want to switch account
+                _showLoginModal();
+                const adminBase = API.BASE.replace(/\/api\/v1\/?$/, "");
+                const tok = API.token.access();
+                const banner = document.createElement("div");
+                banner.style.cssText =
+                  "background:#FFF7ED;border:1.5px solid #FED7AA;border-radius:9px;padding:14px;margin-bottom:16px";
+                banner.innerHTML = `
+                <div style="font-size:12px;color:#92400E;margin-bottom:10px;text-align:center">
+                  Đang có phiên đăng nhập: <b>${currentUser.name || "Superadmin"}</b>
+                </div>
+                <button onclick="window.location.href='${adminBase}/api/v1/auth/admin-session/?token=${encodeURIComponent(tok)}'"
+                  style="width:100%;padding:9px;background:#7C3AED;color:#fff;border:none;border-radius:7px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:6px">
+                  ⚙ Vào Django Admin
+                </button>
+                <button onclick="API.token.clear();this.parentElement.remove()"
+                  style="width:100%;background:none;border:none;color:#6B7280;font-size:11px;cursor:pointer;font-family:inherit;text-decoration:underline;padding:2px">
+                  Đăng xuất · dùng tài khoản khác
+                </button>`;
+                const modalInner = document.querySelector(
+                  "#apiLoginModal > div",
+                );
+                if (modalInner)
+                  modalInner.insertBefore(banner, modalInner.firstChild);
+              } else {
+                _onLoginSuccess({});
+              }
+            });
+        } else {
+          // Show login after a brief moment so the UI renders first
+          setTimeout(_showLoginModal, 200);
+        }
+      });
+
+      // Override the demo saveDraft with the API-backed version when logged in
+      const _origSaveDraft = saveDraft;
+      window.saveDraft = function () {
+        const roleCode = _getUserRoleCode(API.currentUser());
+        const hasToken = !!API.token.access();
+
+        if (!hasToken) {
+          // Keep demo behaviour only when not authenticated.
+          _origSaveDraft();
+          return;
+        }
+
+        if (
+          roleCode === "quan_chung" ||
+          roleCode === "can_bo_bxd" ||
+          roleCode === "admin"
+        ) {
+          saveDraftAPI();
+          return;
+        }
+
+        showToast("⚠ Vai trò hiện tại chưa được cấu hình để lưu hồ sơ.");
+      };
+
+      // Override word export if logged in
+      window.exportSingleWordAPI = exportWordAPI;
+
+      // ===== ADMIN RESPONSIVE TAB STRIP =====
+      function updateAdminTabsVisibility() {
+        const mobileStrip = document.getElementById("adminTabsMobile");
+        const desktopTabs = document.getElementById("adminTabsDesktop");
+        if (!mobileStrip || !desktopTabs) return;
+        const isMobile = window.innerWidth <= 900;
+        mobileStrip.style.display = isMobile ? "flex" : "none";
+        desktopTabs.style.display = isMobile ? "none" : "flex";
+      }
+      // Run on load and on resize
+      window.addEventListener("resize", updateAdminTabsVisibility);
+      // Also run after admin UI is built
+      const _origSwitchRole =
+        typeof switchRole === "function" ? switchRole : null;
+      document.addEventListener("DOMContentLoaded", updateAdminTabsVisibility);
+      setTimeout(updateAdminTabsVisibility, 100);
+
+      // ===== MOBILE SIDEBAR TOGGLE =====
+      function toggleSidebar() {
+        const aside = document.querySelector("aside");
+        const overlay = document.getElementById("sidebarOverlay");
+        if (!aside) return;
+        const isOpen = aside.classList.toggle("mobile-open");
+        overlay.classList.toggle("open", isOpen);
+        document.body.style.overflow = isOpen ? "hidden" : "";
+      }
+      // Close sidebar when a nav item is tapped on mobile
+      document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll(".nav-item").forEach(function (el) {
+          el.addEventListener("click", function () {
+            if (window.innerWidth <= 768) {
+              const aside = document.querySelector("aside");
+              const overlay = document.getElementById("sidebarOverlay");
+              if (aside) aside.classList.remove("mobile-open");
+              if (overlay) overlay.classList.remove("open");
+              document.body.style.overflow = "";
+            }
+          });
+        });
+      });
+
+      // ===== TOAST =====
+      function showToast(msg, dur = 2200) {
+        const t = document.getElementById("toast");
+        if (!t) return;
+        t.textContent = msg;
+        t.classList.add("show");
+        setTimeout(() => t.classList.remove("show"), dur);
+      }
+      function saveDraft() {
+        showToast("✓ Đã lưu nháp – " + new Date().toLocaleTimeString("vi-VN"));
+      }
+      let autoSaveTimer;
+      document.addEventListener("input", (e) => {
+        if (e.target.closest("#memberMain")) {
+          clearTimeout(autoSaveTimer);
+          autoSaveTimer = setTimeout(() => showToast("↑ Tự động lưu…"), 4000);
+        }
+      });
+
+      // Update has-content + row-has-note state live when officer types a field note
+      document.addEventListener("input", (e) => {
+        const ta = e.target;
+        if (!ta.classList.contains("fn-field-note-ta")) return;
+        const hasContent = ta.value.trim().length > 0;
+        ta.classList.toggle("has-content", hasContent);
+        const nd = ta.closest(".fn-field-note");
+        if (nd) nd.classList.toggle("has-note", hasContent);
+        const row = ta.closest(".field-row");
+        if (row) row.classList.toggle("row-has-note", hasContent);
+      });
+
+      // ===== AI CHECK =====
+      // Populated per-profile when AI scan runs; empty until then.
+      let aiCheckData = [];
+      const _aiCheckSections = [
+        "Phần A – Sơ lược lý lịch",
+        "Phần B – Lịch sử bản thân",
+        "Phần C – Công tác, chức vụ",
+        "Phần D – Đặc điểm lịch sử",
+        "Phần E – Đào tạo, bồi dưỡng",
+        "Phần F – Đi nước ngoài",
+        "Phần G – Khen thưởng",
+        "Phần H – Kỷ luật",
+        "Phần I – Hoàn cảnh gia đình",
+        "Phần J – Tự nhận xét",
+      ];
+      function _buildAICheckSections() {
+        return _aiCheckSections.map((part) => ({
+          part,
+          status: "ok",
+          badge: "Hợp lệ",
+          issues: [],
+        }));
+      }
+      function openAICheck() {
+        document.getElementById("aiModal").classList.add("open");
+        document.getElementById("aiScanWrap").style.display = "block";
+        document.getElementById("aiResults").style.display = "none";
+        document.getElementById("aiModalFoot").style.display = "none";
+        const bar = document.getElementById("aiScanBar");
+        bar.style.animation = "none";
+        void bar.offsetWidth;
+        bar.style.animation = "scanProgress 2.5s ease forwards";
+        const labels = [
+          "Đọc dữ liệu phần A…",
+          "Kiểm tra tính liên tiếp thời gian…",
+          "Đối chiếu công tác…",
+          "Xác thực dữ liệu gia đình…",
+          "Kiểm tra đào tạo…",
+          "Tổng hợp kết quả…",
+        ];
+        let i = 0;
+        const lbl = document.getElementById("aiScanLabel");
+        const iv = setInterval(() => {
+          lbl.textContent = labels[i++];
+          if (i >= labels.length) clearInterval(iv);
+        }, 420);
+        setTimeout(() => {
+          // Build fresh section list for this profile scan if not already populated
+          if (!aiCheckData.length) aiCheckData = _buildAICheckSections();
+          document.getElementById("aiScanWrap").style.display = "none";
+          renderAIResults();
+          document.getElementById("aiResults").style.display = "block";
+          document.getElementById("aiModalFoot").style.display = "flex";
+        }, 2600);
+      }
+      function renderAIResults() {
+        const totalErr = aiCheckData.reduce(
+          (a, r) => a + (r.status === "err" ? r.issues.length : 0),
+          0,
+        );
+        const totalWrn = aiCheckData.reduce(
+          (a, r) => a + (r.status === "wrn" ? r.issues.length : 0),
+          0,
+        );
+        const okCount = aiCheckData.filter((r) => r.status === "ok").length;
+        const score =
+          aiCheckData.length === 0
+            ? 0
+            : totalErr === 0
+              ? totalWrn <= 1
+                ? 94
+                : 80
+              : 62;
+        const sc = score >= 85 ? "high" : score >= 70 ? "mid" : "low";
+        let html = `<div style="text-align:center;margin-bottom:20px">
+    <div class="ai-score-circle ${sc}"><div class="ai-score-num">${score}%</div><div class="ai-score-sub">Điểm hồ sơ</div></div>
+    <div style="display:flex;gap:16px;justify-content:center;font-size:13px">
+      <span style="color:#C8102E;font-weight:700">● ${totalErr} lỗi cứng</span>
+      <span style="color:#C47800;font-weight:700">● ${totalWrn} cảnh báo</span>
+      <span style="color:#1B7A50;font-weight:700">● ${okCount} phần hợp lệ</span>
+    </div></div>`;
+        aiCheckData.forEach((r, i) => {
+          const ic =
+            r.status === "ok" ? "ok" : r.status === "err" ? "err" : "wrn";
+          const icon = r.status === "ok" ? "✓" : r.status === "err" ? "✕" : "⚠";
+          html += `<div class="ai-section-result">
+      <div class="ai-sec-head" onclick="toggleAISec(${i})">
+        <div class="ai-sec-icon ${ic}">${icon}</div>
+        <div class="ai-sec-name">${r.part}</div>
+        <span class="ai-sec-badge ${ic}">${r.badge}</span>
+        <span style="color:#A0AABF;margin-left:8px;font-size:12px" id="ai-chev-${i}">▾</span>
+      </div>
+      <div class="ai-sec-body ${r.issues.length ? "open" : ""}" id="ai-body-${i}">
+        ${
+          r.issues.length === 0
+            ? '<div style="font-size:12.5px;color:#1B7A50;">✓ Không có vấn đề nào</div>'
+            : r.issues
+                .map(
+                  (iss) =>
+                    `<div class="ai-issue"><div class="ai-issue-dot" style="background:${iss.color}"></div><span>${iss.text}</span></div>`,
+                )
+                .join("")
+        }
+      </div></div>`;
+        });
+        document.getElementById("aiResults").innerHTML = html;
+      }
+      function toggleAISec(i) {
+        const b = document.getElementById("ai-body-" + i);
+        const c = document.getElementById("ai-chev-" + i);
+        b.classList.toggle("open");
+        if (c) c.textContent = b.classList.contains("open") ? "▴" : "▾";
+      }
+      function closeAIModal() {
+        document.getElementById("aiModal").classList.remove("open");
+      }
+      function goToFirstError() {
+        const firstErr = aiCheckData.findIndex((r) => r.status === "err");
+        closeAIModal();
+        if (firstErr >= 0) {
+          showSection(firstErr);
+          showToast(`→ ${aiCheckData[firstErr].part} – có lỗi cần sửa`);
+        } else showToast("Không có lỗi cứng nào.");
+      }
+
+      // ===== NOTIFICATIONS =====
+      const notifTpls = {
+        tplReturn:
+          "Kính gửi [HỌ TÊN],\n\nHồ sơ lý lịch của bạn cần bổ sung thêm thông tin.\n\nVui lòng đăng nhập và cập nhật theo hướng dẫn.\n\nHạn bổ sung: [HẠN CHÓT]",
+        tplApprove:
+          "Kính gửi [HỌ TÊN],\n\nHồ sơ lý lịch đã được phê duyệt bước đầu.\n\nHồ sơ đang chuyển sang bước Xác minh lý lịch.",
+        tplRemind:
+          "Kính gửi [HỌ TÊN],\n\nBạn chưa nộp hồ sơ lý lịch sau 7 ngày kể từ khi được cấp tài khoản.\n\nVui lòng đăng nhập và hoàn thiện hồ sơ.",
+        tplNew:
+          "Kính gửi [HỌ TÊN],\n\nTài khoản kê khai lý lịch Mẫu 2-KNĐ đã được tạo.\n\nLink: https://lylich.xanhanbe.gov.vn\nCCCD: [CCCD]\nMật khẩu: Nhập OTP khi đăng nhập lần đầu.",
+      };
+      let currentTpl = "tplReturn";
+      function selectTpl(card, key) {
+        document
+          .querySelectorAll(".notif-tpl-card")
+          .forEach((c) => c.classList.remove("selected"));
+        card.classList.add("selected");
+        currentTpl = key;
+        updateNotifPreview();
+      }
+      function switchChannel(ch, tab) {
+        document
+          .querySelectorAll(".channel-tab")
+          .forEach((t) => t.classList.remove("active"));
+        tab.classList.add("active");
+        updateNotifPreview();
+      }
+      function updateNotifPreview() {
+        const txt = notifTpls[currentTpl] || "";
+        const el = document.getElementById("notifPreviewText");
+        const name =
+          document.getElementById("detailName")?.textContent ||
+          document.querySelector(".notif-target-name")?.textContent ||
+          "[HỌ TÊN]";
+        if (el)
+          el.innerHTML = txt
+            .replace("[HỌ TÊN]", `<strong>${_esc(name)}</strong>`)
+            .replace("[HẠN CHÓT]", "<strong>[hạn chót]</strong>")
+            .replace("[CCCD]", "[CCCD]")
+            .replace(/\n/g, "<br>");
+      }
+      async function sendNotification() {
+        const name =
+          document.getElementById("detailName")?.textContent ||
+          document.querySelector(".notif-target-name")?.textContent ||
+          "người dùng";
+        const body = notifTpls[currentTpl] || "";
+        const channel =
+          document.querySelector(".channel-tab.active")?.dataset?.channel ||
+          "app";
+        if (!_currentDetailUserId) {
+          // No active profile — send to all in matching group via bulk
+          showToast("⚠ Mở hồ sơ trước khi gửi thông báo đơn lẻ");
+          return;
+        }
+        try {
+          await API.post("/notifications/send/", {
+            recipient_id: _currentDetailUserId,
+            profile_id: _currentDetailProfileId,
+            channel,
+            type: currentTpl,
+            subject: "Thông báo hồ sơ lý lịch",
+            body: body
+              .replace("[HỌ TÊN]", name)
+              .replace("[HẠN CHÓT]", "")
+              .replace("[CCCD]", ""),
+          });
+          document.getElementById("notifModal")?.classList.remove("open");
+          showToast("📨 Đã gửi thông báo thành công");
+          addActivity(
+            `📨 Gửi thông báo cho <strong>${name}</strong> – thành công`,
+          );
+          _loadNotificationStats();
+        } catch (e) {
+          showToast(`✗ Gửi thất bại: ${e.message}`);
+        }
+      }
+
+      async function sendBulkNotif() {
+        const checked = document.querySelectorAll(
+          "#pgNotif input[type=checkbox]:checked",
+        );
+        if (!checked.length) {
+          alert("Chọn ít nhất một nhóm.");
+          return;
+        }
+        const body = notifTpls[currentTpl] || "";
+        const channel =
+          document.querySelector(".channel-tab.active")?.dataset?.channel ||
+          "app";
+        const group = checked[0]?.value || "all_draft";
+        try {
+          const resp = await API.post("/notifications/bulk-send/", {
+            group,
+            channel,
+            body,
+          });
+          const sent = (resp.data || resp).sent_count ?? checked.length;
+          showToast(`📨 Đã gửi hàng loạt cho ${sent} người`);
+          addActivity(
+            `📨 Gửi nhắc nhở hàng loạt – nhóm ${group} (${sent} người)`,
+          );
+          _loadNotificationStats();
+        } catch (e) {
+          showToast(`✗ Gửi thất bại: ${e.message}`);
+        }
+      }
+    

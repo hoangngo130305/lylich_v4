@@ -1,8 +1,12 @@
+import logging
 from rest_framework import generics, permissions
 from rest_framework.response import Response
+from rest_framework.exceptions import ValidationError
 from .models import FamilyMember
 from .serializers import FamilyMemberSerializer
 from apps.accounts.permissions import IsOwnerOrOfficer, IsOfficerOrApplicant
+
+logger = logging.getLogger(__name__)
 
 
 class FamilyMemberListCreateView(generics.ListCreateAPIView):
@@ -16,10 +20,24 @@ class FamilyMemberListCreateView(generics.ListCreateAPIView):
                 profile_id=profile_id,
                 profile__user=self.request.user,
                 deleted_at__isnull=True
-            ).order_by('sort_order')
+            )
         return FamilyMember.objects.filter(
             profile_id=profile_id, deleted_at__isnull=True
-        ).order_by('sort_order')
+        )
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if not serializer.is_valid():
+            logger.error(
+                "[FAM_400] profile_id=%s | data=%s | errors=%s",
+                kwargs.get('profile_id'), dict(request.data), serializer.errors
+            )
+            raise ValidationError(serializer.errors)
+        self.perform_create(serializer)
+        from rest_framework import status
+        from rest_framework.response import Response
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
     def perform_create(self, serializer):
         serializer.save(profile_id=self.kwargs['profile_id'], updated_by=self.request.user)

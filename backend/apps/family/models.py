@@ -1,10 +1,13 @@
 from django.db import models
+from django.db.models import Case, When, Value, IntegerField
 
 
 class FamilyMember(models.Model):
     class Relationship(models.TextChoices):
         CHA_RUOT            = 'cha_ruot',            'Cha ruột'
+        CHA_DUONG           = 'cha_duong',           'Cha dượng'
         ME_RUOT             = 'me_ruot',             'Mẹ ruột'
+        ME_KE               = 'me_ke',               'Mẹ kế'
         ANH_CHI_EM_RUOT     = 'anh_chi_em_ruot',     'Anh/Chị/Em ruột'
         VO_CHONG            = 'vo_chong',            'Vợ/Chồng'
         CHA_CHONG_VO        = 'cha_chong_vo',        'Cha chồng/vợ'
@@ -40,9 +43,10 @@ class FamilyMember(models.Model):
     hometown               = models.CharField(max_length=500, null=True, blank=True)
     current_address        = models.CharField(max_length=500, null=True, blank=True)
 
-    ethnic_group_text = models.CharField(max_length=100, null=True, blank=True)
-    religion_text     = models.CharField(max_length=100, null=True, blank=True)
-    nationality       = models.CharField(max_length=100, null=True, blank=True)
+    ethnic_group_text  = models.CharField(max_length=100, null=True, blank=True)
+    religion_text      = models.CharField(max_length=100, null=True, blank=True)
+    religious_rank_text = models.CharField(max_length=100, null=True, blank=True)
+    nationality        = models.CharField(max_length=100, null=True, blank=True)
 
     occupation = models.CharField(max_length=255, null=True, blank=True)
     workplace  = models.CharField(max_length=500, null=True, blank=True)
@@ -79,7 +83,19 @@ class FamilyMember(models.Model):
         db_table = 'family_members'
         verbose_name = 'Thành viên gia đình'
         verbose_name_plural = 'Thành viên gia đình'
-        ordering = ['sort_order', 'relationship']
+        ordering = [
+            Case(
+                When(relationship='cha_ruot', then=Value(1)),
+                When(relationship='cha_duong', then=Value(2)),
+                When(relationship='me_ruot', then=Value(3)),
+                When(relationship='me_ke', then=Value(4)),
+                When(relationship='anh_chi_em_ruot', then=Value(5)),
+                When(relationship='vo_chong', then=Value(6)),
+                default=Value(99),
+                output_field=IntegerField(),
+            ),
+            'sort_order'
+        ]
         indexes = [
             models.Index(fields=['profile', 'relationship']),
             models.Index(fields=['full_name']),
