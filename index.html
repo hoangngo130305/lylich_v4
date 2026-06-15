@@ -18491,7 +18491,9 @@
                     if (f.religion_text)
                       lines.push(`Tôn giáo: ${_esc(f.religion_text)}`);
                     if (f.religious_rank_text)
-                      lines.push(`Chức sắc tôn giáo: ${_esc(f.religious_rank_text)}`);
+                      lines.push(
+                        `Chức sắc tôn giáo: ${_esc(f.religious_rank_text)}`,
+                      );
                     if (f.occupation)
                       lines.push(`Nghề nghiệp: ${_esc(f.occupation)}`);
                     if (f.relationship === "anh_chi_em_ruot")
