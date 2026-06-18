@@ -9021,3 +9021,49 @@ WARNING 2026-06-15 17:35:19,601 log 14628 20292 Unauthorized: /api/v1/auth/me/
 WARNING 2026-06-15 17:35:19,602 basehttp 14628 20292 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
 WARNING 2026-06-15 17:35:44,660 log 14628 11472 Unauthorized: /api/v1/auth/me/
 WARNING 2026-06-15 17:35:44,660 basehttp 14628 11472 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-06-16 07:56:34,536 log 25192 13420 Unauthorized: /api/v1/auth/me/
+WARNING 2026-06-16 07:56:34,538 basehttp 25192 13420 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-06-16 07:56:50,379 log 25192 15976 Not Found: /favicon.ico
+WARNING 2026-06-16 07:56:50,380 basehttp 25192 15976 "GET /favicon.ico HTTP/1.1" 404 5355
+WARNING 2026-06-16 07:59:22,950 log 25192 21336 Unauthorized: /api/v1/auth/login/
+WARNING 2026-06-16 07:59:22,951 basehttp 25192 21336 "POST /api/v1/auth/login/ HTTP/1.1" 401 107
+WARNING 2026-06-16 13:46:31,761 log 24512 20584 Unauthorized: /api/v1/auth/me/
+WARNING 2026-06-16 13:46:31,763 basehttp 24512 20584 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-06-16 13:47:24,820 log 24512 18488 Unauthorized: /api/v1/auth/me/
+WARNING 2026-06-16 13:47:24,821 basehttp 24512 18488 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-06-16 13:48:26,410 log 24512 19952 Not Found: /favicon.ico
+WARNING 2026-06-16 13:48:26,410 basehttp 24512 19952 "GET /favicon.ico HTTP/1.1" 404 5355
+WARNING 2026-06-16 13:48:57,827 basehttp 24512 24096 "GET /admin/accounts/officer/ HTTP/1.1" 403 135
+WARNING 2026-06-16 13:48:59,547 basehttp 24512 24096 "GET /admin/accounts/officer/ HTTP/1.1" 403 135
+WARNING 2026-06-16 13:49:00,835 basehttp 24512 24096 "GET /admin/accounts/officer/101/change/ HTTP/1.1" 403 135
+WARNING 2026-06-16 13:49:05,797 basehttp 24512 24096 "GET /admin/accounts/user/ HTTP/1.1" 403 135
+WARNING 2026-06-16 13:52:26,765 basehttp 22380 13228 "GET /admin/accounts/user/ HTTP/1.1" 403 135
+WARNING 2026-06-16 13:52:27,963 basehttp 22380 13228 "GET /admin/accounts/user/ HTTP/1.1" 403 135
+WARNING 2026-06-16 13:52:36,481 basehttp 22380 13228 "GET /admin/accounts/user/ HTTP/1.1" 403 135
+WARNING 2026-06-16 13:52:37,118 basehttp 22380 13228 "GET /admin/accounts/user/ HTTP/1.1" 403 135
+WARNING 2026-06-16 13:52:37,307 basehttp 22380 13228 "GET /admin/accounts/user/ HTTP/1.1" 403 135
+WARNING 2026-06-16 13:52:37,463 basehttp 22380 13228 "GET /admin/accounts/user/ HTTP/1.1" 403 135
+WARNING 2026-06-16 15:01:43,627 log 22380 22436 Unauthorized: /api/v1/auth/me/
+WARNING 2026-06-16 15:01:43,630 basehttp 22380 22436 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-06-16 15:01:46,057 log 22380 14940 Unauthorized: /api/v1/verification/stats/
+WARNING 2026-06-16 15:01:46,058 basehttp 22380 14940 "GET /api/v1/verification/stats/ HTTP/1.1" 401 291
+WARNING 2026-06-16 16:57:28,898 log 22380 6664 Unauthorized: /api/v1/auth/me/
+WARNING 2026-06-16 16:57:28,899 basehttp 22380 6664 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-06-16 16:57:45,389 log 22380 520 Unauthorized: /api/v1/auth/me/
+WARNING 2026-06-16 16:57:45,391 basehttp 22380 520 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-06-17 08:52:16,887 log 12340 14236 Unauthorized: /api/v1/auth/me/
+WARNING 2026-06-17 08:52:16,889 basehttp 12340 14236 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-06-17 08:52:29,597 log 12340 1732 Unauthorized: /api/v1/auth/me/
+WARNING 2026-06-17 08:52:29,598 basehttp 12340 1732 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-06-18 08:53:38,965 log 3088 17248 Unauthorized: /api/v1/auth/me/
+WARNING 2026-06-18 08:53:38,968 basehttp 3088 17248 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-06-18 08:53:51,800 log 3088 13676 Unauthorized: /api/v1/auth/me/
+WARNING 2026-06-18 08:53:51,802 basehttp 3088 13676 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-06-18 08:55:11,178 log 3088 7964 Bad Request: /api/v1/auth/account-requests/
+WARNING 2026-06-18 08:55:11,183 basehttp 3088 7964 "POST /api/v1/auth/account-requests/ HTTP/1.1" 400 521
+WARNING 2026-06-18 09:04:35,317 log 3088 12224 Bad Request: /api/v1/auth/account-requests/
+WARNING 2026-06-18 09:04:35,318 basehttp 3088 12224 "POST /api/v1/auth/account-requests/ HTTP/1.1" 400 519
+WARNING 2026-06-18 10:26:44,111 log 25296 3468 Unauthorized: /api/v1/verification/stats/
+WARNING 2026-06-18 10:26:44,112 basehttp 25296 3468 "GET /api/v1/verification/stats/ HTTP/1.1" 401 291
+WARNING 2026-06-18 10:26:54,448 log 25296 1860 Unauthorized: /api/v1/auth/me/
+WARNING 2026-06-18 10:26:54,449 basehttp 25296 1860 "GET /api/v1/auth/me/ HTTP/1.1" 401 291

@@ -1065,12 +1065,13 @@
         color: var(--text);
         background: transparent;
         resize: none;
-        height: 38px;
+        min-height: 38px;
+        height: auto;
         overflow: hidden;
         line-height: 1.5;
       }
       .td-dienbien textarea:focus {
-        height: 72px;
+        min-height: 72px;
         background: #fffef5;
         border-bottom: 2px solid var(--crimson);
         box-shadow: none;
@@ -1502,11 +1503,27 @@
         background: var(--off-white);
         font-size: 11px;
         color: var(--muted);
+        min-height: 148px;
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
       }
       .photo-upload:hover {
         border-color: var(--crimson);
         background: var(--crimson-xl);
         color: var(--crimson);
+      }
+      .photo-upload.has-photo {
+        padding: 0;
+        border-style: solid;
+        border-color: var(--border);
+      }
+      .photo-upload.has-photo:hover {
+        border-color: var(--crimson);
+        background: transparent;
       }
       .photo-icon {
         font-size: 24px;
@@ -5634,16 +5651,36 @@
                     </div>
                   </div>
                   <div>
+                    <input
+                      type="file"
+                      id="photoFileInput"
+                      accept="image/jpeg,image/png,image/webp"
+                      style="display:none"
+                      onchange="uploadProfilePhoto(this)"
+                    />
                     <div
                       class="photo-upload"
-                      onclick="alert('Tính năng upload ảnh 2×3cm')"
+                      id="photoUploadBox"
+                      onclick="document.getElementById('photoFileInput').click()"
+                      title="Click để tải ảnh lên"
                     >
-                      <div class="photo-icon">📷</div>
-                      <div>Ảnh 2×3</div>
-                      <div style="font-size: 10px; color: var(--hint)">
-                        Click để tải lên
+                      <img
+                        id="photoPreviewImg"
+                        alt="Ảnh hồ sơ"
+                        style="display:none; width:100%; height:100%; object-fit:cover; position:absolute; inset:0;"
+                      />
+                      <div id="photoPlaceholder">
+                        <div class="photo-icon">📷</div>
+                        <div>Ảnh 2×3</div>
+                        <div style="font-size: 10px; color: var(--hint)">
+                          Click để tải lên
+                        </div>
                       </div>
                     </div>
+                    <div
+                      id="photoUploadStatus"
+                      style="font-size:10px; text-align:center; margin-top:4px; color:var(--muted)"
+                    ></div>
                   </div>
                 </div>
               </div>
@@ -7216,8 +7253,17 @@
               >
             </div>
 
+            <!-- Quick-jump bar for section I -->
+            <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px">
+              <button class="add-row-btn" style="width:auto;padding:6px 14px;font-size:12px" onclick="document.getElementById('fam-ruot').scrollIntoView({behavior:'smooth',block:'start'})">↓ Gia đình ruột</button>
+              <button class="add-row-btn" style="width:auto;padding:6px 14px;font-size:12px" onclick="document.getElementById('fam-ongba-minh').scrollIntoView({behavior:'smooth',block:'start'})">↓ Ông bà bên mình</button>
+              <button class="add-row-btn" style="width:auto;padding:6px 14px;font-size:12px" onclick="document.getElementById('fam-vo-chong').scrollIntoView({behavior:'smooth',block:'start'})">↓ Gia đình chồng/vợ</button>
+              <button class="add-row-btn" style="width:auto;padding:6px 14px;font-size:12px" onclick="document.getElementById('fam-ongba-vo').scrollIntoView({behavior:'smooth',block:'start'})">↓ Ông bà bên chồng/vợ</button>
+            </div>
+
             <!-- Gia đình ruột -->
             <div
+              id="fam-ruot"
               style="
                 font-size: 14px;
                 font-weight: 800;
@@ -7265,6 +7311,7 @@
             <div id="famBlocksSpouse"></div>
 
             <div
+              id="fam-ongba-minh"
               style="
                 font-size: 14px;
                 font-weight: 800;
@@ -7281,6 +7328,7 @@
             <div id="famBlocks2"></div>
 
             <div
+              id="fam-vo-chong"
               style="
                 font-size: 14px;
                 font-weight: 800;
@@ -7306,6 +7354,7 @@
             </div>
 
             <div
+              id="fam-ongba-vo"
               style="
                 font-size: 14px;
                 font-weight: 800;
@@ -7646,15 +7695,31 @@
                 <span style="font-size: 16px">👤</span>
                 <span class="pv-card-title">Phần A – Sơ lược lý lịch</span>
               </div>
-              <div class="pv-card-body pv-grid">
-                <div class="pv-field pv-full">
-                  <div class="pv-label">Họ và tên</div>
-                  <div
-                    class="pv-value"
-                    id="pv-full_name"
-                    style="font-size: 16px; font-weight: 700"
-                  ></div>
+              <div class="pv-card-body">
+                <!-- Name + Photo row -->
+                <div style="display:flex; gap:16px; align-items:flex-start; margin-bottom:14px; padding-bottom:12px; border-bottom:1px solid var(--border);">
+                  <div style="flex:1;">
+                    <div class="pv-label">Họ và tên</div>
+                    <div
+                      class="pv-value"
+                      id="pv-full_name"
+                      style="font-size: 16px; font-weight: 700"
+                    ></div>
+                  </div>
+                  <div style="flex-shrink:0; text-align:center;">
+                    <img
+                      id="pvPhotoImg"
+                      alt="Ảnh hồ sơ"
+                      style="display:none; width:88px; height:118px; object-fit:cover; border-radius:5px; border:1.5px solid var(--border);"
+                    />
+                    <div
+                      id="pvPhotoEmpty"
+                      style="width:88px; height:118px; border:1.5px dashed var(--border); border-radius:5px; display:flex; align-items:center; justify-content:center; color:var(--muted); font-size:10px; text-align:center; background:var(--off-white);"
+                    >Chưa có ảnh</div>
+                  </div>
                 </div>
+                <!-- Other fields grid -->
+                <div class="pv-grid">
                 <div class="pv-field">
                   <div class="pv-label">Ngày sinh</div>
                   <div class="pv-value" id="pv-dob"></div>
@@ -7775,8 +7840,9 @@
                     id="pv-rejoin_first_official_date"
                   ></div>
                 </div>
-              </div>
-            </div>
+                </div><!-- /pv-grid -->
+              </div><!-- /pv-card-body -->
+            </div><!-- /pv-card -->
 
             <!-- Sections summary -->
             <div class="pv-card">
@@ -8461,18 +8527,13 @@
 
       async function fetchProvinceWards(provinceCode) {
         if (!provinceCode) return [];
+        // v2 API: depth=2 returns wards directly under province (no district level)
         const res = await fetch(
-          `https://provinces.open-api.vn/api/p/${provinceCode}?depth=3`,
+          `https://provinces.open-api.vn/api/v2/p/${provinceCode}?depth=2`,
         );
         if (!res.ok) return [];
         const data = await res.json();
-        const wards = [];
-        (data.districts || []).forEach((d) => {
-          (d.wards || []).forEach((w) => {
-            wards.push({ code: w.code, name: w.name, districtName: d.name });
-          });
-        });
-        return wards;
+        return (data.wards || []).map((w) => ({ code: w.code, name: w.name }));
       }
 
       async function fetchWards(provinceCode, search = "") {
@@ -9160,22 +9221,6 @@
                   textInp.style.height = textInp.scrollHeight + "px";
                 }
               }
-            });
-          }
-          if (prefix === "" || prefix === "ct") {
-            wardSelect.addEventListener("change", () => {
-              const formRow = wardSelect.closest(".form-row");
-              if (!formRow) return;
-              const locInp = formRow.querySelector(".fam-addr-location");
-              if (!locInp) return;
-              const wardText = (wardSelect.selectedOptions[0]?.text || "")
-                .replace(/^--.*--$/, "")
-                .trim();
-              const provText = (provinceSelect.selectedOptions[0]?.text || "")
-                .replace(/^--.*--$/, "")
-                .trim();
-              const parts = [wardText, provText].filter(Boolean);
-              if (parts.length) locInp.value = parts.join(", ");
             });
           }
         });
@@ -9959,6 +10004,7 @@
           chevron.parentNode.insertBefore(removeBtn, chevron);
         }
         cont.appendChild(el);
+        el.querySelectorAll(".timeline-table").forEach((t) => refreshDienBien(t));
         attachFamilyLocationSearch(num);
         if (!silent) {
           setTimeout(
@@ -10011,6 +10057,7 @@
           chevron.parentNode.insertBefore(removeBtn, chevron);
         }
         cont.appendChild(el);
+        el.querySelectorAll(".timeline-table").forEach((t) => refreshDienBien(t));
         attachFamilyLocationSearch(num);
         if (!silent) {
           setTimeout(
@@ -10190,6 +10237,21 @@
         }
         if (!document.getElementById("camDoan").checked) {
           alert("Vui lòng xác nhận cam đoan trước khi nộp hồ sơ.");
+          return;
+        }
+        // Block submit if required Section A fields are empty
+        const _hoTen = (document.getElementById("hoTen")?.value || "").trim();
+        const _ngaySinh = (document.getElementById("ngaySinh")?.value || "").trim();
+        const _gioiTinh = document.querySelector('input[name="gioiTinh"]:checked')?.value || "";
+        if (!_hoTen || !_ngaySinh || !_gioiTinh) {
+          showSection(0);
+          showToast("⚠ Vui lòng điền đầy đủ thông tin bắt buộc ở Phần A: Họ tên, Ngày sinh, Giới tính.");
+          return;
+        }
+        // Block submit if not all form sections have been visited
+        if (done.size < sections.length - 1) {
+          const remaining = (sections.length - 1) - done.size;
+          showToast(`⚠ Còn ${remaining} phần chưa hoàn thành — vui lòng điền đầy đủ hồ sơ trước khi nộp.`);
           return;
         }
         // Validate all family history timelines before submit
@@ -16214,7 +16276,7 @@
           }
           // Production environment
           if (hostname === "14.224.210.210" || hostname === "lylich.gov.vn") {
-            return "http://14.224.210.210:8003/api/v1";
+            return "http://14.224.210.210:8006/api/v1";
           }
           return "/api/v1";
         }
@@ -17955,6 +18017,70 @@
         document.querySelector("#memberMain .content")?.prepend(box);
       }
 
+      // ── Photo upload helpers ─────────────────────────────────────────────────
+
+      function _showPhotoPreview(url) {
+        const img = document.getElementById("photoPreviewImg");
+        const placeholder = document.getElementById("photoPlaceholder");
+        const box = document.getElementById("photoUploadBox");
+        if (!img || !url) return;
+        img.src = url;
+        img.style.display = "block";
+        if (placeholder) placeholder.style.display = "none";
+        if (box) box.classList.add("has-photo");
+      }
+
+      function _restorePhotoPreview(photoFileDetail) {
+        window._pendingPhotoFileId = photoFileDetail ? photoFileDetail.id : null;
+        if (photoFileDetail && photoFileDetail.url) {
+          _showPhotoPreview(photoFileDetail.url);
+        }
+      }
+
+      async function uploadProfilePhoto(input) {
+        const file = input.files[0];
+        if (!file) return;
+        input.value = "";
+        const statusEl = document.getElementById("photoUploadStatus");
+        const setStatus = (msg, color) => {
+          if (statusEl) { statusEl.textContent = msg; statusEl.style.color = color || "var(--muted)"; }
+        };
+        setStatus("Đang tải lên...");
+        try {
+          // 1. Upload file
+          const fd = new FormData();
+          fd.append("file", file);
+          fd.append("category", "profile_photo");
+          const accessTok = API.token.access();
+          const res = await fetch(`${API.BASE}/uploads/upload/`, {
+            method: "POST",
+            headers: accessTok ? { Authorization: `Bearer ${accessTok}` } : {},
+            body: fd,
+          });
+          if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            throw new Error(err.detail || `Upload lỗi ${res.status}`);
+          }
+          const resp = await res.json();
+          const fileData = resp.data || resp;
+          window._pendingPhotoFileId = fileData.id;
+          _showPhotoPreview(fileData.url);
+
+          // 2. Immediately save photo_file_id to profile so it survives page reload
+          if (window._profileId) {
+            try {
+              await API.patch("/profiles/my/", { photo_file_id: fileData.id });
+            } catch (patchErr) {
+              console.warn("[PHOTO] patch profile failed:", patchErr.message);
+            }
+          }
+          setStatus("Ảnh đã lưu ✓", "#166534");
+        } catch (e) {
+          setStatus("Lỗi: " + e.message, "var(--crimson)");
+          console.error("[PHOTO UPLOAD]", e);
+        }
+      }
+
       async function _loadMyProfile() {
         try {
           const resp = await API.get("/profiles/my/");
@@ -17974,6 +18100,7 @@
           _switchToFormMode();
 
           // ── Section A: Sơ lược lý lịch ─────────────────────────────────
+          _restorePhotoPreview(p.photo_file_detail);
           _setVal("hoTen", p.full_name);
           _setVal("hoTenKhac", p.full_name_other);
           _setVal("ngaySinh", _isoToDMY(p.dob));
@@ -18110,6 +18237,7 @@
 
           // Return banner is rendered after loading correction hints
           await _loadAllSections(p.id);
+          _resizeAllDienBien();
           const correctionData = await _loadMemberCorrectionHints(
             p.id,
             p.status,
@@ -18369,6 +18497,16 @@
           }
         };
         _pv("full_name", p.full_name);
+        // Photo
+        const pvPhotoImg = document.getElementById("pvPhotoImg");
+        const pvPhotoEmpty = document.getElementById("pvPhotoEmpty");
+        if (p.photo_file_detail && p.photo_file_detail.url) {
+          if (pvPhotoImg) { pvPhotoImg.src = p.photo_file_detail.url; pvPhotoImg.style.display = "block"; }
+          if (pvPhotoEmpty) pvPhotoEmpty.style.display = "none";
+        } else {
+          if (pvPhotoImg) pvPhotoImg.style.display = "none";
+          if (pvPhotoEmpty) pvPhotoEmpty.style.display = "flex";
+        }
         _pv("dob", p.dob ? p.dob.split("-").reverse().join("/") : "");
         _pv(
           "gender",
@@ -18741,6 +18879,7 @@
             b.innerHTML = `<strong>↩ Hồ sơ bị trả lại:</strong> ${_esc(p.return_reason)}`;
           }
           await _loadAllSections(p.id);
+          _resizeAllDienBien();
         } catch (e) {
           console.warn("[switchToForm]", e.message);
         }
@@ -18755,7 +18894,7 @@
             location.port === "5501"
               ? "http://127.0.0.1:8000/api/v1"
               : location.hostname === "14.224.210.210"
-                ? "http://14.224.210.210:8003/api/v1"
+                ? "http://14.224.210.210:8006/api/v1"
                 : "/api/v1");
           const tok = localStorage.getItem("access_token");
           const resp = await fetch(`${base}/exports/word/${profileId}/`, {
@@ -18872,6 +19011,10 @@
           : null;
 
         return {
+          photo_file_id:
+            window._pendingPhotoFileId != null
+              ? window._pendingPhotoFileId
+              : undefined,
           full_name:
             document.getElementById("hoTen")?.value?.trim() || undefined,
           full_name_other:
@@ -18930,8 +19073,36 @@
       /* ─────────────────────────────────────────────────────────────────────────
    SAVE DRAFT — wire up the "Lưu nháp" button
 ───────────────────────────────────────────────────────────────────────── */
+      function _validateRequiredFieldsBeforeSave() {
+        const errors = [];
+        const mark = (el) => {
+          if (el) {
+            el.style.outline = "2px solid var(--crimson)";
+            el.style.borderRadius = "4px";
+            el.addEventListener("input", () => { el.style.outline = ""; el.style.borderRadius = ""; }, { once: true });
+          }
+        };
+        const hoTenEl = document.getElementById("hoTen");
+        if (!(hoTenEl?.value || "").trim()) { mark(hoTenEl); errors.push("Họ tên"); }
+        const ngaySinhEl = document.getElementById("ngaySinh");
+        if (!(ngaySinhEl?.value || "").trim()) { mark(ngaySinhEl); errors.push("Ngày sinh"); }
+        const gioiTinhChecked = document.querySelector('input[name="gioiTinh"]:checked');
+        if (!gioiTinhChecked) {
+          document.querySelectorAll('input[name="gioiTinh"]').forEach((r) => {
+            r.closest("label")?.style.setProperty("outline", "2px solid var(--crimson)");
+          });
+          errors.push("Giới tính");
+        }
+        if (errors.length) {
+          showToast("⚠ Thiếu thông tin bắt buộc: " + errors.join(", "));
+          showSection(0);
+        }
+        return errors;
+      }
+
       async function saveDraftAPI() {
         const roleCode = _getUserRoleCode(API.currentUser());
+        _validateRequiredFieldsBeforeSave();
         const payload = _collectFormData();
         try {
           showToast("↑ Đang lưu…");
@@ -18962,6 +19133,7 @@
             // Reload sections so row IDs are refreshed — prevents duplicate
             // POSTs on subsequent saves for rows that were just created.
             await _loadAllSections(window._profileId);
+            _resizeAllDienBien();
           }
 
           // Keep officer/admin list in sync immediately after saving draft.
@@ -19262,8 +19434,23 @@
         setTimeout(() => t.classList.remove("show"), dur);
       }
       function saveDraft() {
-        showToast("✓ Đã lưu nháp – " + new Date().toLocaleTimeString("vi-VN"));
+        saveDraftAPI();
       }
+
+      // Auto-resize all .td-dienbien textareas to fit their content
+      function _resizeAllDienBien() {
+        document.querySelectorAll(".td-dienbien textarea").forEach((ta) => {
+          ta.style.height = "auto";
+          ta.style.height = Math.max(38, ta.scrollHeight) + "px";
+        });
+      }
+      document.addEventListener("input", (e) => {
+        if (e.target.matches(".td-dienbien textarea")) {
+          e.target.style.height = "auto";
+          e.target.style.height = Math.max(38, e.target.scrollHeight) + "px";
+        }
+      });
+
       let autoSaveTimer;
       document.addEventListener("input", (e) => {
         if (e.target.closest("#memberMain")) {

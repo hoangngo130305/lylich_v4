@@ -296,6 +296,21 @@ class ProfileWorkflowView(generics.GenericAPIView):
                     'error': f'Không thể chuyển từ "{profile.get_status_display()}" sang "{Profile.Status(new_status).label}".'
                 }, status=400)
 
+        # Guard: block submit if required fields are missing
+        if action == 'submit':
+            missing = []
+            if not profile.full_name:
+                missing.append('Họ tên')
+            if not profile.dob:
+                missing.append('Ngày sinh')
+            if not profile.gender:
+                missing.append('Giới tính')
+            if missing:
+                return Response({
+                    'success': False,
+                    'error': f'Hồ sơ chưa điền đầy đủ thông tin bắt buộc: {", ".join(missing)}.'
+                }, status=400)
+
         old_status = profile.status
         now = timezone.now()
 
