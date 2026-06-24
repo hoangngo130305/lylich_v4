@@ -1055,7 +1055,8 @@
         position: relative;
         vertical-align: top;
       }
-      .td-dienbien textarea {
+      .td-dienbien textarea,
+      .td-chucvu textarea {
         width: 100%;
         border: none;
         border-radius: 0;
@@ -1069,6 +1070,9 @@
         height: auto;
         overflow: hidden;
         line-height: 1.5;
+      }
+      .td-dienbien textarea:placeholder-shown {
+        min-height: 72px !important;
       }
       .td-dienbien textarea:focus {
         min-height: 72px;
@@ -1270,10 +1274,10 @@
         width: 100%;
       }
       .mmyyyy-wrap select.mm-month {
-        width: 50px;
+        width: 62px;
         border: none;
         border-radius: 0;
-        padding: 9px 2px 9px 5px;
+        padding: 9px 18px 9px 5px;
         background: transparent;
         font-size: 12px;
         font-family: inherit;
@@ -1281,7 +1285,10 @@
         appearance: none;
         cursor: pointer;
         outline: none;
-        background-image: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23999'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 4px center;
+        background-size: 8px 5px;
       }
       .mmyyyy-slash {
         font-size: 12px;
@@ -6776,7 +6783,7 @@
                             "
                           ></textarea>
                         </td>
-                        <td><input type="text" placeholder="" /></td>
+                        <td class="td-chucvu"><textarea class="cvu-ta" rows="1" placeholder="" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'" style="box-sizing:border-box"></textarea></td>
                         <td>
                           <button class="del-btn" onclick="delRow(this)">
                             ✕
@@ -6866,7 +6873,7 @@
                             "
                           ></textarea>
                         </td>
-                        <td><input type="text" placeholder="" /></td>
+                        <td class="td-chucvu"><textarea class="cvu-ta" rows="1" placeholder="" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'" style="box-sizing:border-box"></textarea></td>
                         <td>
                           <button class="del-btn" onclick="delRow(this)">
                             ✕
@@ -6956,7 +6963,7 @@
                             "
                           ></textarea>
                         </td>
-                        <td><input type="text" placeholder="" /></td>
+                        <td class="td-chucvu"><textarea class="cvu-ta" rows="1" placeholder="" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'" style="box-sizing:border-box"></textarea></td>
                         <td>
                           <button class="del-btn" onclick="delRow(this)">
                             ✕
@@ -7309,6 +7316,15 @@
               </button>
             </div>
             <div id="famBlocksSpouse"></div>
+            <div style="margin-top: 8px; margin-bottom: 8px">
+              <button
+                class="add-row-btn"
+                style="width: auto; padding: 7px 20px"
+                onclick="addFamChild()"
+              >
+                + Thêm con ruột
+              </button>
+            </div>
 
             <div
               id="fam-ongba-minh"
@@ -9223,6 +9239,26 @@
               }
             });
           }
+          if (prefix === "ct" || prefix === "") {
+            const _updateCuTru = () => {
+              const formRow = wardSelect.closest(".form-row");
+              if (!formRow) return;
+              const wardText = (wardSelect.selectedOptions[0]?.text || "")
+                .replace(/^--.*--$/, "")
+                .trim();
+              const provText = (provinceSelect.selectedOptions[0]?.text || "")
+                .replace(/^--.*--$/, "")
+                .trim();
+              const street = (formRow.querySelector(".fam-addr-street")?.value || "").trim();
+              const hamlet = (formRow.querySelector(".fam-addr-hamlet")?.value || "").trim();
+              const loc = formRow.querySelector(".fam-addr-location");
+              if (!loc) return;
+              const parts = [street, hamlet, wardText, provText].filter(Boolean);
+              if (parts.length) loc.value = parts.join(", ");
+            };
+            wardSelect.addEventListener("change", _updateCuTru);
+            provinceSelect.addEventListener("change", _updateCuTru);
+          }
         });
       }
 
@@ -9322,6 +9358,21 @@
         const parts = [num, street, ward, prov].filter(Boolean);
         const el = document.getElementById("tamTru");
         if (el && parts.length) el.value = parts.join(", ");
+      }
+      function updateFamCuTru(triggerEl) {
+        const row = triggerEl.closest(".form-row");
+        if (!row) return;
+        const sels = row.querySelectorAll(".searchable-location");
+        const tinhSel = sels[0];
+        const xaSel = sels[1];
+        const prov = (tinhSel?.selectedOptions[0]?.text || "").replace(/^--.*--$/, "").trim();
+        const ward = (xaSel?.selectedOptions[0]?.text || "").replace(/^--.*--$/, "").trim();
+        const street = (row.querySelector(".fam-addr-street")?.value || "").trim();
+        const hamlet = (row.querySelector(".fam-addr-hamlet")?.value || "").trim();
+        const loc = row.querySelector(".fam-addr-location");
+        if (!loc) return;
+        const parts = [street, hamlet, ward, prov].filter(Boolean);
+        if (parts.length) loc.value = parts.join(", ");
       }
 
       function validateField(el, type) {
@@ -9427,7 +9478,7 @@
         const tr = document.createElement("tr");
         const monthYearFrom = `<div class="mmyyyy-wrap"><select class="mm-month"><option value="">MM</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select><span class="mmyyyy-slash">/</span><input class="mm-year" type="number" placeholder="YYYY" min="1900" max="2099" step="1"></div>`;
         const monthYearTo = `<div class="mmyyyy-wrap"><select class="mm-month"><option value="">MM</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select><span class="mmyyyy-slash">/</span><input class="mm-year" type="number" placeholder="YYYY" min="1900" max="2099" step="1"></div>`;
-        tr.innerHTML = `<td>${monthYearFrom}</td><td class="fhd-to-cell"><div class="fhd-to-inner">${monthYearTo}<label class="fhd-present-wrap" title="Đến nay"><input type="checkbox" class="fhd-present-chk" onchange="toggleFhdPresent(this)"> Nay</label></div></td><td class="td-dienbien"><textarea class="fhd-input" rows="2" placeholder="" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'" style="width:100%;resize:none;min-height:38px;overflow:hidden;box-sizing:border-box"></textarea></td><td><input type="text" placeholder=""></td>${_rowActTd("C")}`;
+        tr.innerHTML = `<td>${monthYearFrom}</td><td class="fhd-to-cell"><div class="fhd-to-inner">${monthYearTo}<label class="fhd-present-wrap" title="Đến nay"><input type="checkbox" class="fhd-present-chk" onchange="toggleFhdPresent(this)"> Nay</label></div></td><td class="td-dienbien"><textarea class="fhd-input" rows="2" placeholder="" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'" style="width:100%;resize:none;min-height:38px;overflow:hidden;box-sizing:border-box"></textarea></td><td class="td-chucvu"><textarea class="cvu-ta" rows="1" placeholder="" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'" style="box-sizing:border-box"></textarea></td>${_rowActTd("C")}`;
         return tr;
       }
       function _makeFamHistRow() {
@@ -9443,6 +9494,21 @@
         return tr;
       }
       function insertRowAbove(btn, type) {
+        if (type === "B" && !validateSecB(true)) {
+          showToast("⚠ Vui lòng sửa gián đoạn thời gian trước khi chèn dòng mới");
+          return;
+        }
+        if (type === "C" && !validateSecC(true)) {
+          showToast("⚠ Vui lòng sửa gián đoạn thời gian trước khi chèn dòng mới");
+          return;
+        }
+        if (type === "fam") {
+          const accEl = btn.closest(".family-accordion");
+          if (accEl && !validateFamHistory(accEl, true)) {
+            showToast("⚠ Vui lòng sửa gián đoạn thời gian trước khi chèn dòng mới");
+            return;
+          }
+        }
         const tr = btn.closest("tr");
         const newTr =
           type === "C"
@@ -9455,8 +9521,24 @@
         refreshDienBien(tb.closest(".timeline-table"));
         if (type === "B") validateSecB();
         if (type === "C") validateSecC();
+        if (type === "fam") { const a = btn.closest(".family-accordion"); if (a) validateFamHistory(a); }
       }
       function insertRowBelow(btn, type) {
+        if (type === "B" && !validateSecB(true)) {
+          showToast("⚠ Vui lòng sửa gián đoạn thời gian trước khi chèn dòng mới");
+          return;
+        }
+        if (type === "C" && !validateSecC(true)) {
+          showToast("⚠ Vui lòng sửa gián đoạn thời gian trước khi chèn dòng mới");
+          return;
+        }
+        if (type === "fam") {
+          const accEl = btn.closest(".family-accordion");
+          if (accEl && !validateFamHistory(accEl, true)) {
+            showToast("⚠ Vui lòng sửa gián đoạn thời gian trước khi chèn dòng mới");
+            return;
+          }
+        }
         const tr = btn.closest("tr");
         const newTr =
           type === "C"
@@ -9469,6 +9551,7 @@
         refreshDienBien(tb.closest(".timeline-table"));
         if (type === "B") validateSecB();
         if (type === "C") validateSecC();
+        if (type === "fam") { const a = btn.closest(".family-accordion"); if (a) validateFamHistory(a); }
       }
       function _initInsertBtns(tbodyId, type) {
         const tb = document.getElementById(tbodyId);
@@ -9506,6 +9589,10 @@
       function addRow(tbodyId, ph) {
         const tb = document.getElementById(tbodyId);
         if (tbodyId === "tbB-body") {
+          if (!validateSecB(true)) {
+            showToast("⚠ Vui lòng sửa gián đoạn thời gian trước khi thêm dòng mới");
+            return;
+          }
           tb.appendChild(_makeBRow(ph || "Tiếp theo …"));
           refreshDienBien(tb.closest(".timeline-table"));
           validateSecB();
@@ -9548,6 +9635,10 @@
       function addRowC() {
         const tb = document.getElementById("tbC-body");
         if (!tb) return;
+        if (!validateSecC(true)) {
+          showToast("⚠ Vui lòng sửa gián đoạn thời gian trước khi thêm dòng mới");
+          return;
+        }
         tb.appendChild(_makeCRow());
         refreshDienBien(tb.closest(".timeline-table"));
         validateSecC();
@@ -9556,7 +9647,7 @@
       function delRow(btn) {
         const row = btn.closest("tr");
         if (row.parentElement.rows.length > 1) {
-          const acc = row.closest(".accordion");
+          const acc = row.closest(".family-accordion");
           const tbodyId = row.parentElement.id;
           row.remove();
           if (acc) validateFamHistory(acc);
@@ -9641,8 +9732,8 @@
     </div>
     <div id="sibAlive_${m.num}">
       <div class="form-row"><label>Nơi cư trú <span style="color:var(--crimson)">*</span></label>
-        <div><div class="loc-row"><select id="sel_tinh_fam_${m.num.replace(/\./g, "_")}" class="searchable-location"><option value="">-- Tỉnh/TP --</option></select><select id="sel_xa_fam_${m.num.replace(/\./g, "_")}" class="searchable-location"><option value="">-- Xã/Phường --</option></select></div>
-        <input type="text" class="fam-addr-location" style="margin-top:6px;margin-bottom:4px" placeholder="Phường/Xã, Tỉnh/TP (tự động điền hoặc nhập trực tiếp)"><input type="text" class="fam-addr-street" style="margin-bottom:4px" placeholder="Số nhà, Đường"><input type="text" class="fam-addr-hamlet" placeholder="Ấp / Khu phố / Thôn"></div>
+        <div><div class="loc-row"><select id="sel_tinh_fam_${m.num.replace(/\./g, "_")}" class="searchable-location" onchange="updateFamCuTru(this)"><option value="">-- Tỉnh/TP --</option></select><select id="sel_xa_fam_${m.num.replace(/\./g, "_")}" class="searchable-location" onchange="updateFamCuTru(this)"><option value="">-- Xã/Phường --</option></select></div>
+        <input type="text" class="fam-addr-street" style="margin-top:6px;margin-bottom:4px" placeholder="Số nhà / Lô" oninput="updateFamCuTru(this)"><input type="text" class="fam-addr-hamlet" style="margin-bottom:4px" placeholder="Tên đường / ấp / thôn" oninput="updateFamCuTru(this)"><input type="text" class="fam-addr-location" placeholder="Địa chỉ đầy đủ (tự động điền hoặc nhập trực tiếp)"></div>
       </div>
       <div class="form-row"><label>Nghề nghiệp hiện nay <span style="color:var(--crimson)">*</span></label><input type="text" placeholder="Công nhân / Viên chức / Nội trợ / Hưu trí …"></div>
     </div>
@@ -9671,14 +9762,14 @@
           return `
     <div class="form-row"><label>Họ và tên</label><input type="text" oninput="updateFamName('${m.num}',this.value)"></div>
     <div class="form-row"><label>Năm sinh</label><input type="text" placeholder="YYYY" id="childYear_${m.num}" oninput="checkChildAge('${m.num}',this.value)"></div>
-    <div class="form-row"><label>Nơi ở hiện nay</label>
-      <div><div class="loc-row" style="margin-bottom:6px"><select id="sel_tinh_fam_ct_${m.num.replace(/\./g, "_")}" class="searchable-location"><option value="">-- Tỉnh/TP --</option></select><select id="sel_xa_fam_ct_${m.num.replace(/\./g, "_")}" class="searchable-location"><option value="">-- Xã/Phường --</option></select></div>
-      <input type="text" class="fam-addr-location" style="margin-bottom:4px" placeholder="Phường/Xã, Tỉnh/TP (tự động điền hoặc nhập trực tiếp)"><input type="text" class="fam-addr-street" placeholder="Số nhà, Đường" style="margin-bottom:4px"><input type="text" class="fam-addr-hamlet" placeholder="Ấp / Khu phố / Thôn"></div>
+    <div class="form-row"><label>Nơi cư trú</label>
+      <div><div class="loc-row" style="margin-bottom:6px"><select id="sel_tinh_fam_ct_${m.num.replace(/\./g, "_")}" class="searchable-location" onchange="updateFamCuTru(this)"><option value="">-- Tỉnh/TP --</option></select><select id="sel_xa_fam_ct_${m.num.replace(/\./g, "_")}" class="searchable-location" onchange="updateFamCuTru(this)"><option value="">-- Xã/Phường --</option></select></div>
+      <input type="text" class="fam-addr-street" style="margin-bottom:4px" placeholder="Số nhà / Lô" oninput="updateFamCuTru(this)"><input type="text" class="fam-addr-hamlet" style="margin-bottom:4px" placeholder="Tên đường / ấp / thôn" oninput="updateFamCuTru(this)"><input type="text" class="fam-addr-location" placeholder="Địa chỉ đầy đủ (tự động điền hoặc nhập trực tiếp)"></div>
     </div>
     <div id="childUnder18_${m.num}">
       <div class="form-row">
         <label>Đang học trường<span class="hint-lbl">Nếu &lt;6 tuổi: ghi "Còn nhỏ" · Nếu &lt;18 tuổi: ghi tên trường</span></label>
-        <input type="text" placeholder="VD: Còn nhỏ / Học sinh trường THCS Nhà Bè / …">
+        <input type="text" class="child-school-inp" placeholder="VD: Còn nhỏ / Học sinh trường THCS Nhà Bè / …">
       </div>
     </div>
     <div id="childOver18_${m.num}" style="display:none">
@@ -9692,10 +9783,6 @@
       <div class="form-row"><label>Dân tộc</label><div><select class="fam-sel-ethnic" onchange="toggleFamSelKhac(this)"><option value="">-- Chọn --</option><option>Kinh</option><option>Tày</option><option>Thái</option><option>Mường</option><option>Khmer</option><option>Nùng</option><option>HMông</option><option>Khác</option></select><input class="fam-sel-khac-other" style="display:none;margin-top:4px;width:100%" placeholder="Nhập tên dân tộc"></div></div>
       <div class="form-row"><label>Tôn giáo</label><div><select class="fam-sel-religion" onchange="toggleFamSelKhac(this)"><option value="">-- Chọn --</option><option>Không</option><option>Phật giáo</option><option>Công giáo</option><option>Cao Đài</option><option>Hòa Hảo</option><option>Tin Lành</option><option>Hồi giáo</option><option>Khác</option></select><input class="fam-sel-khac-other" style="display:none;margin-top:4px;width:100%" placeholder="Nhập tên tôn giáo"></div></div>
       <div class="form-row"><label>Chức sắc tôn giáo</label><input type="text" class="fam-religious-rank" placeholder="Linh mục / Mục sư / Hòa thượng / Không có"></div>
-      <div class="form-row"><label>Nơi cư trú</label>
-        <div><div class="loc-row" style="margin-bottom:6px"><select id="sel_tinh_fam_ct_${m.num.replace(/\./g, "_")}" class="searchable-location"><option value="">-- Tỉnh/TP --</option></select><select id="sel_xa_fam_ct_${m.num.replace(/\./g, "_")}" class="searchable-location"><option value="">-- Xã/Phường --</option></select></div>
-        <input type="text" class="fam-addr-location" style="margin-bottom:4px" placeholder="Phường/Xã, Tỉnh/TP (tự động điền hoặc nhập trực tiếp)"><input type="text" class="fam-addr-street" placeholder="Số nhà, Đường" style="margin-bottom:4px"><input type="text" class="fam-addr-hamlet" placeholder="Ấp / Khu phố / Thôn"></div>
-      </div>
       <div class="form-row"><label>Nghề nghiệp</label><input type="text"></div>
       <div style="margin-top:12px;margin-bottom:4px;font-size:12px;font-weight:700;color:var(--muted)">Quá trình lịch sử (từ khi sinh đến nay) <span style="font-weight:400;font-size:11px;color:var(--hint)">(nhập liên tục)</span></div>
       <div class="fhd-error-bar"></div>
@@ -9703,8 +9790,8 @@
 <table class="timeline-table">
         <thead><tr><th style="width:17%">Từ (MM/YYYY)</th><th style="width:22%">Đến (MM/YYYY)</th><th>Diễn biến + Nơi sinh sống</th><th style="width:36px"></th></tr></thead>
         <tbody>
-          <tr><td><input class="fhd-input" type="text" placeholder="MM/YYYY" maxlength="7"></td><td class="fhd-to-cell"><div class="fhd-to-inner"><input class="fhd-input fhd-to-txt" type="text" placeholder="MM/YYYY" maxlength="7"><label class="fhd-present-wrap" title="Đến nay"><input type="checkbox" class="fhd-present-chk" onchange="toggleFhdPresent(this)"> Nay</label></div></td><td><input type="text" placeholder="Còn nhỏ, sống với cha mẹ tại …"></td><td><div class="row-act-wrap"><button class="ins-btn" onclick="insertRowAbove(this,'fam')" title="Chèn dòng trên">▲</button><button class="del-btn" onclick="delRow(this)">✕</button><button class="ins-btn" onclick="insertRowBelow(this,'fam')" title="Chèn dòng dưới">▼</button></div></td></tr>
-          <tr><td><input class="fhd-input" type="text" placeholder="MM/YYYY" maxlength="7"></td><td class="fhd-to-cell"><div class="fhd-to-inner"><input class="fhd-input fhd-to-txt" type="text" placeholder="MM/YYYY" maxlength="7"><label class="fhd-present-wrap" title="Đến nay"><input type="checkbox" class="fhd-present-chk" onchange="toggleFhdPresent(this)"> Nay</label></div></td><td><input type="text"></td><td><div class="row-act-wrap"><button class="ins-btn" onclick="insertRowAbove(this,'fam')" title="Chèn dòng trên">▲</button><button class="del-btn" onclick="delRow(this)">✕</button><button class="ins-btn" onclick="insertRowBelow(this,'fam')" title="Chèn dòng dưới">▼</button></div></td></tr>
+          <tr><td><div class="mmyyyy-wrap"><select class="mm-month"><option value="">MM</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select><span class="mmyyyy-slash">/</span><input class="mm-year" type="number" placeholder="YYYY" min="1900" max="2099" step="1" value=""></div></td><td class="fhd-to-cell"><div class="fhd-to-inner"><div class="mmyyyy-wrap"><select class="mm-month"><option value="">MM</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select><span class="mmyyyy-slash">/</span><input class="mm-year" type="number" placeholder="YYYY" min="1900" max="2099" step="1" value=""></div><label class="fhd-present-wrap" title="Đến nay"><input type="checkbox" class="fhd-present-chk" onchange="toggleFhdPresent(this)"> Nay</label></div></td><td class="td-dienbien"><input type="text" value="" placeholder="Còn nhỏ, sống với cha mẹ tại …"></td><td><div class="row-act-wrap"><button class="ins-btn" onclick="insertRowAbove(this,'fam')" title="Chèn dòng trên">▲</button><button class="del-btn" onclick="delRow(this)">✕</button><button class="ins-btn" onclick="insertRowBelow(this,'fam')" title="Chèn dòng dưới">▼</button></div></td></tr>
+          <tr><td><div class="mmyyyy-wrap"><select class="mm-month"><option value="">MM</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select><span class="mmyyyy-slash">/</span><input class="mm-year" type="number" placeholder="YYYY" min="1900" max="2099" step="1" value=""></div></td><td class="fhd-to-cell"><div class="fhd-to-inner"><div class="mmyyyy-wrap"><select class="mm-month"><option value="">MM</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select><span class="mmyyyy-slash">/</span><input class="mm-year" type="number" placeholder="YYYY" min="1900" max="2099" step="1" value=""></div><label class="fhd-present-wrap" title="Đến nay"><input type="checkbox" class="fhd-present-chk" onchange="toggleFhdPresent(this)"> Nay</label></div></td><td class="td-dienbien"><input type="text" value=""></td><td><div class="row-act-wrap"><button class="ins-btn" onclick="insertRowAbove(this,'fam')" title="Chèn dòng trên">▲</button><button class="del-btn" onclick="delRow(this)">✕</button><button class="ins-btn" onclick="insertRowBelow(this,'fam')" title="Chèn dòng dưới">▼</button></div></td></tr>
         </tbody>
       </table>
 </div>
@@ -9728,8 +9815,8 @@
     <div class="form-row"><label>Tôn giáo</label><div><select class="fam-sel-religion" onchange="toggleFamSelKhac(this)"><option value="">-- Chọn --</option><option>Không</option><option>Phật giáo</option><option>Công giáo</option><option>Cao Đài</option><option>Hòa Hảo</option><option>Tin Lành</option><option>Hồi giáo</option><option>Khác</option></select><input class="fam-sel-khac-other" style="display:none;margin-top:4px;width:100%" placeholder="Nhập tên tôn giáo"></div></div>
     <div class="form-row"><label>Chức sắc tôn giáo</label><input type="text" class="fam-religious-rank" placeholder="Linh mục / Mục sư / Hòa thượng / Không có"></div>
     <div class="form-row"><label>Nơi cư trú<span class="hint-lbl">Để trống nếu đã mất</span></label>
-      <div><div class="loc-row" style="margin-bottom:6px"><select id="sel_tinh_fam_ct_${m.num.replace(/\./g, "_")}" class="searchable-location"><option value="">-- Tỉnh/TP --</option></select><select id="sel_xa_fam_ct_${m.num.replace(/\./g, "_")}" class="searchable-location"><option value="">-- Xã/Phường --</option></select></div>
-      <input type="text" class="fam-addr-location" style="margin-bottom:4px" placeholder="Phường/Xã, Tỉnh/TP (tự động điền hoặc nhập trực tiếp)"><input type="text" class="fam-addr-street" placeholder="Số nhà, Đường" style="margin-bottom:4px"><input type="text" class="fam-addr-hamlet" placeholder="Ấp / Khu phố / Thôn"></div>
+      <div><div class="loc-row" style="margin-bottom:6px"><select id="sel_tinh_fam_ct_${m.num.replace(/\./g, "_")}" class="searchable-location" onchange="updateFamCuTru(this)"><option value="">-- Tỉnh/TP --</option></select><select id="sel_xa_fam_ct_${m.num.replace(/\./g, "_")}" class="searchable-location" onchange="updateFamCuTru(this)"><option value="">-- Xã/Phường --</option></select></div>
+      <input type="text" class="fam-addr-street" style="margin-bottom:4px" placeholder="Số nhà / Lô" oninput="updateFamCuTru(this)"><input type="text" class="fam-addr-hamlet" style="margin-bottom:4px" placeholder="Tên đường / ấp / thôn" oninput="updateFamCuTru(this)"><input type="text" class="fam-addr-location" placeholder="Địa chỉ đầy đủ (tự động điền hoặc nhập trực tiếp)"></div>
     </div>
     <div class="form-row"><label>Nghề nghiệp</label><input type="text"></div>
     <div class="form-row"><label>Là Đảng viên?</label>
@@ -9836,14 +9923,15 @@
     <div class="form-row"><label>Tôn giáo</label><div><select class="fam-sel-religion" onchange="toggleFamSelKhac(this)"><option value="">-- Chọn --</option><option>Không</option><option>Phật giáo</option><option>Công giáo</option><option>Cao Đài</option><option>Hòa Hảo</option><option>Khác</option></select><input class="fam-sel-khac-other" style="display:none;margin-top:4px;width:100%" placeholder="Nhập tên tôn giáo"></div></div>
     <div class="form-row"><label>Chức sắc tôn giáo</label><input type="text" class="fam-religious-rank" placeholder="Linh mục / Mục sư / Hòa thượng / Không có"></div>
     <div class="form-row"><label>Nơi cư trú<span class="hint-lbl">Để trống nếu đã mất</span></label>
-      <div><div class="loc-row" style="margin-bottom:6px"><select id="sel_tinh_fam_ct_${m.num.replace(/\./g, "_")}" class="searchable-location"><option value="">-- Tỉnh/TP --</option></select><select id="sel_xa_fam_ct_${m.num.replace(/\./g, "_")}" class="searchable-location"><option value="">-- Xã/Phường --</option></select></div>
-      <input type="text" class="fam-addr-location" style="margin-bottom:4px" placeholder="Phường/Xã, Tỉnh/TP (tự động điền hoặc nhập trực tiếp)"><input type="text" class="fam-addr-street" placeholder="Số nhà, Đường" style="margin-bottom:4px"><input type="text" class="fam-addr-hamlet" placeholder="Ấp / Khu phố / Thôn"></div>
+      <div><div class="loc-row" style="margin-bottom:6px"><select id="sel_tinh_fam_ct_${m.num.replace(/\./g, "_")}" class="searchable-location" onchange="updateFamCuTru(this)"><option value="">-- Tỉnh/TP --</option></select><select id="sel_xa_fam_ct_${m.num.replace(/\./g, "_")}" class="searchable-location" onchange="updateFamCuTru(this)"><option value="">-- Xã/Phường --</option></select></div>
+      <input type="text" class="fam-addr-street" style="margin-bottom:4px" placeholder="Số nhà / Lô" oninput="updateFamCuTru(this)"><input type="text" class="fam-addr-hamlet" style="margin-bottom:4px" placeholder="Tên đường / ấp / thôn" oninput="updateFamCuTru(this)"><input type="text" class="fam-addr-location" placeholder="Địa chỉ đầy đủ (tự động điền hoặc nhập trực tiếp)"></div>
     </div>
     <div class="form-row"><label>Nghề nghiệp<span class="hint-lbl">Để trống nếu đã mất</span></label><input type="text" placeholder="Nông dân / Hưu trí / Đã mất …"></div>
     <div class="form-row"><label>Là Đảng viên?</label>
-      <div><select onchange="toggleSiblingParty(this,'gpParty_${m.num}')"><option value="no">Không</option><option value="yes">Là đảng viên Đảng Cộng sản Việt Nam</option></select>
+      <div><select onchange="toggleSiblingParty(this,'gpParty_${m.num}')"><option value="">-- Chọn --</option><option value="no">Không phải đảng viên</option><option value="yes">Là đảng viên Đảng Cộng sản Việt Nam</option></select>
         <div id="gpParty_${m.num}" style="display:none;margin-top:8px" class="party-detail-box">
           <div class="form-row"><label>Năm vào Đảng</label><input type="number" placeholder="YYYY" min="1930" max="2099"></div>
+          <div class="form-row"><label>Chi bộ / Đảng bộ</label><input type="text" placeholder="Chi bộ … – Đảng bộ …"></div>
           <div class="form-row"><label>Khen thưởng / Huy hiệu</label><input type="text" placeholder="Huy hiệu Đảng 50 năm / Đảng viên xuất sắc …"></div>
           <div class="form-row"><label>Số năm tuổi Đảng</label><input type="number" placeholder="0" min="0" max="100"></div>
         </div>
@@ -9872,10 +9960,10 @@
     <div class="form-row"><label>Chức sắc tôn giáo</label><input type="text" class="fam-religious-rank" placeholder="Linh mục / Mục sư / Hòa thượng / Không có"></div>
     <div class="form-row"><label>Nơi cư trú<span class="hint-lbl">Để trống nếu đã mất</span></label>
       <div>
-        <div class="loc-row" style="margin-bottom:6px"><select id="sel_tinh_fam_ct_${m.num.replace(/\./g, "_")}" class="searchable-location"><option value="">-- Tỉnh/TP --</option></select><select id="sel_xa_fam_ct_${m.num.replace(/\./g, "_")}" class="searchable-location"><option value="">-- Xã/Phường --</option></select></div>
-        <input type="text" class="fam-addr-location" style="margin-bottom:4px" placeholder="Phường/Xã, Tỉnh/TP (tự động điền hoặc nhập trực tiếp)">
-        <input type="text" class="fam-addr-street" placeholder="Số nhà, Đường" style="margin-bottom:4px">
-        <input type="text" class="fam-addr-hamlet" placeholder="Ấp / Khu phố / Thôn">
+        <div class="loc-row" style="margin-bottom:6px"><select id="sel_tinh_fam_ct_${m.num.replace(/\./g, "_")}" class="searchable-location" onchange="updateFamCuTru(this)"><option value="">-- Tỉnh/TP --</option></select><select id="sel_xa_fam_ct_${m.num.replace(/\./g, "_")}" class="searchable-location" onchange="updateFamCuTru(this)"><option value="">-- Xã/Phường --</option></select></div>
+        <input type="text" class="fam-addr-street" style="margin-bottom:4px" placeholder="Số nhà / Lô" oninput="updateFamCuTru(this)">
+        <input type="text" class="fam-addr-hamlet" style="margin-bottom:4px" placeholder="Tên đường / ấp / thôn" oninput="updateFamCuTru(this)">
+        <input type="text" class="fam-addr-location" placeholder="Địa chỉ đầy đủ (tự động điền hoặc nhập trực tiếp)">
       </div>
     </div>
     <div class="form-row"><label>Nghề nghiệp<span class="hint-lbl">Để trống nếu đã mất</span></label><input type="text" placeholder="Nông dân / Công nhân / Hưu trí / Đã mất …"></div>
@@ -9931,6 +10019,11 @@
       function addRowToNearestTable(btn) {
         const tbl = btn.previousElementSibling.querySelector("tbody");
         if (!tbl) return;
+        const acc = btn.closest(".family-accordion");
+        if (acc && !validateFamHistory(acc, true)) {
+          showToast("⚠ Vui lòng sửa gián đoạn thời gian trước khi thêm giai đoạn mới");
+          return;
+        }
         const row = tbl.insertRow();
         row.innerHTML = _famHistRowHtml({
           from_month: null,
@@ -9940,7 +10033,6 @@
           is_present: false,
           description: "",
         });
-        const acc = btn.closest(".family-accordion");
         if (acc) validateFamHistory(acc);
         refreshDienBien(tbl.closest(".timeline-table"));
       }
@@ -9948,6 +10040,11 @@
       function addRowSpouse(btn) {
         const tbl = btn.previousElementSibling.querySelector("tbody");
         if (!tbl) return;
+        const acc = btn.closest(".family-accordion");
+        if (acc && !validateFamHistory(acc, true)) {
+          showToast("⚠ Vui lòng sửa gián đoạn thời gian trước khi thêm giai đoạn mới");
+          return;
+        }
         const row = tbl.insertRow();
         row.innerHTML = _famHistRowHtml({
           from_month: null,
@@ -9957,7 +10054,6 @@
           is_present: false,
           description: "",
         });
-        const acc = btn.closest(".family-accordion");
         if (acc) validateFamHistory(acc);
         refreshDienBien(tbl.closest(".timeline-table"));
       }
@@ -10173,6 +10269,58 @@
         }
       }
 
+      // Thêm con ruột động
+      let childCount = 3;
+      function addFamChild(silent = false) {
+        const cont = document.getElementById("famBlocksSpouse");
+        const num = "11." + childCount;
+        const ordinal = childCount;
+        childCount++;
+        const div = document.createElement("div");
+        div.innerHTML = buildFamilyBlockItem(
+          { num, title: `Con ruột (${ordinal})`, child: true },
+          false,
+        );
+        const el = div.firstElementChild;
+        el.dataset.relationship = "con";
+        const chevron = el.querySelector(".chevron");
+        if (chevron) {
+          const removeBtn = document.createElement("button");
+          removeBtn.innerHTML = "🗑";
+          removeBtn.title = "Xóa thành viên này";
+          removeBtn.style.cssText =
+            "border:none;background:none;cursor:pointer;font-size:14px;padding:4px 6px;color:var(--hint);margin-left:4px;border-radius:4px;transition:all .15s;";
+          removeBtn.onmouseenter = function () {
+            this.style.color = "var(--crimson)";
+            this.style.background = "var(--crimson-xl)";
+          };
+          removeBtn.onmouseleave = function () {
+            this.style.color = "var(--hint)";
+            this.style.background = "none";
+          };
+          removeBtn.onclick = function (e) {
+            e.stopPropagation();
+            const acc = this.closest(".family-accordion");
+            if (acc) {
+              acc.style.transition = "all .25s";
+              acc.style.opacity = "0";
+              acc.style.transform = "translateY(-6px)";
+              setTimeout(() => acc.remove(), 260);
+            }
+          };
+          chevron.parentNode.insertBefore(removeBtn, chevron);
+        }
+        cont.appendChild(el);
+        attachFamilyLocationSearch(num);
+        if (!silent) {
+          setTimeout(
+            () => el.scrollIntoView({ behavior: "smooth", block: "nearest" }),
+            80,
+          );
+          showToast("✓ Đã thêm con ruột");
+        }
+      }
+
       function buildFamilyBlockItem(m, isFirst) {
         return `<div class="family-accordion">
     <div class="family-head" onclick="toggleFamily(this)">
@@ -10256,19 +10404,35 @@
         }
         // Validate all family history timelines before submit
         let histInvalid = false;
+        const _invalidNames = [];
         document
           .querySelectorAll(".family-accordion[data-relationship]")
           .forEach((acc) => {
             const tbl = acc.querySelector(".timeline-table");
-            if (tbl && !validateFamHistory(acc)) histInvalid = true;
+            if (tbl && !validateFamHistory(acc)) {
+              histInvalid = true;
+              const memberName = (acc.querySelector(".fam-name")?.textContent || "").trim();
+              const memberTitle = (acc.querySelector(".fam-info strong")?.textContent || "").trim();
+              _invalidNames.push(memberName && memberName !== "Chưa điền thông tin" ? memberName : memberTitle);
+              // Tự mở accordion đang thu gọn để dòng lỗi có thể scroll đến được
+              const body = acc.querySelector(".family-body");
+              if (body && !body.classList.contains("open")) {
+                body.classList.add("open");
+                const chev = acc.querySelector(".chevron");
+                if (chev) chev.style.transform = "rotate(180deg)";
+              }
+            }
           });
-        if (!validateSecB()) histInvalid = true;
-        if (!validateSecC()) histInvalid = true;
+        if (!validateSecB()) { histInvalid = true; _invalidNames.push("Lịch sử bản thân (Phần B)"); }
+        if (!validateSecC()) { histInvalid = true; _invalidNames.push("Công tác chức vụ (Phần C)"); }
         if (histInvalid) {
+          const nameList = _invalidNames.length
+            ? "\n• " + _invalidNames.join("\n• ")
+            : "";
           showToast(
-            "⚠ Quá trình lịch sử chưa liên tục — vui lòng kiểm tra lại trước khi nộp",
+            "⚠ Quá trình lịch sử chưa liên tục — vui lòng kiểm tra:" + nameList,
+            6000,
           );
-          // Scroll to first invalid row
           const firstInvalid = document.querySelector(
             ".fhd-row-invalid, .tl-row-invalid",
           );
@@ -10355,6 +10519,7 @@
             rel = num === "2.0" || num === "2" ? "me_ruot" : "me_ke";
           }
           if (!rel && num.startsWith("3.")) rel = "anh_chi_em_ruot";
+          if (!rel && num.startsWith("11.")) rel = "con";
           if (!rel && num.startsWith("13.")) rel = "anh_chi_em_chong_vo";
           if (rel) acc.dataset.relationship = rel;
         });
@@ -10418,6 +10583,7 @@
         tb.querySelectorAll(".td-dienbien").forEach((td) => {
           if (!td.dataset.db) initDienBien(td);
         });
+        validateSecB();
       }
 
       function _fillTbC(rows) {
@@ -10425,25 +10591,34 @@
         if (!tb || !rows || !rows.length) return;
         _srvIds.C.clear();
         tb.innerHTML = "";
+        const _moOpts = (sel) => [1,2,3,4,5,6,7,8,9,10,11,12]
+          .map(m => `<option${m === sel ? " selected" : ""}>${m}</option>`)
+          .join("");
         rows.forEach((r) => {
           _srvIds.C.add(String(r.id));
           const isPresent = !!r.is_present;
-          const fromVal = _fmtMY(r.from_month, r.from_year);
-          const toVal = isPresent ? "" : _fmtMY(r.to_month, r.to_year);
-          const toDisabled = isPresent ? " disabled" : "";
-          const toPlaceholder = isPresent ? "Hiện tại" : "MM/YYYY";
           const chk = isPresent ? " checked" : "";
+          const fromMon = r.from_month || null;
+          const fromYr  = r.from_year  || "";
+          const toMon   = isPresent ? null : (r.to_month || null);
+          const toYr    = isPresent ? "" : (r.to_year || "");
+          const mmFrom = `<div class="mmyyyy-wrap"><select class="mm-month"><option value="">MM</option>${_moOpts(fromMon)}</select><span class="mmyyyy-slash">/</span><input class="mm-year" type="number" placeholder="YYYY" min="1900" max="2099" step="1" value="${fromYr}"></div>`;
+          const mmTo   = `<div class="mmyyyy-wrap"><select class="mm-month"${isPresent ? " disabled" : ""}><option value="">MM</option>${_moOpts(toMon)}</select><span class="mmyyyy-slash">/</span><input class="mm-year" type="number" placeholder="YYYY" min="1900" max="2099" step="1"${isPresent ? " disabled" : ""} value="${toYr}"></div>`;
           const tr = tb.insertRow();
           tr.dataset.id = r.id;
           tr.innerHTML =
-            `<td><input class="fhd-input" type="text" placeholder="MM/YYYY" maxlength="7" value="${_esc(fromVal)}"></td>` +
-            `<td class="fhd-to-cell"><div class="fhd-to-inner"><input class="fhd-input fhd-to-txt" type="text" maxlength="7"${toDisabled} placeholder="${toPlaceholder}" value="${_esc(toVal)}"><label class="fhd-present-wrap" title="Đến nay"><input type="checkbox" class="fhd-present-chk"${chk} onchange="toggleFhdPresent(this)"> Nay</label></div></td>` +
+            `<td>${mmFrom}</td>` +
+            `<td class="fhd-to-cell"><div class="fhd-to-inner">${mmTo}<label class="fhd-present-wrap" title="Đến nay"><input type="checkbox" class="fhd-present-chk"${chk} onchange="toggleFhdPresent(this)"> Nay</label></div></td>` +
             `<td class="td-dienbien"><input type="text" value="${_esc(r.employer || "")}"></td>` +
-            `<td><input type="text" value="${_esc(r.job_title || "")}"></td>` +
+            `<td class="td-chucvu"><textarea class="cvu-ta" rows="1" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'" style="box-sizing:border-box">${_esc(r.job_title || "")}</textarea></td>` +
             `<td><button class="del-btn" onclick="delRow(this)">✕</button></td>`;
         });
         tb.querySelectorAll(".td-dienbien").forEach((td) => {
           if (!td.dataset.db) initDienBien(td);
+        });
+        tb.querySelectorAll(".cvu-ta").forEach((ta) => {
+          ta.style.height = "auto";
+          ta.style.height = ta.scrollHeight + "px";
         });
         validateSecC();
       }
@@ -10681,8 +10856,9 @@
         const addrLoc = (addrLocInp?.value || "").trim();
         const addrStreet = (addrStreetInp?.value || "").trim();
         const addrHamlet = (addrHamletInp?.value || "").trim();
+        // addrLoc is auto-filled (combined); use it directly, fall back to parts if empty
         const addr =
-          [addrLoc, addrStreet, addrHamlet].filter(Boolean).join(", ") || null;
+          addrLoc || [addrStreet, addrHamlet].filter(Boolean).join(", ") || null;
         let occ = null;
         body.querySelectorAll(".form-row").forEach((row) => {
           const lbl = (row.querySelector("label")?.textContent || "")
@@ -10779,19 +10955,8 @@
           ),
         ];
         const accIdx = allSameRel.indexOf(acc);
-        // For siblings: sort_order = count of filled preceding siblings (not raw DOM index),
-        // so that adding a sibling via button while static slots are empty still saves
-        // sort_order=1 (not 3), keeping the data compact and near the top of the section.
-        const seqRels = new Set(["anh_chi_em_ruot", "anh_chi_em_chong_vo"]);
-        let sortOrder;
-        if (seqRels.has(rel)) {
-          sortOrder = allSameRel.slice(0, accIdx).filter((a) => {
-            const ni = a.querySelector('input[oninput*="updateFamName"]');
-            return (ni?.value || "").trim().length > 0;
-          }).length;
-        } else {
-          sortOrder = accIdx;
-        }
+        // sort_order = DOM slot index so data reloads into the same slot.
+        const sortOrder = accIdx;
         return {
           id: acc.dataset.familyId || null,
           relationship: rel,
@@ -10814,6 +10979,7 @@
           party_years_count: partyYearsCount,
           is_deceased: isDeceased,
           deceased_year: deceasedYear,
+          child_school: (body.querySelector("input.child-school-inp")?.value || "").trim() || null,
         };
       }
 
@@ -10989,6 +11155,8 @@
             if (i && !i.value) i.value = m.occupation || "";
           }
         });
+        const childSchoolInp = body.querySelector("input.child-school-inp");
+        if (childSchoolInp) childSchoolInp.value = m.child_school || "";
         if (m.is_party_member) {
           const pSel = body.querySelector(
             'select[onchange*="toggleSiblingParty"],select[onchange*="famParty"],select[onchange*="gpParty"],select[onchange*="spouseParty"]',
@@ -11073,21 +11241,28 @@
       function _checkContinuity(prevTo, nextFrom) {
         if (prevTo === null || nextFrom === null) return "ok";
         if (nextFrom === prevTo) return "ok"; // same month: ok
-        if (
-          nextFrom ===
-          _nextMonthKey(
-            prevTo % 100 === 0 ? null : prevTo % 100,
-            Math.floor(prevTo / 100),
-          )
-        )
-          return "ok"; // adjacent month: ok
+
+        const prevMonth = prevTo % 100;   // 0 = year-only key
+        const prevYear  = Math.floor(prevTo / 100);
+        const nextMonth = nextFrom % 100; // 0 = year-only key
+        const nextYear  = Math.floor(nextFrom / 100);
+
+        // If either date is year-only, compare years only (lenient)
+        if (prevMonth === 0 || nextMonth === 0) {
+          if (nextYear < prevYear) return "overlap";
+          if (nextYear <= prevYear + 1) return "ok"; // same year or next year
+          return "gap";
+        }
+
+        // Both have specific months — check exact adjacency
+        if (nextFrom === _nextMonthKey(prevMonth, prevYear)) return "ok";
         return nextFrom > prevTo ? "gap" : "overlap";
       }
 
       // Generic timeline continuity validator.
       // tbodyId: tbody element id; errBarId: error bar div id;
       // getFromTo(tr) → {fromKey, toKey, isPresent, isEmpty}
-      function _validateTimelineSection(tbodyId, errBarId, getFromTo) {
+      function _validateTimelineSection(tbodyId, errBarId, getFromTo, skipPresentCheck) {
         const tbody = document.getElementById(tbodyId);
         const errBar = document.getElementById(errBarId);
         if (!tbody) return true;
@@ -11116,6 +11291,16 @@
           }
           if (dataRowIdx > 1 && prevToKey !== null && fromKey !== null) {
             const cont = _checkContinuity(prevToKey, fromKey);
+            if (cont !== "ok") {
+              const pM = prevToKey % 100, pY = Math.floor(prevToKey / 100);
+              const cM = fromKey % 100,   cY = Math.floor(fromKey / 100);
+              const mDiff = (cY - pY) * 12 + (cM - pM);
+              console.warn(
+                `[TIMELINE] Dòng ${rowNum} — prevEnd: ${pM ? String(pM).padStart(2,'0')+'/'+pY : pY} (key=${prevToKey})` +
+                ` | currStart: ${cM ? String(cM).padStart(2,'0')+'/'+cY : cY} (key=${fromKey})` +
+                ` | chênh: ${mDiff} tháng | ${cont}`
+              );
+            }
             if (cont === "gap") {
               errors.push(
                 `Dòng ${rowNum}: Thời gian bị gián đoạn với dòng trên`,
@@ -11132,9 +11317,26 @@
           if (rowBad) tr.classList.add("tl-row-invalid");
           prevToKey = isPresent ? null : toKey !== null ? toKey : fromKey;
         });
+        // Kiểm tra dòng cuối có khai đến hiện tại không
+        // skipPresentCheck=true → chỉ hiển thị cảnh báo, không ảnh hưởng return value (dùng khi thêm/chèn dòng)
+        // skipPresentCheck=false/undefined → đưa vào errors, ảnh hưởng return value (dùng khi submit)
+        let presentWarn = null;
+        if (dataRowIdx > 0 && prevToKey !== null) {
+          const _nowYear = new Date().getFullYear();
+          const _lastYear = Math.floor(prevToKey / 100);
+          if (_lastYear < _nowYear) {
+            const msg = `Chưa khai đến hiện tại — dừng ở năm ${_lastYear}`;
+            if (skipPresentCheck) {
+              presentWarn = msg;
+            } else {
+              errors.push(msg);
+            }
+          }
+        }
         if (errBar) {
-          if (errors.length) {
-            errBar.innerHTML = "⚠ " + errors.join("<br>⚠ ");
+          const allMsgs = presentWarn ? [...errors, presentWarn] : errors;
+          if (allMsgs.length) {
+            errBar.innerHTML = "⚠ " + allMsgs.join("<br>⚠ ");
             errBar.classList.add("visible");
           } else {
             errBar.innerHTML = "";
@@ -11238,7 +11440,9 @@
       }
 
       // Validate timeline continuity — returns true if valid
-      function validateFamHistory(acc) {
+      // skipPresentCheck=true → "chưa đến hiện tại" chỉ hiển thị, không ảnh hưởng return (dùng khi thêm/chèn dòng)
+      // skipPresentCheck=false/undefined → đưa vào errors, ảnh hưởng return (dùng khi submit)
+      function validateFamHistory(acc, skipPresentCheck) {
         const body = acc.querySelector(".family-body");
         if (!body) return true;
         const rows = body.querySelectorAll(".timeline-table tbody tr");
@@ -11291,6 +11495,14 @@
             const fk = _myKey(fromParsed.month, fromParsed.year);
             const cont = _checkContinuity(prevToKey, fk);
             if (cont !== "ok") {
+              const pM = prevToKey % 100, pY = Math.floor(prevToKey / 100);
+              const cM = fk % 100,       cY = Math.floor(fk / 100);
+              const mDiff = (cY - pY) * 12 + (cM - pM);
+              console.warn(
+                `[TIMELINE] Dòng ${rowNum} — prevEnd: ${pM ? String(pM).padStart(2,'0')+'/'+pY : pY} (key=${prevToKey})` +
+                ` | currStart: ${cM ? String(cM).padStart(2,'0')+'/'+cY : cY} (key=${fk})` +
+                ` | chênh: ${mDiff} tháng | ${cont}`
+              );
               const diff = cont === "gap" ? "bị gián đoạn" : "bị chồng lấp";
               errors.push(`Dòng ${rowNum}: Thời gian ${diff} với dòng trên`);
               rowInvalid = true;
@@ -11307,9 +11519,27 @@
           }
         });
 
+        // Kiểm tra dòng cuối có khai đến hiện tại không
+        // skipPresentCheck=true → chỉ hiển thị, không block thêm/chèn dòng
+        // skipPresentCheck=false/undefined → đưa vào errors, block submit
+        let presentWarn = null;
+        if (dataRowIdx > 0 && prevToKey !== null) {
+          const _nowYear = new Date().getFullYear();
+          const _lastYear = Math.floor(prevToKey / 100);
+          if (_lastYear < _nowYear) {
+            const msg = `Chưa khai đến hiện tại — dừng ở năm ${_lastYear}`;
+            if (skipPresentCheck) {
+              presentWarn = msg;
+            } else {
+              errors.push(msg);
+            }
+          }
+        }
+
         if (errBar) {
-          if (errors.length) {
-            errBar.innerHTML = "⚠ " + errors.join("<br>⚠ ");
+          const allMsgs = presentWarn ? [...errors, presentWarn] : errors;
+          if (allMsgs.length) {
+            errBar.innerHTML = "⚠ " + allMsgs.join("<br>⚠ ");
             errBar.classList.add("visible");
           } else {
             errBar.innerHTML = "";
@@ -11320,7 +11550,7 @@
       }
 
       // Section B (personal history) continuity validator
-      function validateSecB() {
+      function validateSecB(skipPresentCheck) {
         return _validateTimelineSection("tbB-body", "errBarB", (tr) => {
           const f = _getMmYr(tr.cells[0]);
           const t = _getMmYr(tr.cells[1]);
@@ -11336,7 +11566,7 @@
             fromInvalid: false,
             toInvalid: false,
           };
-        });
+        }, skipPresentCheck);
       }
 
       // Section C (work history) continuity validator
@@ -11358,7 +11588,7 @@
         return "";
       };
 
-      function validateSecC() {
+      function validateSecC(skipPresentCheck) {
         return _validateTimelineSection("tbC-body", "errBarC", (tr) => {
           const fromVal = _getMMyyyy(tr.cells[0]) || "";
           const toInput = tr.cells[1]?.querySelector(".fhd-to-txt");
@@ -11381,7 +11611,7 @@
             fromInvalid: !!(fromVal && !fp),
             toInvalid: !!(!isPresent && toVal && !tp),
           };
-        });
+        }, skipPresentCheck);
       }
 
       function _readAccordionHistory(acc) {
@@ -11448,7 +11678,7 @@
         );
         const newIds = [];
         for (const [i, hr] of rows.entries()) {
-          if (!hr.description) continue;
+          if (!hr.description && !hr.from_year && !hr.to_year && !hr.is_present) continue;
           try {
             const cr = await API.post(base, {
               entry_type: "family",
@@ -11571,12 +11801,14 @@
             meKeNeeded > 0
           )
             _annotateAccordions();
-          // Siblings: only create as many slots as there are members — fill sequentially
-          // to avoid pushing extra slots past the static slots and near Vợ/Chồng.
+          // Siblings/children: create enough slots to cover max sort_order value,
+          // so data saved at slot index N reloads back into slot N (no compaction).
           const sibRuotMembers = members.filter(
             (m) => m.relationship === "anh_chi_em_ruot",
           );
-          const sibRuotNeeded = sibRuotMembers.length;
+          const sibRuotNeeded = sibRuotMembers.length > 0
+            ? Math.max(sibRuotMembers.length, Math.max(...sibRuotMembers.map(m => (m.sort_order ?? 0) + 1)))
+            : 0;
           while (
             document.querySelectorAll(
               '.family-accordion[data-relationship="anh_chi_em_ruot"]',
@@ -11586,27 +11818,35 @@
           const sibChongVoMembers = members.filter(
             (m) => m.relationship === "anh_chi_em_chong_vo",
           );
-          const sibChongVoNeeded = sibChongVoMembers.length;
+          const sibChongVoNeeded = sibChongVoMembers.length > 0
+            ? Math.max(sibChongVoMembers.length, Math.max(...sibChongVoMembers.map(m => (m.sort_order ?? 0) + 1)))
+            : 0;
           while (
             document.querySelectorAll(
               '.family-accordion[data-relationship="anh_chi_em_chong_vo"]',
             ).length < sibChongVoNeeded
           )
             addFamSiblingSpouse(true);
+          // Create slots for children
+          const conMembers = members.filter((m) => m.relationship === "con");
+          const conNeeded = conMembers.length > 0
+            ? Math.max(conMembers.length, Math.max(...conMembers.map(m => (m.sort_order ?? 0) + 1)))
+            : 0;
+          while (
+            document.querySelectorAll(
+              '.family-accordion[data-relationship="con"]',
+            ).length < conNeeded
+          )
+            addFamChild(true);
           // Ensure all dynamically-created slots have data-relationship before filling.
           _annotateAccordions();
           // ── Fill accordions ────────────────────────────────────────────────────
-          // Group members by relationship, sorted by sort_order (relative order preserved).
-          // Father/Mother: sort_order-based fill (ensures cha dượng/mẹ kế go to exact slot).
-          // Siblings: sequential fill (compact — fills 3.1 then 3.2, never skips to 3.4).
+          // All relationships use sort_order-based fill: data saved at DOM index N
+          // always reloads into slot N (no compaction / slot shifting).
           const byRel = {};
           members.forEach((m) =>
             (byRel[m.relationship] = byRel[m.relationship] || []).push(m),
           );
-          const seqFillRels = new Set([
-            "anh_chi_em_ruot",
-            "anh_chi_em_chong_vo",
-          ]);
           Object.entries(byRel).forEach(([rel, relMs]) => {
             relMs.sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
             const accs = [
@@ -11614,45 +11854,21 @@
                 `.family-accordion[data-relationship="${rel}"]`,
               ),
             ];
-            if (seqFillRels.has(rel)) {
-              // Sequential: fill from first free slot in order
-              let nextFreeIdx = 0;
-              for (const m of relMs) {
-                let target = accs.find(
-                  (a) => a.dataset.familyId === String(m.id),
-                );
-                if (!target) {
-                  while (
-                    nextFreeIdx < accs.length &&
-                    accs[nextFreeIdx].dataset.familyId
-                  )
-                    nextFreeIdx++;
-                  target = accs[nextFreeIdx];
-                  nextFreeIdx++;
-                }
-                if (target) {
-                  _fillAccordion(target, m);
-                  if (Array.isArray(m.history) && m.history.length > 0)
-                    _fillAccordionHistory(target, m.history);
-                }
-              }
-            } else {
-              // Sort-order-based: cha dượng (sort_order=1) must go to slot 1, etc.
-              for (const m of relMs) {
-                const sortIdx = m.sort_order ?? 0;
-                const accAtSortIdx = accs[sortIdx];
-                const target =
-                  accs.find((a) => a.dataset.familyId === String(m.id)) ||
-                  (accAtSortIdx && !accAtSortIdx.dataset.familyId
-                    ? accAtSortIdx
-                    : null) ||
-                  accs.find((a) => !a.dataset.familyId) ||
-                  accs[0];
-                if (target) {
-                  _fillAccordion(target, m);
-                  if (Array.isArray(m.history) && m.history.length > 0)
-                    _fillAccordionHistory(target, m.history);
-                }
+            // Sort-order-based fill: member with sort_order=N goes to slot[N].
+            for (const m of relMs) {
+              const sortIdx = m.sort_order ?? 0;
+              const accAtSortIdx = accs[sortIdx];
+              const target =
+                accs.find((a) => a.dataset.familyId === String(m.id)) ||
+                (accAtSortIdx && !accAtSortIdx.dataset.familyId
+                  ? accAtSortIdx
+                  : null) ||
+                accs.find((a) => !a.dataset.familyId) ||
+                accs[0];
+              if (target) {
+                _fillAccordion(target, m);
+                if (Array.isArray(m.history) && m.history.length > 0)
+                  _fillAccordionHistory(target, m.history);
               }
             }
           });
@@ -11681,7 +11897,7 @@
 
       // ── Save all sections ────────────────────────────────────────────
       function _validateSiblings() {
-        const sibRels = ["anh_chi_em_ruot", "anh_chi_em_chong_vo"];
+        const sibRels = ["anh_chi_em_ruot", "anh_chi_em_chong_vo", "cha_chong_vo", "me_chong_vo"];
         const warnings = [];
         document
           .querySelectorAll(".family-accordion[data-relationship]")
@@ -11699,6 +11915,8 @@
             const name = (
               body.querySelector('input[oninput*="updateFamName"]')?.value || ""
             ).trim();
+            // Bỏ qua accordion chưa điền tên
+            if (!name) return;
             const label = name || titleText;
             const missing = [];
             // Gender
@@ -11740,8 +11958,8 @@
         if (warnings.length) {
           console.warn("[SIB_VALID]", warnings);
           showToast(
-            `⚠ ${warnings.length} anh/chị/em thiếu thông tin bắt buộc (xem chi tiết trong console).`,
-            4000,
+            `⚠ ${warnings.length} thành viên thiếu thông tin bắt buộc:\n• ` + warnings.join("\n• "),
+            5000,
           );
         }
       }
@@ -11789,7 +12007,11 @@
           // Save family member history (quá trình lịch sử)
           const famId = acc.dataset.familyId;
           if (famId) {
-            await _saveFamHistory(profileId, parseInt(famId), acc);
+            try {
+              await _saveFamHistory(profileId, parseInt(famId), acc);
+            } catch (eHist) {
+              console.warn("[FAM-HIST] save error for famId", famId, eHist.message);
+            }
           }
         }
       }
@@ -11864,39 +12086,34 @@
       // initAllDienBien chạy sau khi toàn bộ DOM (kể cả family blocks) đã render
       requestAnimationFrame(() => initAllDienBien());
 
-      // Auto-validate timelines when the user edits date inputs
-      document.addEventListener("input", (e) => {
-        const inp = e.target;
-        // Family history accordion
+      // Auto-validate timelines when the user edits any field inside a timeline table
+      function _handleTimelineEvent(target) {
+        // Family accordion: any input/change inside a .timeline-table
+        const acc = target.closest(".family-accordion");
+        if (acc && target.closest(".timeline-table")) {
+          validateFamHistory(acc);
+          return;
+        }
+        // fhd-input / fhd-to-txt outside accordion (child history text inputs)
         if (
-          inp.classList.contains("fhd-input") ||
-          inp.classList.contains("fhd-to-txt")
+          target.classList.contains("fhd-input") ||
+          target.classList.contains("fhd-to-txt")
         ) {
-          const acc = inp.closest(".accordion");
-          if (acc) {
-            validateFamHistory(acc);
-            return;
-          }
-          // Section C fhd-input (not inside accordion)
-          if (inp.closest("#tbC-body")) {
-            validateSecC();
-            return;
-          }
+          if (target.closest("#tbC-body")) { validateSecC(); return; }
         }
-        // Section B mm-year number input
-        if (inp.classList.contains("mm-year") && inp.closest("#tbB-body")) {
-          validateSecB();
+        // Section B/C mm-year number inputs
+        if (target.classList.contains("mm-year")) {
+          if (target.closest("#tbB-body")) { validateSecB(); return; }
+          if (target.closest("#tbC-body")) { validateSecC(); return; }
         }
-      });
-      // Section B mm-month select fires "change"
-      document.addEventListener("change", (e) => {
-        if (
-          e.target.classList.contains("mm-month") &&
-          e.target.closest("#tbB-body")
-        ) {
-          validateSecB();
+        // Section B/C mm-month selects
+        if (target.classList.contains("mm-month")) {
+          if (target.closest("#tbB-body")) { validateSecB(); return; }
+          if (target.closest("#tbC-body")) { validateSecC(); return; }
         }
-      });
+      }
+      document.addEventListener("input",  (e) => _handleTimelineEvent(e.target));
+      document.addEventListener("change", (e) => _handleTimelineEvent(e.target));
 
       // Gọi lại sau mỗi accordion mở để cover các table mới inject vào DOM
       document.addEventListener("click", (e) => {
@@ -12486,6 +12703,13 @@
             </div>
             <div class="edit-sec-body">
               <div class="field-correction-note" id="note-esA"></div>
+              <div class="field-row" id="fr-esA-photo">
+                <div class="field-label">Ảnh hồ sơ</div>
+                <div class="field-value" id="fv-esA-photo" style="padding-top:4px;">
+                  <img id="fi-esA-photo-img" alt="Ảnh hồ sơ" style="display:none;width:88px;height:118px;object-fit:cover;border-radius:5px;border:1.5px solid var(--border);" />
+                  <span id="fi-esA-photo-empty" style="color:var(--hint);font-style:italic;font-size:12px;">Chưa có ảnh</span>
+                </div>
+              </div>
               <div class="field-row">
                 <div class="field-label">Họ và tên</div>
                 <div class="field-value" id="fv-esA-name">—</div>
@@ -12910,7 +13134,13 @@
   <!-- Detail panel -->
   <div class="detail-panel" id="detailPanel">
     <div class="detail-panel-head">
-      <div><h3 id="detailName"></h3><div style="font-size:11px;color:rgba(255,255,255,.45);margin-top:2px" id="detailSub"></div></div>
+      <div style="display:flex;gap:12px;align-items:flex-start;flex:1;min-width:0;">
+        <img id="dpPhotoImg" alt="Ảnh" style="display:none;width:52px;height:70px;object-fit:cover;border-radius:4px;border:2px solid rgba(255,255,255,.3);flex-shrink:0;" />
+        <div style="flex:1;min-width:0;">
+          <h3 id="detailName"></h3>
+          <div style="font-size:11px;color:rgba(255,255,255,.45);margin-top:2px" id="detailSub"></div>
+        </div>
+      </div>
       <button class="close-panel" onclick="closeDetail()">✕</button>
     </div>
     <div class="detail-panel-body">
@@ -13192,6 +13422,16 @@
           const dpOfficer = document.getElementById("dpOfficer");
           if (dpOfficer)
             dpOfficer.textContent = p.officer_in_charge_name || "—";
+          // Photo in detail panel
+          const dpPhotoImg = document.getElementById("dpPhotoImg");
+          if (dpPhotoImg) {
+            if (p.photo_file_detail && p.photo_file_detail.url) {
+              dpPhotoImg.src = p.photo_file_detail.url;
+              dpPhotoImg.style.display = "block";
+            } else {
+              dpPhotoImg.style.display = "none";
+            }
+          }
           const rr = document.getElementById("returnReason");
           if (rr && p.return_reason) rr.value = p.return_reason;
 
@@ -13999,6 +14239,16 @@
             setFv("esA-email", p.user?.email);
             setFv("esA-occupation", p.occupation);
             setFv("esA-temp-addr", p.temporary_address);
+            // Photo in Section A (view only — admin cannot change citizen's photo)
+            const esAPhotoImg = document.getElementById("fi-esA-photo-img");
+            const esAPhotoEmpty = document.getElementById("fi-esA-photo-empty");
+            if (p.photo_file_detail && p.photo_file_detail.url) {
+              if (esAPhotoImg) { esAPhotoImg.src = p.photo_file_detail.url; esAPhotoImg.style.display = "block"; }
+              if (esAPhotoEmpty) esAPhotoEmpty.style.display = "none";
+            } else {
+              if (esAPhotoImg) esAPhotoImg.style.display = "none";
+              if (esAPhotoEmpty) esAPhotoEmpty.style.display = "inline";
+            }
 
             // Section C — education & qualifications
             setFv("esC-edu-gen", p.general_edu_level);
@@ -16276,7 +16526,7 @@
           }
           // Production environment
           if (hostname === "14.224.210.210" || hostname === "lylich.gov.vn") {
-            return "http://14.224.210.210:8006/api/v1";
+            return "http://14.224.210.210:8003/api/v1";
           }
           return "/api/v1";
         }
@@ -18634,6 +18884,8 @@
                       );
                     if (f.occupation)
                       lines.push(`Nghề nghiệp: ${_esc(f.occupation)}`);
+                    if (f.child_school)
+                      lines.push(`Đang học trường: ${_esc(f.child_school)}`);
                     if (f.relationship === "anh_chi_em_ruot")
                       lines.push(
                         `Quốc tịch: ${_esc(f.nationality || "Việt Nam")}`,
@@ -18894,7 +19146,7 @@
             location.port === "5501"
               ? "http://127.0.0.1:8000/api/v1"
               : location.hostname === "14.224.210.210"
-                ? "http://14.224.210.210:8006/api/v1"
+                ? "http://14.224.210.210:8003/api/v1"
                 : "/api/v1");
           const tok = localStorage.getItem("access_token");
           const resp = await fetch(`${base}/exports/word/${profileId}/`, {

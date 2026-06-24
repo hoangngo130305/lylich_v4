@@ -98,6 +98,11 @@ class UserAdmin(ModelAdmin, BaseUserAdmin):
 # ── Officer proxy model ───────────────────────────────────────────────────────
 # Officer model is defined in models.py
 
+class OfficerAddForm(UserCreationForm):
+    class Meta(UserCreationForm.Meta):
+        model = User
+        fields = ('full_name', 'phone', 'email', 'role', 'status')
+
 class OfficerPermissionInline(StackedInline):
     model = OfficerPermission
     can_delete = False
@@ -121,6 +126,7 @@ def _bool_icon(val):
 
 @admin.register(Officer)
 class OfficerAdmin(ModelAdmin, BaseUserAdmin):
+    add_form      = OfficerAddForm
     list_display  = [
         'id', 'full_name', 'phone', 'role', 'status',
         'perm_create_accounts', 'perm_review_profiles', 'perm_approve_profiles',

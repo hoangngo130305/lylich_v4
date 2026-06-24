@@ -12,6 +12,7 @@ logger = logging.getLogger(__name__)
 class FamilyMemberListCreateView(generics.ListCreateAPIView):
     serializer_class = FamilyMemberSerializer
     permission_classes = [IsOfficerOrApplicant]
+    pagination_class = None
 
     def get_queryset(self):
         profile_id = self.kwargs['profile_id']
