@@ -16526,7 +16526,7 @@
           }
           // Production environment
           if (hostname === "14.224.210.210" || hostname === "lylich.gov.vn") {
-            return "http://14.224.210.210:8003/api/v1";
+            return "http://14.224.210.210:8006/api/v1";
           }
           return "/api/v1";
         }
@@ -19146,7 +19146,7 @@
             location.port === "5501"
               ? "http://127.0.0.1:8000/api/v1"
               : location.hostname === "14.224.210.210"
-                ? "http://14.224.210.210:8003/api/v1"
+                ? "http://14.224.210.210:8006/api/v1"
                 : "/api/v1");
           const tok = localStorage.getItem("access_token");
           const resp = await fetch(`${base}/exports/word/${profileId}/`, {
