@@ -10007,3 +10007,7 @@ WARNING 2026-06-24 14:06:37,988 log 4924 21788 Unauthorized: /api/v1/verificatio
 WARNING 2026-06-24 14:06:37,989 basehttp 4924 21788 "GET /api/v1/verification/stats/ HTTP/1.1" 401 291
 WARNING 2026-06-24 14:06:47,463 log 4924 5920 Unauthorized: /api/v1/auth/me/
 WARNING 2026-06-24 14:06:47,464 basehttp 4924 5920 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-06-24 19:58:23,478 log 4924 18268 Unauthorized: /api/v1/auth/me/
+WARNING 2026-06-24 19:58:23,489 basehttp 4924 18268 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-06-24 19:58:23,504 log 4924 5624 Unauthorized: /api/v1/auth/me/
+WARNING 2026-06-24 19:58:23,505 basehttp 4924 5624 "GET /api/v1/auth/me/ HTTP/1.1" 401 291

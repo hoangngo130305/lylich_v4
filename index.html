@@ -1070,6 +1070,8 @@
         height: auto;
         overflow: hidden;
         line-height: 1.5;
+        word-break: break-word;
+        white-space: pre-wrap;
       }
       .td-dienbien textarea:placeholder-shown {
         min-height: 72px !important;
@@ -6783,7 +6785,7 @@
                             "
                           ></textarea>
                         </td>
-                        <td class="td-chucvu"><textarea class="cvu-ta" rows="1" placeholder="" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'" style="box-sizing:border-box"></textarea></td>
+                        <td class="td-chucvu"><textarea class="cvu-ta" rows="1" placeholder="" oninput="this.style.height='1px';this.style.height=this.scrollHeight+'px'" style="width:100%;resize:none;overflow:hidden;min-height:38px;box-sizing:border-box"></textarea></td>
                         <td>
                           <button class="del-btn" onclick="delRow(this)">
                             ✕
@@ -6873,7 +6875,7 @@
                             "
                           ></textarea>
                         </td>
-                        <td class="td-chucvu"><textarea class="cvu-ta" rows="1" placeholder="" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'" style="box-sizing:border-box"></textarea></td>
+                        <td class="td-chucvu"><textarea class="cvu-ta" rows="1" placeholder="" oninput="this.style.height='1px';this.style.height=this.scrollHeight+'px'" style="width:100%;resize:none;overflow:hidden;min-height:38px;box-sizing:border-box"></textarea></td>
                         <td>
                           <button class="del-btn" onclick="delRow(this)">
                             ✕
@@ -6963,7 +6965,7 @@
                             "
                           ></textarea>
                         </td>
-                        <td class="td-chucvu"><textarea class="cvu-ta" rows="1" placeholder="" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'" style="box-sizing:border-box"></textarea></td>
+                        <td class="td-chucvu"><textarea class="cvu-ta" rows="1" placeholder="" oninput="this.style.height='1px';this.style.height=this.scrollHeight+'px'" style="width:100%;resize:none;overflow:hidden;min-height:38px;box-sizing:border-box"></textarea></td>
                         <td>
                           <button class="del-btn" onclick="delRow(this)">
                             ✕
@@ -9478,7 +9480,7 @@
         const tr = document.createElement("tr");
         const monthYearFrom = `<div class="mmyyyy-wrap"><select class="mm-month"><option value="">MM</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select><span class="mmyyyy-slash">/</span><input class="mm-year" type="number" placeholder="YYYY" min="1900" max="2099" step="1"></div>`;
         const monthYearTo = `<div class="mmyyyy-wrap"><select class="mm-month"><option value="">MM</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select><span class="mmyyyy-slash">/</span><input class="mm-year" type="number" placeholder="YYYY" min="1900" max="2099" step="1"></div>`;
-        tr.innerHTML = `<td>${monthYearFrom}</td><td class="fhd-to-cell"><div class="fhd-to-inner">${monthYearTo}<label class="fhd-present-wrap" title="Đến nay"><input type="checkbox" class="fhd-present-chk" onchange="toggleFhdPresent(this)"> Nay</label></div></td><td class="td-dienbien"><textarea class="fhd-input" rows="2" placeholder="" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'" style="width:100%;resize:none;min-height:38px;overflow:hidden;box-sizing:border-box"></textarea></td><td class="td-chucvu"><textarea class="cvu-ta" rows="1" placeholder="" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'" style="box-sizing:border-box"></textarea></td>${_rowActTd("C")}`;
+        tr.innerHTML = `<td>${monthYearFrom}</td><td class="fhd-to-cell"><div class="fhd-to-inner">${monthYearTo}<label class="fhd-present-wrap" title="Đến nay"><input type="checkbox" class="fhd-present-chk" onchange="toggleFhdPresent(this)"> Nay</label></div></td><td class="td-dienbien"><textarea class="fhd-input" rows="2" placeholder="" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'" style="width:100%;resize:none;min-height:38px;overflow:hidden;box-sizing:border-box"></textarea></td><td class="td-chucvu"><textarea class="cvu-ta" rows="1" placeholder="" oninput="this.style.height='1px';this.style.height=this.scrollHeight+'px'" style="width:100%;resize:none;overflow:hidden;min-height:38px;box-sizing:border-box"></textarea></td>${_rowActTd("C")}`;
         return tr;
       }
       function _makeFamHistRow() {
@@ -9618,17 +9620,17 @@
       }
       function addRowF() {
         const tb = document.getElementById("tbF-body");
-        tb.insertRow().innerHTML = `<td><input type="text"></td><td><input type="text"></td><td><button class="del-btn" onclick="delRow(this)">✕</button></td>`;
+        tb.insertRow().innerHTML = `<td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><button class="del-btn" onclick="delRow(this)">✕</button></td>`;
         refreshDienBien(tb.closest(".timeline-table"));
       }
       function addRowG() {
         const tb = document.getElementById("tbG-body");
-        tb.insertRow().innerHTML = `<td><input type="text"></td><td><input type="text"></td><td><button class="del-btn" onclick="delRow(this)">✕</button></td>`;
+        tb.insertRow().innerHTML = `<td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><button class="del-btn" onclick="delRow(this)">✕</button></td>`;
         refreshDienBien(tb.closest(".timeline-table"));
       }
       function addRowH() {
         const tb = document.getElementById("tbH-body");
-        tb.insertRow().innerHTML = `<td><input type="text"></td><td><input type="text"></td><td><button class="del-btn" onclick="delRow(this)">✕</button></td>`;
+        tb.insertRow().innerHTML = `<td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><button class="del-btn" onclick="delRow(this)">✕</button></td>`;
         refreshDienBien(tb.closest(".timeline-table"));
       }
 
@@ -10610,7 +10612,7 @@
             `<td>${mmFrom}</td>` +
             `<td class="fhd-to-cell"><div class="fhd-to-inner">${mmTo}<label class="fhd-present-wrap" title="Đến nay"><input type="checkbox" class="fhd-present-chk"${chk} onchange="toggleFhdPresent(this)"> Nay</label></div></td>` +
             `<td class="td-dienbien"><input type="text" value="${_esc(r.employer || "")}"></td>` +
-            `<td class="td-chucvu"><textarea class="cvu-ta" rows="1" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'" style="box-sizing:border-box">${_esc(r.job_title || "")}</textarea></td>` +
+            `<td class="td-chucvu"><textarea class="cvu-ta" rows="1" oninput="this.style.height='1px';this.style.height=this.scrollHeight+'px'" style="width:100%;resize:none;overflow:hidden;min-height:38px;box-sizing:border-box">${_esc(r.job_title || "")}</textarea></td>` +
             `<td><button class="del-btn" onclick="delRow(this)">✕</button></td>`;
         });
         tb.querySelectorAll(".td-dienbien").forEach((td) => {
@@ -16526,7 +16528,7 @@
           }
           // Production environment
           if (hostname === "14.224.210.210" || hostname === "lylich.gov.vn") {
-            return "http://14.224.210.210:8006/api/v1";
+            return "http://14.224.210.210:8003/api/v1";
           }
           return "/api/v1";
         }
@@ -19146,7 +19148,7 @@
             location.port === "5501"
               ? "http://127.0.0.1:8000/api/v1"
               : location.hostname === "14.224.210.210"
-                ? "http://14.224.210.210:8006/api/v1"
+                ? "http://14.224.210.210:8003/api/v1"
                 : "/api/v1");
           const tok = localStorage.getItem("access_token");
           const resp = await fetch(`${base}/exports/word/${profileId}/`, {

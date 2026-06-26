@@ -220,26 +220,31 @@ class AccountRequestListView(generics.ListCreateAPIView):
             fail_silently=False,
         )
 
-    @transaction.atomic
     def perform_create(self, serializer):
         req = serializer.save()
+        user = None
         try:
             role, _ = Role.objects.get_or_create(
                 code='quan_chung',
                 defaults={'name': 'Quần chúng xin vào Đảng'}
             )
             initial_password = self._generate_initial_password()
-            user = User.objects.create_user(
-                phone=req.phone,
-                password=initial_password,
-                full_name=req.full_name,
-                cccd=req.cccd,
-                email=req.email,
-                role=role,
-                status=User.Status.ACTIVE,
-                phone_verified=True,
-                created_by=self.request.user,
-            )
+
+            # Wrap user creation in its own savepoint so an IntegrityError
+            # (duplicate phone/cccd) doesn't abort the outer transaction and
+            # still allows req.save() in the except block to succeed.
+            with transaction.atomic():
+                user = User.objects.create_user(
+                    phone=req.phone,
+                    password=initial_password,
+                    full_name=req.full_name,
+                    cccd=req.cccd,
+                    email=req.email,
+                    role=role,
+                    status=User.Status.ACTIVE,
+                    phone_verified=True,
+                    created_by=self.request.user,
+                )
 
             self._send_account_email(req, initial_password)
 
@@ -255,6 +260,12 @@ class AccountRequestListView(generics.ListCreateAPIView):
                 description=f'Tạo tài khoản cho {req.full_name}'
             )
         except Exception as e:
+            # Roll back a successfully-created user if a later step (e.g. email) failed
+            if user is not None:
+                try:
+                    user.delete()
+                except Exception:
+                    pass
             req.status = AccountRequest.Status.FAILED
             req.fail_reason = str(e)
             req.processed_at = timezone.now()
