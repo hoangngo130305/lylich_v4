@@ -1388,6 +1388,9 @@
         cursor: pointer;
         margin: 0;
       }
+      .fhd-deceased-wrap {
+        color: #c0392b;
+      }
       td.fhd-to-cell {
         position: relative;
       }
@@ -1423,6 +1426,81 @@
       }
       .fhd-error-bar.visible {
         display: block;
+      }
+
+      /* ══ FAMILY ACCORDION ══ */
+      .family-accordion {
+        border: 1px solid var(--border);
+        border-radius: var(--r);
+        overflow: hidden;
+        margin-bottom: 8px;
+        box-shadow: var(--s-xs);
+      }
+      .family-head {
+        padding: 10px 14px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: var(--white);
+        user-select: none;
+        transition: background 0.15s;
+      }
+      .family-head:hover { background: #f6f8fc; }
+      .family-body {
+        display: none;
+        padding: 14px 16px;
+        border-top: 1px solid var(--border-l);
+        background: #fbfbfe;
+      }
+      .family-body.open { display: block; }
+      .fam-num {
+        width: 24px;
+        height: 24px;
+        border-radius: var(--r-sm);
+        background: var(--navy4);
+        color: rgba(255,255,255,0.85);
+        font-size: 11px;
+        font-weight: 800;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+      .fam-info {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        align-items: baseline;
+        gap: 5px;
+        overflow: hidden;
+      }
+      .fam-info strong {
+        color: var(--navy);
+        font-size: 12.5px;
+        font-weight: 700;
+        white-space: nowrap;
+        flex-shrink: 0;
+      }
+      .fam-name {
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 400;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .chevron {
+        color: var(--hint);
+        font-size: 13px;
+        transition: transform 0.22s;
+        flex-shrink: 0;
+      }
+      .fam-text-birth-place,
+      .fam-text-hometown {
+        grid-column: 2;
+        width: 100%;
+        box-sizing: border-box;
       }
 
       .hist-date-cell {
@@ -6680,6 +6758,7 @@
                 đoạn chuyển việc phải có kê khai
               </div>
             </div>
+            <div class="fhd-error-bar" id="errBarBC"></div>
             <div class="card">
               <div class="card-head">
                 <div class="card-head-dot"></div>
@@ -9700,19 +9779,19 @@
       <tbody>
         <tr>
           <td><div class="mmyyyy-wrap"><select class="mm-month"><option value="">MM</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select><span class="mmyyyy-slash">/</span><input class="mm-year" type="number" placeholder="YYYY" min="1900" max="2099" step="1"></div></td>
-          <td class="fhd-to-cell"><div class="fhd-to-inner"><div class="mmyyyy-wrap"><select class="mm-month"><option value="">MM</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select><span class="mmyyyy-slash">/</span><input class="mm-year" type="number" placeholder="YYYY" min="1900" max="2099" step="1"></div><label class="fhd-present-wrap" title="Đến nay"><input type="checkbox" class="fhd-present-chk" onchange="toggleFhdPresent(this)"> Nay</label></div></td>
+          <td class="fhd-to-cell"><div class="fhd-to-inner"><div class="mmyyyy-wrap"><select class="mm-month"><option value="">MM</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select><span class="mmyyyy-slash">/</span><input class="mm-year" type="number" placeholder="YYYY" min="1900" max="2099" step="1"></div><label class="fhd-present-wrap" title="Đến nay"><input type="checkbox" class="fhd-present-chk" onchange="toggleFhdPresent(this)"> Nay</label><label class="fhd-present-wrap fhd-deceased-wrap" title="Đã mất"><input type="checkbox" class="fhd-deceased-chk" onchange="toggleFhdDeceased(this)"> Đã mất</label></div></td>
           <td class="td-dienbien"><input type="text" placeholder="Sống với cha mẹ, đi học, làm việc tại …"></td>
           <td><div class="row-act-wrap"><button class="ins-btn" onclick="insertRowAbove(this,'fam')" title="Chèn dòng trên">▲</button><button class="del-btn" onclick="delRow(this)">✕</button><button class="ins-btn" onclick="insertRowBelow(this,'fam')" title="Chèn dòng dưới">▼</button></div></td>
         </tr>
         <tr>
           <td><div class="mmyyyy-wrap"><select class="mm-month"><option value="">MM</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select><span class="mmyyyy-slash">/</span><input class="mm-year" type="number" placeholder="YYYY" min="1900" max="2099" step="1"></div></td>
-          <td class="fhd-to-cell"><div class="fhd-to-inner"><div class="mmyyyy-wrap"><select class="mm-month"><option value="">MM</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select><span class="mmyyyy-slash">/</span><input class="mm-year" type="number" placeholder="YYYY" min="1900" max="2099" step="1"></div><label class="fhd-present-wrap" title="Đến nay"><input type="checkbox" class="fhd-present-chk" onchange="toggleFhdPresent(this)"> Nay</label></div></td>
+          <td class="fhd-to-cell"><div class="fhd-to-inner"><div class="mmyyyy-wrap"><select class="mm-month"><option value="">MM</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select><span class="mmyyyy-slash">/</span><input class="mm-year" type="number" placeholder="YYYY" min="1900" max="2099" step="1"></div><label class="fhd-present-wrap" title="Đến nay"><input type="checkbox" class="fhd-present-chk" onchange="toggleFhdPresent(this)"> Nay</label><label class="fhd-present-wrap fhd-deceased-wrap" title="Đã mất"><input type="checkbox" class="fhd-deceased-chk" onchange="toggleFhdDeceased(this)"> Đã mất</label></div></td>
           <td class="td-dienbien"><input type="text"></td>
           <td><div class="row-act-wrap"><button class="ins-btn" onclick="insertRowAbove(this,'fam')" title="Chèn dòng trên">▲</button><button class="del-btn" onclick="delRow(this)">✕</button><button class="ins-btn" onclick="insertRowBelow(this,'fam')" title="Chèn dòng dưới">▼</button></div></td>
         </tr>
         <tr>
           <td><div class="mmyyyy-wrap"><select class="mm-month"><option value="">MM</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select><span class="mmyyyy-slash">/</span><input class="mm-year" type="number" placeholder="YYYY" min="1900" max="2099" step="1"></div></td>
-          <td class="fhd-to-cell"><div class="fhd-to-inner"><div class="mmyyyy-wrap"><select class="mm-month"><option value="">MM</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select><span class="mmyyyy-slash">/</span><input class="mm-year" type="number" placeholder="YYYY" min="1900" max="2099" step="1"></div><label class="fhd-present-wrap" title="Đến nay"><input type="checkbox" class="fhd-present-chk" onchange="toggleFhdPresent(this)"> Nay</label></div></td>
+          <td class="fhd-to-cell"><div class="fhd-to-inner"><div class="mmyyyy-wrap"><select class="mm-month"><option value="">MM</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select><span class="mmyyyy-slash">/</span><input class="mm-year" type="number" placeholder="YYYY" min="1900" max="2099" step="1"></div><label class="fhd-present-wrap" title="Đến nay"><input type="checkbox" class="fhd-present-chk" onchange="toggleFhdPresent(this)"> Nay</label><label class="fhd-present-wrap fhd-deceased-wrap" title="Đã mất"><input type="checkbox" class="fhd-deceased-chk" onchange="toggleFhdDeceased(this)"> Đã mất</label></div></td>
           <td class="td-dienbien"><input type="text"></td>
           <td><div class="row-act-wrap"><button class="ins-btn" onclick="insertRowAbove(this,'fam')" title="Chèn dòng trên">▲</button><button class="del-btn" onclick="delRow(this)">✕</button><button class="ins-btn" onclick="insertRowBelow(this,'fam')" title="Chèn dòng dưới">▼</button></div></td>
         </tr>
@@ -9724,18 +9803,15 @@
 
         if (m.sibling)
           return `
-    <div class="form-row"><label>Họ và tên</label><input type="text" oninput="updateFamName('${m.num}',this.value)" placeholder=""></div>
-    <div class="form-row two-col-50">
-      <div><label>Năm sinh <span style="color:var(--crimson)">*</span></label><input type="number" placeholder="YYYY" min="1900" max="2099"></div>
-      <div><label>Giới tính <span style="color:var(--crimson)">*</span></label><select><option value="">-- Chọn --</option><option value="male">Nam</option><option value="female">Nữ</option></select></div>
-    </div>
+    <div class="form-row two-col"><label>Họ và tên</label><input type="text" oninput="updateFamName('${m.num}',this.value)" placeholder=""><label>Năm sinh <span style="color:var(--crimson)">*</span></label><input type="number" placeholder="YYYY" min="1900" max="2099"></div>
+    <div class="form-row"><label>Giới tính <span style="color:var(--crimson)">*</span></label><select><option value="">-- Chọn --</option><option value="male">Nam</option><option value="female">Nữ</option></select></div>
     <div class="form-row"><label>Đã mất</label>
       <div><label style="display:inline-flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" class="sib-deceased-chk" style="width:auto;accent-color:var(--crimson)" onchange="toggleSibDeceased(this,'${m.num}')"> Đã mất</label></div>
     </div>
     <div id="sibAlive_${m.num}">
       <div class="form-row"><label>Nơi cư trú <span style="color:var(--crimson)">*</span></label>
         <div><div class="loc-row"><select id="sel_tinh_fam_${m.num.replace(/\./g, "_")}" class="searchable-location" onchange="updateFamCuTru(this)"><option value="">-- Tỉnh/TP --</option></select><select id="sel_xa_fam_${m.num.replace(/\./g, "_")}" class="searchable-location" onchange="updateFamCuTru(this)"><option value="">-- Xã/Phường --</option></select></div>
-        <input type="text" class="fam-addr-street" style="margin-top:6px;margin-bottom:4px" placeholder="Số nhà / Lô" oninput="updateFamCuTru(this)"><input type="text" class="fam-addr-hamlet" style="margin-bottom:4px" placeholder="Tên đường / ấp / thôn" oninput="updateFamCuTru(this)"><input type="text" class="fam-addr-location" placeholder="Địa chỉ đầy đủ (tự động điền hoặc nhập trực tiếp)"></div>
+        <div style="display:flex;gap:8px;margin-top:6px;margin-bottom:4px"><input type="text" class="fam-addr-street" placeholder="Số nhà / Lô" oninput="updateFamCuTru(this)" style="flex:0 0 110px;min-width:0"><input type="text" class="fam-addr-hamlet" placeholder="Tên đường / ấp / thôn" oninput="updateFamCuTru(this)" style="min-width:0"></div><input type="text" class="fam-addr-location" placeholder="Địa chỉ đầy đủ (tự động điền hoặc nhập trực tiếp)"></div>
       </div>
       <div class="form-row"><label>Nghề nghiệp hiện nay <span style="color:var(--crimson)">*</span></label><input type="text" placeholder="Công nhân / Viên chức / Nội trợ / Hưu trí …"></div>
     </div>
@@ -9762,11 +9838,10 @@
 
         if (m.child)
           return `
-    <div class="form-row"><label>Họ và tên</label><input type="text" oninput="updateFamName('${m.num}',this.value)"></div>
-    <div class="form-row"><label>Năm sinh</label><input type="text" placeholder="YYYY" id="childYear_${m.num}" oninput="checkChildAge('${m.num}',this.value)"></div>
+    <div class="form-row two-col"><label>Họ và tên</label><input type="text" oninput="updateFamName('${m.num}',this.value)"><label>Năm sinh</label><input type="text" placeholder="YYYY" id="childYear_${m.num}" oninput="checkChildAge('${m.num}',this.value)"></div>
     <div class="form-row"><label>Nơi cư trú</label>
       <div><div class="loc-row" style="margin-bottom:6px"><select id="sel_tinh_fam_ct_${m.num.replace(/\./g, "_")}" class="searchable-location" onchange="updateFamCuTru(this)"><option value="">-- Tỉnh/TP --</option></select><select id="sel_xa_fam_ct_${m.num.replace(/\./g, "_")}" class="searchable-location" onchange="updateFamCuTru(this)"><option value="">-- Xã/Phường --</option></select></div>
-      <input type="text" class="fam-addr-street" style="margin-bottom:4px" placeholder="Số nhà / Lô" oninput="updateFamCuTru(this)"><input type="text" class="fam-addr-hamlet" style="margin-bottom:4px" placeholder="Tên đường / ấp / thôn" oninput="updateFamCuTru(this)"><input type="text" class="fam-addr-location" placeholder="Địa chỉ đầy đủ (tự động điền hoặc nhập trực tiếp)"></div>
+      <div style="display:flex;gap:8px;margin-bottom:4px"><input type="text" class="fam-addr-street" placeholder="Số nhà / Lô" oninput="updateFamCuTru(this)" style="flex:0 0 110px;min-width:0"><input type="text" class="fam-addr-hamlet" placeholder="Tên đường / ấp / thôn" oninput="updateFamCuTru(this)" style="min-width:0"></div><input type="text" class="fam-addr-location" placeholder="Địa chỉ đầy đủ (tự động điền hoặc nhập trực tiếp)"></div>
     </div>
     <div id="childUnder18_${m.num}">
       <div class="form-row">
@@ -9778,10 +9853,10 @@
       <div class="alert alert-info" style="font-size:12px;margin:6px 0 10px">ℹ Con từ 18 tuổi trở lên: khai đầy đủ như bản thân theo quy định Mẫu 2-KNĐ</div>
       <div class="form-row"><label>Nơi sinh<span class="hint-lbl">Không ghi bệnh viện — ghi Xã/Phường, Tỉnh/TP</span></label>
         <div class="loc-row"><select id="sel_tinh_fam_ns_${m.num.replace(/\./g, "_")}" class="searchable-location"><option value="">-- Tỉnh/TP --</option></select><select id="sel_xa_fam_ns_${m.num.replace(/\./g, "_")}" class="searchable-location"><option value="">-- Xã/Phường --</option></select></div>
-        <textarea class="fam-text-birth-place" rows="2" style="margin-top:4px;width:100%;resize:none;overflow:hidden;box-sizing:border-box" placeholder="Nơi sinh (tự động điền hoặc nhập trực tiếp)" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"></textarea></div>
+        <input type="text" class="fam-text-birth-place" style="margin-top:4px;width:100%;box-sizing:border-box" placeholder="Nơi sinh (tự động điền hoặc nhập trực tiếp)"></div>
       <div class="form-row"><label>Quê quán<span class="hint-lbl">Địa danh hành chính mới</span></label>
         <div class="loc-row"><select id="sel_tinh_fam_qq_${m.num.replace(/\./g, "_")}" class="searchable-location"><option value="">-- Tỉnh/TP --</option></select><select id="sel_xa_fam_qq_${m.num.replace(/\./g, "_")}" class="searchable-location"><option value="">-- Xã/Phường --</option></select></div>
-        <textarea class="fam-text-hometown" rows="2" style="margin-top:4px;width:100%;resize:none;overflow:hidden;box-sizing:border-box" placeholder="Quê quán (tự động điền hoặc nhập trực tiếp)" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"></textarea></div>
+        <input type="text" class="fam-text-hometown" style="margin-top:4px;width:100%;box-sizing:border-box" placeholder="Quê quán (tự động điền hoặc nhập trực tiếp)"></div>
       <div class="form-row"><label>Dân tộc</label><div><select class="fam-sel-ethnic" onchange="toggleFamSelKhac(this)"><option value="">-- Chọn --</option><option>Kinh</option><option>Tày</option><option>Thái</option><option>Mường</option><option>Khmer</option><option>Nùng</option><option>HMông</option><option>Khác</option></select><input class="fam-sel-khac-other" style="display:none;margin-top:4px;width:100%" placeholder="Nhập tên dân tộc"></div></div>
       <div class="form-row"><label>Tôn giáo</label><div><select class="fam-sel-religion" onchange="toggleFamSelKhac(this)"><option value="">-- Chọn --</option><option>Không</option><option>Phật giáo</option><option>Công giáo</option><option>Cao Đài</option><option>Hòa Hảo</option><option>Tin Lành</option><option>Hồi giáo</option><option>Khác</option></select><input class="fam-sel-khac-other" style="display:none;margin-top:4px;width:100%" placeholder="Nhập tên tôn giáo"></div></div>
       <div class="form-row"><label>Chức sắc tôn giáo</label><input type="text" class="fam-religious-rank" placeholder="Linh mục / Mục sư / Hòa thượng / Không có"></div>
@@ -9792,8 +9867,8 @@
 <table class="timeline-table">
         <thead><tr><th style="width:17%">Từ (MM/YYYY)</th><th style="width:22%">Đến (MM/YYYY)</th><th>Diễn biến + Nơi sinh sống</th><th style="width:36px"></th></tr></thead>
         <tbody>
-          <tr><td><div class="mmyyyy-wrap"><select class="mm-month"><option value="">MM</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select><span class="mmyyyy-slash">/</span><input class="mm-year" type="number" placeholder="YYYY" min="1900" max="2099" step="1" value=""></div></td><td class="fhd-to-cell"><div class="fhd-to-inner"><div class="mmyyyy-wrap"><select class="mm-month"><option value="">MM</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select><span class="mmyyyy-slash">/</span><input class="mm-year" type="number" placeholder="YYYY" min="1900" max="2099" step="1" value=""></div><label class="fhd-present-wrap" title="Đến nay"><input type="checkbox" class="fhd-present-chk" onchange="toggleFhdPresent(this)"> Nay</label></div></td><td class="td-dienbien"><input type="text" value="" placeholder="Còn nhỏ, sống với cha mẹ tại …"></td><td><div class="row-act-wrap"><button class="ins-btn" onclick="insertRowAbove(this,'fam')" title="Chèn dòng trên">▲</button><button class="del-btn" onclick="delRow(this)">✕</button><button class="ins-btn" onclick="insertRowBelow(this,'fam')" title="Chèn dòng dưới">▼</button></div></td></tr>
-          <tr><td><div class="mmyyyy-wrap"><select class="mm-month"><option value="">MM</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select><span class="mmyyyy-slash">/</span><input class="mm-year" type="number" placeholder="YYYY" min="1900" max="2099" step="1" value=""></div></td><td class="fhd-to-cell"><div class="fhd-to-inner"><div class="mmyyyy-wrap"><select class="mm-month"><option value="">MM</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select><span class="mmyyyy-slash">/</span><input class="mm-year" type="number" placeholder="YYYY" min="1900" max="2099" step="1" value=""></div><label class="fhd-present-wrap" title="Đến nay"><input type="checkbox" class="fhd-present-chk" onchange="toggleFhdPresent(this)"> Nay</label></div></td><td class="td-dienbien"><input type="text" value=""></td><td><div class="row-act-wrap"><button class="ins-btn" onclick="insertRowAbove(this,'fam')" title="Chèn dòng trên">▲</button><button class="del-btn" onclick="delRow(this)">✕</button><button class="ins-btn" onclick="insertRowBelow(this,'fam')" title="Chèn dòng dưới">▼</button></div></td></tr>
+          <tr><td><div class="mmyyyy-wrap"><select class="mm-month"><option value="">MM</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select><span class="mmyyyy-slash">/</span><input class="mm-year" type="number" placeholder="YYYY" min="1900" max="2099" step="1" value=""></div></td><td class="fhd-to-cell"><div class="fhd-to-inner"><div class="mmyyyy-wrap"><select class="mm-month"><option value="">MM</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select><span class="mmyyyy-slash">/</span><input class="mm-year" type="number" placeholder="YYYY" min="1900" max="2099" step="1" value=""></div><label class="fhd-present-wrap" title="Đến nay"><input type="checkbox" class="fhd-present-chk" onchange="toggleFhdPresent(this)"> Nay</label><label class="fhd-present-wrap fhd-deceased-wrap" title="Đã mất"><input type="checkbox" class="fhd-deceased-chk" onchange="toggleFhdDeceased(this)"> Đã mất</label></div></td><td class="td-dienbien"><input type="text" value="" placeholder="Còn nhỏ, sống với cha mẹ tại …"></td><td><div class="row-act-wrap"><button class="ins-btn" onclick="insertRowAbove(this,'fam')" title="Chèn dòng trên">▲</button><button class="del-btn" onclick="delRow(this)">✕</button><button class="ins-btn" onclick="insertRowBelow(this,'fam')" title="Chèn dòng dưới">▼</button></div></td></tr>
+          <tr><td><div class="mmyyyy-wrap"><select class="mm-month"><option value="">MM</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select><span class="mmyyyy-slash">/</span><input class="mm-year" type="number" placeholder="YYYY" min="1900" max="2099" step="1" value=""></div></td><td class="fhd-to-cell"><div class="fhd-to-inner"><div class="mmyyyy-wrap"><select class="mm-month"><option value="">MM</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select><span class="mmyyyy-slash">/</span><input class="mm-year" type="number" placeholder="YYYY" min="1900" max="2099" step="1" value=""></div><label class="fhd-present-wrap" title="Đến nay"><input type="checkbox" class="fhd-present-chk" onchange="toggleFhdPresent(this)"> Nay</label><label class="fhd-present-wrap fhd-deceased-wrap" title="Đã mất"><input type="checkbox" class="fhd-deceased-chk" onchange="toggleFhdDeceased(this)"> Đã mất</label></div></td><td class="td-dienbien"><input type="text" value=""></td><td><div class="row-act-wrap"><button class="ins-btn" onclick="insertRowAbove(this,'fam')" title="Chèn dòng trên">▲</button><button class="del-btn" onclick="delRow(this)">✕</button><button class="ins-btn" onclick="insertRowBelow(this,'fam')" title="Chèn dòng dưới">▼</button></div></td></tr>
         </tbody>
       </table>
 </div>
@@ -9805,20 +9880,19 @@
           return `
     <div class="alert alert-warn" style="margin-bottom:8px;font-size:12px">⚠ Đã ly hôn: chỉ cần khai Họ tên + Năm sinh, các thông tin khác (lập gia đình, ly hôn) ghi trong <strong>Phần C – Lịch sử công tác</strong>. Không cần khai cha mẹ và ông bà bên chồng/vợ khi đã ly hôn.</div>
     <div class="alert alert-info" style="margin-bottom:10px;font-size:12px">ℹ <strong>Lưu ý:</strong> Thông tin ngày lập gia đình và ly hôn (nếu có) <strong>không khai ở đây</strong> — chỉ ghi trong <strong>Phần C</strong> dạng: "Tháng …/…. – Lập gia đình với … chuyển đến sinh sống tại …" và "Tháng …/…. – Ly hôn với … theo Quyết định số … của cấp …"</div>
-    <div class="form-row"><label>Họ và tên</label><input type="text" oninput="updateFamName('${m.num}',this.value)"></div>
-    <div class="form-row"><label>Năm sinh</label><input type="text" placeholder="YYYY"></div>
+    <div class="form-row two-col"><label>Họ và tên</label><input type="text" oninput="updateFamName('${m.num}',this.value)"><label>Năm sinh</label><input type="text" placeholder="YYYY"></div>
     <div class="form-row"><label>Nơi sinh<span class="hint-lbl">Không ghi bệnh viện — ghi Xã/Phường, Tỉnh/TP</span></label>
       <div class="loc-row"><select id="sel_tinh_fam_ns_${m.num.replace(/\./g, "_")}" class="searchable-location"><option value="">-- Tỉnh/TP --</option></select><select id="sel_xa_fam_ns_${m.num.replace(/\./g, "_")}" class="searchable-location"><option value="">-- Xã/Phường --</option></select></div>
-      <textarea class="fam-text-birth-place" rows="2" style="margin-top:4px;width:100%;resize:none;overflow:hidden;box-sizing:border-box" placeholder="Nơi sinh (tự động điền hoặc nhập trực tiếp)" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"></textarea></div>
+      <input type="text" class="fam-text-birth-place" style="margin-top:4px;width:100%;box-sizing:border-box" placeholder="Nơi sinh (tự động điền hoặc nhập trực tiếp)"></div>
     <div class="form-row"><label>Quê quán<span class="hint-lbl">Phải đối chiếu với cha mẹ chồng/vợ</span></label>
       <div class="loc-row"><select id="sel_tinh_fam_qq_${m.num.replace(/\./g, "_")}" class="searchable-location"><option value="">-- Tỉnh/TP --</option></select><select id="sel_xa_fam_qq_${m.num.replace(/\./g, "_")}" class="searchable-location"><option value="">-- Xã/Phường --</option></select></div>
-      <textarea class="fam-text-hometown" rows="2" style="margin-top:4px;width:100%;resize:none;overflow:hidden;box-sizing:border-box" placeholder="Quê quán (tự động điền hoặc nhập trực tiếp)" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"></textarea></div>
+      <input type="text" class="fam-text-hometown" style="margin-top:4px;width:100%;box-sizing:border-box" placeholder="Quê quán (tự động điền hoặc nhập trực tiếp)"></div>
     <div class="form-row"><label>Dân tộc</label><div><select class="fam-sel-ethnic" onchange="toggleFamSelKhac(this)"><option value="">-- Chọn --</option><option>Kinh</option><option>Tày</option><option>Thái</option><option>Mường</option><option>Khmer</option><option>Nùng</option><option>HMông</option><option>Khác</option></select><input class="fam-sel-khac-other" style="display:none;margin-top:4px;width:100%" placeholder="Nhập tên dân tộc"></div></div>
     <div class="form-row"><label>Tôn giáo</label><div><select class="fam-sel-religion" onchange="toggleFamSelKhac(this)"><option value="">-- Chọn --</option><option>Không</option><option>Phật giáo</option><option>Công giáo</option><option>Cao Đài</option><option>Hòa Hảo</option><option>Tin Lành</option><option>Hồi giáo</option><option>Khác</option></select><input class="fam-sel-khac-other" style="display:none;margin-top:4px;width:100%" placeholder="Nhập tên tôn giáo"></div></div>
     <div class="form-row"><label>Chức sắc tôn giáo</label><input type="text" class="fam-religious-rank" placeholder="Linh mục / Mục sư / Hòa thượng / Không có"></div>
     <div class="form-row"><label>Nơi cư trú<span class="hint-lbl">Để trống nếu đã mất</span></label>
       <div><div class="loc-row" style="margin-bottom:6px"><select id="sel_tinh_fam_ct_${m.num.replace(/\./g, "_")}" class="searchable-location" onchange="updateFamCuTru(this)"><option value="">-- Tỉnh/TP --</option></select><select id="sel_xa_fam_ct_${m.num.replace(/\./g, "_")}" class="searchable-location" onchange="updateFamCuTru(this)"><option value="">-- Xã/Phường --</option></select></div>
-      <input type="text" class="fam-addr-street" style="margin-bottom:4px" placeholder="Số nhà / Lô" oninput="updateFamCuTru(this)"><input type="text" class="fam-addr-hamlet" style="margin-bottom:4px" placeholder="Tên đường / ấp / thôn" oninput="updateFamCuTru(this)"><input type="text" class="fam-addr-location" placeholder="Địa chỉ đầy đủ (tự động điền hoặc nhập trực tiếp)"></div>
+      <div style="display:flex;gap:8px;margin-bottom:4px"><input type="text" class="fam-addr-street" placeholder="Số nhà / Lô" oninput="updateFamCuTru(this)" style="flex:0 0 110px;min-width:0"><input type="text" class="fam-addr-hamlet" placeholder="Tên đường / ấp / thôn" oninput="updateFamCuTru(this)" style="min-width:0"></div><input type="text" class="fam-addr-location" placeholder="Địa chỉ đầy đủ (tự động điền hoặc nhập trực tiếp)"></div>
     </div>
     <div class="form-row"><label>Nghề nghiệp</label><input type="text"></div>
     <div class="form-row"><label>Là Đảng viên?</label>
@@ -9848,7 +9922,7 @@
               <div class="mmyyyy-wrap">
                 <select class="mm-month"><option value="">MM</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select><span class="mmyyyy-slash">/</span><input class="mm-year" type="number" placeholder="YYYY" min="1900" max="2099" step="1">
               </div>
-              <label class="fhd-present-wrap" title="Đến nay"><input type="checkbox" class="fhd-present-chk" onchange="toggleFhdPresent(this)"> Nay</label>
+              <label class="fhd-present-wrap" title="Đến nay"><input type="checkbox" class="fhd-present-chk" onchange="toggleFhdPresent(this)"> Nay</label><label class="fhd-present-wrap fhd-deceased-wrap" title="Đã mất"><input type="checkbox" class="fhd-deceased-chk" onchange="toggleFhdDeceased(this)"> Đã mất</label>
             </div>
           </td>
           <td class="td-dienbien"><input type="text" placeholder="Còn nhỏ, sống với cha mẹ tại …"></td>
@@ -9865,7 +9939,7 @@
               <div class="mmyyyy-wrap">
                 <select class="mm-month"><option value="">MM</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select><span class="mmyyyy-slash">/</span><input class="mm-year" type="number" placeholder="YYYY" min="1900" max="2099" step="1">
               </div>
-              <label class="fhd-present-wrap" title="Đến nay"><input type="checkbox" class="fhd-present-chk" onchange="toggleFhdPresent(this)"> Nay</label>
+              <label class="fhd-present-wrap" title="Đến nay"><input type="checkbox" class="fhd-present-chk" onchange="toggleFhdPresent(this)"> Nay</label><label class="fhd-present-wrap fhd-deceased-wrap" title="Đã mất"><input type="checkbox" class="fhd-deceased-chk" onchange="toggleFhdDeceased(this)"> Đã mất</label>
             </div>
           </td>
           <td class="td-dienbien"><input type="text"></td>
@@ -9882,7 +9956,7 @@
               <div class="mmyyyy-wrap">
                 <select class="mm-month"><option value="">MM</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select><span class="mmyyyy-slash">/</span><input class="mm-year" type="number" placeholder="YYYY" min="1900" max="2099" step="1">
               </div>
-              <label class="fhd-present-wrap" title="Đến nay"><input type="checkbox" class="fhd-present-chk" onchange="toggleFhdPresent(this)"> Nay</label>
+              <label class="fhd-present-wrap" title="Đến nay"><input type="checkbox" class="fhd-present-chk" onchange="toggleFhdPresent(this)"> Nay</label><label class="fhd-present-wrap fhd-deceased-wrap" title="Đã mất"><input type="checkbox" class="fhd-deceased-chk" onchange="toggleFhdDeceased(this)"> Đã mất</label>
             </div>
           </td>
           <td class="td-dienbien"><input type="text"></td>
@@ -9899,7 +9973,7 @@
               <div class="mmyyyy-wrap">
                 <select class="mm-month"><option value="">MM</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select><span class="mmyyyy-slash">/</span><input class="mm-year" type="number" placeholder="YYYY" min="1900" max="2099" step="1">
               </div>
-              <label class="fhd-present-wrap" title="Đến nay"><input type="checkbox" class="fhd-present-chk" onchange="toggleFhdPresent(this)"> Nay</label>
+              <label class="fhd-present-wrap" title="Đến nay"><input type="checkbox" class="fhd-present-chk" onchange="toggleFhdPresent(this)"> Nay</label><label class="fhd-present-wrap fhd-deceased-wrap" title="Đã mất"><input type="checkbox" class="fhd-deceased-chk" onchange="toggleFhdDeceased(this)"> Đã mất</label>
             </div>
           </td>
           <td class="td-dienbien"><input type="text"></td>
@@ -9915,18 +9989,18 @@
         if (m.grandparent)
           return `
     <div class="alert alert-info" style="font-size:12px;margin-bottom:10px">ℹ <strong>Hướng dẫn khai quá trình:</strong> Nếu tính đến năm 1975 ông/bà đã trên 18 tuổi → khai theo 2 giai đoạn: (1) từ khi sinh ra đến 1975, (2) từ 1975 đến nay. Nếu dưới 18 tuổi tính đến 1975 → chọn mốc thời gian phù hợp (lập gia đình, đi làm …) để tách giai đoạn.</div>
-    <div class="form-row"><label>Họ và tên</label><input type="text" oninput="updateFamName('${m.num}',this.value)"></div>
-    <div class="form-row two-col-50"><div><label>Năm sinh</label><input type="number" placeholder="YYYY" min="1890" max="2010"></div><div><label>Giới tính</label><select><option value="">--</option><option value="male">Nam</option><option value="female">Nữ</option></select></div></div>
+    <div class="form-row two-col"><label>Họ và tên</label><input type="text" oninput="updateFamName('${m.num}',this.value)"><label>Năm sinh</label><input type="number" placeholder="YYYY" min="1890" max="2010"></div>
+    <div class="form-row"><label>Giới tính</label><select><option value="">--</option><option value="male">Nam</option><option value="female">Nữ</option></select></div>
     <div class="form-row"><label>Quê quán<span class="hint-lbl">Xã, tỉnh theo địa danh mới</span></label>
       <div class="loc-row"><select id="sel_tinh_fam_qq_${m.num.replace(/\./g, "_")}" class="searchable-location"><option value="">-- Tỉnh/TP --</option></select><select id="sel_xa_fam_qq_${m.num.replace(/\./g, "_")}" class="searchable-location"><option value="">-- Xã/Phường --</option></select></div>
-      <textarea class="fam-text-hometown" rows="2" style="margin-top:4px;width:100%;resize:none;overflow:hidden;box-sizing:border-box" placeholder="Quê quán (tự động điền hoặc nhập trực tiếp)" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"></textarea>
+      <input type="text" class="fam-text-hometown" style="margin-top:4px;width:100%;box-sizing:border-box" placeholder="Quê quán (tự động điền hoặc nhập trực tiếp)">
     </div>
     <div class="form-row"><label>Dân tộc</label><div><select class="fam-sel-ethnic" onchange="toggleFamSelKhac(this)"><option value="">-- Chọn --</option><option>Kinh</option><option>Tày</option><option>Thái</option><option>Mường</option><option>Khmer</option><option>Khác</option></select><input class="fam-sel-khac-other" style="display:none;margin-top:4px;width:100%" placeholder="Nhập tên dân tộc"></div></div>
     <div class="form-row"><label>Tôn giáo</label><div><select class="fam-sel-religion" onchange="toggleFamSelKhac(this)"><option value="">-- Chọn --</option><option>Không</option><option>Phật giáo</option><option>Công giáo</option><option>Cao Đài</option><option>Hòa Hảo</option><option>Khác</option></select><input class="fam-sel-khac-other" style="display:none;margin-top:4px;width:100%" placeholder="Nhập tên tôn giáo"></div></div>
     <div class="form-row"><label>Chức sắc tôn giáo</label><input type="text" class="fam-religious-rank" placeholder="Linh mục / Mục sư / Hòa thượng / Không có"></div>
     <div class="form-row"><label>Nơi cư trú<span class="hint-lbl">Để trống nếu đã mất</span></label>
       <div><div class="loc-row" style="margin-bottom:6px"><select id="sel_tinh_fam_ct_${m.num.replace(/\./g, "_")}" class="searchable-location" onchange="updateFamCuTru(this)"><option value="">-- Tỉnh/TP --</option></select><select id="sel_xa_fam_ct_${m.num.replace(/\./g, "_")}" class="searchable-location" onchange="updateFamCuTru(this)"><option value="">-- Xã/Phường --</option></select></div>
-      <input type="text" class="fam-addr-street" style="margin-bottom:4px" placeholder="Số nhà / Lô" oninput="updateFamCuTru(this)"><input type="text" class="fam-addr-hamlet" style="margin-bottom:4px" placeholder="Tên đường / ấp / thôn" oninput="updateFamCuTru(this)"><input type="text" class="fam-addr-location" placeholder="Địa chỉ đầy đủ (tự động điền hoặc nhập trực tiếp)"></div>
+      <div style="display:flex;gap:8px;margin-bottom:4px"><input type="text" class="fam-addr-street" placeholder="Số nhà / Lô" oninput="updateFamCuTru(this)" style="flex:0 0 110px;min-width:0"><input type="text" class="fam-addr-hamlet" placeholder="Tên đường / ấp / thôn" oninput="updateFamCuTru(this)" style="min-width:0"></div><input type="text" class="fam-addr-location" placeholder="Địa chỉ đầy đủ (tự động điền hoặc nhập trực tiếp)"></div>
     </div>
     <div class="form-row"><label>Nghề nghiệp<span class="hint-lbl">Để trống nếu đã mất</span></label><input type="text" placeholder="Nông dân / Hưu trí / Đã mất …"></div>
     <div class="form-row"><label>Là Đảng viên?</label>
@@ -9944,18 +10018,15 @@
 
         // default: Cha/Mẹ ruột, Cha/Mẹ chồng/vợ — có Nơi sinh
         return `
-    <div class="form-row"><label>Họ và tên</label><input type="text" oninput="updateFamName('${m.num}',this.value)"></div>
-    <div class="form-row two-col-50">
-      <div><label>Năm sinh</label><input type="number" placeholder="YYYY" min="1900" max="2099"></div>
-      <div><label>Giới tính</label><select><option value="">--</option><option value="male">Nam</option><option value="female">Nữ</option></select></div>
-    </div>
+    <div class="form-row two-col"><label>Họ và tên</label><input type="text" oninput="updateFamName('${m.num}',this.value)"><label>Năm sinh</label><input type="number" placeholder="YYYY" min="1900" max="2099"></div>
+    <div class="form-row"><label>Giới tính</label><select><option value="">--</option><option value="male">Nam</option><option value="female">Nữ</option></select></div>
     <div class="form-row"><label>Nơi sinh<span class="hint-lbl">Không ghi bệnh viện — ghi Xã/Phường, Tỉnh/TP</span></label>
       <div class="loc-row"><select id="sel_tinh_fam_ns_${m.num.replace(/\./g, "_")}" class="searchable-location"><option value="">-- Tỉnh/TP --</option></select><select id="sel_xa_fam_ns_${m.num.replace(/\./g, "_")}" class="searchable-location"><option value="">-- Xã/Phường --</option></select></div>
-      <textarea class="fam-text-birth-place" rows="2" style="margin-top:4px;width:100%;resize:none;overflow:hidden;box-sizing:border-box" placeholder="Nơi sinh (tự động điền hoặc nhập trực tiếp)" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"></textarea>
+      <input type="text" class="fam-text-birth-place" style="margin-top:4px;width:100%;box-sizing:border-box" placeholder="Nơi sinh (tự động điền hoặc nhập trực tiếp)">
     </div>
     <div class="form-row"><label>Quê quán<span class="hint-lbl">Địa danh hành chính mới</span></label>
       <div class="loc-row"><select id="sel_tinh_fam_qq_${m.num.replace(/\./g, "_")}" class="searchable-location"><option value="">-- Tỉnh/TP --</option></select><select id="sel_xa_fam_qq_${m.num.replace(/\./g, "_")}" class="searchable-location"><option value="">-- Xã/Phường --</option></select></div>
-      <textarea class="fam-text-hometown" rows="2" style="margin-top:4px;width:100%;resize:none;overflow:hidden;box-sizing:border-box" placeholder="Quê quán (tự động điền hoặc nhập trực tiếp)" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"></textarea>
+      <input type="text" class="fam-text-hometown" style="margin-top:4px;width:100%;box-sizing:border-box" placeholder="Quê quán (tự động điền hoặc nhập trực tiếp)">
     </div>
     <div class="form-row"><label>Dân tộc</label><div><select class="fam-sel-ethnic" onchange="toggleFamSelKhac(this)"><option value="">-- Chọn --</option><option>Kinh</option><option>Tày</option><option>Thái</option><option>Mường</option><option>Khmer</option><option>Nùng</option><option>HMông</option><option>Khác</option></select><input class="fam-sel-khac-other" style="display:none;margin-top:4px;width:100%" placeholder="Nhập tên dân tộc"></div></div>
     <div class="form-row"><label>Tôn giáo</label><div><select class="fam-sel-religion" onchange="toggleFamSelKhac(this)"><option value="">-- Chọn --</option><option>Không</option><option>Phật giáo</option><option>Công giáo</option><option>Cao Đài</option><option>Hòa Hảo</option><option>Tin Lành</option><option>Hồi giáo</option><option>Khác</option></select><input class="fam-sel-khac-other" style="display:none;margin-top:4px;width:100%" placeholder="Nhập tên tôn giáo"></div></div>
@@ -9963,8 +10034,7 @@
     <div class="form-row"><label>Nơi cư trú<span class="hint-lbl">Để trống nếu đã mất</span></label>
       <div>
         <div class="loc-row" style="margin-bottom:6px"><select id="sel_tinh_fam_ct_${m.num.replace(/\./g, "_")}" class="searchable-location" onchange="updateFamCuTru(this)"><option value="">-- Tỉnh/TP --</option></select><select id="sel_xa_fam_ct_${m.num.replace(/\./g, "_")}" class="searchable-location" onchange="updateFamCuTru(this)"><option value="">-- Xã/Phường --</option></select></div>
-        <input type="text" class="fam-addr-street" style="margin-bottom:4px" placeholder="Số nhà / Lô" oninput="updateFamCuTru(this)">
-        <input type="text" class="fam-addr-hamlet" style="margin-bottom:4px" placeholder="Tên đường / ấp / thôn" oninput="updateFamCuTru(this)">
+        <div style="display:flex;gap:8px;margin-bottom:4px"><input type="text" class="fam-addr-street" placeholder="Số nhà / Lô" oninput="updateFamCuTru(this)" style="flex:0 0 110px;min-width:0"><input type="text" class="fam-addr-hamlet" placeholder="Tên đường / ấp / thôn" oninput="updateFamCuTru(this)" style="min-width:0"></div>
         <input type="text" class="fam-addr-location" placeholder="Địa chỉ đầy đủ (tự động điền hoặc nhập trực tiếp)">
       </div>
     </div>
@@ -10427,6 +10497,7 @@
           });
         if (!validateSecB()) { histInvalid = true; _invalidNames.push("Lịch sử bản thân (Phần B)"); }
         if (!validateSecC()) { histInvalid = true; _invalidNames.push("Công tác chức vụ (Phần C)"); }
+        if (!_validateBC())  { histInvalid = true; _invalidNames.push("Gián đoạn/chồng lấp Phần B → Phần C"); }
         if (histInvalid) {
           const nameList = _invalidNames.length
             ? "\n• " + _invalidNames.join("\n• ")
@@ -10580,7 +10651,7 @@
             `<td>${_mmCell(r.from_month, r.from_year)}</td>` +
             `<td>${_mmCell(r.to_month, r.to_year)}</td>` +
             `<td class="td-dienbien"><input type="text" value="${_esc(r.description || "")}"></td>` +
-            `<td><button class="del-btn" onclick="delRow(this)">✕</button></td>`;
+            `${_rowActTd("B")}`;
         });
         tb.querySelectorAll(".td-dienbien").forEach((td) => {
           if (!td.dataset.db) initDienBien(td);
@@ -10613,7 +10684,7 @@
             `<td class="fhd-to-cell"><div class="fhd-to-inner">${mmTo}<label class="fhd-present-wrap" title="Đến nay"><input type="checkbox" class="fhd-present-chk"${chk} onchange="toggleFhdPresent(this)"> Nay</label></div></td>` +
             `<td class="td-dienbien"><input type="text" value="${_esc(r.employer || "")}"></td>` +
             `<td class="td-chucvu"><textarea class="cvu-ta" rows="1" oninput="this.style.height='1px';this.style.height=this.scrollHeight+'px'" style="width:100%;resize:none;overflow:hidden;min-height:38px;box-sizing:border-box">${_esc(r.job_title || "")}</textarea></td>` +
-            `<td><button class="del-btn" onclick="delRow(this)">✕</button></td>`;
+            `${_rowActTd("C")}`;
         });
         tb.querySelectorAll(".td-dienbien").forEach((td) => {
           if (!td.dataset.db) initDienBien(td);
@@ -11249,10 +11320,17 @@
         const nextMonth = nextFrom % 100; // 0 = year-only key
         const nextYear  = Math.floor(nextFrom / 100);
 
-        // If either date is year-only, compare years only (lenient)
+        // If either date is year-only
         if (prevMonth === 0 || nextMonth === 0) {
           if (nextYear < prevYear) return "overlap";
-          if (nextYear <= prevYear + 1) return "ok"; // same year or next year
+          // next là year-only: bắt buộc cùng năm với cuối giai đoạn trước
+          // (dù prev có tháng hay không — 09/2021 → 2022 = gián đoạn)
+          if (nextMonth === 0) {
+            return nextYear === prevYear ? "ok" : "gap";
+          }
+          // prev là year-only, next có tháng: cho phép cùng năm hoặc năm liền kề
+          // (vd: 2015 → 01/2016 = ok, vì 2015 có thể kết thúc tháng 12)
+          if (nextYear <= prevYear + 1) return "ok";
           return "gap";
         }
 
@@ -11264,7 +11342,7 @@
       // Generic timeline continuity validator.
       // tbodyId: tbody element id; errBarId: error bar div id;
       // getFromTo(tr) → {fromKey, toKey, isPresent, isEmpty}
-      function _validateTimelineSection(tbodyId, errBarId, getFromTo, skipPresentCheck) {
+      function _validateTimelineSection(tbodyId, errBarId, getFromTo, skipPresentCheck, suppressEndCheck) {
         const tbody = document.getElementById(tbodyId);
         const errBar = document.getElementById(errBarId);
         if (!tbody) return true;
@@ -11322,8 +11400,9 @@
         // Kiểm tra dòng cuối có khai đến hiện tại không
         // skipPresentCheck=true → chỉ hiển thị cảnh báo, không ảnh hưởng return value (dùng khi thêm/chèn dòng)
         // skipPresentCheck=false/undefined → đưa vào errors, ảnh hưởng return value (dùng khi submit)
+        // suppressEndCheck=true → bỏ qua hoàn toàn (dùng khi section tiếp theo đã có dữ liệu nối tiếp)
         let presentWarn = null;
-        if (dataRowIdx > 0 && prevToKey !== null) {
+        if (!suppressEndCheck && dataRowIdx > 0 && prevToKey !== null) {
           const _nowYear = new Date().getFullYear();
           const _lastYear = Math.floor(prevToKey / 100);
           if (_lastYear < _nowYear) {
@@ -11355,13 +11434,16 @@
         const toMonth = r.to_month || "";
         const toYear = r.to_year || "";
         const isPresent = !!r.is_present;
+        const isDeceased = !!r.is_deceased;
         const chk = isPresent ? " checked" : "";
+        const decChk = isDeceased ? " checked" : "";
         const mmyyyyFrom = `<div class="mmyyyy-wrap"><select class="mm-month"><option value="">MM</option><option${fromMonth === 1 ? " selected" : ""}>1</option><option${fromMonth === 2 ? " selected" : ""}>2</option><option${fromMonth === 3 ? " selected" : ""}>3</option><option${fromMonth === 4 ? " selected" : ""}>4</option><option${fromMonth === 5 ? " selected" : ""}>5</option><option${fromMonth === 6 ? " selected" : ""}>6</option><option${fromMonth === 7 ? " selected" : ""}>7</option><option${fromMonth === 8 ? " selected" : ""}>8</option><option${fromMonth === 9 ? " selected" : ""}>9</option><option${fromMonth === 10 ? " selected" : ""}>10</option><option${fromMonth === 11 ? " selected" : ""}>11</option><option${fromMonth === 12 ? " selected" : ""}>12</option></select><span class="mmyyyy-slash">/</span><input class="mm-year" type="number" placeholder="YYYY" min="1900" max="2099" step="1" value="${fromYear}"></div>`;
         const mmyyyyTo = `<div class="mmyyyy-wrap"><select class="mm-month"${isPresent ? " disabled" : ""}><option value="">MM</option><option${toMonth === 1 ? " selected" : ""}>1</option><option${toMonth === 2 ? " selected" : ""}>2</option><option${toMonth === 3 ? " selected" : ""}>3</option><option${toMonth === 4 ? " selected" : ""}>4</option><option${toMonth === 5 ? " selected" : ""}>5</option><option${toMonth === 6 ? " selected" : ""}>6</option><option${toMonth === 7 ? " selected" : ""}>7</option><option${toMonth === 8 ? " selected" : ""}>8</option><option${toMonth === 9 ? " selected" : ""}>9</option><option${toMonth === 10 ? " selected" : ""}>10</option><option${toMonth === 11 ? " selected" : ""}>11</option><option${toMonth === 12 ? " selected" : ""}>12</option></select><span class="mmyyyy-slash">/</span><input class="mm-year" type="number" placeholder="YYYY" min="1900" max="2099" step="1"${isPresent ? " disabled" : ""} value="${isPresent ? "" : toYear}"></div>`;
         return (
           `<td>${mmyyyyFrom}</td>` +
           `<td class="fhd-to-cell"><div class="fhd-to-inner">${mmyyyyTo}` +
           `<label class="fhd-present-wrap" title="Đến nay"><input type="checkbox" class="fhd-present-chk"${chk} onchange="toggleFhdPresent(this)"> Nay</label>` +
+          `<label class="fhd-present-wrap fhd-deceased-wrap" title="Đã mất"><input type="checkbox" class="fhd-deceased-chk"${decChk} onchange="toggleFhdDeceased(this)"> Đã mất</label>` +
           `</div></td>` +
           `<td class="td-dienbien"><input type="text" value="${_esc(r.description || "")}"></td>` +
           `<td><div class="row-act-wrap"><button class="ins-btn" onclick="insertRowAbove(this,'fam')" title="Chèn dòng trên">▲</button><button class="del-btn" onclick="delRow(this)">✕</button><button class="ins-btn" onclick="insertRowBelow(this,'fam')" title="Chèn dòng dưới">▼</button></div></td>`
@@ -11392,12 +11474,39 @@
         }
       }
 
+      // Toggle "Đã mất" checkbox — mutually exclusive with "Nay", date fields stay enabled
+      function toggleFhdDeceased(chk) {
+        const inner = chk.closest(".fhd-to-inner");
+        if (!inner) return;
+        if (chk.checked) {
+          const presentChk = inner.querySelector(".fhd-present-chk");
+          if (presentChk && presentChk.checked) {
+            presentChk.checked = false;
+            const mmWrap = inner.querySelector(".mmyyyy-wrap");
+            if (mmWrap) {
+              const monthSel = mmWrap.querySelector(".mm-month");
+              const yearInp = mmWrap.querySelector(".mm-year");
+              if (monthSel) monthSel.disabled = false;
+              if (yearInp) yearInp.disabled = false;
+            }
+            const toInput = inner.querySelector(".fhd-to-txt");
+            if (toInput) { toInput.disabled = false; toInput.placeholder = "MM/YYYY"; }
+          }
+        }
+        const acc = chk.closest(".family-accordion") || chk.closest(".accordion");
+        if (acc) validateFamHistory(acc);
+      }
+
       // Toggle Present checkbox — disable/enable the To-date input
       function toggleFhdPresent(chk) {
         const inner = chk.closest(".fhd-to-inner");
         if (!inner) return;
+        if (chk.checked) {
+          const decChk = inner.querySelector(".fhd-deceased-chk");
+          if (decChk) decChk.checked = false;
+        }
 
-        // Handle .mmyyyy-wrap rows (family history: cha/mẹ/ông bà/vợ chồng)
+        // Handle .mmyyyy-wrap rows (family history và Section C)
         const mmWrap = inner.querySelector(".mmyyyy-wrap");
         if (mmWrap) {
           const monthSel = mmWrap.querySelector(".mm-month");
@@ -11417,7 +11526,10 @@
           }
           const acc =
             chk.closest(".family-accordion") || chk.closest(".accordion");
-          if (acc) validateFamHistory(acc);
+          if (acc) { validateFamHistory(acc); return; }
+          // Section C rows dùng .mmyyyy-wrap — validate ngay khi toggle Nay
+          const row = chk.closest("tr");
+          if (row?.parentElement?.id === "tbC-body") validateSecC();
           return;
         }
 
@@ -11457,6 +11569,8 @@
           tr.classList.remove("fhd-row-invalid");
           const isPresent =
             !!tr.cells[1]?.querySelector(".fhd-present-chk")?.checked;
+          const isDeceased =
+            !!tr.cells[1]?.querySelector(".fhd-deceased-chk")?.checked;
           const descInput = tr.cells[2]?.querySelector("input,textarea");
           const fromVal = _getMMyyyy(tr.cells[0]) || "";
           const toWrap1 = tr.cells[1]?.querySelector(".mmyyyy-wrap");
@@ -11465,7 +11579,7 @@
             ? _getMMyyyy(tr.cells[1]) || ""
             : toTxt1?.value?.trim() || "";
           const descVal = descInput?.value?.trim() || "";
-          if (!fromVal && !toVal && !descVal && !isPresent) return;
+          if (!fromVal && !toVal && !descVal && !isPresent && !isDeceased) return;
 
           const rowNum = dataRowIdx + 1;
           dataRowIdx++;
@@ -11512,7 +11626,7 @@
           }
           if (rowInvalid) tr.classList.add("fhd-row-invalid");
 
-          if (isPresent) {
+          if (isPresent || isDeceased) {
             prevToKey = null;
           } else if (toParsed) {
             prevToKey = _myKey(toParsed.month, toParsed.year);
@@ -11553,7 +11667,14 @@
 
       // Section B (personal history) continuity validator
       function validateSecB(skipPresentCheck) {
-        return _validateTimelineSection("tbB-body", "errBarB", (tr) => {
+        // Nếu Phần C có dữ liệu → timeline nối tiếp qua C, Phần B không cần khai đến hiện tại
+        const tbC = document.getElementById("tbC-body");
+        const cHasData = !!tbC && Array.from(tbC.rows).some((tr) => {
+          const f = _getMmYr(tr.cells[0]);
+          const d = tr.cells[2] ? _tdv(tr.cells[2]) : "";
+          return !!(f.year || d);
+        });
+        const ok = _validateTimelineSection("tbB-body", "errBarB", (tr) => {
           const f = _getMmYr(tr.cells[0]);
           const t = _getMmYr(tr.cells[1]);
           const d = tr.cells[2] ? _tdv(tr.cells[2]) : "";
@@ -11568,7 +11689,9 @@
             fromInvalid: false,
             toInvalid: false,
           };
-        }, skipPresentCheck);
+        }, skipPresentCheck, cHasData);
+        _validateBC();
+        return ok;
       }
 
       // Section C (work history) continuity validator
@@ -11591,7 +11714,7 @@
       };
 
       function validateSecC(skipPresentCheck) {
-        return _validateTimelineSection("tbC-body", "errBarC", (tr) => {
+        const ok = _validateTimelineSection("tbC-body", "errBarC", (tr) => {
           const fromVal = _getMMyyyy(tr.cells[0]) || "";
           const toInput = tr.cells[1]?.querySelector(".fhd-to-txt");
           const toWrap = tr.cells[1]?.querySelector(".mmyyyy-wrap");
@@ -11614,6 +11737,67 @@
             toInvalid: !!(!isPresent && toVal && !tp),
           };
         }, skipPresentCheck);
+        _validateBC();
+        return ok;
+      }
+
+      // Kiểm tra nối tiếp thời gian giữa cuối Phần B và đầu Phần C
+      function _validateBC() {
+        const errBarBC = document.getElementById("errBarBC");
+
+        // Key "Đến" của dòng cuối có dữ liệu trong Phần B
+        const tbB = document.getElementById("tbB-body");
+        let lastBToKey = null;
+        if (tbB) {
+          Array.from(tbB.rows).forEach((tr) => {
+            const fromVal = _getMMyyyy(tr.cells[0]) || "";
+            const toVal   = _getMMyyyy(tr.cells[1]) || "";
+            const d = tr.cells[2] ? _tdv(tr.cells[2]) : "";
+            if (!fromVal && !toVal && !d) return;
+            const tp = toVal   ? _parseMY(toVal)   : null;
+            const fp = fromVal ? _parseMY(fromVal)  : null;
+            const toKey = tp ? _myKey(tp.month, tp.year) : (fp ? _myKey(fp.month, fp.year) : null);
+            if (toKey !== null) lastBToKey = toKey;
+          });
+        }
+
+        // Key "Từ" của dòng đầu có dữ liệu trong Phần C
+        const tbC = document.getElementById("tbC-body");
+        let firstCFromKey = null;
+        if (tbC) {
+          for (const tr of tbC.rows) {
+            const fromVal  = _getMMyyyy(tr.cells[0]) || "";
+            const toVal    = _getMMyyyy(tr.cells[1]) || "";
+            const isPresent = !!tr.cells[1]?.querySelector(".fhd-present-chk")?.checked;
+            const emp = tr.cells[2]?.querySelector("textarea,input")?.value?.trim() || "";
+            if (!fromVal && !toVal && !emp && !isPresent) continue;
+            const fp = fromVal ? _parseMY(fromVal) : null;
+            if (fp) { firstCFromKey = _myKey(fp.month, fp.year); break; }
+          }
+        }
+
+        if (lastBToKey === null || firstCFromKey === null) {
+          if (errBarBC) { errBarBC.innerHTML = ""; errBarBC.classList.remove("visible"); }
+          return true;
+        }
+
+        const cont = _checkContinuity(lastBToKey, firstCFromKey);
+        if (cont === "ok") {
+          if (errBarBC) { errBarBC.innerHTML = ""; errBarBC.classList.remove("visible"); }
+          return true;
+        }
+
+        const pM = lastBToKey % 100,    pY = Math.floor(lastBToKey / 100);
+        const cM = firstCFromKey % 100, cY = Math.floor(firstCFromKey / 100);
+        const bEnd   = pM ? `${String(pM).padStart(2,"0")}/${pY}` : String(pY);
+        const cStart = cM ? `${String(cM).padStart(2,"0")}/${cY}` : String(cY);
+        const label  = cont === "gap" ? "Gián đoạn" : "Chồng lấp";
+
+        if (errBarBC) {
+          errBarBC.innerHTML = `⚠ ${label} giữa Phần B và Phần C — Phần B kết thúc <b>${bEnd}</b>, Phần C bắt đầu <b>${cStart}</b>`;
+          errBarBC.classList.add("visible");
+        }
+        return false;
       }
 
       function _readAccordionHistory(acc) {
@@ -11631,8 +11815,10 @@
             : toInput?.value?.trim() || "";
           const isPresent =
             !!cells[1].querySelector(".fhd-present-chk")?.checked;
+          const isDeceased =
+            !!cells[1].querySelector(".fhd-deceased-chk")?.checked;
           const desc = _tdv(cells[2]);
-          if (!desc && !fromVal && !toVal && !isPresent) return;
+          if (!desc && !fromVal && !toVal && !isPresent && !isDeceased) return;
           const fp = _parseMY(fromVal);
           const tp = isPresent ? null : _parseMY(toVal);
           rows.push({
@@ -11641,6 +11827,7 @@
             to_year: tp?.year || null,
             to_month: tp?.month || null,
             is_present: isPresent,
+            is_deceased: isDeceased,
             description: desc,
             sort_order: idx,
           });
@@ -11680,7 +11867,7 @@
         );
         const newIds = [];
         for (const [i, hr] of rows.entries()) {
-          if (!hr.description && !hr.from_year && !hr.to_year && !hr.is_present) continue;
+          if (!hr.description && !hr.from_year && !hr.to_year && !hr.is_present && !hr.is_deceased) continue;
           try {
             const cr = await API.post(base, {
               entry_type: "family",
@@ -11690,6 +11877,7 @@
               to_year: hr.to_year || null,
               to_month: hr.to_month || null,
               is_present: hr.is_present || false,
+              is_deceased: hr.is_deceased || false,
               description: hr.description,
               sort_order: i,
             });
@@ -14023,23 +14211,28 @@
         }
 
         function validate(wrap) {
-          const m = parseInt(wrap.querySelector(".mm-month").value, 10);
-          const y = parseInt(wrap.querySelector(".mm-year").value, 10);
+          const mVal = wrap.querySelector(".mm-month").value;
+          const yVal = wrap.querySelector(".mm-year").value.trim();
           wrap.classList.remove("mm-err", "mm-ok");
           // Empty = neutral
-          if (
-            !wrap.querySelector(".mm-month").value &&
-            !wrap.querySelector(".mm-year").value
-          )
+          if (!mVal && !yVal) return true;
+          const y = parseInt(yVal, 10);
+          // Year-only: hợp lệ (không cần nhập tháng)
+          if (!mVal && yVal) {
+            if (isNaN(y) || y < 1900 || y > CUR_YEAR) {
+              wrap.classList.add("mm-err");
+              return false;
+            }
+            wrap.classList.add("mm-ok");
             return true;
-          // Partial
-          if (
-            !wrap.querySelector(".mm-month").value ||
-            !wrap.querySelector(".mm-year").value
-          ) {
+          }
+          // Tháng không có năm: thiếu
+          if (mVal && !yVal) {
             wrap.classList.add("mm-err");
             return false;
           }
+          // Cả tháng lẫn năm
+          const m = parseInt(mVal, 10);
           if (isNaN(m) || m < 1 || m > 12) {
             wrap.classList.add("mm-err");
             return false;
@@ -14066,10 +14259,9 @@
             // Strip non-digits, cap at 4 chars
             el.value = el.value.replace(/\D/g, "").slice(0, 4);
           }
-          // Live validate once both have values
-          const m = wrap.querySelector(".mm-month").value;
+          // Validate khi năm đủ 4 chữ số (kể cả không có tháng)
           const y = wrap.querySelector(".mm-year").value;
-          if (m && y.length === 4) validate(wrap);
+          if (y.length === 4) validate(wrap);
           else wrap.classList.remove("mm-err", "mm-ok");
         });
 
@@ -14507,9 +14699,11 @@
                       : h.from_year || "";
                     const to = h.is_present
                       ? "Hiện tại"
-                      : h.to_month
-                        ? `${String(h.to_month).padStart(2, "0")}/${h.to_year || ""}`
-                        : h.to_year || "";
+                      : h.is_deceased && !h.to_year && !h.to_month
+                        ? "Đã mất"
+                        : h.to_month
+                          ? `${String(h.to_month).padStart(2, "0")}/${h.to_year || ""}`
+                          : h.to_year || "";
                     return `<tr><td style="padding:2px 6px;white-space:nowrap;border:1px solid #E2E8F0">${_esc(fm)}</td><td style="padding:2px 6px;white-space:nowrap;border:1px solid #E2E8F0">${_esc(to)}</td><td style="padding:2px 6px;border:1px solid #E2E8F0">${_esc(h.description || "")}</td></tr>`;
                   })
                   .join("");
@@ -14597,9 +14791,11 @@
                       : h.from_year || "";
                     const to = h.is_present
                       ? "Hiện tại"
-                      : h.to_month
-                        ? `${String(h.to_month).padStart(2, "0")}/${h.to_year || ""}`
-                        : h.to_year || "";
+                      : h.is_deceased && !h.to_year && !h.to_month
+                        ? "Đã mất"
+                        : h.to_month
+                          ? `${String(h.to_month).padStart(2, "0")}/${h.to_year || ""}`
+                          : h.to_year || "";
                     return `<tr><td style="padding:2px 6px;white-space:nowrap;border:1px solid #E2E8F0">${_esc(fm)}</td><td style="padding:2px 6px;white-space:nowrap;border:1px solid #E2E8F0">${_esc(to)}</td><td style="padding:2px 6px;border:1px solid #E2E8F0">${_esc(h.description || "")}</td></tr>`;
                   })
                   .join("");
@@ -18940,9 +19136,11 @@
                               : h.from_year || "";
                             const to = h.is_present
                               ? "Nay"
-                              : h.to_month
-                                ? `${String(h.to_month).padStart(2, "0")}/${h.to_year || ""}`
-                                : h.to_year || "";
+                              : h.is_deceased && !h.to_year && !h.to_month
+                                ? "Đã mất"
+                                : h.to_month
+                                  ? `${String(h.to_month).padStart(2, "0")}/${h.to_year || ""}`
+                                  : h.to_year || "";
                             return `<li>${fm && to ? `<strong>${fm}–${to}</strong>: ` : ""}${_esc(h.description || "")}</li>`;
                           })
                           .join("")}</ul></div>`

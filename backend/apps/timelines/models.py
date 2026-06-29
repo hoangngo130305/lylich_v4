@@ -16,6 +16,7 @@ class HistoryEntry(models.Model):
     to_month    = models.PositiveSmallIntegerField(null=True, blank=True)
     to_year     = models.PositiveSmallIntegerField(null=True, blank=True)
     is_present  = models.BooleanField(default=False)
+    is_deceased = models.BooleanField(default=False)
     description = models.TextField(blank=True, default="")
     location    = models.CharField(max_length=500, null=True, blank=True)
     sort_order  = models.PositiveSmallIntegerField(default=0)
