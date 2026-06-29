@@ -10055,3 +10055,7 @@ WARNING 2026-06-29 17:13:18,540 log 7348 25044 Not Found: /api/auth/login/
 WARNING 2026-06-29 17:13:18,541 basehttp 7348 25044 "POST /api/auth/login/ HTTP/1.1" 404 5368
 WARNING 2026-06-29 17:13:19,469 log 7348 25044 Not Found: /api/auth/login/
 WARNING 2026-06-29 17:13:19,470 basehttp 7348 25044 "POST /api/auth/login/ HTTP/1.1" 404 5368
+WARNING 2026-06-29 17:57:44,334 log 14532 25152 Unauthorized: /api/v1/profiles/my/
+WARNING 2026-06-29 17:57:44,334 basehttp 14532 25152 "PUT /api/v1/profiles/my/ HTTP/1.1" 401 291
+WARNING 2026-06-29 17:58:15,556 log 14532 12220 Unauthorized: /api/v1/verification/stats/
+WARNING 2026-06-29 17:58:15,556 basehttp 14532 12220 "GET /api/v1/verification/stats/ HTTP/1.1" 401 291

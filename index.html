@@ -11737,6 +11737,7 @@
             toInvalid: !!(!isPresent && toVal && !tp),
           };
         }, skipPresentCheck);
+        validateSecB(true);  // re-check B's end-warning now that C may have changed
         _validateBC();
         return ok;
       }
