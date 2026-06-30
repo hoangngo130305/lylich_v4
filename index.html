@@ -8617,9 +8617,21 @@
       let provinceList = [];
 
       async function fetchProvinces() {
-        const res = await fetch("https://provinces.open-api.vn/api/v2/p/");
-        if (!res.ok) return [];
-        return await res.json();
+        const CACHE_KEY = "provinces_cache_v1";
+        const CACHE_TTL = 86400000; // 24 hours
+        try {
+          const cached = JSON.parse(localStorage.getItem(CACHE_KEY) || "null");
+          if (cached && Date.now() - cached.ts < CACHE_TTL) return cached.data;
+        } catch (_) {}
+        try {
+          const res = await fetch("https://provinces.open-api.vn/api/v2/p/");
+          if (!res.ok) return [];
+          const data = await res.json();
+          try { localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), data })); } catch (_) {}
+          return data;
+        } catch (_) {
+          return [];
+        }
       }
 
       async function fetchProvinceWards(provinceCode) {
@@ -10446,7 +10458,20 @@
       ]);
 
       // ===== SUBMIT =====
+      let _isSaving = false;
+      function _setSavingState(saving) {
+        _isSaving = saving;
+        document.querySelectorAll('[onclick="submitForm()"],[onclick="saveDraft()"]').forEach((btn) => {
+          btn.disabled = saving;
+          btn.style.opacity = saving ? "0.6" : "";
+        });
+      }
+
       function submitForm() {
+        if (_isSaving) {
+          showToast("⏳ Đang xử lý, vui lòng chờ…");
+          return;
+        }
         if (
           !validateOtherField("danToc", "danTocKhac") ||
           !validateOtherField("tonGiao", "tonGiaoKhac")
@@ -10516,6 +10541,7 @@
             });
           return;
         }
+        _setSavingState(true);
         (async () => {
           try {
             showToast("⏳ Đang lưu và nộp hồ sơ…");
@@ -10553,6 +10579,8 @@
             await _loadMyProfile();
           } catch (e) {
             showToast("✗ Nộp hồ sơ thất bại: " + e.message);
+          } finally {
+            _setSavingState(false);
           }
         })();
       }
@@ -11894,7 +11922,6 @@
       // ── Load all sections (call after profile ID is known) ───────────
       async function _loadAllSections(profileId) {
         if (!profileId) return;
-        let famHistoryRows = [];
         try {
           const res = await API.get(`/timelines/${profileId}/all/`);
           const d = (res && res.success !== undefined ? res.data : res) || {};
@@ -11904,7 +11931,6 @@
           _fillTbF(d.overseas_travels || []);
           _fillTbAwards("tbG-body", d.awards || [], "G");
           _fillTbAwards("tbH-body", d.disciplines || [], "H");
-          famHistoryRows = d.family_history || [];
           console.log(
             "[LOAD] timelines:",
             Object.fromEntries(
@@ -12068,22 +12094,6 @@
           console.warn("[LOAD] family fail:", e.message);
         }
 
-        // Populate family member history into their accordions
-        if (famHistoryRows.length) {
-          const histByFam = {};
-          famHistoryRows.forEach((h) => {
-            const k = String(h.family_member);
-            if (!histByFam[k]) histByFam[k] = [];
-            histByFam[k].push(h);
-          });
-          document
-            .querySelectorAll(".family-accordion[data-family-id]")
-            .forEach((acc) => {
-              const famId = acc.dataset.familyId;
-              if (famId && histByFam[famId])
-                _fillAccordionHistory(acc, histByFam[famId]);
-            });
-        }
       }
 
       // ── Save all sections ────────────────────────────────────────────
@@ -19554,6 +19564,11 @@
       }
 
       async function saveDraftAPI() {
+        if (_isSaving) {
+          showToast("⏳ Đang xử lý, vui lòng chờ…");
+          return;
+        }
+        _setSavingState(true);
         const roleCode = _getUserRoleCode(API.currentUser());
         _validateRequiredFieldsBeforeSave();
         const payload = _collectFormData();
@@ -19600,6 +19615,8 @@
           showToast("✓ Đã lưu – " + new Date().toLocaleTimeString("vi-VN"));
         } catch (e) {
           showToast("✗ Lưu thất bại: " + e.message);
+        } finally {
+          _setSavingState(false);
         }
       }
 

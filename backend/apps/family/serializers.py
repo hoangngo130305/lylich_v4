@@ -13,5 +13,9 @@ class FamilyMemberSerializer(serializers.ModelSerializer):
 
     def get_history(self, obj):
         from apps.timelines.serializers import HistoryEntrySerializer
-        entries = obj.history_entries.filter().order_by('sort_order', 'from_year', 'from_month')
+        # Use prefetched cache when available; sort in Python to avoid extra DB query.
+        entries = sorted(
+            obj.history_entries.all(),
+            key=lambda e: (e.sort_order or 0, e.from_year or 0, e.from_month or 0),
+        )
         return HistoryEntrySerializer(entries, many=True).data

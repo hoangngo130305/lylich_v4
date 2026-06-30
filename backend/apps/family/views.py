@@ -16,13 +16,16 @@ class FamilyMemberListCreateView(generics.ListCreateAPIView):
 
     def get_queryset(self):
         profile_id = self.kwargs['profile_id']
+        base_qs = FamilyMember.objects.prefetch_related(
+            'history_entries'
+        )
         if self.request.user.role_code == 'quan_chung':
-            return FamilyMember.objects.filter(
+            return base_qs.filter(
                 profile_id=profile_id,
                 profile__user=self.request.user,
                 deleted_at__isnull=True
             )
-        return FamilyMember.objects.filter(
+        return base_qs.filter(
             profile_id=profile_id, deleted_at__isnull=True
         )
 
