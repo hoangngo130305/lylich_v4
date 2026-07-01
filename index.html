@@ -1475,12 +1475,17 @@
         gap: 5px;
         overflow: hidden;
       }
-      .fam-info strong {
+      .fam-title-text {
+        cursor: pointer;
+        border-bottom: 1px dashed transparent;
+        transition: border-color .15s;
+      }
+      .fam-title-text:hover { border-bottom-color: var(--navy); }
+      .fam-info strong, .fam-title-text {
         color: var(--navy);
         font-size: 12.5px;
         font-weight: 700;
         white-space: nowrap;
-        flex-shrink: 0;
       }
       .fam-name {
         color: var(--muted);
@@ -4816,93 +4821,163 @@
       #pgProfileEdit.review-locked .field-row .field-value {
         display: block !important;
       }
+      /* Hide CCCD, phone, email rows in review mode */
+      #pgProfileEdit.review-locked .field-row:has(#fv-esA-cccd),
+      #pgProfileEdit.review-locked .field-row:has(#fv-esA-phone),
+      #pgProfileEdit.review-locked .field-row:has(#fv-esA-email) {
+        display: none !important;
+      }
       /* Dim status select — officer cannot change status directly */
       #pgProfileEdit.review-locked .status-select-wrap {
         pointer-events: none !important;
         opacity: 0.45;
       }
 
-      /* ── Per-field note area (injected under each field-row) ── */
+      /* ── Per-field note area (injected inline beside each field-row) ── */
+
+      /* 3-column layout in review mode: [label 140px] [value 1fr] [note 200px] */
+      #pgProfileEdit.review-locked .field-row {
+        grid-template-columns: 140px 1fr 200px;
+        align-items: start;
+        gap: 0 8px;
+      }
+      /* Note sits in col 3, same row — align-self:start so it grows with content */
+      #pgProfileEdit.review-locked .fn-field-note {
+        grid-column: 3;
+        grid-row: 1;
+        margin: 0;
+        border-radius: 5px;
+        border: 1px solid #e8c860;
+        align-self: start;
+        min-width: 0;
+      }
+      /* Section-level notes stay full-width below */
+      #pgProfileEdit.review-locked .fn-field-note.fn-section-note {
+        grid-column: 1 / -1;
+        grid-row: auto;
+        align-self: auto;
+      }
+
       .fn-field-note {
-        margin: 2px 0 0;
-        padding: 5px 8px 6px;
+        padding: 4px 7px 5px;
         background: #fffceb;
-        border: 1.5px solid #f0c040;
-        border-top: 2px solid #e8c000;
-        border-radius: 0 0 5px 5px;
+        border: 1px solid #e8c860;
+        border-top: 2px solid #d4a800;
+        border-radius: 0 0 4px 4px;
+        margin: 1px 0 0;
       }
       .fn-field-note.fn-section-note {
-        margin: 0 0 10px;
-        border-radius: 6px;
-        border-top: 1.5px solid #f0c040;
+        margin: 0 0 8px;
+        border-radius: 5px;
+        border-top: 1.5px solid #e8c860;
       }
       .fn-field-note .fn-field-note-label {
-        font-size: 10px;
+        font-size: 9.5px;
         font-weight: 700;
-        color: #7a5000;
-        margin-bottom: 3px;
+        color: #8a6000;
+        margin-bottom: 2px;
         letter-spacing: 0.01em;
+        opacity: 0.75;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
       .fn-field-note-ta {
         width: 100%;
-        min-height: 36px;
-        border: 1.5px solid #ddd0a0;
-        border-radius: 4px;
-        padding: 5px 7px;
+        min-height: 30px;
+        border: 1px solid #ddd0a0;
+        border-radius: 3px;
+        padding: 3px 5px;
         font-size: 11.5px;
         font-family: inherit;
-        resize: vertical;
+        resize: none;
         background: #fff;
         box-sizing: border-box;
-        transition:
-          border-color 0.15s,
-          background 0.15s;
+        transition: border-color 0.12s, background 0.12s;
         line-height: 1.45;
         display: block;
+        overflow-y: hidden;
       }
       .fn-field-note-ta:focus {
         border-color: #b09000;
-        background: #fffef5;
+        background: #fffef8;
         outline: none;
       }
       .fn-field-note-ta::placeholder {
-        color: #b09040;
+        color: #c0a850;
         font-style: italic;
+        font-size: 11px;
       }
       .fn-field-note-ta.has-content {
         border-color: #c8a800;
         background: #fffdf0;
       }
-      /* Field-row highlight when officer has added a note */
+      /* Subtle highlight on field-value when note exists */
       .field-row.row-has-note > .field-value {
-        border-left: 3px solid #d4a800;
-        padding-left: 6px;
+        border-left: 2px solid #d4a800;
+        padding-left: 5px;
       }
       .field-row.row-has-note .fn-field-note {
         border-color: #c8a800;
         background: #fff8d6;
       }
 
+      /* ── Per-row collapsible notes for timeline sections (B, C, D) ── */
+      .tl-row-note-bar {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        padding: 1px 0 2px;
+        border-bottom: 1px dashed #e2d090;
+      }
+      .tl-row-note-toggle {
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 10px;
+        color: #a08020;
+        padding: 1px 6px;
+        border-radius: 3px;
+        transition: background .1s, color .1s;
+        letter-spacing: 0.01em;
+      }
+      .tl-row-note-toggle:hover { background: #fffceb; color: #7a5000; }
+      .tl-row-note-toggle.has-note { color: #5a4000; font-weight: 700; background: #fff3c0; }
+      .tl-row-note-panel { display: none; padding: 3px 0 5px; }
+      .tl-row-note-panel.open { display: block; }
+
       /* ── Return-with-notes action bar (officer) ── */
       #reviewActionBar {
         display: none;
         align-items: center;
-        gap: 10px;
-        background: #fff8dc;
-        border: 1.5px solid #f0c040;
-        border-radius: 8px;
-        padding: 8px 14px;
-        margin-bottom: 12px;
+        gap: 8px;
+        background: linear-gradient(90deg, #fffbea 0%, #fff8d0 100%);
+        border: 1px solid #e8c860;
+        border-left: 3px solid #d4a800;
+        border-radius: 6px;
+        padding: 7px 12px;
+        margin-bottom: 10px;
         flex-wrap: wrap;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        box-shadow: 0 2px 6px rgba(0,0,0,.06);
       }
       #reviewActionBar.visible {
         display: flex;
       }
       #reviewActionBar .rab-title {
-        font-size: 12px;
-        font-weight: 700;
+        font-size: 11.5px;
+        font-weight: 600;
         color: #6a4a00;
         flex: 1;
+      }
+      /* Compact editable sections in review mode */
+      #pgProfileEdit.review-locked .editable-section {
+        margin-bottom: 10px;
+      }
+      #pgProfileEdit.review-locked .field-row {
+        padding: 3px 0;
       }
 
       /* ── Citizen note banners (shown when profile is returned) ── */
@@ -4956,6 +5031,51 @@
         font-size: 13px;
         flex-shrink: 0;
         margin-top: 1px;
+      }
+      /* Family history note card — compact banner outside the table */
+      .fam-hist-note-banner {
+        display: flex;
+        align-items: baseline;
+        gap: 5px;
+        background: #fffbea;
+        border: 1px solid #f0c040;
+        border-left: 3px solid #d4a800;
+        border-radius: 4px;
+        padding: 3px 8px;
+        margin-bottom: 4px;
+        font-size: 11.5px;
+        line-height: 1.45;
+        color: #3a2000;
+      }
+      .fam-hist-note-banner .fhb-label {
+        font-weight: 700;
+        color: #7a5000;
+        white-space: nowrap;
+        flex-shrink: 0;
+      }
+      /* Per-member note banner (top of accordion body) */
+      .fam-mem-note-banner {
+        display: flex;
+        align-items: baseline;
+        gap: 5px;
+        background: #fffbea;
+        border: 1px solid #f0c040;
+        border-left: 3px solid #d4a800;
+        border-radius: 4px;
+        padding: 4px 9px;
+        margin-bottom: 8px;
+        font-size: 12px;
+        line-height: 1.5;
+        color: #3a2000;
+      }
+      .fam-mem-note-banner .fhb-label { font-weight: 700; color: #7a5000; white-space: nowrap; flex-shrink: 0; }
+      /* Small 💬 emoji indicator in accordion header */
+      .mem-note-indicator {
+        display: inline-block;
+        font-size: 12px;
+        margin-left: 5px;
+        cursor: default;
+        vertical-align: middle;
       }
       /* Highlight citizen form-rows that have a note */
       .form-row.citizen-has-note > label {
@@ -5150,9 +5270,14 @@
       .timeline-edit-row:last-child {
         border-bottom: none;
       }
-      /* Part B: 5 columns — from / to / hiện-tại / description / delete */
+      /* Part B: 3 columns — period / description / delete */
       #timeline-esB .timeline-edit-row {
-        grid-template-columns: 96px 96px auto 1fr 28px;
+        grid-template-columns: 140px 1fr 28px;
+        align-items: start;
+      }
+      /* Family history (Part D): 2 columns — period / description (no delete) */
+      .fam-hist-body .timeline-edit-row {
+        grid-template-columns: 140px 1fr;
         align-items: start;
       }
       /* Part C: give employer the wide column, job_title fixed */
@@ -9767,7 +9892,7 @@
       <div class="family-head" onclick="toggleFamily(this)">
         <div class="fam-num">${m.num}</div>
         <div class="fam-info">
-          <strong>${m.title}</strong>
+          <strong class="fam-title-text" title="Click để đổi tên">${m.title}</strong>
           <span class="fam-name" id="famName_${m.num}">Chưa điền thông tin</span>
         </div>
         <span class="chevron">▾</span>
@@ -9816,7 +9941,6 @@
         if (m.sibling)
           return `
     <div class="form-row two-col"><label>Họ và tên</label><input type="text" oninput="updateFamName('${m.num}',this.value)" placeholder=""><label>Năm sinh <span style="color:var(--crimson)">*</span></label><input type="number" placeholder="YYYY" min="1900" max="2099"></div>
-    <div class="form-row"><label>Giới tính <span style="color:var(--crimson)">*</span></label><select><option value="">-- Chọn --</option><option value="male">Nam</option><option value="female">Nữ</option></select></div>
     <div class="form-row"><label>Đã mất</label>
       <div><label style="display:inline-flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" class="sib-deceased-chk" style="width:auto;accent-color:var(--crimson)" onchange="toggleSibDeceased(this,'${m.num}')"> Đã mất</label></div>
     </div>
@@ -10002,7 +10126,6 @@
           return `
     <div class="alert alert-info" style="font-size:12px;margin-bottom:10px">ℹ <strong>Hướng dẫn khai quá trình:</strong> Nếu tính đến năm 1975 ông/bà đã trên 18 tuổi → khai theo 2 giai đoạn: (1) từ khi sinh ra đến 1975, (2) từ 1975 đến nay. Nếu dưới 18 tuổi tính đến 1975 → chọn mốc thời gian phù hợp (lập gia đình, đi làm …) để tách giai đoạn.</div>
     <div class="form-row two-col"><label>Họ và tên</label><input type="text" oninput="updateFamName('${m.num}',this.value)"><label>Năm sinh</label><input type="number" placeholder="YYYY" min="1890" max="2010"></div>
-    <div class="form-row"><label>Giới tính</label><select><option value="">--</option><option value="male">Nam</option><option value="female">Nữ</option></select></div>
     <div class="form-row"><label>Quê quán<span class="hint-lbl">Xã, tỉnh theo địa danh mới</span></label>
       <div class="loc-row"><select id="sel_tinh_fam_qq_${m.num.replace(/\./g, "_")}" class="searchable-location"><option value="">-- Tỉnh/TP --</option></select><select id="sel_xa_fam_qq_${m.num.replace(/\./g, "_")}" class="searchable-location"><option value="">-- Xã/Phường --</option></select></div>
       <input type="text" class="fam-text-hometown" style="margin-top:4px;width:100%;box-sizing:border-box" placeholder="Quê quán (tự động điền hoặc nhập trực tiếp)">
@@ -10031,7 +10154,6 @@
         // default: Cha/Mẹ ruột, Cha/Mẹ chồng/vợ — có Nơi sinh
         return `
     <div class="form-row two-col"><label>Họ và tên</label><input type="text" oninput="updateFamName('${m.num}',this.value)"><label>Năm sinh</label><input type="number" placeholder="YYYY" min="1900" max="2099"></div>
-    <div class="form-row"><label>Giới tính</label><select><option value="">--</option><option value="male">Nam</option><option value="female">Nữ</option></select></div>
     <div class="form-row"><label>Nơi sinh<span class="hint-lbl">Không ghi bệnh viện — ghi Xã/Phường, Tỉnh/TP</span></label>
       <div class="loc-row"><select id="sel_tinh_fam_ns_${m.num.replace(/\./g, "_")}" class="searchable-location"><option value="">-- Tỉnh/TP --</option></select><select id="sel_xa_fam_ns_${m.num.replace(/\./g, "_")}" class="searchable-location"><option value="">-- Xã/Phường --</option></select></div>
       <input type="text" class="fam-text-birth-place" style="margin-top:4px;width:100%;box-sizing:border-box" placeholder="Nơi sinh (tự động điền hoặc nhập trực tiếp)">
@@ -10409,13 +10531,45 @@
         return `<div class="family-accordion">
     <div class="family-head" onclick="toggleFamily(this)">
       <div class="fam-num">${m.num}</div>
-      <div class="fam-info"><strong>${m.title}</strong><span class="fam-name" id="famName_${m.num}">Chưa điền thông tin</span></div>
+      <div class="fam-info">
+        <strong class="fam-title-text" title="Click để đổi tên">${m.title}</strong>
+        <span class="fam-name" id="famName_${m.num}">Chưa điền thông tin</span>
+      </div>
       <span class="chevron">▾</span>
     </div>
     <div class="family-body ${isFirst ? "open" : ""}">
       ${buildFamilyForm(m)}
     </div>
   </div>`;
+      }
+
+      function startEditFamTitle(titleEl) {
+        if (!titleEl || titleEl.tagName === "INPUT") return;
+        const acc = titleEl.closest(".family-accordion");
+        if (!acc) return;
+        const currentText = titleEl.textContent;
+        const inp = document.createElement("input");
+        inp.type = "text";
+        inp.value = currentText;
+        inp.style.cssText = "font-weight:700;font-size:12.5px;color:var(--navy);border:1px solid var(--primary,#1a56db);border-radius:4px;padding:1px 6px;width:200px;outline:none;background:#fff;";
+        titleEl.replaceWith(inp);
+        inp.focus();
+        inp.select();
+        function commit() {
+          const newTitle = inp.value.trim() || currentText;
+          const strong = document.createElement("strong");
+          strong.className = "fam-title-text";
+          strong.textContent = newTitle;
+          strong.title = "Click để đổi tên";
+          inp.replaceWith(strong);
+          acc.dataset.customTitle = newTitle;
+        }
+        inp.addEventListener("blur", commit);
+        inp.addEventListener("keydown", function(e) {
+          if (e.key === "Enter") { e.preventDefault(); inp.blur(); }
+          if (e.key === "Escape") { inp.value = currentText; inp.blur(); }
+        });
+        inp.addEventListener("click", function(e) { e.stopPropagation(); });
       }
 
       // Build family sections
@@ -10456,6 +10610,14 @@
         { num: "16", title: "Ông ngoại chồng (vợ)", grandparent: true },
         { num: "17", title: "Bà ngoại chồng (vợ)", grandparent: true },
       ]);
+
+      // Delegate click on family accordion titles — capture phase fires before toggleFamily
+      document.addEventListener("click", function(e) {
+        const titleEl = e.target.closest(".fam-title-text");
+        if (!titleEl) return;
+        e.stopPropagation();
+        startEditFamTitle(titleEl);
+      }, true);
 
       // ===== SUBMIT =====
       let _isSaving = false;
@@ -11065,6 +11227,7 @@
           full_name: fullName,
           birth_year: birthYear,
           gender: gender,
+          custom_label: (acc.dataset.customTitle || "").trim() || null,
           birth_place: birthPlace,
           hometown: hometown,
           ethnic_group_text: ethnicGroupText,
@@ -11089,43 +11252,48 @@
         if (!m || !acc) return;
         acc.dataset.familyId = String(m.id);
         // Update the accordion title.
-        const titleEl = acc.querySelector(".fam-info strong");
+        const titleEl = acc.querySelector(".fam-title-text") || acc.querySelector(".fam-info strong");
         if (titleEl) {
-          const rel = acc.dataset.relationship;
-          let newTitle = null;
-          if (rel === "cha_ruot" || rel === "cha_duong") {
-            const allFathers = [
-              ...document.querySelectorAll(
-                "#famBlocksFathers .family-accordion",
-              ),
-            ];
-            const idx = allFathers.indexOf(acc);
-            newTitle = idx === 0 ? "Cha ruột" : `Cha dượng ${idx}`;
-          } else if (rel === "me_ruot" || rel === "me_ke") {
-            const allMothers = [
-              ...document.querySelectorAll(
-                "#famBlocksMother .family-accordion",
-              ),
-            ];
-            const idx = allMothers.indexOf(acc);
-            newTitle = idx === 0 ? "Mẹ ruột" : `Mẹ kế ${idx}`;
-          } else if (
-            rel === "anh_chi_em_ruot" ||
-            rel === "anh_chi_em_chong_vo"
-          ) {
-            const allRel = [
-              ...document.querySelectorAll(
-                `.family-accordion[data-relationship="${rel}"]`,
-              ),
-            ];
-            const slotIdx = allRel.indexOf(acc);
-            if (slotIdx >= 0) {
-              if (rel === "anh_chi_em_ruot")
-                newTitle = `Anh/Chị/Em ruột thứ ${slotIdx + 1}`;
-              else newTitle = `Anh/Chị/Em chồng (vợ) thứ ${slotIdx + 1}`;
+          if (m.custom_label) {
+            titleEl.textContent = m.custom_label;
+            acc.dataset.customTitle = m.custom_label;
+          } else {
+            const rel = acc.dataset.relationship;
+            let newTitle = null;
+            if (rel === "cha_ruot" || rel === "cha_duong") {
+              const allFathers = [
+                ...document.querySelectorAll(
+                  "#famBlocksFathers .family-accordion",
+                ),
+              ];
+              const idx = allFathers.indexOf(acc);
+              newTitle = idx === 0 ? "Cha ruột" : `Cha dượng ${idx}`;
+            } else if (rel === "me_ruot" || rel === "me_ke") {
+              const allMothers = [
+                ...document.querySelectorAll(
+                  "#famBlocksMother .family-accordion",
+                ),
+              ];
+              const idx = allMothers.indexOf(acc);
+              newTitle = idx === 0 ? "Mẹ ruột" : `Mẹ kế ${idx}`;
+            } else if (
+              rel === "anh_chi_em_ruot" ||
+              rel === "anh_chi_em_chong_vo"
+            ) {
+              const allRel = [
+                ...document.querySelectorAll(
+                  `.family-accordion[data-relationship="${rel}"]`,
+                ),
+              ];
+              const slotIdx = allRel.indexOf(acc);
+              if (slotIdx >= 0) {
+                if (rel === "anh_chi_em_ruot")
+                  newTitle = `Anh/Chị/Em ruột thứ ${slotIdx + 1}`;
+                else newTitle = `Anh/Chị/Em chồng (vợ) thứ ${slotIdx + 1}`;
+              }
             }
+            if (newTitle) titleEl.textContent = newTitle;
           }
-          if (newTitle) titleEl.textContent = newTitle;
         }
         const body = acc.querySelector(".family-body");
         if (!body) return;
@@ -12120,19 +12288,6 @@
             if (!name) return;
             const label = name || titleText;
             const missing = [];
-            // Gender
-            let hasGender = false;
-            body.querySelectorAll("select").forEach((s) => {
-              if (
-                [...s.options].some(
-                  (o) => o.value === "Nam" || o.text === "Nam",
-                ) &&
-                s.value &&
-                s.value !== ""
-              )
-                hasGender = true;
-            });
-            if (!hasGender) missing.push("Giới tính");
             // Birth year
             const byInp = body.querySelector(
               'input[placeholder="YYYY"][type="number"]',
@@ -14469,7 +14624,7 @@
             setFv("esC-foreign-lang", flStr);
             setFv("esC-it", p.it_level);
             const yuDate = p.youth_union_date
-              ? p.youth_union_date.slice(0, 7).split("-").reverse().join("/")
+              ? p.youth_union_date.split("-").reverse().join("/")
               : "";
             setFv(
               "esC-youth-union",
@@ -14509,18 +14664,15 @@
                         ? String(r.from_year)
                         : "";
                     const toVal = r.is_present
-                      ? ""
+                      ? "Hiện tại"
                       : r.to_month
                         ? `${String(r.to_month).padStart(2, "0")}/${r.to_year || ""}`
                         : r.to_year
                           ? String(r.to_year)
                           : "";
-                    const toDisabled = r.is_present ? " disabled" : "";
-                    const presentChk = r.is_present ? " checked" : "";
+                    const periodStr = fromVal && toVal ? `${fromVal}–${toVal}` : fromVal || toVal || "";
                     return `<div class="timeline-edit-row" data-id="${_esc(String(r.id || ""))}">
-              <input value="${_esc(fromVal)}" placeholder="Từ (MM/YYYY)">
-              <input value="${_esc(toVal)}" placeholder="Đến (MM/YYYY)"${toDisabled}>
-              <label style="display:flex;align-items:center;gap:3px;font-size:11px;white-space:nowrap;cursor:pointer;padding-top:8px"><input type="checkbox"${presentChk} onchange="const t=this.closest('.timeline-edit-row').querySelectorAll('input')[1];t.disabled=this.checked;if(this.checked)t.value=''"> Hiện tại</label>
+              <input value="${_esc(periodStr)}" placeholder="05/2020–08/2021">
               <textarea placeholder="Diễn biến: Học gì / Làm gì, ở đâu (tên đơn vị, địa chỉ) + Nơi sinh sống…">${_esc(r.description || r.content || "")}</textarea>
               <button class="del-row-btn" onclick="delTimelineRow(this)" style="margin-top:6px">✕</button>
             </div>`;
@@ -14560,7 +14712,7 @@
                             : "";
                       const fromStr = _fm(r.from_month, r.from_year);
                       const toStr = r.is_present
-                        ? "Nay"
+                        ? "Đến nay"
                         : _fm(r.to_month, r.to_year);
                       const periodStr =
                         r.period_text ||
@@ -14570,7 +14722,7 @@
                       return `<div class="timeline-edit-row" data-id="${_esc(String(r.id || ""))}">
                       <input value="${_esc(periodStr)}" placeholder="Từ–Đến (MM/YYYY–MM/YYYY)">
                       <textarea placeholder="Làm việc gì, ở đâu (tên đơn vị, địa chỉ + nơi sinh sống)">${_esc(r.employer || "")}</textarea>
-                      <input value="${_esc(r.job_title || "")}" placeholder="Chức vụ">
+                      <textarea placeholder="Chức vụ">${_esc(r.job_title || "")}</textarea>
                       <button class="del-row-btn" onclick="this.closest('.timeline-edit-row').remove()" style="margin-top:6px">✕</button>
                     </div>`;
                     })
@@ -14701,29 +14853,31 @@
                 return;
               }
               const LS = 'style="color:#718096;font-size:11px"';
-              const mkHist = (history) => {
+              const mkHist = (history, memberId) => {
                 if (!history?.length) return "";
-                const rows = history
-                  .map((h) => {
-                    const fm = h.from_month
-                      ? `${String(h.from_month).padStart(2, "0")}/${h.from_year || ""}`
-                      : h.from_year || "";
-                    const to = h.is_present
-                      ? "Hiện tại"
-                      : h.is_deceased && !h.to_year && !h.to_month
-                        ? "Đã mất"
-                        : h.to_month
-                          ? `${String(h.to_month).padStart(2, "0")}/${h.to_year || ""}`
-                          : h.to_year || "";
-                    return `<tr><td style="padding:2px 6px;white-space:nowrap;border:1px solid #E2E8F0">${_esc(fm)}</td><td style="padding:2px 6px;white-space:nowrap;border:1px solid #E2E8F0">${_esc(to)}</td><td style="padding:2px 6px;border:1px solid #E2E8F0">${_esc(h.description || "")}</td></tr>`;
-                  })
-                  .join("");
-                return `<div style="margin-top:8px"><div style="font-size:11px;font-weight:600;color:#718096;margin-bottom:3px">Quá trình lịch sử</div><table style="width:100%;font-size:11px;border-collapse:collapse"><thead><tr style="background:#F7FAFC"><th style="padding:2px 6px;text-align:left;width:90px;border:1px solid #E2E8F0">Từ</th><th style="padding:2px 6px;text-align:left;width:90px;border:1px solid #E2E8F0">Đến</th><th style="padding:2px 6px;text-align:left;border:1px solid #E2E8F0">Nội dung</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+                const rows = history.map((h, hi) => {
+                  const fm = h.from_month
+                    ? `${String(h.from_month).padStart(2, "0")}/${h.from_year || ""}`
+                    : h.from_year || "";
+                  const to = h.is_present
+                    ? "Đến nay"
+                    : h.is_deceased && !h.to_year && !h.to_month
+                      ? "Đã mất"
+                      : h.to_month
+                        ? `${String(h.to_month).padStart(2, "0")}/${h.to_year || ""}`
+                        : h.to_year || "";
+                  const period = fm && to ? `${fm}–${to}` : fm || to || "";
+                  return `<div class="timeline-edit-row" data-hist-id="${_esc(String(h.id || ""))}" data-hist-idx="${hi}">
+                    <input value="${_esc(period)}" placeholder="Thời gian" readonly>
+                    <textarea rows="2" readonly>${_esc(h.description || "")}</textarea>
+                  </div>`;
+                }).join("");
+                return `<div style="margin-top:8px"><div style="font-size:11px;font-weight:600;color:#718096;margin-bottom:4px">Quá trình lịch sử</div><div class="fam-hist-body" data-member-id="${_esc(String(memberId || ""))}">${rows}</div></div>`;
               };
               famBody.innerHTML = members
                 .map((m) => {
                   const rel = _esc(
-                    _famRelMap[m.relationship] || m.relationship || "",
+                    m.custom_label || _famRelMap[m.relationship] || m.relationship || "",
                   );
                   const genderTxt =
                     m.gender === "male"
@@ -14739,7 +14893,7 @@
                     val
                       ? `<div style="grid-column:span 2"><span ${LS}>${label}:</span> ${_esc(String(val))}</div>`
                       : "";
-                  return `<div style="border:1px solid #E2E8F0;border-radius:6px;padding:12px 14px;margin-bottom:10px;font-size:12px">
+                  return `<div style="border:1px solid #E2E8F0;border-radius:6px;padding:12px 14px;margin-bottom:10px;font-size:12px" data-fam-id="${_esc(String(m.id || ""))}">
                   <div style="font-weight:700;color:#2D3748;margin-bottom:8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
                     <span style="background:#EBF4FF;color:#3B82F6;padding:2px 8px;border-radius:4px;font-size:11px">${rel}</span>
                     ${_esc(m.full_name || "—")}
@@ -14761,22 +14915,23 @@
                     ${m.is_deceased ? fv("Năm mất", m.deceased_year) + fv("Nguyên nhân mất", m.deceased_cause) : ""}
                     ${fvW("Trường học", m.child_school)}
                   </div>
-                  ${
-                    m.is_party_member
-                      ? `<div style="margin-top:8px;padding:6px 10px;background:#F0FFF4;border-radius:4px">
-                    <div style="font-weight:600;color:#276749;margin-bottom:4px">Đảng viên</div>
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:3px 16px">
-                      ${fv("Ngày vào Đảng", m.party_join_date)}
-                      ${fv("Nơi vào Đảng", m.party_join_place)}
-                      ${fv("Chi bộ/Đảng bộ", m.party_chi_bo)}
-                      ${fv("Khen thưởng/Huy hiệu", m.party_awards_text)}
-                      ${m.party_years_count ? `<div><span ${LS}>Tuổi Đảng:</span> ${m.party_years_count} năm</div>` : ""}
-                    </div>
-                  </div>`
-                      : '<div style="margin-top:6px;color:#718096;font-size:11.5px">Không phải đảng viên</div>'
-                  }
+                  ${(() => {
+                    if (!m.is_party_member) return "";
+                    let dateStr = "ngày ... tháng ... năm ...";
+                    if (m.party_join_date) {
+                      const dp = String(m.party_join_date).split("-");
+                      const y = dp[0] || "..."; const mo = dp[1] ? String(parseInt(dp[1])) : "..."; const d = dp[2] ? String(parseInt(dp[2])) : "...";
+                      dateStr = `ngày ${d} tháng ${mo} năm ${y}`;
+                    } else if (m.party_join_year) {
+                      dateStr = `năm ${m.party_join_year}`;
+                    }
+                    const chiBo = _esc(m.party_chi_bo || "...........................");
+                    return `<div style="margin-top:8px;padding:7px 10px;background:#F0FFF4;border-left:3px solid #38a169;border-radius:0 4px 4px 0;font-size:12px;color:#1a202c;line-height:1.6">
+                      Là đảng viên Đảng Cộng sản Việt Nam, vào Đảng ${_esc(dateStr)}, hiện sinh hoạt tại chi bộ/đảng bộ ${chiBo}.
+                    </div>`;
+                  })()}
                   ${m.notes ? `<div style="margin-top:6px"><span ${LS}>Ghi chú:</span> ${_esc(m.notes)}</div>` : ""}
-                  ${mkHist(m.history)}
+                  ${mkHist(m.history, m.id)}
                 </div>`;
                 })
                 .join("");
@@ -14801,7 +14956,7 @@
                       ? `${String(h.from_month).padStart(2, "0")}/${h.from_year || ""}`
                       : h.from_year || "";
                     const to = h.is_present
-                      ? "Hiện tại"
+                      ? "Đến nay"
                       : h.is_deceased && !h.to_year && !h.to_month
                         ? "Đã mất"
                         : h.to_month
@@ -14814,9 +14969,8 @@
               };
               famBody.innerHTML = members
                 .map((m) => {
-                  const rel = _esc(
-                    _famRelMap[m.relationship] || m.relationship || "",
-                  );
+                  const relDefault = _esc(_famRelMap[m.relationship] || m.relationship || "");
+                  const rel = _esc(m.custom_label || _famRelMap[m.relationship] || m.relationship || "");
                   const partyChecked = m.is_party_member ? " checked" : "";
                   const deceasedChecked = m.is_deceased ? " checked" : "";
                   const partyDisplay = m.is_party_member ? "grid" : "none";
@@ -14841,6 +14995,7 @@
                     <div style="grid-column:span 2"><label ${LS}>Chức danh/Chức vụ</label><input ${IS} data-field="job_title" value="${_esc(m.job_title || "")}"></div>
                     <div style="grid-column:span 2"><label ${LS}>Trường học (nếu là con dưới 18)</label><input ${IS} data-field="child_school" value="${_esc(m.child_school || "")}"></div>
                     <div style="grid-column:span 2"><label ${LS}>Ghi chú</label><input ${IS} data-field="notes" value="${_esc(m.notes || "")}"></div>
+                    <div style="grid-column:span 2"><label ${LS}>Tên hiển thị tùy chỉnh <span style="font-weight:400;color:#A0AEC0">(để trống = dùng mặc định: ${relDefault})</span></label><input ${IS} data-field="custom_label" value="${_esc(m.custom_label || "")}"></div>
                   </div>
                   <div style="margin-top:8px;display:flex;gap:16px;flex-wrap:wrap">
                     <label style="display:flex;align-items:center;gap:4px;font-size:12px;cursor:pointer">
@@ -15046,6 +15201,11 @@
       let _fieldNotes = {};
       let _reviewProfileId = null;
 
+      function _autoResizeNote(ta) {
+        ta.style.height = "auto";
+        ta.style.height = (ta.scrollHeight + 2) + "px";
+      }
+
       function _isReviewMode() {
         return document
           .getElementById("pgProfileEdit")
@@ -15088,6 +15248,7 @@
         pg.querySelectorAll(".field-row.row-has-note").forEach((r) =>
           r.classList.remove("row-has-note"),
         );
+        pg.querySelectorAll(".tl-row-note-bar, .tl-row-note-panel").forEach((el) => el.remove());
       }
 
       // Enter review-only mode for can_bo_bxd — direct DOM manipulation for reliability
@@ -15145,26 +15306,27 @@
         });
 
         // ── Inject per-field note areas under every .field-row ──
+        // Fields excluded from review notes (name cannot be changed by citizen)
+        const _NO_NOTE_FIELDS = new Set(["fi-esA-name"]);
         pg.querySelectorAll(".field-row").forEach((row) => {
           const inp = row.querySelector(
             ".field-input[id], .field-select-input[id], .field-textarea[id]",
           );
           if (!inp) return;
           const fieldKey = inp.id;
+          if (_NO_NOTE_FIELDS.has(fieldKey)) return;
           const fieldLabel = inp.dataset.field || fieldKey;
           const nd = document.createElement("div");
           nd.className = "fn-field-note";
           nd.dataset.fieldKey = fieldKey;
           nd.innerHTML =
-            `<div class="fn-field-note-label">💬 Góp ý: ${_esc(fieldLabel)}</div>` +
-            `<textarea class="fn-field-note-ta" placeholder="Nhập góp ý để quần chúng chỉnh sửa…" rows="2"></textarea>`;
+            `<div class="fn-field-note-label">💬 ${_esc(fieldLabel)}</div>` +
+            `<textarea class="fn-field-note-ta" placeholder="Nhập góp ý…" rows="1" oninput="_autoResizeNote(this)" onfocus="_autoResizeNote(this)"></textarea>`;
           row.appendChild(nd);
         });
 
         // ── Section-level notes for timeline / table sections ──
         [
-          { key: "esB", label: "B. Lịch sử bản thân", secId: "esB" },
-          { key: "esC-work", label: "C. Lịch sử công tác", secId: "esC" },
           { key: "esD", label: "D. Thành phần gia đình", secId: "esD" },
           { key: "esE", label: "E. Khen thưởng", secId: "esE" },
           { key: "esFT", label: "F. Đi nước ngoài", secId: "esFT" },
@@ -15178,9 +15340,90 @@
           nd.className = "fn-field-note fn-section-note";
           nd.dataset.fieldKey = key;
           nd.innerHTML =
-            `<div class="fn-field-note-label">💬 Góp ý: ${label}</div>` +
-            `<textarea class="fn-field-note-ta" placeholder="Nhập góp ý cho phần này để quần chúng chỉnh sửa…" rows="2"></textarea>`;
+            `<div class="fn-field-note-label">💬 ${label}</div>` +
+            `<textarea class="fn-field-note-ta" placeholder="Nhập góp ý cho phần này…" rows="1" oninput="_autoResizeNote(this)" onfocus="_autoResizeNote(this)"></textarea>`;
           body.insertBefore(nd, body.firstElementChild);
+        });
+
+        // ── Per-row note toggles for Sections B and C ──
+        const _injectTlRowNotes = (containerId, keyPrefix, rowLabel) => {
+          const container = document.getElementById(containerId);
+          if (!container) return;
+          container.querySelectorAll(".timeline-edit-row").forEach((row, idx) => {
+            const key = `${keyPrefix}-row-${idx}`;
+            const bar = document.createElement("div");
+            bar.className = "tl-row-note-bar";
+            bar.dataset.rowKey = key;
+            bar.innerHTML = `<button class="tl-row-note-toggle" onclick="_toggleTlRowNote('${key}')">💬 Góp ý dòng này</button>`;
+            row.after(bar);
+            const panel = document.createElement("div");
+            panel.className = "tl-row-note-panel";
+            panel.dataset.rowKey = key;
+            const nd = document.createElement("div");
+            nd.className = "fn-field-note fn-section-note";
+            nd.dataset.fieldKey = key;
+            nd.innerHTML =
+              `<div class="fn-field-note-label">💬 Góp ý — ${rowLabel} #${idx + 1}</div>` +
+              `<textarea class="fn-field-note-ta" placeholder="Nhập góp ý cho dòng này…" rows="1" oninput="_autoResizeNote(this)" onfocus="_autoResizeNote(this)"></textarea>`;
+            panel.appendChild(nd);
+            bar.after(panel);
+          });
+        };
+        _injectTlRowNotes("timeline-esB", "esB-tl", "Giai đoạn");
+        _injectTlRowNotes("timeline-esC", "esC-work", "Công tác");
+
+        // ── One note per family member + per-history-row notes (Part D) ──
+        document.querySelectorAll("#family-esD-body [data-fam-id]").forEach((card) => {
+          const memberId = card.dataset.famId;
+          if (!memberId) return;
+
+          // Per-member note toggle (at bottom of card)
+          const memKey = `esD-mem-${memberId}`;
+          const headerEl = card.querySelector('[style*="font-weight:700"]');
+          const memberName = (headerEl?.textContent || "Thành viên").replace(/\s+/g, " ").trim().slice(0, 50);
+          const memBar = document.createElement("div");
+          memBar.className = "tl-row-note-bar";
+          memBar.dataset.rowKey = memKey;
+          memBar.innerHTML = `<button class="tl-row-note-toggle" onclick="_toggleTlRowNote('${memKey}')">💬 Góp ý thành viên này</button>`;
+          const memPanel = document.createElement("div");
+          memPanel.className = "tl-row-note-panel";
+          memPanel.dataset.rowKey = memKey;
+          const memNd = document.createElement("div");
+          memNd.className = "fn-field-note fn-section-note";
+          memNd.dataset.fieldKey = memKey;
+          memNd.innerHTML =
+            `<div class="fn-field-note-label">💬 Góp ý — ${_esc(memberName)}</div>` +
+            `<textarea class="fn-field-note-ta" placeholder="Nhập góp ý về thành viên này…" rows="1" oninput="_autoResizeNote(this)" onfocus="_autoResizeNote(this)"></textarea>`;
+          memPanel.appendChild(memNd);
+          const wrap = document.createElement("div");
+          wrap.style.cssText = "margin-top:8px;border-top:1px dashed #e2d090;padding-top:5px";
+          wrap.appendChild(memBar);
+          wrap.appendChild(memPanel);
+          card.appendChild(wrap);
+
+          // Per-history-row note toggles (inside the fam-hist-body of this card)
+          card.querySelectorAll(".fam-hist-body").forEach((histBody) => {
+            histBody.querySelectorAll(".timeline-edit-row").forEach((row, idx) => {
+              const histId = row.dataset.histId;
+              const rowKey = histId ? `esD-hist-${histId}` : `esD-mem-${memberId}-hist-${idx}`;
+              const bar = document.createElement("div");
+              bar.className = "tl-row-note-bar";
+              bar.dataset.rowKey = rowKey;
+              bar.innerHTML = `<button class="tl-row-note-toggle" onclick="_toggleTlRowNote('${rowKey}')">💬 Góp ý dòng này</button>`;
+              row.after(bar);
+              const panel = document.createElement("div");
+              panel.className = "tl-row-note-panel";
+              panel.dataset.rowKey = rowKey;
+              const nd = document.createElement("div");
+              nd.className = "fn-field-note fn-section-note";
+              nd.dataset.fieldKey = rowKey;
+              nd.innerHTML =
+                `<div class="fn-field-note-label">💬 Góp ý — Lịch sử #${idx + 1}</div>` +
+                `<textarea class="fn-field-note-ta" placeholder="Nhập góp ý cho dòng này…" rows="1" oninput="_autoResizeNote(this)" onfocus="_autoResizeNote(this)"></textarea>`;
+              panel.appendChild(nd);
+              bar.after(panel);
+            });
+          });
         });
 
         // ── Load and populate existing notes ──
@@ -15200,9 +15443,18 @@
               if (ta) {
                 ta.value = note;
                 ta.classList.add("has-content");
+                _autoResizeNote(ta);
               }
               nd.classList.add("has-note");
               nd.closest(".field-row")?.classList.add("row-has-note");
+              // Auto-open per-row panel and highlight toggle when note exists
+              const panel = nd.closest(".tl-row-note-panel");
+              if (panel) {
+                panel.classList.add("open");
+                const bar = panel.previousElementSibling;
+                const btn = bar?.querySelector(".tl-row-note-toggle");
+                if (btn) { btn.textContent = "▲ Ẩn góp ý"; btn.classList.add("has-note"); }
+              }
             },
           );
         } catch (e) {
@@ -15211,6 +15463,24 @@
       }
 
       function _toggleNoteArea() {} // no-op kept for safety
+
+      function _toggleTlRowNote(key) {
+        const panel = document.querySelector(`.tl-row-note-panel[data-row-key="${key}"]`);
+        const bar   = document.querySelector(`.tl-row-note-bar[data-row-key="${key}"]`);
+        if (!panel || !bar) return;
+        const open = panel.classList.toggle("open");
+        const btn  = bar.querySelector(".tl-row-note-toggle");
+        if (!btn) return;
+        const ta = panel.querySelector(".fn-field-note-ta");
+        const hasContent = ta && ta.value.trim().length > 0;
+        if (open) {
+          btn.textContent = "▲ Ẩn góp ý";
+          if (ta) { _autoResizeNote(ta); ta.focus(); }
+        } else {
+          btn.textContent = hasContent ? "💬 Đã có góp ý" : "💬 Góp ý dòng này";
+          if (hasContent) btn.classList.add("has-note"); else btn.classList.remove("has-note");
+        }
+      }
 
       // Collect all per-field note textareas → [{field_key, note}]
       function _collectFieldNotes() {
@@ -15258,7 +15528,12 @@
         _collectFieldNotes()
           .filter((n) => n.note)
           .forEach((n) => {
-            const lbl = _EDIT_SECTION_LABEL?.[n.field_key] || n.field_key;
+            const fk = n.field_key;
+            const lbl = _EDIT_SECTION_LABEL?.[fk]
+              || (fk.startsWith("esB-tl-row-") ? "B. Lịch sử bản thân"
+                : fk.startsWith("esC-work-row-") ? "C. Lịch sử công tác"
+                : (fk.startsWith("esD-hist-") || fk.startsWith("esD-mem-")) ? "D. Thành phần gia đình"
+                : fk);
             flaggedSections.add(lbl);
           });
         openReturnModal();
@@ -15410,24 +15685,22 @@
           document
             .querySelectorAll("#timeline-esB .timeline-edit-row")
             .forEach((row) => {
-              const inputs = row.querySelectorAll("input");
-              // inputs[0]=from, inputs[1]=to, inputs[2]=is_present checkbox
-              // description is now a <textarea> (fallback to inputs[3] for old rows)
+              const periodInp = row.querySelector("input");
               const ta = row.querySelector("textarea");
-              const desc = (ta ? ta.value : inputs[3]?.value || "").trim();
+              const desc = (ta?.value || "").trim();
               if (!desc) return;
-              const isPresent = inputs[2]?.checked || false;
-              const from = _parseMY(inputs[0]?.value);
-              const to = isPresent
-                ? { month: null, year: null }
-                : _parseMY(inputs[1]?.value);
+              const period = (periodInp?.value || "").trim();
+              const parts = period.split(/\s*[–\-]\s*/);
+              const from = _parseMY(parts[0]);
+              const isNay = /nay|hiện tại/i.test(parts[1] || "");
+              const to = isNay ? { month: null, year: null } : _parseMY(parts[1]);
               tlRows.push({
                 id: row.dataset.id || null,
                 from_month: from.month,
                 from_year: from.year,
                 to_month: to.month,
                 to_year: to.year,
-                is_present: isPresent,
+                is_present: isNay,
                 description: desc,
                 profile: id,
               });
@@ -15453,7 +15726,7 @@
               const period = r._vals[0] || "";
               const parts = period.split(/\s*[–\-]\s*/);
               const from = _parseMY(parts[0]);
-              const isNay = /nay/i.test(parts[1] || "");
+              const isNay = /nay|hiện tại/i.test(parts[1] || "");
               const to = isNay
                 ? { month: null, year: null }
                 : _parseMY(parts[1]);
@@ -15812,7 +16085,7 @@
         if (!cont) return;
         const row = document.createElement("div");
         row.className = "timeline-edit-row";
-        row.innerHTML = `<input placeholder="Từ (MM/YYYY)"><input placeholder="Đến (MM/YYYY)"><label style="display:flex;align-items:center;gap:3px;font-size:11px;white-space:nowrap;cursor:pointer;padding-top:8px"><input type="checkbox" onchange="const t=this.closest('.timeline-edit-row').querySelectorAll('input')[1];t.disabled=this.checked;if(this.checked)t.value=''"> Hiện tại</label><textarea rows="3" placeholder="Diễn biến: Học gì / Làm gì, ở đâu (tên đơn vị, địa chỉ) + Nơi sinh sống…"></textarea><button class="del-row-btn" onclick="delTimelineRow(this)" style="margin-top:6px">✕</button>`;
+        row.innerHTML = `<input placeholder="05/2020–08/2021"><textarea rows="3" placeholder="Diễn biến: Học gì / Làm gì, ở đâu (tên đơn vị, địa chỉ) + Nơi sinh sống…"></textarea><button class="del-row-btn" onclick="delTimelineRow(this)" style="margin-top:6px">✕</button>`;
         cont.appendChild(row);
         row.querySelector("input").focus();
       }
@@ -18719,7 +18992,6 @@
 
       // Map: admin field key → citizen form input ID (or null to fall back to section)
       const _FIELD_KEY_TO_CITIZEN_INPUT = {
-        "fi-esA-name": "hoTen",
         "fi-esA-dob": "ngaySinh",
         "fi-esA-birthplace": "birthPlaceDetail",
         "fi-esA-hometown": "queQuan",
@@ -18763,7 +19035,7 @@
         // section-level table notes
         esB: "secB",
         "esC-work": "secC",
-        esD: "secD",
+        esD: "secI",
         esE: "secG",
         esFT: "secF",
         esH: "secH",
@@ -18801,7 +19073,13 @@
             if (!n.note || n.resolved) return;
             const key = n.field_key;
             const citizenInputId = _FIELD_KEY_TO_CITIZEN_INPUT[key];
-            const citizenSecId = _FIELD_KEY_TO_CITIZEN_SEC[key] || null;
+            // Static mapping first; fall back to prefix-based routing for per-row dynamic keys
+            let citizenSecId = _FIELD_KEY_TO_CITIZEN_SEC[key] || null;
+            if (!citizenInputId && !citizenSecId) {
+              if (key.startsWith("esB-tl-row-"))        citizenSecId = "secB";
+              else if (key.startsWith("esC-work-row-")) citizenSecId = "secC";
+              // esD family history notes handled separately below — do NOT set citizenSecId
+            }
 
             if (citizenInputId) {
               // Show banner next to the specific citizen form input
@@ -18821,6 +19099,104 @@
               // Mark parent section
               const sec = inp.closest(".section");
               if (sec) sec.classList.add("has-admin-note");
+            } else if (key.startsWith("esD-hist-") || key.startsWith("esD-mem-")) {
+              // Per-member note (esD-mem-{id} exact, no -hist- suffix)
+              const esDmemOnly = key.match(/^esD-mem-(\d+)$/);
+              if (esDmemOnly) {
+                const memberId = esDmemOnly[1];
+                const acc = document.querySelector(`#secI .family-accordion[data-family-id="${memberId}"]`);
+                if (acc) {
+                  // Open accordion
+                  const famBody = acc.querySelector('.family-body');
+                  if (famBody && !famBody.classList.contains('open')) {
+                    famBody.classList.add('open');
+                    const chev = acc.querySelector('.chevron');
+                    if (chev) chev.style.transform = 'rotate(180deg)';
+                  }
+                  // Small indicator badge in accordion header next to member name
+                  const famInfo = acc.querySelector('.fam-info');
+                  if (famInfo && !famInfo.querySelector('.mem-note-indicator')) {
+                    const indicator = document.createElement('span');
+                    indicator.className = 'mem-note-indicator citizen-field-note-banner visible';
+                    famInfo.appendChild(indicator);
+                    indicator.textContent = '💬';
+                    indicator.title = 'Có góp ý từ Ban xây dựng Đảng';
+                  }
+                  // Compact note banner at top of accordion body
+                  if (famBody) {
+                    const noteDiv = document.createElement('div');
+                    noteDiv.className = 'fam-mem-note-banner citizen-field-note-banner visible';
+                    noteDiv.innerHTML = `<span class="fhb-label">💬 Góp ý BXĐ:</span><span>${_esc(n.note)}</span>`;
+                    famBody.insertBefore(noteDiv, famBody.firstChild);
+                  }
+                  const secI = document.getElementById('secI');
+                  if (secI) secI.classList.add('has-admin-note');
+                }
+                return;
+              }
+              // Per-row note for family history: insert directly into that member's history table
+              const esDmemM = key.match(/^esD-mem-(\d+)-hist-(\d+)$/);
+              const esDhistM = key.match(/^esD-hist-(\d+)$/);
+              let targetTr = null, acc = null, rowIdx = null;
+              if (esDmemM) {
+                const memberId = esDmemM[1];
+                rowIdx = parseInt(esDmemM[2]);
+                acc = document.querySelector(`#secI .family-accordion[data-family-id="${memberId}"]`);
+                if (acc) {
+                  const trs = acc.querySelectorAll('.family-body .timeline-table tbody tr:not(.fam-hist-note-row)');
+                  targetTr = trs[rowIdx] || null;
+                }
+              } else if (esDhistM) {
+                targetTr = document.querySelector(`#secI tr[data-hist-id="${esDhistM[1]}"]`);
+                if (targetTr) {
+                  acc = targetTr.closest('.family-accordion');
+                  const tbody = targetTr.closest('tbody');
+                  if (tbody) rowIdx = [...tbody.querySelectorAll('tr:not(.fam-hist-note-row)')].indexOf(targetTr);
+                }
+              }
+              const memberName = acc
+                ? ((acc.querySelector('.fam-title-text') || acc.querySelector('.fam-info strong'))?.textContent?.trim() || "Thành viên")
+                : "Thành viên";
+              if (targetTr && acc) {
+                // Expand accordion so citizen can see the note
+                const famBody = acc.querySelector('.family-body');
+                if (famBody && !famBody.classList.contains('open')) {
+                  famBody.classList.add('open');
+                  const chev = acc.querySelector('.chevron');
+                  if (chev) chev.style.transform = 'rotate(180deg)';
+                }
+                // Insert a compact note banner OUTSIDE the table, before timeline-wrap
+                const noteDiv = document.createElement('div');
+                noteDiv.className = 'fam-hist-note-banner citizen-field-note-banner visible';
+                const labelText = rowIdx !== null ? `💬 Dòng ${rowIdx + 1}:` : '💬 Góp ý:';
+                noteDiv.innerHTML = `<span class="fhb-label">${labelText}</span><span>${_esc(n.note)}</span>`;
+                const tlWrap = famBody ? famBody.querySelector('.timeline-wrap') : null;
+                if (tlWrap) tlWrap.before(noteDiv);
+                else if (famBody) famBody.appendChild(noteDiv);
+                const secI = document.getElementById('secI');
+                if (secI) secI.classList.add('has-admin-note');
+              } else {
+                // Fallback: add to section banner if TR not found
+                const sec = document.getElementById('secI');
+                if (!sec) return;
+                sec.classList.add('has-admin-note');
+                let banner = sec.querySelector('.citizen-note-banner');
+                if (!banner) {
+                  banner = document.createElement('div');
+                  banner.className = 'citizen-note-banner visible';
+                  banner.innerHTML = `<div class="cnb-body"></div>`;
+                  const header = sec.querySelector('.section-header');
+                  if (header) header.after(banner); else sec.prepend(banner);
+                }
+                const body = banner.querySelector('.cnb-body');
+                if (body) {
+                  const item = document.createElement('div');
+                  item.className = 'cnb-item';
+                  const lbl = rowIdx !== null ? `Lịch sử ${memberName} dòng ${rowIdx + 1}: ` : `Lịch sử ${memberName}: `;
+                  item.innerHTML = `<span class="cfnb-icon">💬</span><span><strong>${_esc(lbl)}</strong>${_esc(n.note)}</span>`;
+                  body.appendChild(item);
+                }
+              }
             } else if (citizenSecId) {
               // Section-level banner
               const sec = document.getElementById(citizenSecId);
@@ -18838,9 +19214,15 @@
               }
               const body = banner.querySelector(".cnb-body");
               if (body) {
+                // Build a row label for per-row dynamic keys
+                let rowLabel = "";
+                const rowMatch  = key.match(/^esB-tl-row-(\d+)$/);
+                const workMatch = key.match(/^esC-work-row-(\d+)$/);
+                if (rowMatch)   rowLabel = `Giai đoạn #${+rowMatch[1] + 1}: `;
+                else if (workMatch) rowLabel = `Công tác #${+workMatch[1] + 1}: `;
                 const item = document.createElement("div");
                 item.className = "cnb-item";
-                item.innerHTML = `<span class="cfnb-icon">💬</span><span>${_esc(n.note)}</span>`;
+                item.innerHTML = `<span class="cfnb-icon">💬</span><span>${rowLabel ? `<strong>${_esc(rowLabel)}</strong>` : ""}${_esc(n.note)}</span>`;
                 body.appendChild(item);
               }
             }
@@ -19156,7 +19538,7 @@
                           })
                           .join("")}</ul></div>`
                       : "";
-                    return `<li><strong>${_esc(f.relationship_display || f.relationship || "")}:</strong> ${_esc(f.full_name || "")}<br><span style="font-size:11px;color:var(--muted)">${lines.join(" · ")}</span>${histHtml}</li>`;
+                    return `<li><strong>${_esc(f.custom_label || f.relationship_display || f.relationship || "")}:</strong> ${_esc(f.full_name || "")}<br><span style="font-size:11px;color:var(--muted)">${lines.join(" · ")}</span>${histHtml}</li>`;
                   })
                   .join("")
               : `<div class="pv-sec-empty">Chưa nhập</div>`

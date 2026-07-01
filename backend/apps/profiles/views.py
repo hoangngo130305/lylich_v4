@@ -346,6 +346,10 @@ class ProfileWorkflowView(generics.GenericAPIView):
         profile.updated_by = request.user
         profile.save()
 
+        # On (re-)submit: wipe all field notes so the officer reviews with a clean slate
+        if action == 'submit':
+            ProfileFieldNote.objects.filter(profile=profile).delete()
+
         # Create review record
         ProfileReview.objects.create(
             profile=profile,

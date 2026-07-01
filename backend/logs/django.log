@@ -10065,3 +10065,21 @@ WARNING 2026-06-30 14:39:16,779 log 9384 23908 Unauthorized: /api/v1/auth/me/
 WARNING 2026-06-30 14:39:16,782 basehttp 9384 23908 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
 WARNING 2026-06-30 14:39:30,618 log 9384 7116 Unauthorized: /api/v1/auth/me/
 WARNING 2026-06-30 14:39:30,619 basehttp 9384 7116 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-06-30 17:32:58,234 log 9384 25604 Unauthorized: /api/v1/auth/logout/
+WARNING 2026-06-30 17:32:58,235 basehttp 9384 25604 "POST /api/v1/auth/logout/ HTTP/1.1" 401 291
+WARNING 2026-06-30 21:43:47,893 log 17008 8696 Unauthorized: /api/v1/auth/me/
+WARNING 2026-06-30 21:43:47,897 basehttp 17008 8696 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-06-30 21:44:12,566 log 17008 10120 Not Found: /favicon.ico
+WARNING 2026-06-30 21:44:12,567 basehttp 17008 10120 "GET /favicon.ico HTTP/1.1" 404 5355
+WARNING 2026-07-01 08:59:42,560 log 14728 3096 Unauthorized: /api/v1/auth/me/
+WARNING 2026-07-01 08:59:42,562 basehttp 14728 3096 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-07-01 08:59:57,774 log 14728 15288 Unauthorized: /api/v1/auth/me/
+WARNING 2026-07-01 08:59:57,775 basehttp 14728 15288 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-07-01 10:03:15,517 log 14728 22336 Unauthorized: /api/v1/auth/me/
+WARNING 2026-07-01 10:03:15,518 basehttp 14728 22336 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-07-01 10:03:15,753 log 14728 21120 Unauthorized: /api/v1/auth/me/
+WARNING 2026-07-01 10:03:15,760 basehttp 14728 21120 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-07-01 11:03:34,745 log 14728 24588 Unauthorized: /api/v1/profiles/my/
+WARNING 2026-07-01 11:03:34,748 basehttp 14728 24588 "PUT /api/v1/profiles/my/ HTTP/1.1" 401 291
+WARNING 2026-07-01 11:03:45,306 log 14728 592 Unauthorized: /api/v1/verification/stats/
+WARNING 2026-07-01 11:03:45,308 basehttp 14728 592 "GET /api/v1/verification/stats/ HTTP/1.1" 401 291
