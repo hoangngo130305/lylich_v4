@@ -346,10 +346,6 @@ class ProfileWorkflowView(generics.GenericAPIView):
         profile.updated_by = request.user
         profile.save()
 
-        # On (re-)submit: wipe all field notes so the officer reviews with a clean slate
-        if action == 'submit':
-            ProfileFieldNote.objects.filter(profile=profile).delete()
-
         # Create review record
         ProfileReview.objects.create(
             profile=profile,
@@ -517,19 +513,25 @@ class ProfileFieldNoteView(generics.GenericAPIView):
 
         notes_data = request.data if isinstance(request.data, list) else request.data.get('notes', [])
         saved = []
+        deleted_keys = []
         for item in notes_data:
             field_key  = str(item.get('field_key', '')).strip()
             note_text  = str(item.get('note', '')).strip()
             resolved   = bool(item.get('resolved', False))
             if not field_key:
                 continue
-            obj, _ = ProfileFieldNote.objects.update_or_create(
-                profile=profile,
-                field_key=field_key,
-                defaults={'note': note_text, 'reviewer': request.user, 'resolved': resolved},
-            )
-            saved.append(ProfileFieldNoteSerializer(obj).data)
+            if not note_text:
+                # Empty note = admin cleared it → delete the record
+                ProfileFieldNote.objects.filter(profile=profile, field_key=field_key).delete()
+                deleted_keys.append(field_key)
+            else:
+                obj, _ = ProfileFieldNote.objects.update_or_create(
+                    profile=profile,
+                    field_key=field_key,
+                    defaults={'note': note_text, 'reviewer': request.user, 'resolved': resolved},
+                )
+                saved.append(ProfileFieldNoteSerializer(obj).data)
 
         log_activity(request.user, 'field_notes_save', target_model='Profile', target_id=profile.id,
-                     description=f'Lưu {len(saved)} nhận xét cho hồ sơ {profile.full_name}')
-        return Response({'success': True, 'data': saved})
+                     description=f'Lưu {len(saved)} nhận xét, xóa {len(deleted_keys)} nhận xét cho hồ sơ {profile.full_name}')
+        return Response({'success': True, 'data': saved, 'deleted': deleted_keys})

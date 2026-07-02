@@ -60,6 +60,7 @@ class FamilyMember(models.Model):
     is_party_member  = models.BooleanField(default=False)
     party_join_year  = models.PositiveSmallIntegerField(null=True, blank=True)
     party_chi_bo     = models.CharField(max_length=255, null=True, blank=True)
+    party_dang_bo    = models.CharField(max_length=255, null=True, blank=True)
     party_awards_text = models.TextField(null=True, blank=True)
     party_years_count = models.PositiveSmallIntegerField(null=True, blank=True)
 

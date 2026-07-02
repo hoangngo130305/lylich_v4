@@ -703,6 +703,8 @@ def _party_str(member):
         parts.append(f'Vào Đảng năm {member.party_join_year}')
     if member.party_chi_bo:
         parts.append(f'Chi bộ: {member.party_chi_bo}')
+    if member.party_dang_bo:
+        parts.append(f'Đảng bộ: {member.party_dang_bo}')
     return ', '.join(parts)
 
 

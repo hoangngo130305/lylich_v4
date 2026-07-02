@@ -4833,29 +4833,55 @@
         opacity: 0.45;
       }
 
-      /* ── Per-field note area (injected inline beside each field-row) ── */
+      /* ── Per-field note area — horizontal: [label] [value] [note beside value] ── */
 
-      /* 3-column layout in review mode: [label 140px] [value 1fr] [note 200px] */
+      /* One row: label fixed, value content-sized, note fills remaining space right beside value */
       #pgProfileEdit.review-locked .field-row {
-        grid-template-columns: 140px 1fr 200px;
-        align-items: start;
-        gap: 0 8px;
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: nowrap;
+        align-items: flex-start;
+        gap: 6px 10px;
+        padding: 4px 0;
       }
-      /* Note sits in col 3, same row — align-self:start so it grows with content */
+      /* Label: fixed width, muted */
+      #pgProfileEdit.review-locked .field-row .field-label {
+        flex: 0 0 130px;
+        min-width: 0;
+        font-size: 10.5px;
+        color: #718096;
+        font-weight: 600;
+        margin-bottom: 0;
+        padding-top: 2px;
+      }
+      /* Value: content-width only, no grow — keeps note right beside it */
+      #pgProfileEdit.review-locked .field-row .field-value {
+        flex: 0 1 auto;
+        min-width: 0;
+        white-space: normal;
+        word-break: break-word;
+        line-height: 1.5;
+        font-size: 12.5px;
+      }
+      /* Note: grows to fill remaining horizontal space beside value */
       #pgProfileEdit.review-locked .fn-field-note {
-        grid-column: 3;
-        grid-row: 1;
+        flex: 1 1 200px;
+        min-width: 130px;
+        box-sizing: border-box;
         margin: 0;
         border-radius: 5px;
         border: 1px solid #e8c860;
-        align-self: start;
-        min-width: 0;
+        grid-column: unset;
+        grid-row: unset;
       }
-      /* Section-level notes stay full-width below */
+      /* In the row context the label is redundant — hide it for cleaner layout */
+      #pgProfileEdit.review-locked .field-row .fn-field-note .fn-field-note-label {
+        display: none;
+      }
       #pgProfileEdit.review-locked .fn-field-note.fn-section-note {
-        grid-column: 1 / -1;
-        grid-row: auto;
-        align-self: auto;
+        margin: 0;
+        grid-column: unset;
+        grid-row: unset;
       }
 
       .fn-field-note {
@@ -4976,9 +5002,6 @@
       #pgProfileEdit.review-locked .editable-section {
         margin-bottom: 10px;
       }
-      #pgProfileEdit.review-locked .field-row {
-        padding: 3px 0;
-      }
 
       /* ── Citizen note banners (shown when profile is returned) ── */
       /* Section-level: groups all notes for a section */
@@ -5013,26 +5036,49 @@
       .citizen-field-note-banner {
         display: none;
         align-items: flex-start;
-        gap: 7px;
-        background: #fff8dc;
-        border: 1.5px solid #f0c040;
+        gap: 5px;
+        background: #fffbea;
+        border: 1px solid #f0c040;
         border-left: 3px solid #d4a800;
-        border-radius: 5px;
-        padding: 5px 9px;
-        margin: 3px 0 6px;
-        font-size: 12px;
-        color: #5a3e00;
-        line-height: 1.45;
+        border-radius: 4px;
+        padding: 3px 8px;
+        margin: 2px 0 4px;
+        font-size: 11px;
+        color: #4a3200;
+        line-height: 1.4;
       }
       .citizen-field-note-banner.visible {
         display: flex;
       }
       .cfnb-icon {
-        font-size: 13px;
+        font-size: 12px;
         flex-shrink: 0;
         margin-top: 1px;
       }
       /* Family history note card — compact banner outside the table */
+      /* Inline note row inside family history table — sits directly after its data row */
+      .fam-hist-note-row td {
+        background: #fffbea;
+        border-top: none !important;
+        border-left: 3px solid #d4a800 !important;
+        border-bottom: 1px solid #f0e08a !important;
+        padding: 0 !important;
+        font-size: 11px;
+        line-height: 1.4;
+        color: #3a2000;
+      }
+      .fam-hist-note-row .fhn-inner {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        padding: 2px 10px 3px;
+      }
+      .fam-hist-note-row .fhb-label {
+        font-weight: 700;
+        color: #7a5000;
+        margin-right: 4px;
+      }
+      /* Fallback: standalone banner used when targetTr not found */
       .fam-hist-note-banner {
         display: flex;
         align-items: baseline;
@@ -5275,9 +5321,9 @@
         grid-template-columns: 140px 1fr 28px;
         align-items: start;
       }
-      /* Family history (Part D): 2 columns — period / description (no delete) */
+      /* Family history (Part D): 3 columns — from / to / description */
       .fam-hist-body .timeline-edit-row {
-        grid-template-columns: 140px 1fr;
+        grid-template-columns: 105px 105px 1fr;
         align-items: start;
       }
       /* Part C: give employer the wide column, job_title fixed */
@@ -9964,7 +10010,8 @@
         </select>
         <div id="sibParty_${m.num}" style="display:none;margin-top:8px" class="party-detail-box">
           <div class="form-row"><label>Năm vào Đảng</label><input type="number" placeholder="YYYY" min="1930" max="2099"></div>
-          <div class="form-row"><label>Chi bộ / Đảng bộ</label><input type="text" placeholder="Chi bộ … – Đảng bộ …"></div>
+          <div class="form-row"><label>Chi bộ</label><input type="text" class="fam-party-chi-bo" placeholder="Chi bộ …"></div>
+          <div class="form-row"><label>Đảng bộ</label><input type="text" class="fam-party-dang-bo" placeholder="Đảng bộ …"></div>
           <div class="form-row"><label>Khen thưởng / Danh hiệu</label><input type="text" placeholder="Huy hiệu Đảng năm … / Đảng viên xuất sắc …"></div>
           <div class="form-row"><label>Số năm tuổi Đảng</label><input type="number" placeholder="0" min="0" max="80"> <span class="hint">Tính đến năm hiện tại</span></div>
         </div>
@@ -10035,7 +10082,8 @@
       <div><select onchange="toggleSiblingParty(this,'spouseParty_${m.num}')"><option value="">-- Chọn --</option><option value="no">Không phải đảng viên</option><option value="yes">Là đảng viên Đảng Cộng sản Việt Nam</option></select>
         <div id="spouseParty_${m.num}" style="display:none;margin-top:8px" class="party-detail-box">
           <div class="form-row"><label>Năm vào Đảng</label><input type="number" placeholder="YYYY" min="1930" max="2099"></div>
-          <div class="form-row"><label>Chi bộ / Đảng bộ</label><input type="text" placeholder="Chi bộ … – Đảng bộ …"></div>
+          <div class="form-row"><label>Chi bộ</label><input type="text" class="fam-party-chi-bo" placeholder="Chi bộ …"></div>
+          <div class="form-row"><label>Đảng bộ</label><input type="text" class="fam-party-dang-bo" placeholder="Đảng bộ …"></div>
           <div class="form-row"><label>Khen thưởng / Huy hiệu Đảng</label><input type="text" placeholder="Huy hiệu Đảng / Đảng viên xuất sắc …"></div>
           <div class="form-row"><label>Số năm tuổi Đảng</label><input type="number" placeholder="0" min="0" max="80"></div>
         </div>
@@ -10142,7 +10190,8 @@
       <div><select onchange="toggleSiblingParty(this,'gpParty_${m.num}')"><option value="">-- Chọn --</option><option value="no">Không phải đảng viên</option><option value="yes">Là đảng viên Đảng Cộng sản Việt Nam</option></select>
         <div id="gpParty_${m.num}" style="display:none;margin-top:8px" class="party-detail-box">
           <div class="form-row"><label>Năm vào Đảng</label><input type="number" placeholder="YYYY" min="1930" max="2099"></div>
-          <div class="form-row"><label>Chi bộ / Đảng bộ</label><input type="text" placeholder="Chi bộ … – Đảng bộ …"></div>
+          <div class="form-row"><label>Chi bộ</label><input type="text" class="fam-party-chi-bo" placeholder="Chi bộ …"></div>
+          <div class="form-row"><label>Đảng bộ</label><input type="text" class="fam-party-dang-bo" placeholder="Đảng bộ …"></div>
           <div class="form-row"><label>Khen thưởng / Huy hiệu</label><input type="text" placeholder="Huy hiệu Đảng 50 năm / Đảng viên xuất sắc …"></div>
           <div class="form-row"><label>Số năm tuổi Đảng</label><input type="number" placeholder="0" min="0" max="100"></div>
         </div>
@@ -10182,7 +10231,8 @@
         </select>
         <div id="famParty_${m.num}" style="display:none;margin-top:8px" class="party-detail-box">
           <div class="form-row"><label>Năm vào Đảng</label><input type="number" placeholder="YYYY" min="1930" max="2099"></div>
-          <div class="form-row"><label>Chi bộ / Đảng bộ</label><input type="text" placeholder="Chi bộ … – Đảng bộ …"></div>
+          <div class="form-row"><label>Chi bộ</label><input type="text" class="fam-party-chi-bo" placeholder="Chi bộ …"></div>
+          <div class="form-row"><label>Đảng bộ</label><input type="text" class="fam-party-dang-bo" placeholder="Đảng bộ …"></div>
           <div class="form-row"><label>Khen thưởng / Huy hiệu Đảng</label><input type="text" placeholder="Huy hiệu Đảng 30 năm / Đảng viên xuất sắc …"></div>
           <div class="form-row"><label>Số năm tuổi Đảng</label><input type="number" placeholder="0" min="0" max="80"> <span class="hint">Tính đến năm hiện tại</span></div>
         </div>
@@ -11139,6 +11189,7 @@
         const isParty = pSel ? pSel.value === "yes" : false;
         let partyYear = null,
           chiBoVal = null,
+          dangBoVal = null,
           partyAwards = null,
           partyYearsCount = null;
         if (isParty) {
@@ -11146,8 +11197,10 @@
           if (pbox) {
             const yi = pbox.querySelector('input[placeholder*="YYYY"]');
             partyYear = parseInt(yi?.value) || null;
-            const ci = pbox.querySelector('input[placeholder*="Chi bộ"]');
+            const ci = pbox.querySelector('input.fam-party-chi-bo');
             chiBoVal = ci?.value.trim() || null;
+            const di = pbox.querySelector('input.fam-party-dang-bo');
+            dangBoVal = di?.value.trim() || null;
             const ai = pbox.querySelector('input[placeholder*="Huy hiệu"]');
             partyAwards = ai?.value.trim() || null;
             const yci = pbox.querySelector(
@@ -11239,6 +11292,7 @@
           is_party_member: isParty,
           party_join_year: partyYear,
           party_chi_bo: chiBoVal,
+          party_dang_bo: dangBoVal,
           party_awards_text: partyAwards,
           party_years_count: partyYearsCount,
           is_deceased: isDeceased,
@@ -11442,8 +11496,12 @@
                 if (yi) yi.value = m.party_join_year;
               }
               if (m.party_chi_bo) {
-                const ci = pbox.querySelector('input[placeholder*="Chi bộ"]');
+                const ci = pbox.querySelector('input.fam-party-chi-bo');
                 if (ci) ci.value = m.party_chi_bo;
+              }
+              if (m.party_dang_bo) {
+                const di = pbox.querySelector('input.fam-party-dang-bo');
+                if (di) di.value = m.party_dang_bo;
               }
               if (m.party_awards_text) {
                 const ai = pbox.querySelector('input[placeholder*="Huy hiệu"]');
@@ -13024,7 +13082,7 @@
           <div class="edit-sidenav-title">Điều hướng phần</div>
           <div class="edit-nav-item active" onclick="scrollToSection('esA')">A. Sơ lược lý lịch</div>
           <div class="edit-nav-item" onclick="scrollToSection('esB')">B. Lịch sử bản thân</div>
-          <div class="edit-nav-item" onclick="scrollToSection('esC')">C. Trình độ & Công tác</div>
+          <div class="edit-nav-item" onclick="scrollToSection('esC')">C. Công tác</div>
           <div class="edit-nav-item" id="esD-nav" onclick="scrollToSection('esD')">D. Thành phần gia đình</div>
           <div class="edit-nav-item" onclick="scrollToSection('esE')">E. Khen thưởng</div>
           <div class="edit-nav-item" onclick="scrollToSection('esFT')">F. Đi nước ngoài</div>
@@ -13102,6 +13160,11 @@
                 <select class="field-select-input" id="fi-esA-religion" data-field="Tôn giáo"><option value="">—</option><option value="Không" selected>Không</option><option>Phật giáo</option><option>Công giáo</option><option>Cao Đài</option><option>Tin Lành</option><option>Khác</option></select>
               </div>
               <div class="field-row">
+                <div class="field-label">Chức sắc tôn giáo</div>
+                <div class="field-value" id="fv-esA-religious-title">Không có chức sắc</div>
+                <input class="field-input" id="fi-esA-religious-title" value="" data-field="Chức sắc tôn giáo" placeholder="Không có chức sắc">
+              </div>
+              <div class="field-row">
                 <div class="field-label">Nơi thường trú</div>
                 <div class="field-value" id="fv-esA-address">—</div>
                 <input class="field-input" id="fi-esA-address" value="" data-field="Nơi thường trú">
@@ -13131,40 +13194,8 @@
                 <div class="field-value" id="fv-esA-temp-addr">—</div>
                 <input class="field-input" id="fi-esA-temp-addr" value="" data-field="Nơi tạm trú" placeholder="Để trống nếu không có">
               </div>
-            </div>
-          </div>
-
-          <!-- B. Personal History Timeline -->
-          <div class="editable-section" id="esB">
-            <div class="edit-sec-head">
-              <div class="card-head-dot"></div>
-              <h4>B. Lịch sử bản thân (liên tục từ nhỏ đến nay)</h4>
-              <div class="edit-sec-actions">
-                <button class="edit-btn flag-btn" onclick="toggleSectionFlag('esB','B. Lịch sử bản thân')" title="Đánh dấu cần bổ sung">⚑ Gắn cờ</button>
-                <button class="edit-btn" onclick="toggleEdit('esB')">✏ Chỉnh sửa</button>
-              </div>
-            </div>
-            <div class="edit-sec-body">
-              <div class="field-correction-note" id="note-esB"></div>
-              <div id="timeline-esB">
-                <div style="text-align:center;padding:16px;color:var(--muted);font-size:12.5px">⏳ Đang tải lịch sử bản thân…</div>
-              </div>
-              <button class="add-row-btn" style="margin-top:8px" onclick="addHistoryRowB()">+ Thêm giai đoạn</button>
-            </div>
-          </div>
-
-          <!-- C. Education & Work -->
-          <div class="editable-section" id="esC">
-            <div class="edit-sec-head">
-              <div class="card-head-dot"></div>
-              <h4>C. Trình độ học vấn & Công tác</h4>
-              <div class="edit-sec-actions">
-                <button class="edit-btn flag-btn" onclick="toggleSectionFlag('esC','C. Trình độ')" title="Đánh dấu cần bổ sung">⚑ Gắn cờ</button>
-                <button class="edit-btn" onclick="toggleEdit('esC')">✏ Chỉnh sửa</button>
-              </div>
-            </div>
-            <div class="edit-sec-body">
-              <div class="field-correction-note" id="note-esC"></div>
+              <!-- Trình độ học vấn (Mục 11 – thuộc Phần A) -->
+              <div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border-xl);font-weight:600;font-size:12px;color:var(--text2);margin-bottom:6px">Trình độ học vấn</div>
               <div class="field-row">
                 <div class="field-label">Trình độ GD phổ thông</div>
                 <div class="field-value" id="fv-esC-edu-gen">—</div>
@@ -13215,14 +13246,44 @@
                 <div class="field-value" id="fv-esC-ethnic-lang">—</div>
                 <input class="field-input" id="fi-esC-ethnic-lang" value="" data-field="Tiếng dân tộc" placeholder="Tên tiếng dân tộc thiểu số">
               </div>
-              <!-- Work history (Part C: công tác, chức vụ đã qua) -->
-              <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border-xl)">
-                <div style="font-weight:600;font-size:12.5px;color:var(--text2);margin-bottom:8px">Những công tác, chức vụ đã qua (Phần C)</div>
-                <div id="timeline-esC">
-                  <div style="text-align:center;padding:16px;color:var(--muted);font-size:12.5px">⏳ Đang tải lịch sử công tác…</div>
-                </div>
-                <button class="add-row-btn" style="margin-top:8px" onclick="addWorkRowC()">+ Thêm công tác</button>
+            </div>
+          </div>
+
+          <!-- B. Personal History Timeline -->
+          <div class="editable-section" id="esB">
+            <div class="edit-sec-head">
+              <div class="card-head-dot"></div>
+              <h4>B. Lịch sử bản thân (liên tục từ nhỏ đến nay)</h4>
+              <div class="edit-sec-actions">
+                <button class="edit-btn flag-btn" onclick="toggleSectionFlag('esB','B. Lịch sử bản thân')" title="Đánh dấu cần bổ sung">⚑ Gắn cờ</button>
+                <button class="edit-btn" onclick="toggleEdit('esB')">✏ Chỉnh sửa</button>
               </div>
+            </div>
+            <div class="edit-sec-body">
+              <div class="field-correction-note" id="note-esB"></div>
+              <div id="timeline-esB">
+                <div style="text-align:center;padding:16px;color:var(--muted);font-size:12.5px">⏳ Đang tải lịch sử bản thân…</div>
+              </div>
+              <button class="add-row-btn" style="margin-top:8px" onclick="addHistoryRowB()">+ Thêm giai đoạn</button>
+            </div>
+          </div>
+
+          <!-- C. Work History -->
+          <div class="editable-section" id="esC">
+            <div class="edit-sec-head">
+              <div class="card-head-dot"></div>
+              <h4>C. Những công tác, chức vụ đã qua</h4>
+              <div class="edit-sec-actions">
+                <button class="edit-btn flag-btn" onclick="toggleSectionFlag('esC','C. Công tác')" title="Đánh dấu cần bổ sung">⚑ Gắn cờ</button>
+                <button class="edit-btn" onclick="toggleEdit('esC')">✏ Chỉnh sửa</button>
+              </div>
+            </div>
+            <div class="edit-sec-body">
+              <div class="field-correction-note" id="note-esC"></div>
+              <div id="timeline-esC">
+                <div style="text-align:center;padding:16px;color:var(--muted);font-size:12.5px">⏳ Đang tải lịch sử công tác…</div>
+              </div>
+              <button class="add-row-btn" style="margin-top:8px" onclick="addWorkRowC()">+ Thêm công tác</button>
             </div>
           </div>
 
@@ -14493,7 +14554,7 @@
         esA: "A. Sơ lược lý lịch",
         esB: "B. Lịch sử bản thân",
         "esC-work": "C. Lịch sử công tác",
-        esC: "C. Trình độ & Công tác",
+        esC: "C. Những công tác, chức vụ đã qua",
         esD: "D. Gia đình",
         esE: "E. Khen thưởng",
         esFT: "F. Đi nước ngoài",
@@ -14515,16 +14576,17 @@
         "fi-esA-email": "A. Email",
         "fi-esA-occupation": "A. Nghề nghiệp",
         "fi-esA-temp-addr": "A. Nơi tạm trú",
-        "fi-esC-edu-gen": "C. Trình độ phổ thông",
-        "fi-esC-edu-qual": "C. Trình độ chuyên môn",
-        "fi-esC-political": "C. Lý luận chính trị",
-        "fi-esC-foreign-lang": "C. Ngoại ngữ",
-        "fi-esC-it": "C. Tin học",
-        "fi-esC-youth-union": "C. Vào Đoàn",
-        "fi-esC-sci-tech": "C. Khoa học công nghệ",
-        "fi-esC-degree": "C. Học vị",
-        "fi-esC-acad-title": "C. Học hàm",
-        "fi-esC-ethnic-lang": "C. Tiếng dân tộc",
+        "fi-esA-religious-title": "A. Chức sắc tôn giáo",
+        "fi-esC-edu-gen": "A. Trình độ phổ thông",
+        "fi-esC-edu-qual": "A. Trình độ chuyên môn",
+        "fi-esC-political": "A. Lý luận chính trị",
+        "fi-esC-foreign-lang": "A. Ngoại ngữ",
+        "fi-esC-it": "A. Tin học",
+        "fi-esC-youth-union": "A. Vào Đoàn",
+        "fi-esC-sci-tech": "A. Khoa học công nghệ",
+        "fi-esC-degree": "A. Học vị",
+        "fi-esC-acad-title": "A. Học hàm",
+        "fi-esC-ethnic-lang": "A. Tiếng dân tộc",
         "fi-esJ-self": "J. Tự nhận xét",
         "fi-esK-name": "K. Họ tên cam đoan",
         "fi-esK-date": "K. Ngày ký cam đoan",
@@ -14593,6 +14655,7 @@
             setFv("esA-ethnic", ethnicName);
             const relName = p.religion_name || p.religion_other || "Không";
             setFv("esA-religion", relName);
+            setFv("esA-religious-title", p.religious_title, p.religious_title || "Không có chức sắc");
 
             // Section A — additional fields
             setFv("esA-cccd", p.cccd || p.user?.cccd);
@@ -14859,16 +14922,17 @@
                   const fm = h.from_month
                     ? `${String(h.from_month).padStart(2, "0")}/${h.from_year || ""}`
                     : h.from_year || "";
-                  const to = h.is_present
-                    ? "Đến nay"
-                    : h.is_deceased && !h.to_year && !h.to_month
-                      ? "Đã mất"
+                  // Deceased rows: no "To" date shown
+                  const toVal = h.is_deceased
+                    ? ""
+                    : h.is_present
+                      ? "Đến nay"
                       : h.to_month
                         ? `${String(h.to_month).padStart(2, "0")}/${h.to_year || ""}`
                         : h.to_year || "";
-                  const period = fm && to ? `${fm}–${to}` : fm || to || "";
                   return `<div class="timeline-edit-row" data-hist-id="${_esc(String(h.id || ""))}" data-hist-idx="${hi}">
-                    <input value="${_esc(period)}" placeholder="Thời gian" readonly>
+                    <input value="${_esc(fm)}" placeholder="Từ" readonly>
+                    <input value="${_esc(toVal)}" placeholder="" readonly>
                     <textarea rows="2" readonly>${_esc(h.description || "")}</textarea>
                   </div>`;
                 }).join("");
@@ -14905,8 +14969,7 @@
                     ${fvW("Nơi sinh", m.birth_place)}
                     ${fvW("Quê quán", m.hometown)}
                     ${fv("Dân tộc", m.ethnic_group_text)}
-                    ${fv("Tôn giáo", m.religion_text)}
-                    ${m.religious_rank_text ? fv("Chức sắc tôn giáo", m.religious_rank_text) : ""}
+                    ${m.religion_text ? fv("Tôn giáo", `${m.religion_text} (${m.religious_rank_text || "không có chức sắc"})`) : ""}
                     ${fvW("Nơi ở hiện tại", m.current_address)}
                     ${fv("Nghề nghiệp", m.occupation)}
                     ${["anh_chi_em_ruot", "anh_chi_em_chong_vo"].includes(m.relationship) ? fv("Quốc tịch", m.nationality || "Việt Nam") : ""}
@@ -14925,9 +14988,10 @@
                     } else if (m.party_join_year) {
                       dateStr = `năm ${m.party_join_year}`;
                     }
-                    const chiBo = _esc(m.party_chi_bo || "...........................");
+                    const chiBo = _esc(m.party_chi_bo || "..............................");
+                    const dangBo = _esc(m.party_dang_bo || "..............................");
                     return `<div style="margin-top:8px;padding:7px 10px;background:#F0FFF4;border-left:3px solid #38a169;border-radius:0 4px 4px 0;font-size:12px;color:#1a202c;line-height:1.6">
-                      Là đảng viên Đảng Cộng sản Việt Nam, vào Đảng ${_esc(dateStr)}, hiện sinh hoạt tại chi bộ/đảng bộ ${chiBo}.
+                      Là đảng viên Đảng Cộng sản Việt Nam, vào Đảng ${_esc(dateStr)}, hiện sinh hoạt tại chi bộ ${chiBo} thuộc đảng bộ ${dangBo}.
                     </div>`;
                   })()}
                   ${m.notes ? `<div style="margin-top:6px"><span ${LS}>Ghi chú:</span> ${_esc(m.notes)}</div>` : ""}
@@ -15014,7 +15078,8 @@
                   <div class="fam-party-extra" style="display:${partyDisplay};grid-template-columns:1fr 1fr;gap:6px 16px;margin-top:6px;padding:8px 10px;background:#F0FFF4;border-radius:4px">
                     <div><label ${LS}>Ngày vào Đảng</label><input ${IS} data-field="party_join_date" value="${_esc(m.party_join_date || "")}"></div>
                     <div><label ${LS}>Nơi vào Đảng</label><input ${IS} data-field="party_join_place" value="${_esc(m.party_join_place || "")}"></div>
-                    <div><label ${LS}>Chi bộ/Đảng bộ</label><input ${IS} data-field="party_chi_bo" value="${_esc(m.party_chi_bo || "")}"></div>
+                    <div><label ${LS}>Chi bộ</label><input ${IS} data-field="party_chi_bo" value="${_esc(m.party_chi_bo || "")}"></div>
+                    <div><label ${LS}>Đảng bộ</label><input ${IS} data-field="party_dang_bo" value="${_esc(m.party_dang_bo || "")}"></div>
                     <div><label ${LS}>Khen thưởng/Huy hiệu</label><input ${IS} data-field="party_awards_text" value="${_esc(m.party_awards_text || "")}"></div>
                     <div><label ${LS}>Số năm tuổi Đảng</label><input ${IS} type="number" data-field="party_years_count" value="${m.party_years_count || ""}"></div>
                   </div>
@@ -15325,27 +15390,7 @@
           row.appendChild(nd);
         });
 
-        // ── Section-level notes for timeline / table sections ──
-        [
-          { key: "esD", label: "D. Thành phần gia đình", secId: "esD" },
-          { key: "esE", label: "E. Khen thưởng", secId: "esE" },
-          { key: "esFT", label: "F. Đi nước ngoài", secId: "esFT" },
-          { key: "esH", label: "H. Kỷ luật", secId: "esH" },
-        ].forEach(({ key, label, secId }) => {
-          const sec = document.getElementById(secId);
-          if (!sec) return;
-          const body = sec.querySelector(".edit-sec-body");
-          if (!body) return;
-          const nd = document.createElement("div");
-          nd.className = "fn-field-note fn-section-note";
-          nd.dataset.fieldKey = key;
-          nd.innerHTML =
-            `<div class="fn-field-note-label">💬 ${label}</div>` +
-            `<textarea class="fn-field-note-ta" placeholder="Nhập góp ý cho phần này…" rows="1" oninput="_autoResizeNote(this)" onfocus="_autoResizeNote(this)"></textarea>`;
-          body.insertBefore(nd, body.firstElementChild);
-        });
-
-        // ── Per-row note toggles for Sections B and C ──
+        // ── Per-row note toggles for Sections B, C, E, F, H ──
         const _injectTlRowNotes = (containerId, keyPrefix, rowLabel) => {
           const container = document.getElementById(containerId);
           if (!container) return;
@@ -15371,6 +15416,9 @@
         };
         _injectTlRowNotes("timeline-esB", "esB-tl", "Giai đoạn");
         _injectTlRowNotes("timeline-esC", "esC-work", "Công tác");
+        _injectTlRowNotes("timeline-esG", "esE", "Khen thưởng");
+        _injectTlRowNotes("timeline-esF", "esFT", "Đi nước ngoài");
+        _injectTlRowNotes("timeline-esH", "esH", "Kỷ luật");
 
         // ── One note per family member + per-history-row notes (Part D) ──
         document.querySelectorAll("#family-esD-body [data-fam-id]").forEach((card) => {
@@ -15384,7 +15432,7 @@
           const memBar = document.createElement("div");
           memBar.className = "tl-row-note-bar";
           memBar.dataset.rowKey = memKey;
-          memBar.innerHTML = `<button class="tl-row-note-toggle" onclick="_toggleTlRowNote('${memKey}')">💬 Góp ý thành viên này</button>`;
+          memBar.innerHTML = `<button class="tl-row-note-toggle" data-default-label="💬 Góp ý thành viên này" onclick="_toggleTlRowNote('${memKey}')">💬 Góp ý thành viên này</button>`;
           const memPanel = document.createElement("div");
           memPanel.className = "tl-row-note-panel";
           memPanel.dataset.rowKey = memKey;
@@ -15477,7 +15525,7 @@
           btn.textContent = "▲ Ẩn góp ý";
           if (ta) { _autoResizeNote(ta); ta.focus(); }
         } else {
-          btn.textContent = hasContent ? "💬 Đã có góp ý" : "💬 Góp ý dòng này";
+          btn.textContent = hasContent ? "💬 Đã có góp ý" : (btn.dataset.defaultLabel || "💬 Góp ý dòng này");
           if (hasContent) btn.classList.add("has-note"); else btn.classList.remove("has-note");
         }
       }
@@ -15504,8 +15552,11 @@
           return;
         }
         try {
-          const notes = _collectFieldNotes().filter((n) => n.note);
+          // Send non-empty notes + empty notes for keys that had existing records (to delete them)
+          const notes = _collectFieldNotes().filter((n) => n.note || n.field_key in _fieldNotes);
           await API.post(`/profiles/${id}/field-notes/`, notes);
+          // Update local cache so subsequent saves know which keys now have DB records
+          notes.forEach((n) => { if (n.note) _fieldNotes[n.field_key] = n.note; else delete _fieldNotes[n.field_key]; });
           showToast("✅ Đã lưu nhận xét");
         } catch (e) {
           showToast("✗ Lưu nhận xét thất bại: " + e.message);
@@ -15518,7 +15569,7 @@
         const id = _reviewProfileId || currentEditProfile?.id;
         if (id) {
           try {
-            const notes = _collectFieldNotes().filter((n) => n.note);
+            const notes = _collectFieldNotes().filter((n) => n.note || n.field_key in _fieldNotes);
             if (notes.length)
               await API.post(`/profiles/${id}/field-notes/`, notes);
           } catch (_) {}
@@ -15533,6 +15584,9 @@
               || (fk.startsWith("esB-tl-row-") ? "B. Lịch sử bản thân"
                 : fk.startsWith("esC-work-row-") ? "C. Lịch sử công tác"
                 : (fk.startsWith("esD-hist-") || fk.startsWith("esD-mem-")) ? "D. Thành phần gia đình"
+                : fk.startsWith("esE-row-") ? "E. Khen thưởng"
+                : fk.startsWith("esFT-row-") ? "F. Đi nước ngoài"
+                : fk.startsWith("esH-row-") ? "H. Kỷ luật"
                 : fk);
             flaggedSections.add(lbl);
           });
@@ -15652,6 +15706,7 @@
             "esA-address": "current_address",
             "esA-occupation": "occupation",
             "esA-temp-addr": "temporary_address",
+            "esA-religious-title": "religious_title",
             "esC-edu-gen": "general_edu_level",
             "esC-edu-qual": "edu_specialization",
             "esC-political": "political_level_detail",
@@ -18990,67 +19045,43 @@
       // ===== TOPBAR NAME UPDATE =====
       // ===== PROFILE VIEW MODE =====
 
-      // Map: admin field key → citizen form input ID (or null to fall back to section)
-      const _FIELD_KEY_TO_CITIZEN_INPUT = {
-        "fi-esA-dob": "ngaySinh",
-        "fi-esA-birthplace": "birthPlaceDetail",
-        "fi-esA-hometown": "queQuan",
-        "fi-esA-address": "noiO",
-        "fi-esA-temp-addr": "tamTru",
-        // fields without a single citizen input fall back to their section
-        "fi-esA-gender": null,
-        "fi-esA-ethnic": null,
-        "fi-esA-religion": null,
-        "fi-esA-cccd": null,
-        "fi-esA-phone": null,
-        "fi-esA-email": null,
-        "fi-esA-occupation": null,
-        // Section C fields → section secC
-        "fi-esC-edu-gen": null,
-        "fi-esC-edu-qual": null,
-        "fi-esC-political": null,
-        "fi-esC-foreign-lang": null,
-        "fi-esC-it": null,
-        "fi-esC-youth-union": null,
-        "fi-esC-sci-tech": null,
-        "fi-esC-degree": null,
-        "fi-esC-acad-title": null,
-        "fi-esC-ethnic-lang": null,
-        // Section J
-        "fi-esJ-self": null,
-        // Section K
-        "fi-esK-name": null,
-        "fi-esK-date": null,
-      };
-      // Map: admin field key → fallback citizen section ID
+      // Returns the citizen .form-row element for a given admin field key, or null
+      function _findCitizenFormRow(key) {
+        const idMap = {
+          "fi-esA-dob":             "ngaySinh",
+          "fi-esA-birthplace":      "birthPlaceDetail",
+          "fi-esA-hometown":        "queQuan",
+          "fi-esA-address":         "noiO",
+          "fi-esA-temp-addr":       "tamTru",
+          "fi-esA-ethnic":          "danToc",
+          "fi-esA-religion":        "tonGiao",
+          "fi-esA-religious-title": "chucSac",
+          "fi-esA-occupation":      "ngheNghiep",
+          "fi-esC-edu-gen":         "trinhDoVanHoa",
+          "fi-esC-edu-qual":        "trinhDoChuyenMon",
+          "fi-esC-sci-tech":        "khoaHocCongNghe",
+          "fi-esC-degree":          "hocViCaoNhat",
+          "fi-esC-acad-title":      "hocHamCaoNhat",
+          "fi-esC-political":       "trinhDoLyLuan",
+          "fi-esC-foreign-lang":    "ngoaiNgu",
+          "fi-esC-it":              "tinHoc",
+          "fi-esC-ethnic-lang":     "tiengDanToc",
+        };
+        if (idMap[key]) return document.getElementById(idMap[key])?.closest('.form-row') || null;
+        if (key === "fi-esA-gender")
+          return document.querySelector('input[name="gioiTinh"]')?.closest('.form-row') || null;
+        if (key === "fi-esC-youth-union")
+          return document.querySelector('input[name="doanStatus"]')?.closest('.form-row') || null;
+        return null;
+      }
+      // Map: admin field key → fallback citizen section ID (for section-level notes only)
       const _FIELD_KEY_TO_CITIZEN_SEC = {
-        // per-field esA keys with no direct input → secA
-        "fi-esA-gender": "secA",
-        "fi-esA-ethnic": "secA",
-        "fi-esA-religion": "secA",
-        "fi-esA-cccd": "secA",
-        "fi-esA-phone": "secA",
-        "fi-esA-email": "secA",
-        "fi-esA-occupation": "secA",
-        // section-level table notes
-        esB: "secB",
+        esB:        "secB",
         "esC-work": "secC",
-        esD: "secI",
-        esE: "secG",
-        esFT: "secF",
-        esH: "secH",
-        // section C fields
-        "fi-esC-edu-gen": "secC",
-        "fi-esC-edu-qual": "secC",
-        "fi-esC-political": "secC",
-        "fi-esC-foreign-lang": "secC",
-        "fi-esC-it": "secC",
-        "fi-esC-youth-union": "secC",
-        "fi-esC-sci-tech": "secC",
-        "fi-esC-degree": "secC",
-        "fi-esC-acad-title": "secC",
-        "fi-esC-ethnic-lang": "secC",
-        // J / K
+        esD:        "secI",
+        esE:        "secG",
+        esFT:       "secF",
+        esH:        "secH",
         "fi-esJ-self": "secJ",
         "fi-esK-name": "secK",
         "fi-esK-date": "secK",
@@ -19072,34 +19103,114 @@
           notes.forEach((n) => {
             if (!n.note || n.resolved) return;
             const key = n.field_key;
-            const citizenInputId = _FIELD_KEY_TO_CITIZEN_INPUT[key];
-            // Static mapping first; fall back to prefix-based routing for per-row dynamic keys
-            let citizenSecId = _FIELD_KEY_TO_CITIZEN_SEC[key] || null;
-            if (!citizenInputId && !citizenSecId) {
-              if (key.startsWith("esB-tl-row-"))        citizenSecId = "secB";
-              else if (key.startsWith("esC-work-row-")) citizenSecId = "secC";
-              // esD family history notes handled separately below — do NOT set citizenSecId
-            }
 
-            if (citizenInputId) {
-              // Show banner next to the specific citizen form input
-              const inp = document.getElementById(citizenInputId);
-              if (!inp) return;
+            // Try inline: find the specific .form-row in citizen form
+            const formRow = _findCitizenFormRow(key);
+            if (formRow) {
               const banner = document.createElement("div");
               banner.className = "citizen-field-note-banner visible";
               banner.innerHTML =
                 `<span class="cfnb-icon">💬</span>` +
                 `<span><strong>Góp ý BXĐ:</strong> ${_esc(n.note)}</span>`;
-              // Inject after the input (or its form-row if available)
-              const formRow = inp.closest(".form-row");
-              if (formRow) formRow.after(banner);
-              else inp.after(banner);
-              // Highlight the input's form-row
-              if (formRow) formRow.classList.add("citizen-has-note");
-              // Mark parent section
-              const sec = inp.closest(".section");
+              formRow.after(banner);
+              formRow.classList.add("citizen-has-note");
+              const sec = formRow.closest(".section");
               if (sec) sec.classList.add("has-admin-note");
-            } else if (key.startsWith("esD-hist-") || key.startsWith("esD-mem-")) {
+              return;
+            }
+
+            // Per-row: Part B timeline
+            if (key.startsWith("esB-tl-row-")) {
+              const idx = parseInt(key.replace("esB-tl-row-", ""), 10);
+              const tbody = document.getElementById("tbB-body");
+              if (tbody && !isNaN(idx)) {
+                const dataRows = [...tbody.querySelectorAll("tr:not(.fam-hist-note-row)")];
+                const targetTr = dataRows[idx];
+                if (targetTr) {
+                  const noteRow = document.createElement("tr");
+                  noteRow.className = "fam-hist-note-row citizen-field-note-banner visible";
+                  noteRow.innerHTML = `<td colspan="${targetTr.cells.length || 4}"><div class="fhn-inner" title="${_esc(n.note)}"><span class="fhb-label">💬 Góp ý BXĐ:</span>${_esc(n.note)}</div></td>`;
+                  targetTr.after(noteRow);
+                  document.getElementById("secB")?.classList.add("has-admin-note");
+                }
+              }
+              return;
+            }
+
+            // Per-row: Part C work history
+            if (key.startsWith("esC-work-row-")) {
+              const idx = parseInt(key.replace("esC-work-row-", ""), 10);
+              const tbody = document.getElementById("tbC-body");
+              if (tbody && !isNaN(idx)) {
+                const dataRows = [...tbody.querySelectorAll("tr:not(.fam-hist-note-row)")];
+                const targetTr = dataRows[idx];
+                if (targetTr) {
+                  const noteRow = document.createElement("tr");
+                  noteRow.className = "fam-hist-note-row citizen-field-note-banner visible";
+                  noteRow.innerHTML = `<td colspan="${targetTr.cells.length || 5}"><div class="fhn-inner" title="${_esc(n.note)}"><span class="fhb-label">💬 Góp ý BXĐ:</span>${_esc(n.note)}</div></td>`;
+                  targetTr.after(noteRow);
+                  document.getElementById("secC")?.classList.add("has-admin-note");
+                }
+              }
+              return;
+            }
+
+            // Per-row: E Khen thưởng
+            if (key.startsWith("esE-row-")) {
+              const idx = parseInt(key.replace("esE-row-", ""), 10);
+              const tbody = document.getElementById("tbG-body");
+              if (tbody && !isNaN(idx)) {
+                const dataRows = [...tbody.querySelectorAll("tr:not(.fam-hist-note-row)")];
+                const targetTr = dataRows[idx];
+                if (targetTr) {
+                  const noteRow = document.createElement("tr");
+                  noteRow.className = "fam-hist-note-row citizen-field-note-banner visible";
+                  noteRow.innerHTML = `<td colspan="${targetTr.cells.length || 4}"><div class="fhn-inner" title="${_esc(n.note)}"><span class="fhb-label">💬 Góp ý BXĐ:</span>${_esc(n.note)}</div></td>`;
+                  targetTr.after(noteRow);
+                  document.getElementById("secG")?.classList.add("has-admin-note");
+                }
+              }
+              return;
+            }
+
+            // Per-row: F Đi nước ngoài
+            if (key.startsWith("esFT-row-")) {
+              const idx = parseInt(key.replace("esFT-row-", ""), 10);
+              const tbody = document.getElementById("tbF-body");
+              if (tbody && !isNaN(idx)) {
+                const dataRows = [...tbody.querySelectorAll("tr:not(.fam-hist-note-row)")];
+                const targetTr = dataRows[idx];
+                if (targetTr) {
+                  const noteRow = document.createElement("tr");
+                  noteRow.className = "fam-hist-note-row citizen-field-note-banner visible";
+                  noteRow.innerHTML = `<td colspan="${targetTr.cells.length || 4}"><div class="fhn-inner" title="${_esc(n.note)}"><span class="fhb-label">💬 Góp ý BXĐ:</span>${_esc(n.note)}</div></td>`;
+                  targetTr.after(noteRow);
+                  document.getElementById("secF")?.classList.add("has-admin-note");
+                }
+              }
+              return;
+            }
+
+            // Per-row: H Kỷ luật
+            if (key.startsWith("esH-row-")) {
+              const idx = parseInt(key.replace("esH-row-", ""), 10);
+              const tbody = document.getElementById("tbH-body");
+              if (tbody && !isNaN(idx)) {
+                const dataRows = [...tbody.querySelectorAll("tr:not(.fam-hist-note-row)")];
+                const targetTr = dataRows[idx];
+                if (targetTr) {
+                  const noteRow = document.createElement("tr");
+                  noteRow.className = "fam-hist-note-row citizen-field-note-banner visible";
+                  noteRow.innerHTML = `<td colspan="${targetTr.cells.length || 4}"><div class="fhn-inner" title="${_esc(n.note)}"><span class="fhb-label">💬 Góp ý BXĐ:</span>${_esc(n.note)}</div></td>`;
+                  targetTr.after(noteRow);
+                  document.getElementById("secH")?.classList.add("has-admin-note");
+                }
+              }
+              return;
+            }
+
+            // esD per-member / per-row family history
+            if (key.startsWith("esD-hist-") || key.startsWith("esD-mem-")) {
               // Per-member note (esD-mem-{id} exact, no -hist- suffix)
               const esDmemOnly = key.match(/^esD-mem-(\d+)$/);
               if (esDmemOnly) {
@@ -19165,39 +19276,20 @@
                   const chev = acc.querySelector('.chevron');
                   if (chev) chev.style.transform = 'rotate(180deg)';
                 }
-                // Insert a compact note banner OUTSIDE the table, before timeline-wrap
-                const noteDiv = document.createElement('div');
-                noteDiv.className = 'fam-hist-note-banner citizen-field-note-banner visible';
-                const labelText = rowIdx !== null ? `💬 Dòng ${rowIdx + 1}:` : '💬 Góp ý:';
-                noteDiv.innerHTML = `<span class="fhb-label">${labelText}</span><span>${_esc(n.note)}</span>`;
-                const tlWrap = famBody ? famBody.querySelector('.timeline-wrap') : null;
-                if (tlWrap) tlWrap.before(noteDiv);
-                else if (famBody) famBody.appendChild(noteDiv);
+                // Insert inline note row directly after the history data row
+                const noteRow = document.createElement('tr');
+                noteRow.className = 'fam-hist-note-row citizen-field-note-banner visible';
+                const colCount = targetTr.cells.length || 4;
+                noteRow.innerHTML = `<td colspan="${colCount}"><div class="fhn-inner" title="${_esc(n.note)}"><span class="fhb-label">💬 Góp ý BXĐ:</span>${_esc(n.note)}</div></td>`;
+                targetTr.after(noteRow);
                 const secI = document.getElementById('secI');
                 if (secI) secI.classList.add('has-admin-note');
-              } else {
-                // Fallback: add to section banner if TR not found
-                const sec = document.getElementById('secI');
-                if (!sec) return;
-                sec.classList.add('has-admin-note');
-                let banner = sec.querySelector('.citizen-note-banner');
-                if (!banner) {
-                  banner = document.createElement('div');
-                  banner.className = 'citizen-note-banner visible';
-                  banner.innerHTML = `<div class="cnb-body"></div>`;
-                  const header = sec.querySelector('.section-header');
-                  if (header) header.after(banner); else sec.prepend(banner);
-                }
-                const body = banner.querySelector('.cnb-body');
-                if (body) {
-                  const item = document.createElement('div');
-                  item.className = 'cnb-item';
-                  const lbl = rowIdx !== null ? `Lịch sử ${memberName} dòng ${rowIdx + 1}: ` : `Lịch sử ${memberName}: `;
-                  item.innerHTML = `<span class="cfnb-icon">💬</span><span><strong>${_esc(lbl)}</strong>${_esc(n.note)}</span>`;
-                  body.appendChild(item);
-                }
               }
-            } else if (citizenSecId) {
+            }
+
+            // Section-level fallback
+            const citizenSecId = _FIELD_KEY_TO_CITIZEN_SEC[key];
+            if (citizenSecId) {
               // Section-level banner
               const sec = document.getElementById(citizenSecId);
               if (!sec) return;
@@ -19505,7 +19597,10 @@
                             ? `tại ${_esc(f.party_join_place)}`
                             : "",
                           f.party_chi_bo
-                            ? `Chi bộ/Đảng bộ: ${_esc(f.party_chi_bo)}`
+                            ? `Chi bộ: ${_esc(f.party_chi_bo)}`
+                            : "",
+                          f.party_dang_bo
+                            ? `Đảng bộ: ${_esc(f.party_dang_bo)}`
                             : "",
                           f.party_awards_text
                             ? `Khen thưởng/Huy hiệu: ${_esc(f.party_awards_text)}`

@@ -135,7 +135,7 @@ class FamilyMemberAdmin(ModelAdmin):
         }),
         ('Đảng viên', {
             'fields': (
-                'is_party_member', 'party_join_year', 'party_chi_bo',
+                'is_party_member', 'party_join_year', 'party_chi_bo', 'party_dang_bo',
                 'party_awards_text', 'party_years_count',
                 'party_join_date', 'party_join_place',
             ),
