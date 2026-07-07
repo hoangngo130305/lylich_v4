@@ -11239,3 +11239,57 @@ Traceback (most recent call last):
     raise errorclass(errno, errval)
 django.db.utils.OperationalError: (1054, "Unknown column 'family_members.party_dang_bo' in 'SELECT'")
 ERROR 2026-07-02 08:36:06,002 basehttp 20888 324 "GET /api/v1/family/69/members/ HTTP/1.1" 500 318056
+WARNING 2026-07-02 11:18:40,177 log 21928 21496 Unauthorized: /api/v1/verification/stats/
+WARNING 2026-07-02 11:18:40,179 basehttp 21928 21496 "GET /api/v1/verification/stats/ HTTP/1.1" 401 291
+WARNING 2026-07-02 11:18:47,874 log 21928 14260 Unauthorized: /api/v1/auth/me/
+WARNING 2026-07-02 11:18:47,875 basehttp 21928 14260 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-07-04 14:07:33,501 log 12152 10608 Unauthorized: /api/v1/auth/me/
+WARNING 2026-07-04 14:07:33,503 basehttp 12152 10608 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-07-04 14:07:40,932 log 12152 18456 Unauthorized: /api/v1/auth/me/
+WARNING 2026-07-04 14:07:40,933 basehttp 12152 18456 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-07-04 16:34:38,070 log 9456 21464 Unauthorized: /api/v1/auth/me/
+WARNING 2026-07-04 16:34:38,072 basehttp 9456 21464 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-07-04 16:35:32,796 log 9456 23112 Unauthorized: /api/v1/auth/me/
+WARNING 2026-07-04 16:35:32,797 basehttp 9456 23112 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-07-04 17:41:12,748 log 10852 23772 Unauthorized: /api/v1/auth/me/
+WARNING 2026-07-04 17:41:12,749 basehttp 10852 23772 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-07-04 17:55:33,920 log 10852 21740 Unauthorized: /api/v1/auth/me/
+WARNING 2026-07-04 17:55:33,922 basehttp 10852 21740 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-07-04 18:07:43,611 log 10852 15088 Unauthorized: /api/v1/auth/password/change/
+WARNING 2026-07-04 18:07:43,612 basehttp 10852 15088 "POST /api/v1/auth/password/change/ HTTP/1.1" 401 171
+WARNING 2026-07-04 18:07:54,769 log 10852 15088 Unauthorized: /api/v1/auth/password/change/
+WARNING 2026-07-04 18:07:54,770 basehttp 10852 15088 "POST /api/v1/auth/password/change/ HTTP/1.1" 401 171
+WARNING 2026-07-04 18:07:56,243 log 10852 15088 Unauthorized: /api/v1/auth/password/change/
+WARNING 2026-07-04 18:07:56,243 basehttp 10852 15088 "POST /api/v1/auth/password/change/ HTTP/1.1" 401 171
+WARNING 2026-07-04 18:07:56,989 log 10852 15088 Unauthorized: /api/v1/auth/password/change/
+WARNING 2026-07-04 18:07:56,989 basehttp 10852 15088 "POST /api/v1/auth/password/change/ HTTP/1.1" 401 171
+WARNING 2026-07-04 18:11:38,674 log 10852 7424 Unauthorized: /api/v1/auth/password/change/
+WARNING 2026-07-04 18:11:38,675 basehttp 10852 7424 "POST /api/v1/auth/password/change/ HTTP/1.1" 401 171
+WARNING 2026-07-04 18:11:47,614 log 10852 7424 Unauthorized: /api/v1/auth/password/change/
+WARNING 2026-07-04 18:11:47,615 basehttp 10852 7424 "POST /api/v1/auth/password/change/ HTTP/1.1" 401 171
+WARNING 2026-07-04 18:13:06,913 log 10852 7424 Unauthorized: /api/v1/auth/password/change/
+WARNING 2026-07-04 18:13:06,914 basehttp 10852 7424 "POST /api/v1/auth/password/change/ HTTP/1.1" 401 171
+WARNING 2026-07-04 18:47:26,915 log 10852 16116 Unauthorized: /api/v1/auth/login/
+WARNING 2026-07-04 18:47:26,916 basehttp 10852 16116 "POST /api/v1/auth/login/ HTTP/1.1" 401 107
+WARNING 2026-07-04 18:47:36,081 log 10852 16116 Unauthorized: /api/v1/auth/login/
+WARNING 2026-07-04 18:47:36,082 basehttp 10852 16116 "POST /api/v1/auth/login/ HTTP/1.1" 401 112
+WARNING 2026-07-04 18:47:37,302 log 10852 16116 Unauthorized: /api/v1/auth/login/
+WARNING 2026-07-04 18:47:37,307 basehttp 10852 16116 "POST /api/v1/auth/login/ HTTP/1.1" 401 112
+WARNING 2026-07-05 22:49:22,741 log 24988 7832 Unauthorized: /api/v1/auth/me/
+WARNING 2026-07-05 22:49:22,742 basehttp 24988 7832 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-07-05 22:51:37,841 log 24988 10416 Unauthorized: /api/v1/auth/me/
+WARNING 2026-07-05 22:51:37,842 basehttp 24988 10416 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-07-05 23:49:55,269 log 24988 11184 Unauthorized: /api/v1/auth/me/
+WARNING 2026-07-05 23:49:55,270 basehttp 24988 11184 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-07-06 19:41:14,177 log 8188 20308 Unauthorized: /api/v1/auth/me/
+WARNING 2026-07-06 19:41:14,179 basehttp 8188 20308 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-07-06 19:41:28,212 log 8188 21116 Unauthorized: /api/v1/auth/me/
+WARNING 2026-07-06 19:41:28,214 basehttp 8188 21116 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-07-06 21:03:33,653 log 20196 19116 Unauthorized: /api/v1/auth/me/
+WARNING 2026-07-06 21:03:33,676 basehttp 20196 19116 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-07-06 21:03:33,801 log 20196 12684 Unauthorized: /api/v1/auth/me/
+WARNING 2026-07-06 21:03:33,803 basehttp 20196 12684 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-07-06 22:13:30,350 log 21272 13380 Unauthorized: /api/v1/verification/stats/
+WARNING 2026-07-06 22:13:30,351 basehttp 21272 13380 "GET /api/v1/verification/stats/ HTTP/1.1" 401 291
+WARNING 2026-07-06 22:28:05,167 log 21272 22804 Unauthorized: /api/v1/auth/me/
+WARNING 2026-07-06 22:28:05,185 basehttp 21272 22804 "GET /api/v1/auth/me/ HTTP/1.1" 401 291

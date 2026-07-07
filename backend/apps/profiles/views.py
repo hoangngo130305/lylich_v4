@@ -314,6 +314,9 @@ class ProfileWorkflowView(generics.GenericAPIView):
         old_status = profile.status
         now = timezone.now()
 
+        if action == 'return' and profile.status == Profile.Status.COMPLETED:
+            return Response({'success': False, 'error': 'Hồ sơ đã hoàn thiện nên không thể trả lại.'}, status=400)
+
         # Apply status changes
         if action == 'submit':
             profile.status = Profile.Status.SUBMITTED

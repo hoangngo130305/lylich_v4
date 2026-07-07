@@ -231,6 +231,32 @@ def _bold_header(cell, text):
     _cell_write(cell, text, bold=True)
 
 
+def _shade_cell(cell, fill_hex: str):
+    """Set cell background color (fill_hex without #, e.g. '1F4E79')."""
+    tc_pr = cell._tc.get_or_add_tcPr()
+    shd = tc_pr.find(qn('w:shd'))
+    if shd is None:
+        shd = OxmlElement('w:shd')
+        tc_pr.append(shd)
+    shd.set(qn('w:val'), 'clear')
+    shd.set(qn('w:color'), 'auto')
+    shd.set(qn('w:fill'), fill_hex)
+
+
+def _cell_write_white(cell, text, bold=True):
+    """Write text in white color (for use on dark/colored backgrounds)."""
+    para = cell.paragraphs[0]
+    para.clear()
+    run = para.add_run(text)
+    run.bold = bold
+    rpr = run._r.get_or_add_rPr()
+    color_el = rpr.find(qn('w:color'))
+    if color_el is None:
+        color_el = OxmlElement('w:color')
+        rpr.append(color_el)
+    color_el.set(qn('w:val'), 'FFFFFF')
+
+
 # ── FieldResolver ──────────────────────────────────────────────────────────────
 
 _UNSET = object()
@@ -262,6 +288,12 @@ class FieldResolver:
             return ''
         if field == 'period_text':
             return self._period_str(obj)
+        if field == 'religion_with_rank':
+            religion = getattr(obj, 'religion_text', None) or ''
+            rank = getattr(obj, 'religious_rank_text', None) or ''
+            if not religion:
+                return 'Không'
+            return f'{religion} ({rank})' if rank else f'{religion} (không có chức sắc)'
         if field == 'issued_year_month':
             m = getattr(obj, 'issued_month', None)
             y = getattr(obj, 'issued_year',  None)
@@ -406,29 +438,49 @@ def _r_title_block(doc, sec, sm, fr):
 
 
 def _r_section_heading(doc, sec, sm, fr):
-    p = _safe_para(doc, sm.p('heading2'))
-    p.add_run(sec.get('text', ''))
+    tbl = doc.add_table(rows=1, cols=1)
+    _safe_table_style(tbl, sm.t())
+    cell = tbl.rows[0].cells[0]
+    _shade_cell(cell, '1F4E79')
+    _cell_write_white(cell, sec.get('text', ''))
+    _set_col_widths(tbl, [16.5])
+    _safe_para(doc, sm.p('normal'))
 
 
 def _r_instruction(doc, sec, sm, fr):
-    p = _safe_para(doc, sm.p('normal'))
-    run = p.add_run(sec.get('text', ''))
+    tbl = doc.add_table(rows=1, cols=1)
+    _safe_table_style(tbl, sm.t())
+    cell = tbl.rows[0].cells[0]
+    _shade_cell(cell, 'FFF2CC')
+    para = cell.paragraphs[0]
+    run = para.add_run(sec.get('text', ''))
     run.italic = True
+    _set_col_widths(tbl, [16.5])
+    _safe_para(doc, sm.p('normal'))
 
 
 def _r_table_static(doc, sec, sm, fr):
     rows_def = sec.get('rows', [])
+    label    = sec.get('label', '')
     if not rows_def:
-        _safe_para(doc, sm.p('normal'))   # placeholder — never skip section
+        _safe_para(doc, sm.p('normal'))
         return
 
-    tbl = doc.add_table(rows=0, cols=3)
+    tbl = doc.add_table(rows=0, cols=2)
     _safe_table_style(tbl, sm.t())
+
+    if label:
+        hrow = tbl.add_row()
+        merged = hrow.cells[0].merge(hrow.cells[1])
+        _shade_cell(merged, 'D6E4F0')
+        para = merged.paragraphs[0]
+        run = para.add_run(label)
+        run.bold = True
 
     for rd in rows_def:
         row = tbl.add_row()
-        _cell_write(row.cells[0], rd.get('field_no', ''))
-        _cell_write(row.cells[1], rd.get('label', ''), bold=True)
+        _shade_cell(row.cells[0], 'F2F2F2')
+        _cell_write(row.cells[0], rd.get('label', ''), bold=True)
 
         field = rd.get('field', '')
         fb    = rd.get('fallback', '')
@@ -444,9 +496,9 @@ def _r_table_static(doc, sec, sm, fr):
             elif v2:
                 val = v2
 
-        _cell_write(row.cells[2], val)
+        _cell_write(row.cells[1], val)
 
-    _set_col_widths(tbl, [1.0, 6.5, 9.0])
+    _set_col_widths(tbl, [6.5, 10.0])
     _safe_para(doc, sm.p('normal'))
 
 
@@ -470,9 +522,11 @@ def _r_table_dynamic(doc, sec, sm, fr):
     tbl = doc.add_table(rows=1, cols=len(columns))
     _safe_table_style(tbl, sm.t())
 
-    # Header row
+    # Header row — blue background, white text
     for i, col in enumerate(columns):
-        _bold_header(tbl.rows[0].cells[i], col.get('header', ''))
+        cell = tbl.rows[0].cells[i]
+        _shade_cell(cell, '2E75B6')
+        _cell_write_white(cell, col.get('header', ''))
 
     # Data rows — never skip any
     for obj in rows:
@@ -517,9 +571,6 @@ def _r_family_block(doc, sec, sm, fr):
     rel        = sec.get('relationship', '')
     fields_def = sec.get('fields', [])
 
-    p = _safe_para(doc, sm.p('heading3'))
-    p.add_run(title)
-
     try:
         member = profile.family_members.filter(
             relationship=rel, deleted_at__isnull=True
@@ -528,21 +579,34 @@ def _r_family_block(doc, sec, sm, fr):
         print(f'[FAMILY][ERR] rel={rel!r}:\n{traceback.format_exc()}')
         member = None
 
-    if not fields_def:
-        _safe_para(doc, sm.p('normal'))
+    # Skip entire section (heading + table) when there is no data
+    if member is None:
         return
 
     tbl = doc.add_table(rows=0, cols=2)
     _safe_table_style(tbl, sm.t())
 
+    # Section heading row — light green, spanning both columns
+    hrow = tbl.add_row()
+    merged = hrow.cells[0].merge(hrow.cells[1])
+    _shade_cell(merged, 'E2EFDA')
+    para = merged.paragraphs[0]
+    run = para.add_run(title)
+    run.bold = True
+
+    if not fields_def:
+        _set_col_widths(tbl, [5.5, 11.0])
+        _safe_para(doc, sm.p('normal'))
+        return
+
     for fd in fields_def:
-        row = tbl.add_row()
-        _cell_write(row.cells[0], fd.get('label', ''), bold=True)
-
-        if member is None:
-            _cell_write(row.cells[1], '')
+        if fd.get('skip_if_deceased') and member.is_deceased:
             continue
-
+        if fd.get('skip_if_alive') and not member.is_deceased:
+            continue
+        row = tbl.add_row()
+        _shade_cell(row.cells[0], 'F2F2F2')
+        _cell_write(row.cells[0], fd.get('label', ''), bold=True)
         fname = fd.get('field', '')
         if fname == 'is_party_member':
             _cell_write(row.cells[1], _party_str(member))
@@ -554,7 +618,10 @@ def _r_family_block(doc, sec, sm, fr):
     # Optional history sub-table
     h_src  = sec.get('history_source')
     h_cols = sec.get('history_columns', [])
-    if h_src and member and h_cols:
+    if h_src and h_cols:
+        p_ql = _safe_para(doc, sm.p('normal'))
+        p_ql.add_run('Quá trình lịch sử:').bold = True
+
         try:
             h_rows = list(member.history_entries.order_by(
                 'from_year', 'from_month', 'sort_order'
@@ -567,7 +634,9 @@ def _r_family_block(doc, sec, sm, fr):
         _safe_table_style(htbl, sm.t())
 
         for i, col in enumerate(h_cols):
-            _bold_header(htbl.rows[0].cells[i], col.get('header', ''))
+            cell = htbl.rows[0].cells[i]
+            _shade_cell(cell, '2E75B6')
+            _cell_write_white(cell, col.get('header', ''))
 
         for obj in h_rows:
             r = htbl.add_row()
@@ -589,9 +658,6 @@ def _r_family_list_block(doc, sec, sm, fr):
     rel        = sec.get('relationship', '')
     fields_def = sec.get('fields', [])
 
-    p = _safe_para(doc, sm.p('heading3'))
-    p.add_run(title)
-
     try:
         members = list(profile.family_members.filter(
             relationship=rel, deleted_at__isnull=True
@@ -600,33 +666,103 @@ def _r_family_list_block(doc, sec, sm, fr):
         print(f'[FAMILY][ERR] list rel={rel!r}:\n{traceback.format_exc()}')
         members = []
 
+    # Skip entire section (heading + tables) when there is no data
     if not members:
-        tbl = doc.add_table(rows=0, cols=2)
-        _safe_table_style(tbl, sm.t())
-        _set_col_widths(tbl, [5.5, 11.0])
-        for fd in fields_def:
-            r = tbl.add_row()
-            _cell_write(r.cells[0], fd.get('label', ''), bold=True)
-        _safe_para(doc, sm.p('normal'))
         return
 
-    for idx, member in enumerate(members, 1):
-        p2 = _safe_para(doc, sm.p('normal'))
-        run = p2.add_run(f'Người thứ {idx}:')
-        run.bold = True
+    # Group heading (section title) — dark navy banner
+    grp_tbl = doc.add_table(rows=1, cols=1)
+    _safe_table_style(grp_tbl, sm.t())
+    grp_cell = grp_tbl.rows[0].cells[0]
+    _shade_cell(grp_cell, '1F4E79')
+    _cell_write_white(grp_cell, title)
+    _set_col_widths(grp_tbl, [16.5])
+    _safe_para(doc, sm.p('normal'))
+
+    current_year = localdate().year
+
+    for member in members:
+        label = member.custom_label or (
+            'Con ruột' if member.relationship == 'con'
+            else member.get_relationship_display()
+        )
+
+        # Compute age once per member for conditional fields
+        try:
+            member_age = current_year - int(member.birth_year) if member.birth_year else None
+        except (ValueError, TypeError):
+            member_age = None
 
         tbl = doc.add_table(rows=0, cols=2)
         _safe_table_style(tbl, sm.t())
-        _set_col_widths(tbl, [5.5, 11.0])
+
+        # Per-member heading row — light green, spanning both columns
+        hrow = tbl.add_row()
+        merged = hrow.cells[0].merge(hrow.cells[1])
+        _shade_cell(merged, 'E2EFDA')
+        para = merged.paragraphs[0]
+        run = para.add_run(label)
+        run.bold = True
 
         for fd in fields_def:
+            if fd.get('skip_if_deceased') and member.is_deceased:
+                continue
+            if fd.get('skip_if_alive') and not member.is_deceased:
+                continue
+            if fd.get('skip_if_under_18') and member_age is not None and member_age < 18:
+                continue
+            if fd.get('skip_if_over_18') and (member_age is None or member_age >= 18):
+                continue
             r = tbl.add_row()
+            _shade_cell(r.cells[0], 'F2F2F2')
             _cell_write(r.cells[0], fd.get('label', ''), bold=True)
             fname = fd.get('field', '')
             if fname == 'is_party_member':
                 _cell_write(r.cells[1], _party_str(member))
             else:
-                _cell_write(r.cells[1], fr.obj_field(member, fname))
+                val = fr.obj_field(member, fname)
+                if not val and fd.get('default'):
+                    val = fd['default']
+                _cell_write(r.cells[1], val)
+
+        _set_col_widths(tbl, [5.5, 11.0])
+
+        # Optional per-member history sub-table
+        h_src  = sec.get('history_source')
+        h_cols = sec.get('history_columns', [])
+        skip_hist_under_18 = sec.get('skip_history_if_under_18', False)
+        if h_src and h_cols and not (skip_hist_under_18 and member_age is not None and member_age < 18):
+            try:
+                h_rows = list(member.history_entries.order_by(
+                    'from_year', 'from_month', 'sort_order'
+                ))
+            except Exception:
+                print(f'[FAMILY][ERR] history rel={rel!r} member={member.id}:\n{traceback.format_exc()}')
+                h_rows = []
+
+            if h_rows:
+                p_ql = _safe_para(doc, sm.p('normal'))
+                p_ql.add_run('Quá trình lịch sử:').bold = True
+
+                htbl = doc.add_table(rows=1, cols=len(h_cols))
+                _safe_table_style(htbl, sm.t())
+
+                for i, col in enumerate(h_cols):
+                    cell = htbl.rows[0].cells[i]
+                    _shade_cell(cell, '2E75B6')
+                    _cell_write_white(cell, col.get('header', ''))
+
+                for obj in h_rows:
+                    hr = htbl.add_row()
+                    for i, col in enumerate(h_cols):
+                        _cell_write(hr.cells[i], fr.obj_field(obj, col.get('field', '')))
+
+                for _ in range(max(0, 3 - len(h_rows))):
+                    htbl.add_row()
+
+                _set_col_widths(htbl, [c.get('width_cm', 4.0) for c in h_cols])
+
+        _safe_para(doc, sm.p('normal'))
 
     _safe_para(doc, sm.p('normal'))
 
@@ -665,8 +801,13 @@ def _r_committee_comment(doc, sec, sm, fr):
     by_f   = sec.get('signed_by', '')
     date_f = sec.get('signed_date', '')
 
-    p = _safe_para(doc, sm.p('heading2'))
-    p.add_run(title)
+    tbl_h = doc.add_table(rows=1, cols=1)
+    _safe_table_style(tbl_h, sm.t())
+    cell_h = tbl_h.rows[0].cells[0]
+    _shade_cell(cell_h, '1F4E79')
+    _cell_write_white(cell_h, title)
+    _set_col_widths(tbl_h, [16.5])
+    _safe_para(doc, sm.p('normal'))
 
     content  = fr.resolve(field) if field else ''
     signed   = fr.resolve(by_f)  if by_f  else ''
@@ -698,13 +839,16 @@ def _r_committee_comment(doc, sec, sm, fr):
 def _party_str(member):
     if not member.is_party_member:
         return 'Không'
-    parts = ['Có']
+    parts = ['Là đảng viên Đảng Cộng sản Việt Nam']
     if member.party_join_year:
-        parts.append(f'Vào Đảng năm {member.party_join_year}')
-    if member.party_chi_bo:
-        parts.append(f'Chi bộ: {member.party_chi_bo}')
-    if member.party_dang_bo:
-        parts.append(f'Đảng bộ: {member.party_dang_bo}')
+        parts.append(f'vào Đảng năm {member.party_join_year}')
+    chi_bo  = member.party_chi_bo  or ''
+    dang_bo = member.party_dang_bo or ''
+    if chi_bo or dang_bo:
+        loc = f'chi bộ {chi_bo}' if chi_bo else ''
+        if dang_bo:
+            loc += f' thuộc đảng bộ {dang_bo}' if loc else f'đảng bộ {dang_bo}'
+        parts.append(f'hiện sinh hoạt tại {loc}')
     return ', '.join(parts)
 
 
