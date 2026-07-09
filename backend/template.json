@@ -807,6 +807,63 @@
       ]
     },
     {
+      "id": "vo_ke",
+      "type": "family_member_list_block",
+      "title": "4b. Vợ kế",
+      "relationship": "vo_ke",
+      "fields": [
+        {
+          "label": "Họ và tên",
+          "field": "full_name"
+        },
+        {
+          "label": "Năm sinh",
+          "field": "birth_year"
+        },
+        {
+          "label": "Nơi sinh",
+          "field": "birth_place"
+        },
+        {
+          "label": "Quê quán",
+          "field": "hometown"
+        },
+        {
+          "label": "Dân tộc",
+          "field": "ethnic_group_text"
+        },
+        {
+          "label": "Tôn giáo",
+          "field": "religion_with_rank"
+        },
+        {
+          "label": "Nơi cư trú",
+          "field": "current_address"
+        },
+        {
+          "label": "Nghề nghiệp",
+          "field": "occupation"
+        },
+        {
+          "label": "Là Đảng viên ĐCS Việt Nam",
+          "field": "is_party_member"
+        }
+      ],
+      "history_source": "history_entries",
+      "history_columns": [
+        {
+          "header": "Từ tháng/năm\nđến tháng/năm",
+          "field": "period_text",
+          "width_cm": 3.5
+        },
+        {
+          "header": "Làm gì, ở đâu",
+          "field": "description",
+          "width_cm": 13.5
+        }
+      ]
+    },
+    {
       "id": "con",
       "type": "family_member_list_block",
       "title": "5. Con",

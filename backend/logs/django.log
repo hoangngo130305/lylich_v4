@@ -11297,3 +11297,37 @@ WARNING 2026-07-07 09:45:17,427 log 3644 4172 Unauthorized: /api/v1/auth/me/
 WARNING 2026-07-07 09:45:17,428 basehttp 3644 4172 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
 WARNING 2026-07-07 09:49:49,339 log 3644 19080 Unauthorized: /api/v1/auth/me/
 WARNING 2026-07-07 09:49:49,340 basehttp 3644 19080 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-07-07 10:52:00,518 log 3644 18788 Unauthorized: /api/v1/auth/me/
+WARNING 2026-07-07 10:52:00,520 basehttp 3644 18788 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-07-07 10:52:00,596 log 3644 9080 Unauthorized: /api/v1/auth/me/
+WARNING 2026-07-07 10:52:00,609 basehttp 3644 9080 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-07-07 11:04:29,233 log 3644 8636 Unauthorized: /api/v1/auth/login/
+WARNING 2026-07-07 11:04:29,233 basehttp 3644 8636 "POST /api/v1/auth/login/ HTTP/1.1" 401 107
+WARNING 2026-07-07 11:04:34,811 log 3644 8636 Unauthorized: /api/v1/auth/login/
+WARNING 2026-07-07 11:04:34,812 basehttp 3644 8636 "POST /api/v1/auth/login/ HTTP/1.1" 401 107
+WARNING 2026-07-09 10:51:07,359 log 9244 13504 Unauthorized: /api/v1/auth/me/
+WARNING 2026-07-09 10:51:07,360 basehttp 9244 13504 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-07-09 11:15:59,193 log 9244 21224 Unauthorized: /api/v1/auth/me/
+WARNING 2026-07-09 11:15:59,195 basehttp 9244 21224 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-07-09 16:11:07,905 log 23104 10004 Not Found: /api/auth/me/
+WARNING 2026-07-09 16:11:07,906 basehttp 23104 10004 "GET /api/auth/me/ HTTP/1.1" 404 5358
+WARNING 2026-07-09 16:11:07,916 log 23104 25232 Not Found: /api/auth/me/
+WARNING 2026-07-09 16:11:07,917 basehttp 23104 25232 "GET /api/auth/me/ HTTP/1.1" 404 5358
+WARNING 2026-07-09 16:15:53,778 log 23104 25232 Not Found: /api/auth/login/
+WARNING 2026-07-09 16:15:53,779 basehttp 23104 25232 "POST /api/auth/login/ HTTP/1.1" 404 5368
+WARNING 2026-07-09 16:16:26,889 log 23104 25232 Not Found: /api/auth/login/
+WARNING 2026-07-09 16:16:26,890 basehttp 23104 25232 "POST /api/auth/login/ HTTP/1.1" 404 5368
+WARNING 2026-07-09 16:16:27,985 log 23104 25232 Not Found: /api/auth/login/
+WARNING 2026-07-09 16:16:27,987 basehttp 23104 25232 "POST /api/auth/login/ HTTP/1.1" 404 5368
+WARNING 2026-07-09 16:16:28,185 log 23104 25232 Not Found: /api/auth/login/
+WARNING 2026-07-09 16:16:28,187 basehttp 23104 25232 "POST /api/auth/login/ HTTP/1.1" 404 5368
+WARNING 2026-07-09 16:16:41,878 log 23104 25232 Not Found: /api/auth/login/
+WARNING 2026-07-09 16:16:41,880 basehttp 23104 25232 "POST /api/auth/login/ HTTP/1.1" 404 5368
+WARNING 2026-07-09 16:16:47,814 log 23104 25232 Not Found: /api/auth/login/
+WARNING 2026-07-09 16:16:47,815 basehttp 23104 25232 "POST /api/auth/login/ HTTP/1.1" 404 5368
+WARNING 2026-07-09 16:16:48,470 log 23104 25232 Not Found: /api/auth/login/
+WARNING 2026-07-09 16:16:48,471 basehttp 23104 25232 "POST /api/auth/login/ HTTP/1.1" 404 5368
+WARNING 2026-07-09 16:16:48,660 log 23104 25232 Not Found: /api/auth/login/
+WARNING 2026-07-09 16:16:48,662 basehttp 23104 25232 "POST /api/auth/login/ HTTP/1.1" 404 5368
+WARNING 2026-07-09 16:16:48,813 log 23104 25232 Not Found: /api/auth/login/
+WARNING 2026-07-09 16:16:48,815 basehttp 23104 25232 "POST /api/auth/login/ HTTP/1.1" 404 5368
