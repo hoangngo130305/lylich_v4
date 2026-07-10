@@ -930,7 +930,7 @@
           "skip_if_under_18": true
         },
         {
-          "label": "Đang học trường (nếu dưới 18 tuổi)",
+          "label": "Nghề nghiệp",
           "field": "child_school",
           "skip_if_over_18": true
         },
