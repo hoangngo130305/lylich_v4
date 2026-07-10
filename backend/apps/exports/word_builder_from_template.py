@@ -272,6 +272,8 @@ class FieldResolver:
     def resolve(self, path, fallback=''):
         if not path:
             return fallback
+        if path == 'profile.religion_with_rank':
+            return self._profile_religion_with_rank(fallback)
         raw, err = self._walk(path)
         ok = raw is not None and raw is not _UNSET and raw != ''
         self._log.append({'path': path, 'raw': raw, 'err': err, 'ok': ok})
@@ -311,6 +313,19 @@ class FieldResolver:
         else:
             val = attr
         return self._fmt(val)
+
+    def _profile_religion_with_rank(self, fallback=''):
+        """profile.religion_with_rank — merges Tôn giáo + Chức sắc into one line,
+        e.g. 'Thiên chúa (không có chức sắc)', matching how family members render it."""
+        profile = self._ctx.get('profile')
+        if profile is None:
+            return fallback
+        rel_obj = getattr(profile, 'religion', None)
+        religion = (getattr(rel_obj, 'name', None) or getattr(profile, 'religion_other', None) or '').strip()
+        if not religion or religion == 'Không':
+            return religion or fallback or 'Không'
+        rank = (getattr(profile, 'religious_title', None) or '').strip()
+        return f'{religion} ({rank})' if rank else f'{religion} (không có chức sắc)'
 
     def fetch(self, source, profile, flt, order_by):
         _MAP = {
@@ -459,6 +474,42 @@ def _r_instruction(doc, sec, sm, fr):
     _safe_para(doc, sm.p('normal'))
 
 
+def _resolve_row_value(rd, fr):
+    """Resolve a row's display value from its field/fallback/field2 spec.
+    'join' controls how field2 is appended to field (defaults to the
+    ', tại <field2>' pattern used for date+place rows); pass e.g. ' – '
+    for name+position pairs."""
+    field = rd.get('field', '')
+    fb    = rd.get('fallback', '')
+    val   = fr.resolve(field) if field else ''
+    if not val and fb:
+        val = fr.resolve(fb)
+
+    f2 = rd.get('field2', '')
+    if f2:
+        v2 = fr.resolve(f2)
+        join = rd.get('join')
+        if val and v2:
+            val = f'{val}{join}{v2}' if join else f'{val}, tại {v2}'
+        elif v2:
+            val = v2
+    return val
+
+
+def _write_static_row(tbl, label, val):
+    row = tbl.add_row()
+    _shade_cell(row.cells[0], 'F2F2F2')
+    _cell_write(row.cells[0], label, bold=True)
+    _cell_write(row.cells[1], val)
+
+
+def _write_static_header_row(tbl, text):
+    row = tbl.add_row()
+    merged = row.cells[0].merge(row.cells[1])
+    _shade_cell(merged, 'F2F2F2')
+    _cell_write(merged, text, bold=True)
+
+
 def _r_table_static(doc, sec, sm, fr):
     rows_def = sec.get('rows', [])
     label    = sec.get('label', '')
@@ -478,25 +529,24 @@ def _r_table_static(doc, sec, sm, fr):
         run.bold = True
 
     for rd in rows_def:
-        row = tbl.add_row()
-        _shade_cell(row.cells[0], 'F2F2F2')
-        _cell_write(row.cells[0], rd.get('label', ''), bold=True)
+        field_no = rd.get('field_no', '')
+        row_label = f"{field_no}. {rd.get('label', '')}" if field_no else rd.get('label', '')
 
-        field = rd.get('field', '')
-        fb    = rd.get('fallback', '')
-        val   = fr.resolve(field) if field else ''
-        if not val and fb:
-            val = fr.resolve(fb)
+        if rd.get('group'):
+            _write_static_header_row(tbl, row_label)
+            for child in rd.get('children', []):
+                if child.get('header_only'):
+                    prefix = child.get('prefix', '-')
+                    _write_static_header_row(tbl, f"{prefix} {child.get('label', '')}".strip())
+                    continue
+                prefix = child.get('prefix', '-')
+                child_label = f"{prefix} {child.get('label', '')}".strip()
+                val = _resolve_row_value(child, fr)
+                _write_static_row(tbl, child_label, val)
+            continue
 
-        f2 = rd.get('field2', '')
-        if f2:
-            v2 = fr.resolve(f2)
-            if val and v2:
-                val = f'{val}, tại {v2}'
-            elif v2:
-                val = v2
-
-        _cell_write(row.cells[1], val)
+        val = _resolve_row_value(rd, fr)
+        _write_static_row(tbl, row_label, val)
 
     _set_col_widths(tbl, [6.5, 10.0])
     _safe_para(doc, sm.p('normal'))

@@ -74,65 +74,63 @@
     {
       "id": "phan_a_basic",
       "type": "table_static",
-      "label": "Thông tin cá nhân (mục 01–10)",
       "rows": [
         {
-          "field_no": "01",
+          "field_no": "1",
           "label": "Họ và tên khai sinh (IN HOA)",
           "field": "profile.full_name"
         },
         {
-          "field_no": "02",
-          "label": "Họ và tên thường dùng",
+          "field_no": "2",
+          "label": "Các tên gọi khác",
           "field": "profile.full_name_other"
         },
         {
-          "field_no": "03",
+          "field_no": "3",
           "label": "Ngày sinh",
           "field": "profile.dob",
           "format": "DD/MM/YYYY"
         },
         {
-          "field_no": "04",
+          "field_no": "4",
           "label": "Giới tính",
           "field": "profile.get_gender_display"
         },
         {
-          "field_no": "05",
+          "field_no": "5",
           "label": "Nơi đăng ký khai sinh",
           "field": "profile.birth_place_detail"
         },
         {
-          "field_no": "06",
+          "field_no": "6",
           "label": "Quê quán",
           "field": "profile.hometown_detail"
         },
         {
-          "field_no": "07a",
-          "label": "Nơi thường trú",
-          "field": "profile.current_address"
+          "field_no": "7",
+          "label": "Nơi cư trú:",
+          "group": true,
+          "children": [
+            {
+              "label": "Nơi thường trú",
+              "field": "profile.current_address"
+            },
+            {
+              "label": "Nơi tạm trú",
+              "field": "profile.temporary_address"
+            }
+          ]
         },
         {
-          "field_no": "07b",
-          "label": "Nơi tạm trú",
-          "field": "profile.temporary_address"
-        },
-        {
-          "field_no": "08",
+          "field_no": "8",
           "label": "Dân tộc",
           "field": "profile.ethnic_group.name",
           "fallback": "profile.ethnic_group_other"
         },
         {
-          "field_no": "09",
+          "field_no": "9",
           "label": "Tôn giáo",
-          "field": "profile.religion.name",
-          "fallback": "profile.religion_other"
-        },
-        {
-          "field_no": "09b",
-          "label": "Chức sắc tôn giáo",
-          "field": "profile.religious_title"
+          "field": "profile.religion_with_rank"
         },
         {
           "field_no": "10",
@@ -144,62 +142,58 @@
     {
       "id": "phan_a_edu",
       "type": "table_static",
-      "label": "Trình độ học vấn và chuyên môn (mục 11)",
       "rows": [
         {
-          "field_no": "11a",
-          "label": "Giáo dục phổ thông",
-          "field": "profile.general_edu_level"
-        },
-        {
-          "field_no": "11b",
-          "label": "Chuyên môn nghiệp vụ",
-          "field": "profile.edu_level.name",
-          "fallback": "profile.edu_specialization"
-        },
-        {
-          "field_no": "11c",
-          "label": "Khoa học công nghệ",
-          "field": "profile.science_tech_qualifications"
-        },
-        {
-          "field_no": "11d",
-          "label": "Học vị cao nhất",
-          "field": "profile.highest_degree"
-        },
-        {
-          "field_no": "11e",
-          "label": "Học hàm cao nhất",
-          "field": "profile.academic_title"
-        },
-        {
-          "field_no": "11f",
-          "label": "Lý luận chính trị",
-          "field": "profile.political_level.name",
-          "fallback": "profile.political_level_detail"
-        },
-        {
-          "field_no": "11g",
-          "label": "Ngoại ngữ",
-          "field": "profile.foreign_languages",
-          "fallback": "profile.foreign_language_name"
-        },
-        {
-          "field_no": "11h",
-          "label": "Tin học",
-          "field": "profile.it_level"
-        },
-        {
-          "field_no": "11i",
-          "label": "Tiếng dân tộc thiểu số",
-          "field": "profile.ethnic_language"
+          "field_no": "11",
+          "label": "Trình độ hiện nay",
+          "group": true,
+          "children": [
+            {
+              "label": "Giáo dục phổ thông",
+              "field": "profile.general_edu_level"
+            },
+            {
+              "label": "Chuyên môn nghiệp vụ",
+              "field": "profile.edu_level.name",
+              "fallback": "profile.edu_specialization"
+            },
+            {
+              "label": "Khoa học công nghệ",
+              "field": "profile.science_tech_qualifications"
+            },
+            {
+              "label": "Học vị cao nhất",
+              "field": "profile.highest_degree"
+            },
+            {
+              "label": "Học hàm cao nhất",
+              "field": "profile.academic_title"
+            },
+            {
+              "label": "Lý luận chính trị",
+              "field": "profile.political_level.name",
+              "fallback": "profile.political_level_detail"
+            },
+            {
+              "label": "Ngoại ngữ",
+              "field": "profile.foreign_languages",
+              "fallback": "profile.foreign_language_name"
+            },
+            {
+              "label": "Tin học",
+              "field": "profile.it_level"
+            },
+            {
+              "label": "Tiếng dân tộc thiểu số",
+              "field": "profile.ethnic_language"
+            }
+          ]
         }
       ]
     },
     {
       "id": "phan_a_doan",
       "type": "table_static",
-      "label": "Đoàn TNCS HCM (mục 12)",
       "rows": [
         {
           "field_no": "12",
@@ -211,21 +205,44 @@
       ]
     },
     {
-      "id": "phan_a_gioi_thieu",
+      "id": "phan_a_rejoin",
       "type": "table_static",
-      "label": "Người giới thiệu vào Đảng (mục 13)",
       "rows": [
         {
-          "field_no": "13a",
-          "label": "Người giới thiệu thứ nhất",
-          "field": "profile.rejoin_introducer1_name",
-          "field2": "profile.rejoin_introducer1_position"
-        },
-        {
-          "field_no": "13b",
-          "label": "Người giới thiệu thứ hai",
-          "field": "profile.rejoin_introducer2_name",
-          "field2": "profile.rejoin_introducer2_position"
+          "field_no": "13",
+          "label": "Đối với người xin được kết nạp lại vào Đảng",
+          "group": true,
+          "children": [
+            {
+              "label": "Ngày và nơi kết nạp vào đảng lần thứ nhất:",
+              "field": "profile.rejoin_first_party_join_date",
+              "field2": "profile.rejoin_first_party_join_place",
+              "format": "Ngày DD/MM/YYYY, tại {rejoin_first_party_join_place}"
+            },
+            {
+              "label": "Ngày và nơi công nhận chính thức lần thứ nhất:",
+              "field": "profile.rejoin_first_official_date",
+              "format": "Ngày DD/MM/YYYY"
+            },
+            {
+              "label": "Người giới thiệu vào đảng lần thứ nhất:",
+              "header_only": true
+            },
+            {
+              "prefix": "1.",
+              "label": "",
+              "field": "profile.rejoin_introducer1_name",
+              "field2": "profile.rejoin_introducer1_position",
+              "join": " – "
+            },
+            {
+              "prefix": "2.",
+              "label": "",
+              "field": "profile.rejoin_introducer2_name",
+              "field2": "profile.rejoin_introducer2_position",
+              "join": " – "
+            }
+          ]
         }
       ]
     },

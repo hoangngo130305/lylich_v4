@@ -5915,7 +5915,7 @@
                     </div>
                     <div class="form-row">
                       <label
-                        >02. Họ và tên thường dùng<span class="hint-lbl"
+                        >02. Các tên gọi khác<span class="hint-lbl"
                           >Nếu khác với tên khai sinh</span
                         ></label
                       >
@@ -8215,7 +8215,7 @@
                     <div class="pv-value" id="pv-full_name"></div>
                   </div>
                   <div class="pv-field">
-                    <div class="pv-label">Họ tên thường dùng</div>
+                    <div class="pv-label">Các tên gọi khác</div>
                     <div class="pv-value" id="pv-full_name_other"></div>
                   </div>
                   <div class="pv-field">
@@ -8251,12 +8251,12 @@
                     <div class="pv-value" id="pv-religion"></div>
                   </div>
                   <div class="pv-field">
-                    <div class="pv-label">Nghề nghiệp hiện nay</div>
-                    <div class="pv-value" id="pv-occupation"></div>
-                  </div>
-                  <div class="pv-field">
                     <div class="pv-label">Chức sắc tôn giáo</div>
                     <div class="pv-value" id="pv-religious_title"></div>
+                  </div>
+                  <div class="pv-field">
+                    <div class="pv-label">Nghề nghiệp hiện nay</div>
+                    <div class="pv-value" id="pv-occupation"></div>
                   </div>
                   <div class="pv-field">
                     <div class="pv-label">Giáo dục phổ thông</div>
@@ -13648,9 +13648,9 @@
                 <input class="field-input" id="fi-esA-name" value="" data-field="Họ và tên">
               </div>
               <div class="field-row">
-                <div class="field-label">Họ tên thường dùng</div>
+                <div class="field-label">Các tên gọi khác</div>
                 <div class="field-value" id="fv-esA-name-other">—</div>
-                <input class="field-input" id="fi-esA-name-other" value="" data-field="Họ tên thường dùng">
+                <input class="field-input" id="fi-esA-name-other" value="" data-field="Các tên gọi khác">
               </div>
               <div class="field-row">
                 <div class="field-label">Giới tính</div>
@@ -13664,11 +13664,6 @@
               </div>
               <div class="field-row">
                 <div class="field-label">Nơi đăng ký khai sinh</div>
-                <div class="field-value" id="fv-esA-birthplace">—</div>
-                <input class="field-input" id="fi-esA-birthplace" value="" data-field="Nơi sinh">
-              </div>
-              <div class="field-row">
-                <div class="field-label">Nơi đăng ký khai sinh </div>
                 <div class="field-value" id="fv-esA-birthplace-detail">—</div>
                 <input class="field-input" id="fi-esA-birthplace-detail" value="" data-field="Nơi đăng ký khai sinh">
               </div>
@@ -13678,9 +13673,9 @@
                 <input class="field-input" id="fi-esA-hometown" value="" data-field="Quê quán">
               </div>
               <div class="field-row">
-                <div class="field-label">Nơi ở hiện nay</div>
+                <div class="field-label">Nơi thường trú</div>
                 <div class="field-value" id="fv-esA-address">—</div>
-                <input class="field-input" id="fi-esA-address" value="" data-field="Nơi ở hiện nay">
+                <input class="field-input" id="fi-esA-address" value="" data-field="Nơi thường trú">
               </div>
               <div class="field-row">
                 <div class="field-label">CCCD</div>
@@ -13696,11 +13691,6 @@
                 <div class="field-label">Email</div>
                 <div class="field-value empty" id="fv-esA-email">—</div>
                 <input class="field-input" id="fi-esA-email" placeholder="email@example.com" data-field="Email">
-              </div>
-              <div class="field-row">
-                <div class="field-label">Nghề nghiệp</div>
-                <div class="field-value" id="fv-esA-occupation">—</div>
-                <input class="field-input" id="fi-esA-occupation" value="" data-field="Nghề nghiệp">
               </div>
               <div class="field-row">
                 <div class="field-label">Nơi tạm trú</div>
@@ -13721,6 +13711,11 @@
                 <div class="field-label">Chức sắc tôn giáo</div>
                 <div class="field-value" id="fv-esA-religious-title">Không có chức sắc</div>
                 <input class="field-input" id="fi-esA-religious-title" value="" data-field="Chức sắc tôn giáo" placeholder="Không có chức sắc">
+              </div>
+              <div class="field-row">
+                <div class="field-label">Nghề nghiệp</div>
+                <div class="field-value" id="fv-esA-occupation">—</div>
+                <input class="field-input" id="fi-esA-occupation" value="" data-field="Nghề nghiệp">
               </div>
               <!-- Trình độ học vấn (Mục 11 – thuộc Phần A) -->
               <div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border-xl);font-weight:600;font-size:12px;color:var(--text2);margin-bottom:6px">Trình độ học vấn</div>
@@ -15136,7 +15131,6 @@
         "fi-esA-name-other": "A. Họ tên thường dùng",
         "fi-esA-gender": "A. Giới tính",
         "fi-esA-dob": "A. Ngày sinh",
-        "fi-esA-birthplace": "A. Nơi sinh",
         "fi-esA-birthplace-detail": "A. Nơi đăng ký khai sinh",
         "fi-esA-hometown": "A. Quê quán",
         "fi-esA-ethnic": "A. Dân tộc",
@@ -16390,7 +16384,7 @@
             "esA-name": "full_name",
             "esA-gender": "gender",
             "esA-dob": "dob",
-            "esA-birthplace": "birth_place_detail",
+            "esA-birthplace-detail": "birth_place_detail",
             "esA-hometown": "hometown_detail",
             "esA-address": "current_address",
             "esA-occupation": "occupation",
