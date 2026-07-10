@@ -10,6 +10,7 @@ class FamilyMember(models.Model):
         ME_KE               = 'me_ke',               'Mẹ kế'
         ANH_CHI_EM_RUOT     = 'anh_chi_em_ruot',     'Anh/Chị/Em ruột'
         VO_CHONG            = 'vo_chong',            'Vợ/Chồng'
+        CHONG_KE            = 'chong_ke',            'Chồng kế'
         VO_KE               = 'vo_ke',               'Vợ kế'
         CHA_CHONG_VO        = 'cha_chong_vo',        'Cha chồng/vợ'
         ME_CHONG_VO         = 'me_chong_vo',         'Mẹ chồng/vợ'
@@ -95,19 +96,20 @@ class FamilyMember(models.Model):
                 When(relationship='me_ke',               then=Value(4)),
                 When(relationship='anh_chi_em_ruot',     then=Value(5)),
                 When(relationship='vo_chong',            then=Value(6)),
-                When(relationship='vo_ke',               then=Value(7)),
-                When(relationship='con',                 then=Value(8)),
-                When(relationship='ong_noi',             then=Value(9)),
-                When(relationship='ba_noi',              then=Value(10)),
-                When(relationship='ong_ngoai',           then=Value(11)),
-                When(relationship='ba_ngoai',            then=Value(12)),
-                When(relationship='cha_chong_vo',        then=Value(13)),
-                When(relationship='me_chong_vo',         then=Value(14)),
-                When(relationship='anh_chi_em_chong_vo', then=Value(15)),
-                When(relationship='ong_noi_chong_vo',    then=Value(16)),
-                When(relationship='ba_noi_chong_vo',     then=Value(17)),
-                When(relationship='ong_ngoai_chong_vo',  then=Value(18)),
-                When(relationship='ba_ngoai_chong_vo',   then=Value(19)),
+                When(relationship='chong_ke',            then=Value(7)),
+                When(relationship='vo_ke',               then=Value(8)),
+                When(relationship='con',                 then=Value(9)),
+                When(relationship='ong_noi',             then=Value(10)),
+                When(relationship='ba_noi',              then=Value(11)),
+                When(relationship='ong_ngoai',           then=Value(12)),
+                When(relationship='ba_ngoai',            then=Value(13)),
+                When(relationship='cha_chong_vo',        then=Value(14)),
+                When(relationship='me_chong_vo',         then=Value(15)),
+                When(relationship='anh_chi_em_chong_vo', then=Value(16)),
+                When(relationship='ong_noi_chong_vo',    then=Value(17)),
+                When(relationship='ba_noi_chong_vo',     then=Value(18)),
+                When(relationship='ong_ngoai_chong_vo',  then=Value(19)),
+                When(relationship='ba_ngoai_chong_vo',   then=Value(20)),
                 default=Value(99),
                 output_field=IntegerField(),
             ),

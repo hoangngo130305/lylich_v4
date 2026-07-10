@@ -11331,3 +11331,13 @@ WARNING 2026-07-09 16:16:48,660 log 23104 25232 Not Found: /api/auth/login/
 WARNING 2026-07-09 16:16:48,662 basehttp 23104 25232 "POST /api/auth/login/ HTTP/1.1" 404 5368
 WARNING 2026-07-09 16:16:48,813 log 23104 25232 Not Found: /api/auth/login/
 WARNING 2026-07-09 16:16:48,815 basehttp 23104 25232 "POST /api/auth/login/ HTTP/1.1" 404 5368
+WARNING 2026-07-10 08:48:18,410 log 22424 4936 Unauthorized: /api/v1/auth/me/
+WARNING 2026-07-10 08:48:18,415 basehttp 22424 4936 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-07-10 08:58:00,686 log 22424 1112 Not Found: /api/auth/login/
+WARNING 2026-07-10 08:58:00,687 basehttp 22424 1112 "POST /api/auth/login/ HTTP/1.1" 404 5368
+WARNING 2026-07-10 08:58:00,886 log 22424 1548 Not Found: /api/sale-videos/
+WARNING 2026-07-10 08:58:00,887 basehttp 22424 1548 "GET /api/sale-videos/ HTTP/1.1" 404 5370
+WARNING 2026-07-10 08:58:01,071 log 22424 27356 Not Found: /api/sale-projects/
+WARNING 2026-07-10 08:58:01,071 basehttp 22424 27356 "GET /api/sale-projects/ HTTP/1.1" 404 5376
+WARNING 2026-07-10 08:58:09,335 log 22424 27124 Not Found: /api/auth/me/
+WARNING 2026-07-10 08:58:09,336 basehttp 22424 27124 "GET /api/auth/me/ HTTP/1.1" 404 5358

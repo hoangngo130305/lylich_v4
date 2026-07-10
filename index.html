@@ -7749,6 +7749,16 @@
               </button>
             </div>
             <div id="famBlocksSpouse"></div>
+            <div id="famBlocksHusbandKe"></div>
+            <div style="margin-top: 4px; margin-bottom: 8px">
+              <button
+                class="add-row-btn"
+                style="width: auto; padding: 7px 20px"
+                onclick="addFamHusbandKe()"
+              >
+                + Thêm chồng kế
+              </button>
+            </div>
             <div id="famBlocksSpouseKe"></div>
             <div style="margin-top: 4px; margin-bottom: 8px">
               <button
@@ -10926,6 +10936,58 @@
         }
       }
 
+      // Thêm chồng kế động
+      let chongKeCount = 1;
+      function addFamHusbandKe(silent = false) {
+        const cont = document.getElementById("famBlocksHusbandKe");
+        const num = "10c." + chongKeCount;
+        const ordinal = chongKeCount;
+        chongKeCount++;
+        const div = document.createElement("div");
+        div.innerHTML = buildFamilyBlockItem(
+          { num, title: `Chồng kế (${ordinal})`, spouse: true },
+          false,
+        );
+        const el = div.firstElementChild;
+        el.dataset.relationship = "chong_ke";
+        const chevron = el.querySelector(".chevron");
+        if (chevron) {
+          const removeBtn = document.createElement("button");
+          removeBtn.innerHTML = "🗑";
+          removeBtn.title = "Xóa thành viên này";
+          removeBtn.style.cssText =
+            "border:none;background:none;cursor:pointer;font-size:14px;padding:4px 6px;color:var(--hint);margin-left:4px;border-radius:4px;transition:all .15s;";
+          removeBtn.onmouseenter = function () {
+            this.style.color = "var(--crimson)";
+            this.style.background = "var(--crimson-xl)";
+          };
+          removeBtn.onmouseleave = function () {
+            this.style.color = "var(--hint)";
+            this.style.background = "none";
+          };
+          removeBtn.onclick = function (e) {
+            e.stopPropagation();
+            const acc = this.closest(".family-accordion");
+            if (acc) {
+              acc.style.transition = "all .25s";
+              acc.style.opacity = "0";
+              acc.style.transform = "translateY(-6px)";
+              setTimeout(() => acc.remove(), 260);
+            }
+          };
+          chevron.parentNode.insertBefore(removeBtn, chevron);
+        }
+        cont.appendChild(el);
+        attachFamilyLocationSearch(num);
+        if (!silent) {
+          setTimeout(
+            () => el.scrollIntoView({ behavior: "smooth", block: "nearest" }),
+            80,
+          );
+          showToast("✓ Đã thêm chồng kế");
+        }
+      }
+
       function buildFamilyBlockItem(m, isFirst) {
         return `<div class="family-accordion">
     <div class="family-head" onclick="toggleFamily(this)">
@@ -11223,6 +11285,7 @@
             rel = num === "2.0" || num === "2" ? "me_ruot" : "me_ke";
           }
           if (!rel && num.startsWith("3.")) rel = "anh_chi_em_ruot";
+          if (!rel && num.startsWith("10c.")) rel = "chong_ke";
           if (!rel && num.startsWith("10.")) rel = "vo_ke";
           if (!rel && num.startsWith("11.")) rel = "con";
           if (!rel && num.startsWith("13.")) rel = "anh_chi_em_chong_vo";
@@ -11724,6 +11787,14 @@
               ];
               const idx = allMothers.indexOf(acc);
               newTitle = idx === 0 ? "Mẹ ruột" : `Mẹ kế ${idx}`;
+            } else if (rel === "chong_ke") {
+              const allChongKe = [
+                ...document.querySelectorAll(
+                  '.family-accordion[data-relationship="chong_ke"]',
+                ),
+              ];
+              const idx = allChongKe.indexOf(acc);
+              if (idx >= 0) newTitle = `Chồng kế ${idx + 1}`;
             } else if (rel === "vo_ke") {
               const allVoKe = [
                 ...document.querySelectorAll(
@@ -12741,6 +12812,26 @@
             ).length < sibChongVoNeeded
           )
             addFamSiblingSpouse(true);
+          // Create slots for chong_ke
+          const chongKeMembers = members.filter(
+            (m) => m.relationship === "chong_ke",
+          );
+          const chongKeNeeded =
+            chongKeMembers.length > 0
+              ? Math.max(
+                  chongKeMembers.length,
+                  Math.max(
+                    ...chongKeMembers.map((m) => (m.sort_order ?? 0) + 1),
+                  ),
+                )
+              : 0;
+          while (
+            document.querySelectorAll(
+              '.family-accordion[data-relationship="chong_ke"]',
+            ).length < chongKeNeeded
+          )
+            addFamHusbandKe(true);
+          if (chongKeNeeded > 0) _annotateAccordions();
           // Create slots for vo_ke
           const voKeMembers = members.filter((m) => m.relationship === "vo_ke");
           const voKeNeeded =
@@ -15500,6 +15591,7 @@
               ong_ngoai: "Ông ngoại",
               ba_ngoai: "Bà ngoại",
               vo_chong: "Vợ/Chồng",
+              chong_ke: "Chồng kế",
               vo_ke: "Vợ kế",
               con: "Con",
               anh_chi_em_ruot: "Anh/Chị/Em ruột",
@@ -15583,7 +15675,7 @@
                     ${m.religion_text ? fv("Tôn giáo", `${m.religion_text} (${m.religious_rank_text || "không có chức sắc"})`) : ""}
                     ${fvW("Nơi ở hiện tại", m.current_address)}
                     ${fv("Nghề nghiệp", m.occupation)}
-                    ${["anh_chi_em_ruot", "anh_chi_em_chong_vo", "con", "vo_ke", "vo_chong"].includes(m.relationship) ? fv("Quốc tịch", m.nationality || "Việt Nam") : ""}
+                    ${["anh_chi_em_ruot", "anh_chi_em_chong_vo", "con", "chong_ke", "vo_ke", "vo_chong"].includes(m.relationship) ? fv("Quốc tịch", m.nationality || "Việt Nam") : ""}
                     ${fv("Nơi làm việc", m.workplace)}
                     ${fvW("Chức danh/Chức vụ", m.job_title)}
                     ${m.is_deceased ? fv("Năm mất", m.deceased_year) + fv("Nguyên nhân mất", m.deceased_cause) : ""}
@@ -15678,7 +15770,7 @@
                     <div style="grid-column:span 2"><label ${LS}>Chức sắc tôn giáo</label><input ${IS} data-field="religious_rank_text" value="${_esc(m.religious_rank_text || "")}"></div>
                     <div style="grid-column:span 2"><label ${LS}>Nơi ở hiện tại</label><input ${IS} data-field="current_address" value="${_esc(m.current_address || "")}"></div>
                     <div><label ${LS}>Nghề nghiệp</label><input ${IS} data-field="occupation" value="${_esc(m.occupation || "")}"></div>
-                    ${["anh_chi_em_ruot", "anh_chi_em_chong_vo", "con", "vo_ke", "vo_chong"].includes(m.relationship) ? `<div><label ${LS}>Quốc tịch</label><input ${IS} data-field="nationality" value="${_esc(m.nationality || "Việt Nam")}"></div>` : ""}
+                    ${["anh_chi_em_ruot", "anh_chi_em_chong_vo", "con", "chong_ke", "vo_ke", "vo_chong"].includes(m.relationship) ? `<div><label ${LS}>Quốc tịch</label><input ${IS} data-field="nationality" value="${_esc(m.nationality || "Việt Nam")}"></div>` : ""}
                     <div><label ${LS}>Nơi làm việc</label><input ${IS} data-field="workplace" value="${_esc(m.workplace || "")}"></div>
                     <div style="grid-column:span 2"><label ${LS}>Chức danh/Chức vụ</label><input ${IS} data-field="job_title" value="${_esc(m.job_title || "")}"></div>
                     <div style="grid-column:span 2"><label ${LS}>Trường học (nếu là con dưới 18)</label><input ${IS} data-field="child_school" value="${_esc(m.child_school || "")}"></div>
