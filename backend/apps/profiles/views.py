@@ -321,6 +321,12 @@ class ProfileWorkflowView(generics.GenericAPIView):
         if action == 'submit':
             profile.status = Profile.Status.SUBMITTED
             profile.submitted_at = now
+            if old_status == Profile.Status.RETURNED:
+                # Resubmission after a return: hide prior reviewer notes from the
+                # citizen (keep the records, just marked resolved) so the next
+                # review round starts clean; the reviewer still sees the old text
+                # and can delete it outright by clearing + re-saving the note.
+                ProfileFieldNote.objects.filter(profile=profile).update(resolved=True)
         elif action == 'approve':
             if old_status == Profile.Status.SUBMITTED:
                 profile.status = Profile.Status.PENDING

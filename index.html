@@ -4907,6 +4907,29 @@
         border-radius: 5px;
         border-top: 1.5px solid #e8c860;
       }
+      /* Per-section general note: compact single-line strip, no separate
+         label (the placeholder already says what it's for) */
+      .fn-field-note.fn-general-note {
+        padding: 2px 6px;
+        margin: 0 0 8px;
+        border-radius: 4px;
+        border: 1px solid #e8d99a;
+        border-top: 1px solid #e8d99a;
+        background: #fffdf3;
+      }
+      .fn-general-note .fn-field-note-label {
+        display: none;
+      }
+      .fn-general-note .fn-field-note-ta {
+        min-height: 22px;
+        padding: 2px 4px;
+        font-size: 11px;
+        border: none;
+        background: transparent;
+      }
+      .fn-general-note .fn-field-note-ta:focus {
+        background: #fff;
+      }
       .fn-field-note .fn-field-note-label {
         font-size: 9.5px;
         font-weight: 700;
@@ -5057,6 +5080,9 @@
         font-size: 12px;
         color: #5a3e00;
         line-height: 1.45;
+        min-width: 0;
+        word-break: break-word;
+        overflow-wrap: anywhere;
       }
       /* Per-field inline banner: shown directly after the input */
       .citizen-field-note-banner {
@@ -5072,6 +5098,9 @@
         font-size: 11px;
         color: #4a3200;
         line-height: 1.4;
+        min-width: 0;
+        word-break: break-word;
+        overflow-wrap: anywhere;
       }
       .citizen-field-note-banner.visible {
         display: flex;
@@ -8241,7 +8270,7 @@
                     <div class="pv-value" id="pv-hometown_detail"></div>
                   </div>
                   <div class="pv-field pv-full">
-                    <div class="pv-label">Nơi ở hiện nay</div>
+                    <div class="pv-label">Nơi thường trú</div>
                     <div class="pv-value" id="pv-current_address"></div>
                   </div>
                   <div class="pv-field pv-full">
@@ -13809,7 +13838,9 @@
               </div>
             </div>
             <div class="edit-sec-body">
-              <div class="field-correction-note" id="note-esA"></div>
+              <div class="fn-field-note fn-section-note fn-general-note" data-field-key="esA">
+                <textarea class="fn-field-note-ta" placeholder="💬 Góp ý chung cho phần này…" rows="1" oninput="_autoResizeNote(this)" onfocus="_autoResizeNote(this)"></textarea>
+              </div>
               <div class="field-row" id="fr-esA-photo">
                 <div class="field-label">Ảnh hồ sơ</div>
                 <div class="field-value" id="fv-esA-photo" style="padding-top:4px;">
@@ -13982,7 +14013,9 @@
               </div>
             </div>
             <div class="edit-sec-body">
-              <div class="field-correction-note" id="note-esB"></div>
+              <div class="fn-field-note fn-section-note fn-general-note" data-field-key="esB">
+                <textarea class="fn-field-note-ta" placeholder="💬 Góp ý chung cho phần này…" rows="1" oninput="_autoResizeNote(this)" onfocus="_autoResizeNote(this)"></textarea>
+              </div>
               <div id="timeline-esB">
                 <div style="text-align:center;padding:16px;color:var(--muted);font-size:12.5px">⏳ Đang tải lịch sử bản thân…</div>
               </div>
@@ -14000,7 +14033,9 @@
               </div>
             </div>
             <div class="edit-sec-body">
-              <div class="field-correction-note" id="note-esC"></div>
+              <div class="fn-field-note fn-section-note fn-general-note" data-field-key="esC">
+                <textarea class="fn-field-note-ta" placeholder="💬 Góp ý chung cho phần này…" rows="1" oninput="_autoResizeNote(this)" onfocus="_autoResizeNote(this)"></textarea>
+              </div>
               <div id="timeline-esC">
                 <div style="text-align:center;padding:16px;color:var(--muted);font-size:12.5px">⏳ Đang tải lịch sử công việc, chức vụ…</div>
               </div>
@@ -14018,7 +14053,9 @@
               </div>
             </div>
             <div class="edit-sec-body">
-              <div class="field-correction-note" id="note-esDPol"></div>
+              <div class="fn-field-note fn-section-note fn-general-note" data-field-key="esDPol">
+                <textarea class="fn-field-note-ta" placeholder="💬 Góp ý chung cho phần này…" rows="1" oninput="_autoResizeNote(this)" onfocus="_autoResizeNote(this)"></textarea>
+              </div>
               <div class="field-row">
                 <div class="field-label">Đặc điểm lịch sử chính trị</div>
                 <div class="field-value empty" id="fv-esDPol-text">—</div>
@@ -14037,7 +14074,9 @@
               </div>
             </div>
             <div class="edit-sec-body">
-              <div class="field-correction-note" id="note-esEdu"></div>
+              <div class="fn-field-note fn-section-note fn-general-note" data-field-key="esEdu">
+                <textarea class="fn-field-note-ta" placeholder="💬 Góp ý chung cho phần này…" rows="1" oninput="_autoResizeNote(this)" onfocus="_autoResizeNote(this)"></textarea>
+              </div>
               <div id="timeline-esE">
                 <div style="text-align:center;padding:16px;color:var(--muted);font-size:12.5px">⏳ Đang tải đào tạo, bồi dưỡng…</div>
               </div>
@@ -14055,7 +14094,9 @@
               </div>
             </div>
             <div class="edit-sec-body">
-              <div class="field-correction-note" id="note-esFT"></div>
+              <div class="fn-field-note fn-section-note fn-general-note" data-field-key="esFT">
+                <textarea class="fn-field-note-ta" placeholder="💬 Góp ý chung cho phần này…" rows="1" oninput="_autoResizeNote(this)" onfocus="_autoResizeNote(this)"></textarea>
+              </div>
               <div id="timeline-esF">
                 <div style="text-align:center;padding:16px;color:var(--muted);font-size:12.5px">⏳ Đang tải lịch sử đi nước ngoài…</div>
               </div>
@@ -14073,7 +14114,9 @@
               </div>
             </div>
             <div class="edit-sec-body">
-              <div class="field-correction-note" id="note-esE"></div>
+              <div class="fn-field-note fn-section-note fn-general-note" data-field-key="esE">
+                <textarea class="fn-field-note-ta" placeholder="💬 Góp ý chung cho phần này…" rows="1" oninput="_autoResizeNote(this)" onfocus="_autoResizeNote(this)"></textarea>
+              </div>
               <div id="timeline-esG">
                 <div style="text-align:center;padding:16px;color:var(--muted);font-size:12.5px">⏳ Đang tải khen thưởng…</div>
               </div>
@@ -14091,7 +14134,9 @@
               </div>
             </div>
             <div class="edit-sec-body">
-              <div class="field-correction-note" id="note-esH"></div>
+              <div class="fn-field-note fn-section-note fn-general-note" data-field-key="esH">
+                <textarea class="fn-field-note-ta" placeholder="💬 Góp ý chung cho phần này…" rows="1" oninput="_autoResizeNote(this)" onfocus="_autoResizeNote(this)"></textarea>
+              </div>
               <div id="timeline-esH">
                 <div style="text-align:center;padding:16px;color:var(--muted);font-size:12.5px">⏳ Đang tải kỷ luật…</div>
               </div>
@@ -14109,7 +14154,9 @@
               </div>
             </div>
             <div class="edit-sec-body">
-              <div class="field-correction-note" id="note-esD"></div>
+              <div class="fn-field-note fn-section-note fn-general-note" data-field-key="esD">
+                <textarea class="fn-field-note-ta" placeholder="💬 Góp ý chung cho phần này…" rows="1" oninput="_autoResizeNote(this)" onfocus="_autoResizeNote(this)"></textarea>
+              </div>
               <div id="family-esD-body">
                 <div style="text-align:center;padding:16px;color:var(--muted);font-size:12.5px">⏳ Đang tải hoàn cảnh gia đình…</div>
               </div>
@@ -14126,7 +14173,9 @@
               </div>
             </div>
             <div class="edit-sec-body">
-              <div class="field-correction-note" id="note-esJ"></div>
+              <div class="fn-field-note fn-section-note fn-general-note" data-field-key="esJ">
+                <textarea class="fn-field-note-ta" placeholder="💬 Góp ý chung cho phần này…" rows="1" oninput="_autoResizeNote(this)" onfocus="_autoResizeNote(this)"></textarea>
+              </div>
               <div class="field-row">
                 <div class="field-label">Tự đánh giá bản thân (≥ 200 chữ)</div>
                 <div class="field-value empty" id="fv-esJ-self">—</div>
@@ -14145,7 +14194,9 @@
               </div>
             </div>
             <div class="edit-sec-body">
-              <div class="field-correction-note" id="note-esK"></div>
+              <div class="fn-field-note fn-section-note fn-general-note" data-field-key="esK">
+                <textarea class="fn-field-note-ta" placeholder="💬 Góp ý chung cho phần này…" rows="1" oninput="_autoResizeNote(this)" onfocus="_autoResizeNote(this)"></textarea>
+              </div>
               <div style="background:var(--bg);border:1.5px dashed var(--border-m);border-radius:var(--r-sm);padding:12px;margin-bottom:12px;font-size:12px;color:var(--muted);line-height:1.5">
                 Tôi xác nhận rằng những thông tin khai trên là trung thực, chính xác. Tôi chịu trách nhiệm pháp lý nếu khai báo không trung thực. Tôi sẵn sàng tuân thủ Điều lệ Đảng Cộng sản Việt Nam.
               </div>
@@ -15333,7 +15384,7 @@
         "fi-esA-hometown": "A. Quê quán",
         "fi-esA-ethnic": "A. Dân tộc",
         "fi-esA-religion": "A. Tôn giáo",
-        "fi-esA-address": "A. Nơi ở hiện nay",
+        "fi-esA-address": "A. Nơi thường trú",
         "fi-esA-cccd": "A. CCCD",
         "fi-esA-phone": "A. Điện thoại",
         "fi-esA-email": "A. Email",
@@ -16151,8 +16202,11 @@
         if (sw) sw.style.display = "";
         // Hide review action bar
         document.getElementById("reviewActionBar")?.classList.remove("visible");
-        // Clean up injected note areas
-        pg.querySelectorAll(".fn-field-note").forEach((el) => el.remove());
+        // Clean up injected note areas (but not the static per-section general
+        // note boxes — those are permanent HTML, not re-injected each time).
+        pg.querySelectorAll(".fn-field-note:not(.fn-general-note)").forEach(
+          (el) => el.remove(),
+        );
         pg.querySelectorAll(".field-row.row-has-note").forEach((r) =>
           r.classList.remove("row-has-note"),
         );
@@ -20253,7 +20307,9 @@
       }
       // Map: admin field key → fallback citizen section ID (for section-level notes only)
       const _FIELD_KEY_TO_CITIZEN_SEC = {
+        esA: "secA",
         esB: "secB",
+        esC: "secC",
         "esC-work": "secC",
         esDPol: "secD",
         esD: "secI",
@@ -20261,6 +20317,8 @@
         esE: "secG",
         esFT: "secF",
         esH: "secH",
+        esJ: "secJ",
+        esK: "secK",
         "fi-esJ-self": "secJ",
         "fi-esK-name": "secK",
         "fi-esK-date": "secK",
