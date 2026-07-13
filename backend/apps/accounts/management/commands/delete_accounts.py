@@ -10,6 +10,7 @@ Chi khi them --confirm moi thuc su xoa:
 """
 from django.core.management.base import BaseCommand
 from django.db import transaction
+from django.db.models.deletion import ProtectedError
 
 PHONES = [
     "0567845673",  # Ngo Dinh Hoang
@@ -82,10 +83,40 @@ class Command(BaseCommand):
 
         with transaction.atomic():
             deleted_files_count, _ = UploadedFile.objects.filter(uploader__in=users).delete()
-            deleted_total, deleted_by_model = users.delete()
+            deleted_total, cleared_protected = self._force_delete(users)
 
+        extra = (
+            f' (da don truoc {cleared_protected} ban ghi lien quan bi rang buoc PROTECT: '
+            f'lich su duyet, file xuat Word...)' if cleared_protected else ''
+        )
         self.stdout.write(self.style.SUCCESS(
             f'\nDa xoa xong: {deleted_total} ban ghi lien quan '
             f'(tai khoan, ho so, gia dinh, gop y, lich su duyet...), '
-            f'{deleted_files_count} file da upload.'
+            f'{deleted_files_count} file da upload.{extra}'
         ))
+
+    def _force_delete(self, queryset, max_attempts=10):
+        """Delete a queryset, automatically clearing any PROTECT-blocking related
+        objects (audit/history rows referencing these users as the "actor") first,
+        instead of having to enumerate every such model by hand. Retries until the
+        real delete succeeds or we give up after max_attempts (safety valve against
+        an infinite loop if something is misbehaving)."""
+        cleared = 0
+        for _ in range(max_attempts):
+            try:
+                deleted_total, _by_model = queryset.delete()
+                return deleted_total, cleared
+            except ProtectedError as e:
+                protected_objects = e.protected_objects
+                by_model = {}
+                for obj in protected_objects:
+                    by_model.setdefault(type(obj), []).append(obj.pk)
+                for model, pks in by_model.items():
+                    self.stdout.write(
+                        f'  (don truoc {len(pks)} ban ghi {model.__name__} dang chan xoa)'
+                    )
+                    n, _ = model.objects.filter(pk__in=pks).delete()
+                    cleared += n
+        raise RuntimeError(
+            f'Da thu {max_attempts} lan van con ban ghi PROTECT chan xoa — dung lai de tranh vong lap vo tan.'
+        )
