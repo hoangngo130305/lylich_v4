@@ -38,6 +38,9 @@ PHONES = [
     "0901111003",  # Pham Thi Dung (seed)
     "0901111002",  # Tran Minh Tuan (seed)
     "0901111001",  # Le Thi Mai (seed)
+    "0967561234",  # Nguyen Van Anh
+    "0987675612",  # Nguyen Van A
+    "0945671234",  # test
 ]
 
 
