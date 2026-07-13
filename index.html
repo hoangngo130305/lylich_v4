@@ -10314,10 +10314,11 @@
     </div>
     <div id="childUnder18_${m.num}">
       <div class="form-row">
-        <label>Đang học trường<span class="hint-lbl">Nếu &lt;6 tuổi: ghi "Còn nhỏ" · Nếu &lt;18 tuổi: ghi tên trường</span></label>
-        <input type="text" class="child-school-inp" placeholder="VD: Còn nhỏ / Học sinh trường THCS Nhà Bè / …">
+        <label>Nghề nghiệp<span class="hint-lbl">Nếu &lt;6 tuổi: ghi "Còn nhỏ" · Nếu đang đi học: ghi tên trường · Nếu đã đi làm: ghi nghề nghiệp</span></label>
+        <input type="text" class="child-school-inp" placeholder="VD: Còn nhỏ / Học sinh trường THCS Nhà Bè / Công nhân …">
       </div>
     </div>
+    <div class="form-row"><label>Quốc tịch</label><input type="text" class="fam-nationality-input" placeholder="Việt Nam" value="Việt Nam"></div>
     <div id="childOver18_${m.num}" style="display:none">
       <div class="alert alert-info" style="font-size:12px;margin:6px 0 10px">ℹ Con từ 18 tuổi trở lên: khai đầy đủ như bản thân theo quy định Mẫu 2-KNĐ</div>
       <div class="form-row"><label>Nơi sinh<span class="hint-lbl">Không ghi bệnh viện — ghi Xã/Phường, Tỉnh/TP</span></label>
@@ -10343,7 +10344,6 @@
 </div>
       <button class="add-row-btn" style="margin-top:8px" onclick="addRowToNearestTable(this)">+ Thêm giai đoạn</button>
     </div>
-    <div class="form-row"><label>Quốc tịch</label><input type="text" class="fam-nationality-input" placeholder="Việt Nam" value="Việt Nam"></div>
   `;
 
         if (m.spouse)
@@ -11680,7 +11680,11 @@
             .replace(/[✱*]/g, "")
             .trim()
             .toLowerCase();
-          if (lbl.includes("nghề nghiệp") && !occ) {
+          if (
+            lbl.includes("nghề nghiệp") &&
+            !occ &&
+            !row.querySelector(".child-school-inp")
+          ) {
             const i = row.querySelector("input[type=text],input:not([type])");
             if (i) occ = i.value.trim() || null;
           }
@@ -15790,7 +15794,7 @@
                     ${fv("Nơi làm việc", m.workplace)}
                     ${fvW("Chức danh/Chức vụ", m.job_title)}
                     ${m.is_deceased ? fv("Năm mất", m.deceased_year) + fv("Nguyên nhân mất", m.deceased_cause) : ""}
-                    ${fvW("Trường học", m.child_school)}
+                    ${fvW("Nghề nghiệp", m.child_school)}
                   </div>
                   ${(() => {
                     if (!m.is_party_member) return "";
@@ -15884,7 +15888,7 @@
                     ${["anh_chi_em_ruot", "anh_chi_em_chong_vo", "con", "chong_ke", "vo_ke", "vo_chong"].includes(m.relationship) ? `<div><label ${LS}>Quốc tịch</label><input ${IS} data-field="nationality" value="${_esc(m.nationality || "Việt Nam")}"></div>` : ""}
                     <div><label ${LS}>Nơi làm việc</label><input ${IS} data-field="workplace" value="${_esc(m.workplace || "")}"></div>
                     <div style="grid-column:span 2"><label ${LS}>Chức danh/Chức vụ</label><input ${IS} data-field="job_title" value="${_esc(m.job_title || "")}"></div>
-                    <div style="grid-column:span 2"><label ${LS}>Trường học (nếu là con dưới 18)</label><input ${IS} data-field="child_school" value="${_esc(m.child_school || "")}"></div>
+                    <div style="grid-column:span 2"><label ${LS}>Nghề nghiệp (nếu là con dưới 18)</label><input ${IS} data-field="child_school" value="${_esc(m.child_school || "")}"></div>
                     <div style="grid-column:span 2"><label ${LS}>Ghi chú</label><input ${IS} data-field="notes" value="${_esc(m.notes || "")}"></div>
                     <div style="grid-column:span 2"><label ${LS}>Tên hiển thị tùy chỉnh <span style="font-weight:400;color:#A0AEC0">(để trống = dùng mặc định: ${relDefault})</span></label><input ${IS} data-field="custom_label" value="${_esc(m.custom_label || "")}"></div>
                   </div>
@@ -20833,7 +20837,7 @@
                     if (f.occupation)
                       lines.push(`Nghề nghiệp: ${_esc(f.occupation)}`);
                     if (f.child_school)
-                      lines.push(`Đang học trường: ${_esc(f.child_school)}`);
+                      lines.push(`Nghề nghiệp: ${_esc(f.child_school)}`);
                     if (
                       [
                         "anh_chi_em_ruot",
