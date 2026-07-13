@@ -329,11 +329,6 @@
       "text": "PHẦN E – NHỮNG LỚP ĐÀO TẠO, BỒI DƯỠNG ĐÃ QUA"
     },
     {
-      "id": "phan_e_note",
-      "type": "instruction",
-      "text": "Ghi rõ tháng (không chỉ ghi năm). Cột 4: bằng cử nhân ĐH, cao đẳng, chứng chỉ..."
-    },
-    {
       "id": "phan_e_education",
       "type": "table_dynamic",
       "source": "education_history",
@@ -372,11 +367,6 @@
       "text": "PHẦN F – ĐI NƯỚC NGOÀI"
     },
     {
-      "id": "phan_f_note",
-      "type": "instruction",
-      "text": "Chỉ kê khai các chuyến đi học tập, lao động, công tác từ 3 tháng trở lên. Không kê khai du lịch ngắn ngày."
-    },
-    {
       "id": "phan_f_overseas",
       "type": "table_dynamic",
       "source": "overseas_travels",
@@ -388,7 +378,7 @@
       "empty_rows": 5,
       "columns": [
         {
-          "header": "Từ tháng/năm – đến",
+          "header": "Từ tháng/năm – đến tháng/năm",
           "field": "period_text",
           "width_cm": 4.0
         },
@@ -408,11 +398,6 @@
       "id": "phan_g_heading",
       "type": "section_heading",
       "text": "PHẦN G – KHEN THƯỞNG"
-    },
-    {
-      "id": "phan_g_note",
-      "type": "instruction",
-      "text": "Ghi rõ tháng + năm ký giấy khen. Kê khai bằng khen trở lên hoặc hình thức cao nhất. Ghi rõ cấp quyết định."
     },
     {
       "id": "phan_g_awards",
@@ -448,11 +433,6 @@
       "id": "phan_h_heading",
       "type": "section_heading",
       "text": "PHẦN H – KỶ LUẬT"
-    },
-    {
-      "id": "phan_h_note",
-      "type": "instruction",
-      "text": "Kê khai cả trường hợp bị xem xét kỷ luật nhưng không bị xử lý, hoặc không bị kỷ luật do hết thời hiệu."
     },
     {
       "id": "phan_h_disciplines",
@@ -826,7 +806,7 @@
     {
       "id": "chong_ke",
       "type": "family_member_list_block",
-      "title": "4a. Chồng kế",
+      "title": "4.1. Chồng kế",
       "relationship": "chong_ke",
       "fields": [
         {
@@ -883,7 +863,7 @@
     {
       "id": "vo_ke",
       "type": "family_member_list_block",
-      "title": "4b. Vợ kế",
+      "title": "4.2. Vợ kế",
       "relationship": "vo_ke",
       "fields": [
         {
@@ -1621,14 +1601,52 @@
       ]
     },
     {
+      "id": "ong_ba_khac",
+      "type": "family_member_list_block",
+      "title": "17. Ông/Bà khác",
+      "relationship": "ong_ba_khac",
+      "fields": [
+        {
+          "label": "Họ và tên",
+          "field": "full_name"
+        },
+        {
+          "label": "Năm sinh",
+          "field": "birth_year"
+        },
+        {
+          "label": "Năm mất",
+          "field": "deceased_year",
+          "skip_if_alive": true
+        },
+        {
+          "label": "Quê quán",
+          "field": "hometown"
+        },
+        {
+          "label": "Dân tộc",
+          "field": "ethnic_group_text"
+        },
+        {
+          "label": "Tôn giáo",
+          "field": "religion_with_rank"
+        },
+        {
+          "label": "Nơi cư trú",
+          "field": "current_address",
+          "skip_if_deceased": true
+        },
+        {
+          "label": "Nghề nghiệp",
+          "field": "occupation",
+          "skip_if_deceased": true
+        }
+      ]
+    },
+    {
       "id": "phan_j_heading",
       "type": "section_heading",
       "text": "PHẦN J – TỰ NHẬN XÉT, ĐÁNH GIÁ BẢN THÂN"
-    },
-    {
-      "id": "phan_j_note",
-      "type": "instruction",
-      "text": "Ghi những ưu điểm, khuyết điểm chính về: phẩm chất chính trị, đạo đức lối sống, năng lực công tác và quan hệ quần chúng. Tối thiểu 200 từ."
     },
     {
       "id": "phan_j_self_assessment",
@@ -1653,15 +1671,6 @@
           "date_field": "profile.declaration_date"
         }
       ]
-    },
-    {
-      "id": "chung_nhan_cap_uy",
-      "type": "committee_comment",
-      "title": "CHỨNG NHẬN CỦA CẤP ỦY CƠ SỞ",
-      "comment_type": "cap_uy_co_so",
-      "field": "cap_uy_comment.content",
-      "signed_by": "cap_uy_comment.signed_by",
-      "signed_date": "cap_uy_comment.signed_date"
     }
   ]
 }

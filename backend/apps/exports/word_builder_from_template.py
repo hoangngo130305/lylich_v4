@@ -633,6 +633,10 @@ def _r_family_block(doc, sec, sm, fr):
     if member is None:
         return
 
+    # Prefer the name the citizen renamed this member to ("Click để đổi tên"
+    # on the form) over the static template title, same as _r_family_list_block.
+    label = member.custom_label or title
+
     tbl = doc.add_table(rows=0, cols=2)
     _safe_table_style(tbl, sm.t())
 
@@ -641,7 +645,7 @@ def _r_family_block(doc, sec, sm, fr):
     merged = hrow.cells[0].merge(hrow.cells[1])
     _shade_cell(merged, 'E2EFDA')
     para = merged.paragraphs[0]
-    run = para.add_run(title)
+    run = para.add_run(label)
     run.bold = True
 
     if not fields_def:

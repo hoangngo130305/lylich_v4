@@ -23,6 +23,7 @@ class FamilyMember(models.Model):
         BA_NOI_CHONG_VO     = 'ba_noi_chong_vo',     'Bà nội chồng/vợ'
         ONG_NGOAI_CHONG_VO  = 'ong_ngoai_chong_vo',  'Ông ngoại chồng/vợ'
         BA_NGOAI_CHONG_VO   = 'ba_ngoai_chong_vo',   'Bà ngoại chồng/vợ'
+        ONG_BA_KHAC         = 'ong_ba_khac',         'Ông/Bà khác'
         CON                 = 'con',                 'Con'
 
     class Gender(models.TextChoices):
@@ -110,6 +111,7 @@ class FamilyMember(models.Model):
                 When(relationship='ba_noi_chong_vo',     then=Value(18)),
                 When(relationship='ong_ngoai_chong_vo',  then=Value(19)),
                 When(relationship='ba_ngoai_chong_vo',   then=Value(20)),
+                When(relationship='ong_ba_khac',         then=Value(21)),
                 default=Value(99),
                 output_field=IntegerField(),
             ),
