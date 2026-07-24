@@ -64,7 +64,7 @@ class UserAdmin(ModelAdmin, BaseUserAdmin):
     ordering      = ['-created_at']
     fieldsets     = (
         ('Thông tin cơ bản', {
-            'fields': ('full_name', 'phone', 'email', 'cccd', 'zalo_uid', 'role')
+            'fields': ('full_name', 'phone', 'email', 'cccd', 'zalo_uid', 'chi_bo', 'dang_bo', 'role')
         }),
         ('Trạng thái', {
             'fields': ('status', 'phone_verified', 'email_verified',

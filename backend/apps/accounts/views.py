@@ -177,6 +177,53 @@ class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
         return Response({'success': True, 'message': 'Tài khoản đã bị vô hiệu hóa.'})
 
 
+class UserHardDeleteView(generics.GenericAPIView):
+    """Permanently deletes a quần chúng account and everything tied to it
+    (hồ sơ, file đính kèm, lịch sử xét duyệt…). Lets a Ban Xây dựng Đảng
+    officer remove accounts that shouldn't exist without going through
+    superadmin/server access.
+    """
+    permission_classes = [IsOfficer]
+    queryset = User.objects.all()
+
+    def _force_delete(self, queryset, max_attempts=10):
+        from django.db.models import ProtectedError
+        cleared = 0
+        for _ in range(max_attempts):
+            try:
+                return queryset.delete(), cleared
+            except ProtectedError as e:
+                by_model = {}
+                for obj in e.protected_objects:
+                    by_model.setdefault(type(obj), []).append(obj.pk)
+                for model, pks in by_model.items():
+                    n, _ = model.objects.filter(pk__in=pks).delete()
+                    cleared += n
+        raise RuntimeError('Không thể xóa do còn dữ liệu liên quan không tự gỡ được.')
+
+    def delete(self, request, pk):
+        try:
+            user = User.objects.get(pk=pk)
+        except User.DoesNotExist:
+            return Response({'success': False, 'error': 'Không tìm thấy tài khoản.'}, status=404)
+        if user.role_code != 'quan_chung':
+            return Response({'success': False, 'error': 'Chỉ có thể xóa vĩnh viễn tài khoản quần chúng.'}, status=400)
+        if user.is_superuser:
+            return Response({'success': False, 'error': 'Không thể xóa tài khoản quản trị.'}, status=400)
+
+        full_name, user_id = user.full_name, user.id
+        try:
+            self._force_delete(User.objects.filter(pk=user.pk))
+        except RuntimeError as e:
+            return Response({'success': False, 'error': str(e)}, status=409)
+
+        log_activity(
+            request.user, 'user_hard_delete', target_model='User', target_id=user_id,
+            description=f'Xóa vĩnh viễn tài khoản & hồ sơ của {full_name}'
+        )
+        return Response({'success': True, 'message': f'Đã xóa vĩnh viễn tài khoản của {full_name}.'})
+
+
 class AccountRequestListView(generics.ListCreateAPIView):
     permission_classes = [CanCreateAccounts]
     filterset_fields  = ['status']
@@ -240,6 +287,8 @@ class AccountRequestListView(generics.ListCreateAPIView):
                     full_name=req.full_name,
                     cccd=req.cccd,
                     email=req.email,
+                    chi_bo=req.chi_bo,
+                    dang_bo=req.dang_bo,
                     role=role,
                     status=User.Status.ACTIVE,
                     phone_verified=True,

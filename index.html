@@ -391,6 +391,18 @@
         font-size: 9.5px;
         color: rgba(255, 255, 255, 0.35);
       }
+      .sidebar-user-party {
+        margin-top: 9px;
+        padding-top: 9px;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+        font-size: 10.5px;
+        line-height: 1.6;
+        color: rgba(255, 255, 255, 0.55);
+      }
+      .sidebar-user-party b {
+        color: rgba(255, 255, 255, 0.85);
+        font-weight: 600;
+      }
       .sidebar-user-actions {
         margin-top: 10px;
       }
@@ -2276,7 +2288,7 @@
         border-radius: 22px;
         font-size: 12.5px;
         font-weight: 600;
-        z-index: 300;
+        z-index: 10000;
         opacity: 0;
         transition: all 0.3s;
         pointer-events: none;
@@ -5735,6 +5747,10 @@
               <div class="sidebar-user-name">Người dùng</div>
               <div class="sidebar-user-role">Quần chúng</div>
             </div>
+          </div>
+          <div class="sidebar-user-party" id="sidebarUserParty" style="display:none">
+            <div>Chi bộ: <b id="sidebarUserChiBo">—</b></div>
+            <div>Đảng bộ: <b id="sidebarUserDangBo">—</b></div>
           </div>
           <div class="sidebar-user-actions">
             <button class="sidebar-logout-btn" onclick="apiLogout()">
@@ -10311,7 +10327,7 @@
         <div><div class="loc-row"><select id="sel_tinh_fam_${m.num.replace(/\./g, "_")}" class="searchable-location" onchange="updateFamCuTru(this)"><option value="">-- Tỉnh/TP --</option></select><select id="sel_xa_fam_${m.num.replace(/\./g, "_")}" class="searchable-location" onchange="updateFamCuTru(this)"><option value="">-- Xã/Phường --</option></select></div>
         <div style="display:flex;gap:8px;margin-top:6px;margin-bottom:4px"><input type="text" class="fam-addr-street" placeholder="Số nhà / Lô" oninput="updateFamCuTru(this)" style="flex:0 0 110px;min-width:0"><input type="text" class="fam-addr-hamlet" placeholder="Tên đường / ấp / thôn" oninput="updateFamCuTru(this)" style="min-width:0"></div><input type="text" class="fam-addr-location" placeholder="Địa chỉ đầy đủ (tự động điền hoặc nhập trực tiếp)"></div>
       </div>
-      <div class="form-row"><label>Nghề nghiệp hiện nay <span style="color:var(--crimson)">*</span></label><input type="text" placeholder="Công nhân / Viên chức / Nội trợ / Hưu trí …"></div>
+      <div class="form-row"><label>Nghề nghiệp hiện nay <span style="color:var(--crimson)">*</span><span class="hint-lbl">Nếu không có ghi "Không"</span></label><input type="text" placeholder="Công nhân / Viên chức / Nội trợ / Hưu trí …"></div>
     </div>
     <div id="sibDeceased_${m.num}" style="display:none">
       <div class="form-row"><label>Năm mất</label><input type="number" placeholder="YYYY" min="1900" max="2099"></div>
@@ -10343,7 +10359,7 @@
     </div>
     <div id="childUnder18_${m.num}">
       <div class="form-row">
-        <label>Nghề nghiệp<span class="hint-lbl">Nếu &lt;6 tuổi: ghi "Còn nhỏ" · Nếu đang đi học: ghi tên trường · Nếu đã đi làm: ghi nghề nghiệp</span></label>
+        <label>Nghề nghiệp<span class="hint-lbl">Nếu &lt;6 tuổi: ghi "Còn nhỏ" · Nếu đang đi học: ghi tên trường · Nếu đã đi làm: ghi nghề nghiệp · Nếu không có ghi "Không"</span></label>
         <input type="text" class="child-school-inp" placeholder="VD: Còn nhỏ / Học sinh trường THCS Nhà Bè / Công nhân …">
       </div>
     </div>
@@ -10359,7 +10375,7 @@
       <div class="form-row"><label>Dân tộc</label><div><select class="fam-sel-ethnic" onchange="toggleFamSelKhac(this)"><option value="">-- Chọn --</option><option>Kinh</option><option>Tày</option><option>Thái</option><option>Mường</option><option>Khmer</option><option>Nùng</option><option>HMông</option><option>Khác</option></select><input class="fam-sel-khac-other" style="display:none;margin-top:4px;width:100%" placeholder="Nhập tên dân tộc"></div></div>
       <div class="form-row"><label>Tôn giáo</label><div><select class="fam-sel-religion" onchange="toggleFamSelKhac(this)"><option value="">-- Chọn --</option><option>Không</option><option>Phật giáo</option><option>Công giáo</option><option>Cao Đài</option><option>Hòa Hảo</option><option>Tin Lành</option><option>Hồi giáo</option><option>Khác</option></select><input class="fam-sel-khac-other" style="display:none;margin-top:4px;width:100%" placeholder="Nhập tên tôn giáo"></div></div>
       <div class="form-row"><label>Chức sắc tôn giáo</label><input type="text" class="fam-religious-rank" placeholder="Linh mục / Mục sư / Hòa thượng / Không có"></div>
-      <div class="form-row"><label>Nghề nghiệp</label><input type="text"></div>
+      <div class="form-row"><label>Nghề nghiệp<span class="hint-lbl">Nếu không có ghi "Không"</span></label><input type="text"></div>
       <div style="margin-top:12px;margin-bottom:4px;font-size:12px;font-weight:700;color:var(--muted)">Quá trình lịch sử (từ khi sinh đến nay) <span style="font-weight:400;font-size:11px;color:var(--hint)">(nhập liên tục)</span></div>
       <div class="fhd-error-bar"></div>
       <div class="timeline-wrap">
@@ -10393,7 +10409,7 @@
       <div><div class="loc-row" style="margin-bottom:6px"><select id="sel_tinh_fam_ct_${m.num.replace(/\./g, "_")}" class="searchable-location" onchange="updateFamCuTru(this)"><option value="">-- Tỉnh/TP --</option></select><select id="sel_xa_fam_ct_${m.num.replace(/\./g, "_")}" class="searchable-location" onchange="updateFamCuTru(this)"><option value="">-- Xã/Phường --</option></select></div>
       <div style="display:flex;gap:8px;margin-bottom:4px"><input type="text" class="fam-addr-street" placeholder="Số nhà / Lô" oninput="updateFamCuTru(this)" style="flex:0 0 110px;min-width:0"><input type="text" class="fam-addr-hamlet" placeholder="Tên đường / ấp / thôn" oninput="updateFamCuTru(this)" style="min-width:0"></div><input type="text" class="fam-addr-location" placeholder="Địa chỉ đầy đủ (tự động điền hoặc nhập trực tiếp)"></div>
     </div>
-    <div class="form-row"><label>Nghề nghiệp</label><input type="text"></div>
+    <div class="form-row"><label>Nghề nghiệp<span class="hint-lbl">Nếu không có ghi "Không"</span></label><input type="text"></div>
     <div class="form-row"><label>Quốc tịch</label><input type="text" class="fam-nationality-input" placeholder="Việt Nam" value="Việt Nam"></div>
     <div class="form-row"><label>Là Đảng viên?</label>
       <div><select onchange="toggleSiblingParty(this,'spouseParty_${m.num}')"><option value="">-- Chọn --</option><option value="no">Không phải đảng viên</option><option value="yes">Là đảng viên Đảng Cộng sản Việt Nam</option></select>
@@ -10501,7 +10517,7 @@
       <div><div class="loc-row" style="margin-bottom:6px"><select id="sel_tinh_fam_ct_${m.num.replace(/\./g, "_")}" class="searchable-location" onchange="updateFamCuTru(this)"><option value="">-- Tỉnh/TP --</option></select><select id="sel_xa_fam_ct_${m.num.replace(/\./g, "_")}" class="searchable-location" onchange="updateFamCuTru(this)"><option value="">-- Xã/Phường --</option></select></div>
       <div style="display:flex;gap:8px;margin-bottom:4px"><input type="text" class="fam-addr-street" placeholder="Số nhà / Lô" oninput="updateFamCuTru(this)" style="flex:0 0 110px;min-width:0"><input type="text" class="fam-addr-hamlet" placeholder="Tên đường / ấp / thôn" oninput="updateFamCuTru(this)" style="min-width:0"></div><input type="text" class="fam-addr-location" placeholder="Địa chỉ đầy đủ (tự động điền hoặc nhập trực tiếp)"></div>
     </div>
-    <div class="form-row"><label>Nghề nghiệp<span class="hint-lbl">Để trống nếu đã mất</span></label><input type="text" placeholder="Nông dân / Hưu trí / Đã mất …"></div>
+    <div class="form-row"><label>Nghề nghiệp<span class="hint-lbl">Để trống nếu đã mất · Nếu không có ghi "Không"</span></label><input type="text" placeholder="Nông dân / Hưu trí / Đã mất …"></div>
     <div class="form-row"><label>Là Đảng viên?</label>
       <div><select onchange="toggleSiblingParty(this,'gpParty_${m.num}')"><option value="">-- Chọn --</option><option value="no">Không phải đảng viên</option><option value="yes">Là đảng viên Đảng Cộng sản Việt Nam</option></select>
         <div id="gpParty_${m.num}" style="display:none;margin-top:8px" class="party-detail-box">
@@ -10536,7 +10552,7 @@
         <input type="text" class="fam-addr-location" placeholder="Địa chỉ đầy đủ (tự động điền hoặc nhập trực tiếp)">
       </div>
     </div>
-    <div class="form-row"><label>Nghề nghiệp<span class="hint-lbl">Để trống nếu đã mất</span></label><input type="text" placeholder="Nông dân / Công nhân / Hưu trí / Đã mất …"></div>
+    <div class="form-row"><label>Nghề nghiệp<span class="hint-lbl">Để trống nếu đã mất · Nếu không có ghi "Không"</span></label><input type="text" placeholder="Nông dân / Công nhân / Hưu trí / Đã mất …"></div>
     <div class="form-row"><label>Là Đảng viên?</label>
       <div>
         <select onchange="toggleSiblingParty(this,'famParty_${m.num}')">
@@ -13609,12 +13625,11 @@
       </div>
       <div class="account-two-col" style="display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start">
         <div class="card">
-          <div class="card-head"><div class="card-head-dot"></div><h3 id="accStepTitle">Bước 1 – Thông tin định danh</h3></div>
+          <div class="card-head"><div class="card-head-dot"></div><h3 id="accStepTitle">Bước 1 – Thông tin tài khoản</h3></div>
           <div class="card-body">
             <div class="account-steps">
-              <div class="acc-step-item active" id="step1Indicator"><div class="acc-step-circle">1</div><div class="acc-step-label">Định danh</div></div>
-              <div class="acc-step-item" id="step2Indicator"><div class="acc-step-circle">2</div><div class="acc-step-label">Liên lạc</div></div>
-              <div class="acc-step-item" id="step3Indicator"><div class="acc-step-circle">3</div><div class="acc-step-label">Xác nhận</div></div>
+              <div class="acc-step-item active" id="step1Indicator"><div class="acc-step-circle">1</div><div class="acc-step-label">Thông tin</div></div>
+              <div class="acc-step-item" id="step3Indicator"><div class="acc-step-circle">2</div><div class="acc-step-label">Xác nhận</div></div>
             </div>
 
             <!-- STEP 1 -->
@@ -13623,24 +13638,18 @@
               <div class="form-row"><label>Số CCCD <span class="req">*</span></label><input type="text" id="accCCCD" placeholder="0XX XXX XXXXXX" maxlength="12"></div>
               <div class="form-row"><label>Ngày sinh <span class="req">*</span></label><input type="date" id="accDOB"></div>
               <div class="form-row"><label>Số điện thoại <span class="req">*</span></label><input type="tel" id="accPhone" placeholder="Nhập số điện thoại"></div>
-              <div style="display:flex;gap:8px;padding-top:16px;border-top:1px solid var(--border-xl);margin-top:4px">
-                <button class="btn btn-ghost" style="flex:1;justify-content:center" onclick="resetAccForm()">Hủy</button>
-                <button class="btn btn-primary" style="flex:2;justify-content:center" onclick="goToAccStep(2)">Tiếp theo →</button>
-              </div>
-            </div>
-
-            <!-- STEP 2 -->
-            <div id="accStep2" class="acc-step-form" style="display:none">
               <div class="form-row"><label>Email Gmail <span class="req">*</span></label><input type="email" id="accEmail" placeholder="example@gmail.com"></div>
+              <div class="form-row"><label>Chi bộ</label><input type="text" id="accChiBo" placeholder="Nhập tên Chi bộ …"></div>
+              <div class="form-row"><label>Đảng bộ</label><input type="text" id="accDangBo" placeholder="Nhập tên Đảng bộ …"></div>
               <div class="form-row"><label>Mật khẩu khởi tạo</label><input type="text" value="Hệ thống tự tạo ngẫu nhiên và gửi qua Gmail" disabled></div>
               <div class="form-row"><label>Kênh thông báo</label><div class="check-group"><label class="check-opt"><input type="checkbox" id="chkEmail" checked disabled> Gmail</label></div></div>
               <div style="display:flex;gap:8px;padding-top:16px;border-top:1px solid var(--border-xl);margin-top:4px">
-                <button class="btn btn-ghost" style="flex:1;justify-content:center" onclick="goToAccStep(1)">← Quay lại</button>
+                <button class="btn btn-ghost" style="flex:1;justify-content:center" onclick="resetAccForm()">Hủy</button>
                 <button class="btn btn-primary" style="flex:2;justify-content:center" onclick="goToAccStep(3)">Tiếp theo →</button>
               </div>
             </div>
 
-            <!-- STEP 3 -->
+            <!-- STEP 2 (Xác nhận) -->
             <div id="accStep3" class="acc-step-form" style="display:none">
               <div style="background:#F4F6F9;border-radius:10px;padding:14px;margin-bottom:16px">
                 <div style="font-size:12px;font-weight:600;color:var(--muted);margin-bottom:10px;text-transform:uppercase">Thông tin xác nhận</div>
@@ -13650,6 +13659,8 @@
                   <div><strong>Ngày sinh:</strong> <span id="reviewDOB">—</span></div>
                   <div><strong>Số điện thoại:</strong> <span id="reviewPhone">—</span></div>
                   <div style="margin-top:8px"><strong>Email:</strong> <span id="reviewEmail">—</span></div>
+                  <div><strong>Chi bộ:</strong> <span id="reviewChiBo">—</span></div>
+                  <div><strong>Đảng bộ:</strong> <span id="reviewDangBo">—</span></div>
                   <div><strong>Mật khẩu khởi tạo:</strong> Hệ thống tạo ngẫu nhiên và gửi qua Gmail</div>
                   <div><strong>Kênh thông báo:</strong> <span id="reviewChannels">—</span></div>
                 </div>
@@ -13658,7 +13669,7 @@
                 ℹ Sau khi xác nhận, hệ thống sẽ tạo tài khoản và gửi thông tin đăng nhập qua Gmail.
               </div>
               <div style="display:flex;gap:8px;padding-top:16px;border-top:1px solid var(--border-xl);margin-top:4px">
-                <button class="btn btn-ghost" style="flex:1;justify-content:center" onclick="goToAccStep(2)">← Quay lại</button>
+                <button class="btn btn-ghost" style="flex:1;justify-content:center" onclick="goToAccStep(1)">← Quay lại</button>
                 <button class="btn btn-primary" style="flex:2;justify-content:center" onclick="submitCreateAccount()">✓ Xác nhận & Cấp tài khoản</button>
               </div>
             </div>
@@ -14580,6 +14591,7 @@
       <td style="font-size:12px;">${created}</td>
       <td>
         <button class="act-btn act-view" onclick="_openUserInfo(${u.id})">Xem thông tin</button>
+        <button class="act-btn act-return" onclick="_deleteQuanChung(${u.id},'${_esc(u.full_name || "quần chúng này")}')">Xóa</button>
       </td>
     </tr>`;
           })
@@ -14986,12 +14998,13 @@
       }
 
       function goToAccStep(step) {
-        // Validate current step before moving forward
+        // Validate step 1 before moving forward to confirmation
         if (step > 1) {
           const name = document.getElementById("accName").value.trim();
           const cccd = document.getElementById("accCCCD").value.trim();
           const dob = document.getElementById("accDOB").value;
           const phone = document.getElementById("accPhone").value.trim();
+          const email = document.getElementById("accEmail").value.trim();
 
           if (!name || !cccd || !dob || !phone) {
             alert("Vui lòng điền đủ Họ tên, CCCD, Ngày sinh và Số điện thoại.");
@@ -15001,9 +15014,6 @@
             alert("CCCD phải có 12 ký tự");
             return;
           }
-        }
-        if (step > 2) {
-          const email = document.getElementById("accEmail").value.trim();
           if (!email) {
             alert("Vui lòng nhập email Gmail để nhận tài khoản.");
             return;
@@ -15016,12 +15026,10 @@
 
         // Hide all steps
         document.getElementById("accStep1").style.display = "none";
-        document.getElementById("accStep2").style.display = "none";
         document.getElementById("accStep3").style.display = "none";
 
         // Remove active class from all indicators
         document.getElementById("step1Indicator").classList.remove("active");
-        document.getElementById("step2Indicator").classList.remove("active");
         document.getElementById("step3Indicator").classList.remove("active");
 
         // Show current step
@@ -15029,17 +15037,12 @@
           document.getElementById("accStep1").style.display = "block";
           document.getElementById("step1Indicator").classList.add("active");
           document.getElementById("accStepTitle").textContent =
-            "Bước 1 – Thông tin định danh";
-        } else if (step === 2) {
-          document.getElementById("accStep2").style.display = "block";
-          document.getElementById("step2Indicator").classList.add("active");
-          document.getElementById("accStepTitle").textContent =
-            "Bước 2 – Gmail nhận tài khoản";
+            "Bước 1 – Thông tin tài khoản";
         } else if (step === 3) {
           document.getElementById("accStep3").style.display = "block";
           document.getElementById("step3Indicator").classList.add("active");
           document.getElementById("accStepTitle").textContent =
-            "Bước 3 – Xác nhận thông tin";
+            "Bước 2 – Xác nhận thông tin";
           updateAccReview();
         }
       }
@@ -15051,6 +15054,8 @@
         document.getElementById("accDOB").value = "";
         document.getElementById("accPhone").value = "";
         document.getElementById("accEmail").value = "";
+        document.getElementById("accChiBo").value = "";
+        document.getElementById("accDangBo").value = "";
         document.getElementById("chkEmail").checked = true;
         goToAccStep(1);
       }
@@ -15061,6 +15066,8 @@
         const dob = document.getElementById("accDOB").value;
         const phone = document.getElementById("accPhone").value.trim();
         const email = document.getElementById("accEmail").value.trim();
+        const chiBo = document.getElementById("accChiBo").value.trim();
+        const dangBo = document.getElementById("accDangBo").value.trim();
         const channels = [];
         if (document.getElementById("chkEmail").checked) channels.push("Gmail");
 
@@ -15071,6 +15078,8 @@
           : "—";
         document.getElementById("reviewPhone").textContent = phone || "—";
         document.getElementById("reviewEmail").textContent = email || "—";
+        document.getElementById("reviewChiBo").textContent = chiBo || "—";
+        document.getElementById("reviewDangBo").textContent = dangBo || "—";
         document.getElementById("reviewChannels").textContent = channels.length
           ? channels.join(", ")
           : "Không chọn";
@@ -15082,6 +15091,8 @@
         const dob = document.getElementById("accDOB").value;
         const phone = document.getElementById("accPhone").value.trim();
         const email = document.getElementById("accEmail").value.trim();
+        const chiBo = document.getElementById("accChiBo").value.trim();
+        const dangBo = document.getElementById("accDangBo").value.trim();
         const notify_email = document.getElementById("chkEmail").checked;
 
         if (!email) {
@@ -15097,6 +15108,8 @@
             phone,
             dob: dob,
             email: email || undefined,
+            chi_bo: chiBo || undefined,
+            dang_bo: dangBo || undefined,
             notify_email,
           });
           console.log("[DEBUG] account request created successfully");
@@ -18202,6 +18215,8 @@
               phone: user.phone,
               is_superuser: user.is_superuser || false,
               permissions: user.permissions || undefined,
+              chi_bo: user.chi_bo || "",
+              dang_bo: user.dang_bo || "",
             }),
           );
 
@@ -18649,6 +18664,19 @@
             .join("")
             .toUpperCase();
         });
+        // Show Chi bộ / Đảng bộ on the citizen sidebar, if provided
+        const partyBox = document.getElementById("sidebarUserParty");
+        if (partyBox) {
+          if (roleCode === "quan_chung" && (user.chi_bo || user.dang_bo)) {
+            document.getElementById("sidebarUserChiBo").textContent =
+              user.chi_bo || "—";
+            document.getElementById("sidebarUserDangBo").textContent =
+              user.dang_bo || "—";
+            partyBox.style.display = "block";
+          } else {
+            partyBox.style.display = "none";
+          }
+        }
         // Store roleCode globally for use in other functions
         window.appState = window.appState || {};
         window.appState.roleCode = roleCode;
@@ -19745,6 +19773,36 @@
       </div>`;
         } catch (e) {
           body.innerHTML = `<div style="color:var(--red)">✗ Không tải được thông tin: ${_esc(e.message)}</div>`;
+        }
+      }
+
+      /* ─────────────────────────────────────────────────────────────────────────
+   XÓA VĨNH VIỄN TÀI KHOẢN QUẦN CHÚNG (Ban Xây dựng Đảng tự thao tác)
+───────────────────────────────────────────────────────────────────────── */
+      async function _deleteQuanChung(userId, fullName) {
+        if (
+          !confirm(
+            `Xóa VĨNH VIỄN tài khoản và toàn bộ hồ sơ của "${fullName}"?\n\nHành động này sẽ xóa luôn tài khoản đăng nhập, hồ sơ lý lịch, file đính kèm, lịch sử xét duyệt… và KHÔNG THỂ khôi phục.`,
+          )
+        )
+          return;
+        if (
+          !confirm(
+            `Xác nhận lần cuối: xóa hẳn "${fullName}" khỏi hệ thống?`,
+          )
+        )
+          return;
+
+        try {
+          showToast("⏳ Đang xóa…");
+          await API.del(`/auth/users/${userId}/hard-delete/`);
+          showToast(`✅ Đã xóa vĩnh viễn tài khoản của ${fullName}`);
+          addActivity(
+            `🗑 Xóa vĩnh viễn tài khoản & hồ sơ quần chúng <strong>${_esc(fullName)}</strong>`,
+          );
+          _loadProfileList();
+        } catch (e) {
+          showToast(`✗ Xóa thất bại: ${e.message}`);
         }
       }
 

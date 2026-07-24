@@ -19,6 +19,7 @@ urlpatterns = [
     path('users/',            views.UserListView.as_view(),       name='user-list'),
     path('users/<int:pk>/',   views.UserDetailView.as_view(),     name='user-detail'),
     path('users/<int:pk>/toggle-status/', views.toggle_user_status, name='user-toggle-status'),
+    path('users/<int:pk>/hard-delete/', views.UserHardDeleteView.as_view(), name='user-hard-delete'),
     path('users/<int:user_id>/login-history/', views.LoginHistoryListView.as_view(), name='user-login-history'),
 
     # Account requests

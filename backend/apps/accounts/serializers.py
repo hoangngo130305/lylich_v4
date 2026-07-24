@@ -28,7 +28,8 @@ class UserPublicSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'full_name', 'phone', 'email', 'role', 'status',
-                  'avatar_path', 'last_login_at', 'created_at', 'is_superuser', 'permissions']
+                  'avatar_path', 'last_login_at', 'created_at', 'is_superuser', 'permissions',
+                  'chi_bo', 'dang_bo']
 
     def get_permissions(self, obj):
         return get_officer_permissions(obj)
@@ -47,6 +48,7 @@ class UserDetailSerializer(serializers.ModelSerializer):
         model = User
         fields = [
             'id', 'full_name', 'phone', 'email', 'cccd', 'zalo_uid',
+            'chi_bo', 'dang_bo',
             'role', 'role_id', 'status', 'avatar_path',
             'email_verified', 'phone_verified',
             'last_login_at', 'login_attempts', 'locked_until',
@@ -215,6 +217,7 @@ class AccountRequestSerializer(serializers.ModelSerializer):
         model = AccountRequest
         fields = [
             'id', 'full_name', 'cccd', 'dob', 'phone', 'email',
+            'chi_bo', 'dang_bo',
             'officer_in_charge', 'notify_sms', 'notify_email', 'notify_zalo',
             'status', 'fail_reason', 'notes', 'created_at', 'processed_at',
         ]
@@ -231,6 +234,7 @@ class AccountRequestCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = AccountRequest
         fields = ['full_name', 'cccd', 'dob', 'phone', 'email',
+                  'chi_bo', 'dang_bo',
                   'officer_in_charge', 'notes']
 
     def validate_email(self, value):

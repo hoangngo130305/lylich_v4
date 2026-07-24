@@ -65,6 +65,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     email            = models.EmailField(max_length=255, null=True, blank=True)
     cccd             = models.CharField(max_length=12, unique=True, null=True, blank=True)
     zalo_uid         = models.CharField(max_length=100, null=True, blank=True)
+    chi_bo           = models.CharField(max_length=255, null=True, blank=True, verbose_name='Chi bộ')
+    dang_bo          = models.CharField(max_length=255, null=True, blank=True, verbose_name='Đảng bộ')
 
     otp_code         = models.CharField(max_length=8, null=True, blank=True)
     otp_expires_at   = models.DateTimeField(null=True, blank=True)
@@ -260,6 +262,8 @@ class AccountRequest(models.Model):
     dob               = models.DateField()
     phone             = models.CharField(max_length=20)
     email             = models.EmailField(null=True, blank=True)
+    chi_bo            = models.CharField(max_length=255, null=True, blank=True, verbose_name='Chi bộ')
+    dang_bo           = models.CharField(max_length=255, null=True, blank=True, verbose_name='Đảng bộ')
     officer_in_charge = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL,
                                           related_name='assigned_requests', db_column='officer_in_charge')
     notify_sms        = models.BooleanField(default=True)
