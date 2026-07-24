@@ -13489,7 +13489,7 @@
           <table class="profile-table">
             <thead><tr>
               <th>Họ và tên</th><th>Số điện thoại</th><th>CCCD</th>
-              <th>Trạng thái TK</th><th>Hồ sơ</th><th>Ngày tạo</th><th style="width:120px">Thao tác</th>
+              <th>Trạng thái TK</th><th>Hồ sơ</th><th>Ngày tạo</th><th style="width:112px">Thao tác</th>
             </tr></thead>
             <tbody id="profileTbody"></tbody>
           </table>
@@ -14589,9 +14589,11 @@
       <td><span class="pill ${accSt.cls}">${accSt.label}</span></td>
       <td>${profileSt ? `<span class="pill ${profileSt.cls}">${profileSt.label}</span>` : '<span style="font-size:11px;color:var(--hint)">—</span>'}</td>
       <td style="font-size:12px;">${created}</td>
-      <td>
-        <button class="act-btn act-view" onclick="_openUserInfo(${u.id})">Xem thông tin</button>
-        <button class="act-btn act-return" onclick="_deleteQuanChung(${u.id},'${_esc(u.full_name || "quần chúng này")}')">Xóa</button>
+      <td style="padding:8px 10px">
+        <div style="display:flex;gap:2px;flex-wrap:nowrap">
+          <button class="act-btn act-view" style="padding:5px 7px" title="Xem thông tin" onclick="_openUserInfo(${u.id})">Xem</button>
+          <button class="act-btn act-return" style="padding:5px 7px" title="Xóa vĩnh viễn tài khoản" onclick="_deleteQuanChung(${u.id},'${_esc(u.full_name || "quần chúng này")}')">Xóa</button>
+        </div>
       </td>
     </tr>`;
           })
