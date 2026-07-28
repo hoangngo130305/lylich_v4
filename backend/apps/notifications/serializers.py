@@ -12,6 +12,7 @@ class NotificationSerializer(serializers.ModelSerializer):
     type_display    = serializers.CharField(source='get_type_display', read_only=True)
     channel_display = serializers.CharField(source='get_channel_display', read_only=True)
     sender_name     = serializers.CharField(source='sender.full_name', read_only=True, default=None)
+    recipient_name  = serializers.CharField(source='recipient.full_name', read_only=True, default=None)
     profile_name    = serializers.CharField(source='profile.full_name', read_only=True, default=None)
 
     class Meta:
@@ -19,7 +20,7 @@ class NotificationSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'type', 'type_display', 'channel', 'channel_display',
             'subject', 'body', 'is_read', 'read_at', 'sent_status', 'sent_at',
-            'sender_name', 'profile_id', 'profile_name',
+            'sender_name', 'recipient_name', 'profile_id', 'profile_name',
             'created_at',
         ]
         read_only_fields = ['id', 'created_at']
@@ -40,6 +41,9 @@ class BulkSendSerializer(serializers.Serializer):
         ('all_draft', 'Tất cả đang kê khai'),
         ('all_returned', 'Tất cả hồ sơ trả lại'),
         ('all_submitted', 'Tất cả đã nộp'),
+        ('late_submit_7d', 'Chưa nộp > 7 ngày'),
+        ('returned_stale_3d', 'Hồ sơ trả lại chưa cập nhật > 3 ngày'),
+        ('new_no_login', 'Tài khoản mới chưa đăng nhập'),
         ('custom', 'Tùy chỉnh'),
     ])
     channel     = serializers.ChoiceField(choices=NotificationTemplate.Channel.choices)

@@ -8,6 +8,7 @@ urlpatterns = [
     path('read-all/',             views.mark_all_read,                  name='notification-read-all'),
     path('send/',                 views.send_notification,              name='notification-send'),
     path('bulk-send/',            views.bulk_send,                      name='notification-bulk-send'),
+    path('bulk-groups/',          views.bulk_group_counts,              name='notification-bulk-groups'),
     path('templates/',            views.NotificationTemplateListView.as_view(),  name='template-list'),
     path('templates/<int:pk>/',   views.NotificationTemplateDetailView.as_view(),name='template-detail'),
 ]

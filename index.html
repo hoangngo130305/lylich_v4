@@ -8513,15 +8513,17 @@
                 <div class="notif-channel-tabs" id="channelTabs">
                   <div
                     class="channel-tab active"
-                    onclick="switchChannel('zalo', this)"
+                    data-channel="zalo_oa"
+                    onclick="switchChannel('zalo_oa', this)"
                   >
                     Zalo OA
                   </div>
-                  <div class="channel-tab" onclick="switchChannel('sms', this)">
+                  <div class="channel-tab" data-channel="sms" onclick="switchChannel('sms', this)">
                     SMS
                   </div>
                   <div
                     class="channel-tab"
+                    data-channel="email"
                     onclick="switchChannel('email', this)"
                   >
                     Email
@@ -8682,25 +8684,25 @@
                   >
                     Gửi đến
                   </div>
-                  <div
+                  <select
+                    id="notifRecipientSelect"
                     style="
-                      display: flex;
-                      align-items: center;
-                      gap: 8px;
+                      width: 100%;
+                      padding: 8px 10px;
+                      border: 1.5px solid var(--border);
+                      border-radius: 8px;
+                      font-family: inherit;
                       font-size: 12.5px;
+                      outline: none;
                     "
+                    onchange="updateNotifPreview()"
                   >
-                    <input type="checkbox" checked style="width: auto" />
-                    <strong id="notifTargetName">—</strong>
-                    <span
-                      id="notifTargetPhone"
-                      style="color: var(--muted)"
-                    ></span>
-                  </div>
+                    <option value="">-- Chọn quần chúng --</option>
+                  </select>
                   <div
                     style="margin-top: 8px; font-size: 11px; color: var(--hint)"
                   >
-                    Sẽ gửi qua Zalo OA (nếu đã liên kết) hoặc SMS
+                    Sẽ gửi qua kênh đã chọn ở cột bên trái
                   </div>
                 </div>
               </div>
@@ -13572,7 +13574,7 @@
           <div class="admin-page-sub">Quản lý và gửi thông báo đến quần chúng qua Zalo, SMS, Email</div>
         </div>
         <div class="admin-page-actions">
-          <button id="btnSendNotif" class="btn btn-primary" onclick="document.getElementById('notifModal').classList.add('open')">+ Gửi thông báo mới</button>
+          <button id="btnSendNotif" class="btn btn-primary" onclick="_openNotifModal()">+ Gửi thông báo mới</button>
         </div>
       </div>
       <div class="notif-stat-grid">
@@ -13604,9 +13606,9 @@
             <div class="card-head"><div class="card-head-dot"></div><h3>Chọn nhóm nhận nhắc nhở</h3></div>
             <div class="card-body">
               <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px">
-                <label class="bulk-group-label"><input type="checkbox" style="width:auto;accent-color:var(--crimson)"><span style="flex:1">Chưa nộp <strong>&gt; 7 ngày</strong></span><span id="bulkCountLateSubmit" class="bulk-group-count" style="background:var(--crimson-xl);color:var(--crimson)">—</span></label>
-                <label class="bulk-group-label"><input type="checkbox" style="width:auto;accent-color:var(--crimson)"><span style="flex:1">Hồ sơ trả lại <strong>chưa cập nhật &gt; 3 ngày</strong></span><span id="bulkCountReturnedStale" class="bulk-group-count" style="background:var(--warn-l);color:var(--warn)">—</span></label>
-                <label class="bulk-group-label"><input type="checkbox" style="width:auto;accent-color:var(--crimson)"><span style="flex:1">Tài khoản mới <strong>chưa đăng nhập</strong></span><span id="bulkCountNewNoLogin" class="bulk-group-count" style="background:#F5F3FF;color:#6D28D9">—</span></label>
+                <label class="bulk-group-label"><input type="checkbox" value="late_submit_7d" style="width:auto;accent-color:var(--crimson)"><span style="flex:1">Chưa nộp <strong>&gt; 7 ngày</strong></span><span id="bulkCountLateSubmit" class="bulk-group-count" style="background:var(--crimson-xl);color:var(--crimson)">—</span></label>
+                <label class="bulk-group-label"><input type="checkbox" value="returned_stale_3d" style="width:auto;accent-color:var(--crimson)"><span style="flex:1">Hồ sơ trả lại <strong>chưa cập nhật &gt; 3 ngày</strong></span><span id="bulkCountReturnedStale" class="bulk-group-count" style="background:var(--warn-l);color:var(--warn)">—</span></label>
+                <label class="bulk-group-label"><input type="checkbox" value="new_no_login" style="width:auto;accent-color:var(--crimson)"><span style="flex:1">Tài khoản mới <strong>chưa đăng nhập</strong></span><span id="bulkCountNewNoLogin" class="bulk-group-count" style="background:#F5F3FF;color:#6D28D9">—</span></label>
               </div>
               <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="sendBulkNotif()">📨 Gửi nhắc nhở hàng loạt</button>
             </div>
@@ -14704,11 +14706,6 @@
             }
           } catch (_) {}
 
-          // Update notif modal target
-          const nt = document.getElementById("notifTargetName");
-          const np = document.getElementById("notifTargetPhone");
-          if (nt) nt.textContent = p.full_name || "—";
-          if (np) np.textContent = p.user?.phone ? "– " + p.user.phone : "";
           updateNotifPreview();
         } catch (e) {
           document.getElementById("detailName").textContent = "Lỗi tải hồ sơ";
@@ -19317,10 +19314,14 @@
             $("ns-batches").textContent = (data.recent_batches || []).length;
         } catch {}
 
+        _loadBulkGroupCounts();
+
         const log = document.getElementById("notifLog");
         if (!log) return;
         try {
-          const data = await API.get("/notifications/?page_size=20");
+          // scope=sent — show notifications this Ban XD Đảng has sent OUT to
+          // quần chúng, not the officer's own inbox (those are different things).
+          const data = await API.get("/notifications/?page_size=20&scope=sent");
           const items = data.results || [];
           window.appState.notifications = items;
           console.log("[API] notifications loaded", items.length);
@@ -19330,19 +19331,26 @@
             return;
           }
           const chCls = {
-            zalo: "notif-channel-zalo",
+            zalo_oa: "notif-channel-zalo",
             sms: "notif-channel-sms",
             email: "notif-channel-email",
+            in_app: "notif-channel-sms",
           };
-          const chLabel = { zalo: "Zalo OA", sms: "SMS", email: "Email" };
+          const chLabel = {
+            zalo_oa: "Zalo OA",
+            sms: "SMS",
+            email: "Email",
+            in_app: "Trong ứng dụng",
+          };
           log.innerHTML = items
             .map((n) => {
               const ch = n.channel || "sms";
               const sent = n.sent_status === "sent" || n.is_read;
+              const who = n.recipient_name || n.profile_name || n.subject || "—";
               return `<div class="notif-log-item">
         <div class="notif-log-icon" style="background:var(--success-l)">✅</div>
         <div class="notif-log-body">
-          <div class="notif-log-name">${_esc(n.profile_name || n.subject || "—")}</div>
+          <div class="notif-log-name">${_esc(who)}</div>
           <div class="notif-log-desc">${_esc((n.body || n.subject || "").substring(0, 60))}</div>
           <div class="notif-log-meta">
             <span class="notif-channel-badge ${chCls[ch] || "notif-channel-sms"}">${chLabel[ch] || ch}</span>
@@ -21986,6 +21994,14 @@
         tplNew:
           "Kính gửi [HỌ TÊN],\n\nTài khoản kê khai lý lịch Mẫu 2-KNĐ đã được tạo.\n\nLink: https://lylich.xanhanbe.gov.vn\nCCCD: [CCCD]\nMật khẩu: Nhập OTP khi đăng nhập lần đầu.",
       };
+      // Frontend template keys don't map 1:1 to backend Notification.Type choices —
+      // translate here so send_notification()'s ChoiceField validation passes.
+      const _tplToNotifType = {
+        tplReturn: "profile_returned",
+        tplApprove: "profile_approved",
+        tplRemind: "custom",
+        tplNew: "account_created",
+      };
       let currentTpl = "tplReturn";
       function selectTpl(card, key) {
         document
@@ -22000,14 +22016,41 @@
           .querySelectorAll(".channel-tab")
           .forEach((t) => t.classList.remove("active"));
         tab.classList.add("active");
+        tab.dataset.channel = ch;
+        updateNotifPreview();
+      }
+      async function _openNotifModal() {
+        document.getElementById("notifModal")?.classList.add("open");
+        const sel = document.getElementById("notifRecipientSelect");
+        if (sel) {
+          sel.innerHTML = `<option value="">⏳ Đang tải danh sách…</option>`;
+          try {
+            const data = await API.get(
+              "/auth/users/?role__code=quan_chung&page_size=200&ordering=full_name",
+            );
+            const users = data.results || [];
+            sel.innerHTML = users.length
+              ? `<option value="">-- Chọn quần chúng --</option>` +
+                users
+                  .map(
+                    (u) =>
+                      `<option value="${u.id}" data-name="${_esc(u.full_name)}">${_esc(u.full_name)} — ${_esc(u.phone || "")}</option>`,
+                  )
+                  .join("")
+              : `<option value="">Không có quần chúng nào</option>`;
+          } catch (e) {
+            sel.innerHTML = `<option value="">✗ Lỗi tải danh sách</option>`;
+          }
+        }
         updateNotifPreview();
       }
       function updateNotifPreview() {
         const txt = notifTpls[currentTpl] || "";
         const el = document.getElementById("notifPreviewText");
+        const sel = document.getElementById("notifRecipientSelect");
         const name =
+          sel?.selectedOptions?.[0]?.dataset?.name ||
           document.getElementById("detailName")?.textContent ||
-          document.querySelector(".notif-target-name")?.textContent ||
           "[HỌ TÊN]";
         if (el)
           el.innerHTML = txt
@@ -22017,25 +22060,28 @@
             .replace(/\n/g, "<br>");
       }
       async function sendNotification() {
+        const sel = document.getElementById("notifRecipientSelect");
+        const recipientId = sel?.value
+          ? parseInt(sel.value, 10)
+          : _currentDetailUserId || null;
         const name =
+          sel?.selectedOptions?.[0]?.dataset?.name ||
           document.getElementById("detailName")?.textContent ||
-          document.querySelector(".notif-target-name")?.textContent ||
           "người dùng";
+        if (!recipientId) {
+          showToast("⚠ Vui lòng chọn quần chúng cần gửi thông báo");
+          return;
+        }
         const body = notifTpls[currentTpl] || "";
         const channel =
           document.querySelector(".channel-tab.active")?.dataset?.channel ||
-          "app";
-        if (!_currentDetailUserId) {
-          // No active profile — send to all in matching group via bulk
-          showToast("⚠ Mở hồ sơ trước khi gửi thông báo đơn lẻ");
-          return;
-        }
+          "zalo_oa";
         try {
           await API.post("/notifications/send/", {
-            recipient_id: _currentDetailUserId,
-            profile_id: _currentDetailProfileId,
+            recipient_id: recipientId,
+            profile_id: _currentDetailProfileId || undefined,
             channel,
-            type: currentTpl,
+            type: _tplToNotifType[currentTpl] || "custom",
             subject: "Thông báo hồ sơ lý lịch",
             body: body
               .replace("[HỌ TÊN]", name)
@@ -22045,17 +22091,28 @@
           document.getElementById("notifModal")?.classList.remove("open");
           showToast("📨 Đã gửi thông báo thành công");
           addActivity(
-            `📨 Gửi thông báo cho <strong>${name}</strong> – thành công`,
+            `📨 Gửi thông báo cho <strong>${_esc(name)}</strong> – thành công`,
           );
           _loadNotificationStats();
+          _loadNotifPage();
         } catch (e) {
           showToast(`✗ Gửi thất bại: ${e.message}`);
         }
       }
 
+      async function _loadBulkGroupCounts() {
+        try {
+          const resp = await API.get("/notifications/bulk-groups/");
+          const data = resp.data || resp;
+          _setText("bulkCountLateSubmit", data.late_submit_7d ?? "—");
+          _setText("bulkCountReturnedStale", data.returned_stale_3d ?? "—");
+          _setText("bulkCountNewNoLogin", data.new_no_login ?? "—");
+        } catch {}
+      }
+
       async function sendBulkNotif() {
-        const checked = document.querySelectorAll(
-          "#pgNotif input[type=checkbox]:checked",
+        const checked = Array.from(
+          document.querySelectorAll("#pgNotif input[type=checkbox]:checked"),
         );
         if (!checked.length) {
           alert("Chọn ít nhất một nhóm.");
@@ -22064,23 +22121,35 @@
         const body = notifTpls[currentTpl] || "";
         const channel =
           document.querySelector(".channel-tab.active")?.dataset?.channel ||
-          "app";
-        const group = checked[0]?.value || "all_draft";
-        try {
-          const resp = await API.post("/notifications/bulk-send/", {
-            group,
-            channel,
-            body,
-          });
-          const sent = (resp.data || resp).sent_count ?? checked.length;
-          showToast(`📨 Đã gửi hàng loạt cho ${sent} người`);
-          addActivity(
-            `📨 Gửi nhắc nhở hàng loạt – nhóm ${group} (${sent} người)`,
-          );
-          _loadNotificationStats();
-        } catch (e) {
-          showToast(`✗ Gửi thất bại: ${e.message}`);
+          "zalo_oa";
+        let totalSent = 0;
+        const failedGroups = [];
+        for (const cb of checked) {
+          const group = cb.value;
+          try {
+            const resp = await API.post("/notifications/bulk-send/", {
+              group,
+              channel,
+              body,
+            });
+            totalSent += (resp.data || resp).sent_count ?? 0;
+          } catch (e) {
+            failedGroups.push(group);
+          }
         }
+        if (failedGroups.length) {
+          showToast(
+            `⚠ Đã gửi ${totalSent} người, ${failedGroups.length} nhóm lỗi`,
+          );
+        } else {
+          showToast(`📨 Đã gửi hàng loạt cho ${totalSent} người`);
+        }
+        addActivity(
+          `📨 Gửi nhắc nhở hàng loạt – ${checked.length} nhóm (${totalSent} người)`,
+        );
+        _loadNotificationStats();
+        _loadNotifPage();
+        _loadBulkGroupCounts();
       }
     </script>
     <div
