@@ -13490,7 +13490,7 @@
         <div class="profile-table-wrap">
           <table class="profile-table">
             <thead><tr>
-              <th>Họ và tên</th><th>Số điện thoại</th><th>CCCD</th>
+              <th>Họ và tên</th><th>Số điện thoại</th><th>CCCD</th><th>Chi bộ</th><th>Đảng bộ</th>
               <th>Trạng thái TK</th><th>Hồ sơ</th><th>Ngày tạo</th><th style="width:112px">Thao tác</th>
             </tr></thead>
             <tbody id="profileTbody"></tbody>
@@ -14537,7 +14537,7 @@
       async function _loadProfileList() {
         const tb = document.getElementById("profileTbody");
         if (!tb) return;
-        tb.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:28px;color:var(--muted)">⏳ Đang tải dữ liệu…</td></tr>`;
+        tb.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:28px;color:var(--muted)">⏳ Đang tải dữ liệu…</td></tr>`;
         try {
           const params = new URLSearchParams();
           params.set("role__code", "quan_chung");
@@ -14552,7 +14552,7 @@
           console.log("[API] users loaded", _usersCache.length);
           renderProfiles(_usersCache);
         } catch (e) {
-          tb.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:28px;color:var(--red)">✗ Lỗi tải dữ liệu: ${_esc(e.message)}</td></tr>`;
+          tb.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:28px;color:var(--red)">✗ Lỗi tải dữ liệu: ${_esc(e.message)}</td></tr>`;
           console.error("[API] User list failed:", e);
         }
       }
@@ -14566,7 +14566,7 @@
           badgeDesktop.textContent = String(_profilesTotal || 0);
         if (badgeMobile) badgeMobile.textContent = String(_profilesTotal || 0);
         if (!data.length) {
-          tb.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:28px;color:var(--muted)">Không có quần chúng nào.</td></tr>`;
+          tb.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:28px;color:var(--muted)">Không có quần chúng nào.</td></tr>`;
           document.getElementById("profileCount").textContent =
             "Hiển thị 0 / 0 quần chúng";
           return;
@@ -14588,6 +14588,8 @@
       <td><div class="name-cell">${_esc(u.full_name || "—")}</div><div class="sub-cell">${_esc(u.email || "")}</div></td>
       <td style="font-size:12px;">${_esc(u.phone || "—")}</td>
       <td style="font-size:12px;">${_esc(u.cccd || "—")}</td>
+      <td style="font-size:12px;">${_esc(u.chi_bo || "—")}</td>
+      <td style="font-size:12px;">${_esc(u.dang_bo || "—")}</td>
       <td><span class="pill ${accSt.cls}">${accSt.label}</span></td>
       <td>${profileSt ? `<span class="pill ${profileSt.cls}">${profileSt.label}</span>` : '<span style="font-size:11px;color:var(--hint)">—</span>'}</td>
       <td style="font-size:12px;">${created}</td>
@@ -18003,12 +18005,15 @@
           // Live Server (port 5500) or file:// → point to Django
           const { protocol, hostname, port } = location;
           if (protocol === "file:" || port === "5500" || port === "5501") {
-            return "http://127.0.0.1:8000/api/v1";
+            const host = hostname || "127.0.0.1";
+            return "http://" + host + ":8010/api/v1";
           }
           // Production environment
           if (hostname === "14.224.210.210" || hostname === "lylich.gov.vn") {
             return "http://14.224.210.210:8003/api/v1";
           }
+          // May PC lam server tam thoi (lylich.nhabe.vn) - Caddy reverse-proxy
+          // /api/* ve Django tren cung origin HTTPS, nen dung duong dan tuong doi.
           return "/api/v1";
         }
         const BASE = _detectBase();
@@ -21247,7 +21252,7 @@
             (location.protocol === "file:" ||
             location.port === "5500" ||
             location.port === "5501"
-              ? "http://127.0.0.1:8000/api/v1"
+              ? "http://" + (location.hostname || "127.0.0.1") + ":8010/api/v1"
               : location.hostname === "14.224.210.210"
                 ? "http://14.224.210.210:8003/api/v1"
                 : "/api/v1");

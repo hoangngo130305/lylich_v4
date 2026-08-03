@@ -158,11 +158,12 @@ def export_profiles_excel(request):
     wb = openpyxl.Workbook()
     ws = wb.active
     ws.title = 'DanhSachQuanChung'
-    ws.append(['Họ và tên', 'Số điện thoại', 'CCCD', 'Trạng thái tài khoản', 'Trạng thái hồ sơ', 'Ngày tạo'])
+    ws.append(['Họ và tên', 'Số điện thoại', 'CCCD', 'Chi bộ', 'Đảng bộ', 'Trạng thái tài khoản', 'Trạng thái hồ sơ', 'Ngày tạo'])
     for u in qs:
         profile = getattr(u, 'profile', None)
         ws.append([
             u.full_name, u.phone, u.cccd or '',
+            u.chi_bo or '', u.dang_bo or '',
             'Hoạt động' if u.status == 'active' else 'Bị khoá',
             status_labels.get(profile.status, '—') if profile else 'Chưa có hồ sơ',
             u.created_at.strftime('%d/%m/%Y') if u.created_at else '',
