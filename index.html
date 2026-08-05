@@ -13555,11 +13555,11 @@
         <div class="profile-table-wrap">
           <table class="profile-table">
             <thead><tr>
-              <th>Quần chúng</th><th>Trạng thái hồ sơ</th>
+              <th>Quần chúng</th><th>Chi bộ</th><th>Đảng bộ</th><th>Trạng thái hồ sơ</th>
               <th>Ngày nộp</th><th>Cập nhật</th><th style="width:240px">Thao tác</th><th style="width:120px">Xuất Word</th>
             </tr></thead>
             <tbody id="verifyTbody">
-              <tr><td colspan="6" style="text-align:center;padding:24px;color:var(--muted)">⏳ Đang tải…</td></tr>
+              <tr><td colspan="8" style="text-align:center;padding:24px;color:var(--muted)">⏳ Đang tải…</td></tr>
             </tbody>
           </table>
         </div>
@@ -19389,7 +19389,7 @@
         const tbody = document.getElementById("verifyTbody");
         if (!tbody) return;
         tbody.innerHTML =
-          '<tr><td colspan="5" style="text-align:center;padding:24px;color:var(--muted)">⏳ Đang tải…</td></tr>';
+          '<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--muted)">⏳ Đang tải…</td></tr>';
         try {
           // Load stats
           const statsResp = await API.get("/verification/stats/");
@@ -19452,7 +19452,7 @@
 
           if (!displayUsers.length) {
             tbody.innerHTML =
-              '<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--muted)">Chưa có hồ sơ nào cần theo dõi.</td></tr>';
+              '<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--muted)">Chưa có hồ sơ nào cần theo dõi.</td></tr>';
             return;
           }
 
@@ -19496,6 +19496,8 @@
                 p.status === "completed";
               return `<tr>
         <td><div class="name-cell">${safeName}</div><div class="sub-cell">${_esc(u.phone || "")}</div></td>
+        <td style="font-size:12px;">${_esc(u.chi_bo || "—")}</td>
+        <td style="font-size:12px;">${_esc(u.dang_bo || "—")}</td>
         <td><span class="pill ${st.cls}">${st.label}</span></td>
         <td style="font-size:12px;white-space:nowrap">${submitted}</td>
         <td style="font-size:12px;white-space:nowrap">${updated}</td>
