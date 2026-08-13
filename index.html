@@ -12769,6 +12769,8 @@
           const fp = _parseMY(fromVal);
           const tp = isPresent ? null : _parseMY(toVal);
           rows.push({
+            id: tr.dataset.histId || null,
+            _tr: tr,
             from_year: fp?.year || null,
             from_month: fp?.month || null,
             to_year: tp?.year || null,
@@ -12808,14 +12810,10 @@
         validateFamHistory(acc); // update error bar but do not block save
         const rows = _readAccordionHistory(acc);
         const base = `/timelines/${profileId}/history/`;
-        // Always re-fetch the family member's ACTUAL current history ids from
-        // the server instead of trusting acc.dataset.famHistIds. If a prior
-        // save's delete silently failed (or the local cache ever drifted),
-        // stale rows would stay orphaned in the DB — same period/description
-        // as the still-tracked row — and get rendered as a duplicate on every
-        // reload, reappearing even after the user deletes the visible copy
-        // (since that copy was never the untracked orphan). Refetching here
-        // guarantees every save fully cleans up whatever truly exists.
+        // Re-fetch the family member's ACTUAL current history ids from the
+        // server instead of trusting acc.dataset.famHistIds, so rows removed
+        // directly on the server (or by a stale local cache) are still
+        // accounted for below.
         let oldIds;
         try {
           const fresh = await API.get(`/family/${profileId}/members/${famId}/`);
@@ -12826,8 +12824,28 @@
         } catch (e) {
           oldIds = JSON.parse(acc.dataset.famHistIds || "[]");
         }
+        const oldIdSet = new Set(oldIds);
+        // A row only counts as "kept" if its id is one the server actually
+        // has right now for THIS member — a stale/foreign dataset.histId
+        // (e.g. left over from a different member) must never be trusted to
+        // PATCH an unrelated record.
+        const keptIds = new Set(
+          rows
+            .filter((r) => r.id && oldIdSet.has(String(r.id)))
+            .map((r) => String(r.id)),
+        );
+        // Only delete rows the user actually removed. Rows still present get
+        // PATCHed in place instead of being deleted-and-recreated — a single
+        // failed delete can then no longer leave a duplicate of an otherwise
+        // unchanged period sitting in the DB forever.
         await Promise.all(
-          oldIds.map((id) => API.del(`${base}${id}/`).catch(() => {})),
+          oldIds
+            .filter((id) => !keptIds.has(id))
+            .map((id) =>
+              API.del(`${base}${id}/`).catch((e) =>
+                console.warn("[FAM-HIST DEL]", id, e.message),
+              ),
+            ),
         );
         const newIds = [];
         for (const [i, hr] of rows.entries()) {
@@ -12839,20 +12857,29 @@
             !hr.is_deceased
           )
             continue;
+          const payload = {
+            entry_type: "family",
+            family_member: famId,
+            from_year: hr.from_year || null,
+            from_month: hr.from_month || null,
+            to_year: hr.to_year || null,
+            to_month: hr.to_month || null,
+            is_present: hr.is_present || false,
+            is_deceased: hr.is_deceased || false,
+            description: hr.description,
+            sort_order: i,
+          };
           try {
-            const cr = await API.post(base, {
-              entry_type: "family",
-              family_member: famId,
-              from_year: hr.from_year || null,
-              from_month: hr.from_month || null,
-              to_year: hr.to_year || null,
-              to_month: hr.to_month || null,
-              is_present: hr.is_present || false,
-              is_deceased: hr.is_deceased || false,
-              description: hr.description,
-              sort_order: i,
-            });
-            if (cr?.id) newIds.push(String(cr.id));
+            if (hr.id && keptIds.has(String(hr.id))) {
+              await API.patch(`${base}${hr.id}/`, payload);
+              newIds.push(String(hr.id));
+            } else {
+              const cr = await API.post(base, payload);
+              if (cr?.id) {
+                newIds.push(String(cr.id));
+                if (hr._tr) hr._tr.dataset.histId = cr.id;
+              }
+            }
           } catch (e) {
             console.warn("[FAM-HIST]", e.message);
           }
