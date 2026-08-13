@@ -5426,11 +5426,18 @@
         grid-template-columns: 1fr 130px 160px 28px;
         align-items: start;
       }
-      /* Đi nước ngoài / Khen thưởng / Kỷ luật: top-align rows so short inputs
-         don't get vertically centered against a growing multi-line textarea */
+      /* Đi nước ngoài / Khen thưởng / Kỷ luật: give the content/description
+         column (2nd) the wide column instead of falling back to the generic
+         100px 100px 1fr 32px default — that default put the SHORT country/
+         level/org field in the wide 1fr slot and squeezed the long content
+         textarea into a fixed 100px column, wrapping it into a tall narrow
+         strip while leaving a huge empty gap next to it. Also top-align rows
+         so short inputs don't get vertically centered against a growing
+         multi-line textarea. */
       #timeline-esF .timeline-edit-row,
       #timeline-esG .timeline-edit-row,
       #timeline-esH .timeline-edit-row {
+        grid-template-columns: 100px 1fr 140px 28px;
         align-items: start;
       }
       .timeline-edit-row input,
@@ -5442,12 +5449,15 @@
         font-family: inherit;
         outline: none;
         width: 100%;
+        min-width: 0;
         box-sizing: border-box;
       }
       .timeline-edit-row textarea {
         resize: vertical;
         min-height: 36px;
         line-height: 1.5;
+        overflow-wrap: break-word;
+        word-break: break-word;
       }
       .timeline-edit-row input:focus,
       .timeline-edit-row textarea:focus {
@@ -6159,25 +6169,44 @@
                       </select>
                     </div>
                     <div class="loc-detail-row">
-                      <input
-                        type="text"
+                      <textarea
                         id="soNhaTT"
+                        rows="1"
                         placeholder="Số nhà / Lô"
-                        oninput="updateNoiO()"
-                      />
-                      <input
-                        type="text"
+                        style="resize: none; overflow: hidden; min-height: 38px"
+                        oninput="
+                          this.style.height = 'auto';
+                          this.style.height = this.scrollHeight + 'px';
+                          updateNoiO();
+                        "
+                      ></textarea>
+                      <textarea
                         id="tenDuongTT"
+                        rows="1"
                         placeholder="Tên đường / ấp / thôn"
-                        oninput="updateNoiO()"
-                      />
+                        style="resize: none; overflow: hidden; min-height: 38px"
+                        oninput="
+                          this.style.height = 'auto';
+                          this.style.height = this.scrollHeight + 'px';
+                          updateNoiO();
+                        "
+                      ></textarea>
                     </div>
-                    <input
-                      type="text"
+                    <textarea
                       id="noiO"
-                      style="margin-top: 6px"
+                      rows="1"
+                      style="
+                        margin-top: 6px;
+                        resize: none;
+                        overflow: hidden;
+                        min-height: 38px;
+                      "
                       placeholder="Địa chỉ thường trú đầy đủ (tự động điền hoặc nhập thủ công)"
-                    />
+                      oninput="
+                        this.style.height = 'auto';
+                        this.style.height = this.scrollHeight + 'px';
+                      "
+                    ></textarea>
                   </div>
                 </div>
                 <div class="form-row">
@@ -6205,25 +6234,44 @@
                       </select>
                     </div>
                     <div class="loc-detail-row">
-                      <input
-                        type="text"
+                      <textarea
                         id="soNhaTX"
+                        rows="1"
                         placeholder="Số nhà / Lô"
-                        oninput="updateTamTru()"
-                      />
-                      <input
-                        type="text"
+                        style="resize: none; overflow: hidden; min-height: 38px"
+                        oninput="
+                          this.style.height = 'auto';
+                          this.style.height = this.scrollHeight + 'px';
+                          updateTamTru();
+                        "
+                      ></textarea>
+                      <textarea
                         id="tenDuongTX"
+                        rows="1"
                         placeholder="Tên đường / ấp / thôn"
-                        oninput="updateTamTru()"
-                      />
+                        style="resize: none; overflow: hidden; min-height: 38px"
+                        oninput="
+                          this.style.height = 'auto';
+                          this.style.height = this.scrollHeight + 'px';
+                          updateTamTru();
+                        "
+                      ></textarea>
                     </div>
-                    <input
-                      type="text"
+                    <textarea
                       id="tamTru"
-                      style="margin-top: 6px"
+                      rows="1"
+                      style="
+                        margin-top: 6px;
+                        resize: none;
+                        overflow: hidden;
+                        min-height: 38px;
+                      "
                       placeholder="Địa chỉ tạm trú đầy đủ (tự động điền hoặc nhập thủ công)"
-                    />
+                      oninput="
+                        this.style.height = 'auto';
+                        this.style.height = this.scrollHeight + 'px';
+                      "
+                    ></textarea>
                   </div>
                 </div>
               </div>
@@ -6296,7 +6344,7 @@
                         "
                       >
                         <option value="">-- Chọn tôn giáo --</option>
-                        <option value="khong">Không</option>
+                        <option>Không</option>
                         <option>Phật giáo</option>
                         <option>Công giáo</option>
                         <option>Cao Đài</option>
@@ -9887,6 +9935,13 @@
       // is kept as-is in `dataset.legacyTail`, so nothing gets lost just because
       // the dropdowns haven't been touched yet. The moment either dropdown is
       // picked, that legacy tail is dropped in favor of the live selection.
+      // Auto-grow a <textarea> address field to fit its content (no clipped/
+      // hidden text). Safe to call on any element — no-ops on non-textareas.
+      function _autoGrowAddrTa(el) {
+        if (!el || el.tagName !== "TEXTAREA") return;
+        el.style.height = "auto";
+        el.style.height = Math.max(38, el.scrollHeight) + "px";
+      }
       function _recomposeAddr(el, num, street, ward, prov) {
         if (!el) return;
         num = (num || "").trim();
@@ -9898,6 +9953,7 @@
             ? [ward, prov].filter(Boolean).join(", ")
             : el.dataset.legacyTail || "";
         el.value = [num, street, wardProv].filter(Boolean).join(", ");
+        _autoGrowAddrTa(el);
       }
       // Split a previously-saved combined address into the sub-inputs on load,
       // so a later edit to just one of them doesn't wipe out the rest of it.
@@ -9916,6 +9972,22 @@
           if (streetInput && !streetInput.value) streetInput.value = segs[0];
           addrEl.dataset.legacyTail = "";
         }
+        _autoGrowAddrTa(numInput);
+        _autoGrowAddrTa(streetInput);
+        _autoGrowAddrTa(addrEl);
+      }
+      // Safety net: resize every address textarea in Phần A after profile data
+      // has been programmatically loaded into them (JS-set values don't fire
+      // their own oninput, so nothing else would trigger the grow otherwise).
+      function _resizeAllAddrFields() {
+        [
+          "soNhaTT",
+          "tenDuongTT",
+          "noiO",
+          "soNhaTX",
+          "tenDuongTX",
+          "tamTru",
+        ].forEach((id) => _autoGrowAddrTa(document.getElementById(id)));
       }
       function updateNoiO() {
         _recomposeAddr(
@@ -9998,7 +10070,7 @@
       function toggleChucSac() {
         const v = document.getElementById("tonGiao").value;
         document.getElementById("chucSac").style.display =
-          v && v !== "khong" ? "block" : "none";
+          v && v !== "Không" ? "block" : "none";
       }
 
       function filterWards(selectEl, wardSelectId) {
@@ -12735,8 +12807,25 @@
       async function _saveFamHistory(profileId, famId, acc) {
         validateFamHistory(acc); // update error bar but do not block save
         const rows = _readAccordionHistory(acc);
-        const oldIds = JSON.parse(acc.dataset.famHistIds || "[]");
         const base = `/timelines/${profileId}/history/`;
+        // Always re-fetch the family member's ACTUAL current history ids from
+        // the server instead of trusting acc.dataset.famHistIds. If a prior
+        // save's delete silently failed (or the local cache ever drifted),
+        // stale rows would stay orphaned in the DB — same period/description
+        // as the still-tracked row — and get rendered as a duplicate on every
+        // reload, reappearing even after the user deletes the visible copy
+        // (since that copy was never the untracked orphan). Refetching here
+        // guarantees every save fully cleans up whatever truly exists.
+        let oldIds;
+        try {
+          const fresh = await API.get(`/family/${profileId}/members/${famId}/`);
+          const freshMember = fresh?.data || fresh || {};
+          oldIds = (freshMember.history || [])
+            .map((h) => String(h.id))
+            .filter(Boolean);
+        } catch (e) {
+          oldIds = JSON.parse(acc.dataset.famHistIds || "[]");
+        }
         await Promise.all(
           oldIds.map((id) => API.del(`${base}${id}/`).catch(() => {})),
         );
@@ -15723,7 +15812,7 @@
                         return `<div class="timeline-edit-row" data-id="${_esc(String(r.id || ""))}">
                         <input value="${_esc(per)}" placeholder="Thời gian (tháng/năm)">
                         <textarea rows="1" placeholder="Nội dung khen thưởng" oninput="_autoResizeNote(this)" onfocus="_autoResizeNote(this)">${_esc(r.content || "")}</textarea>
-                        <input value="${_esc(r.level || "")}" placeholder="Cấp">
+                        <textarea rows="1" placeholder="Cấp" oninput="_autoResizeNote(this)" onfocus="_autoResizeNote(this)">${_esc(r.level || "")}</textarea>
                         <button class="del-row-btn" onclick="this.closest('.timeline-edit-row').remove()">✕</button>
                       </div>`;
                       })
@@ -15747,7 +15836,7 @@
                         return `<div class="timeline-edit-row" data-id="${_esc(String(r.id || ""))}">
                         <input value="${_esc(per)}" placeholder="Thời gian (tháng/năm)">
                         <textarea rows="1" placeholder="Nội dung kỷ luật" oninput="_autoResizeNote(this)" onfocus="_autoResizeNote(this)">${_esc(r.content || "")}</textarea>
-                        <input value="${_esc(r.level || "")}" placeholder="Mức kỷ luật">
+                        <textarea rows="1" placeholder="Mức kỷ luật" oninput="_autoResizeNote(this)" onfocus="_autoResizeNote(this)">${_esc(r.level || "")}</textarea>
                         <button class="del-row-btn" onclick="this.closest('.timeline-edit-row').remove()">✕</button>
                       </div>`;
                       })
@@ -15888,6 +15977,12 @@
                 </div>`;
                 })
                 .join("");
+              // Auto-expand all "Quá trình lịch sử" textareas to show full
+              // content without scrolling (same treatment as Phần B/C/E/F/G/H).
+              famBody.querySelectorAll("textarea").forEach((ta) => {
+                ta.style.height = "auto";
+                ta.style.height = ta.scrollHeight + "px";
+              });
             }
             function _renderFamTableEdit(members) {
               const famBody = document.getElementById("family-esD-body");
@@ -16071,6 +16166,10 @@
 
             // pgProfileEdit is always review-only — no one edits citizen data directly
             await _enterAdminReviewMode(profileId);
+            // Content was set via JS (not typed), so the oninput auto-resize
+            // handlers never fired — force a resize pass so long "Quá trình
+            // lịch sử" text isn't clipped inside its textarea.
+            _resizeAllDienBien();
 
             return;
           } catch (e) {
@@ -17108,7 +17207,7 @@
         if (!cont) return;
         const row = document.createElement("div");
         row.className = "timeline-edit-row";
-        row.innerHTML = `<input placeholder="Thời gian (tháng/năm)"><textarea rows="1" placeholder="Nội dung" oninput="_autoResizeNote(this)" onfocus="_autoResizeNote(this)"></textarea><input placeholder="Cấp"><button class="del-row-btn" onclick="this.closest('.timeline-edit-row').remove()">✕</button>`;
+        row.innerHTML = `<input placeholder="Thời gian (tháng/năm)"><textarea rows="1" placeholder="Nội dung" oninput="_autoResizeNote(this)" onfocus="_autoResizeNote(this)"></textarea><textarea rows="1" placeholder="Cấp" oninput="_autoResizeNote(this)" onfocus="_autoResizeNote(this)"></textarea><button class="del-row-btn" onclick="this.closest('.timeline-edit-row').remove()">✕</button>`;
         cont.appendChild(row);
         row.querySelector("input, textarea").focus();
       }
@@ -20319,6 +20418,7 @@
           // Return banner is rendered after loading correction hints
           await _loadAllSections(p.id);
           _resizeAllDienBien();
+          _resizeAllAddrFields();
           const correctionData = await _loadMemberCorrectionHints(
             p.id,
             p.status,
@@ -21242,6 +21342,7 @@
           }
           await _loadAllSections(p.id);
           _resizeAllDienBien();
+          _resizeAllAddrFields();
         } catch (e) {
           console.warn("[switchToForm]", e.message);
         }
@@ -21831,15 +21932,17 @@
         saveDraftAPI();
       }
 
-      // Auto-resize all .td-dienbien textareas to fit their content
+      // Auto-resize all .td-dienbien / .td-chucvu textareas to fit their content
       function _resizeAllDienBien() {
-        document.querySelectorAll(".td-dienbien textarea").forEach((ta) => {
-          ta.style.height = "auto";
-          ta.style.height = Math.max(38, ta.scrollHeight) + "px";
-        });
+        document
+          .querySelectorAll(".td-dienbien textarea, .td-chucvu textarea")
+          .forEach((ta) => {
+            ta.style.height = "auto";
+            ta.style.height = Math.max(38, ta.scrollHeight) + "px";
+          });
       }
       document.addEventListener("input", (e) => {
-        if (e.target.matches(".td-dienbien textarea")) {
+        if (e.target.matches(".td-dienbien textarea, .td-chucvu textarea")) {
           e.target.style.height = "auto";
           e.target.style.height = Math.max(38, e.target.scrollHeight) + "px";
         }
