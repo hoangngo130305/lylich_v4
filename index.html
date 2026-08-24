@@ -21742,7 +21742,14 @@
       async function apiLogout() {
         await API.logout();
         showToast("Đã đăng xuất");
-        setTimeout(_showLoginModal, 600);
+        // Full page reload — not just re-showing the login modal — so every
+        // in-memory JS value (profile id, cached family-member ids, address
+        // sub-fields, etc.) from the outgoing session is wiped clean before
+        // the next account logs in on this same tab. Without this, stale
+        // DOM/JS state from the previous account can bleed into the next
+        // account's form (e.g. an address sub-field left non-empty never
+        // gets overwritten by the new account's data — see _seedAddrFromLoaded).
+        setTimeout(() => window.location.reload(), 600);
       }
 
       /* ─────────────────────────────────────────────────────────────────────────
