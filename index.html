@@ -13654,9 +13654,14 @@
         <div class="card-head">
           <div class="card-head-dot"></div>
           <h3>Danh sách hồ sơ theo dõi xác minh</h3>
-          <div style="margin-left:auto">
+          <div style="margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <div class="search-box" style="flex:0 1 220px;min-width:160px">
+              <span class="search-icon">🔍</span>
+              <input type="text" placeholder="Tìm theo họ tên, SĐT, CCCD…" oninput="filterVerifyList(this.value)">
+            </div>
             <select class="filter-select" id="verifyStatusFilter" style="font-size:11.5px;padding:5px 26px 5px 10px;" onchange="_loadVerificationList()">
               <option value="">Tất cả trạng thái</option>
+              <option value="no_profile">Chưa tạo hồ sơ</option>
               <option value="draft">Đang kê khai</option>
               <option value="submitted">Đã nộp</option>
               <option value="pending">Đang xem xét</option>
@@ -19511,6 +19516,12 @@
       /* ─────────────────────────────────────────────────────────────────────────
    VERIFICATION LIST
 ───────────────────────────────────────────────────────────────────────── */
+      let _verifyFilters = { search: "" };
+      function filterVerifyList(q) {
+        _verifyFilters.search = q;
+        _loadVerificationList();
+      }
+
       async function _loadVerificationList() {
         const tbody = document.getElementById("verifyTbody");
         if (!tbody) return;
@@ -19532,16 +19543,26 @@
           // Load users, profiles and verifications in parallel
           const statusFilter =
             document.getElementById("verifyStatusFilter")?.value || "";
+          // "no_profile" is a client-only sentinel (users with zero profile
+          // records) — it isn't a real Profile.status value, so it must never
+          // be sent to the /profiles/ endpoint as a status filter.
           const profileParams = new URLSearchParams({
-            page_size: "100",
+            page_size: "300",
             ordering: "-updated_at",
           });
-          if (statusFilter) profileParams.set("status", statusFilter);
+          if (statusFilter && statusFilter !== "no_profile")
+            profileParams.set("status", statusFilter);
+
+          const usersParams = new URLSearchParams({
+            role__code: "quan_chung",
+            page_size: "300",
+            ordering: "-created_at",
+          });
+          if (_verifyFilters.search)
+            usersParams.set("search", _verifyFilters.search);
 
           const [usersData, profData, verifyData] = await Promise.all([
-            API.get(
-              "/auth/users/?role__code=quan_chung&page_size=300&ordering=-created_at",
-            ),
+            API.get(`/auth/users/?${usersParams}`),
             API.get(`/profiles/?${profileParams}`),
             API.get("/verification/?page_size=200"),
           ]);
@@ -19566,13 +19587,17 @@
             if (p.user_phone) profileByPhone[p.user_phone] = p;
           });
 
-          // Always show full user list; if a status filter is selected, keep rows with matching profiles only.
-          const displayUsers = statusFilter
-            ? users.filter((u) => {
-                const p = profileByPhone[u.phone];
-                return p && p.status === statusFilter;
-              })
-            : users;
+          // Always show full user list; if a status filter is selected, keep
+          // only rows matching it — "no_profile" keeps users with no profile
+          // record at all, any real status keeps users whose profile has it.
+          const displayUsers = !statusFilter
+            ? users
+            : statusFilter === "no_profile"
+              ? users.filter((u) => !profileByPhone[u.phone])
+              : users.filter((u) => {
+                  const p = profileByPhone[u.phone];
+                  return p && p.status === statusFilter;
+                });
 
           console.log("[API] verify users loaded", displayUsers.length);
 
