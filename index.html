@@ -13650,28 +13650,25 @@
           <div><div class="verify-stat-val" id="vs-overdue" style="color:var(--crimson)">—</div><div class="verify-stat-lbl">Quá hạn</div></div>
         </div>
       </div>
+      <div class="filter-bar">
+        <div class="search-box"><span class="search-icon">🔍</span><input type="text" placeholder="Tìm theo họ tên, SĐT, CCCD…" oninput="filterVerifyList(this.value)"></div>
+        <select class="filter-select" id="verifyStatusFilter" onchange="_loadVerificationList()">
+          <option value="">Tất cả trạng thái</option>
+          <option value="no_profile">Chưa tạo hồ sơ</option>
+          <option value="draft">Đang kê khai</option>
+          <option value="submitted">Đã nộp</option>
+          <option value="pending">Đang xem xét</option>
+          <option value="under_review">Đang thẩm định</option>
+          <option value="approved">Đã phê duyệt</option>
+          <option value="verifying">Đang xác minh</option>
+          <option value="returned">Trả lại</option>
+          <option value="completed">Hoàn thiện</option>
+        </select>
+      </div>
       <div class="card">
         <div class="card-head">
           <div class="card-head-dot"></div>
           <h3>Danh sách hồ sơ theo dõi xác minh</h3>
-          <div style="margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-            <div class="search-box" style="flex:0 1 220px;min-width:160px">
-              <span class="search-icon">🔍</span>
-              <input type="text" placeholder="Tìm theo họ tên, SĐT, CCCD…" oninput="filterVerifyList(this.value)">
-            </div>
-            <select class="filter-select" id="verifyStatusFilter" style="font-size:11.5px;padding:5px 26px 5px 10px;" onchange="_loadVerificationList()">
-              <option value="">Tất cả trạng thái</option>
-              <option value="no_profile">Chưa tạo hồ sơ</option>
-              <option value="draft">Đang kê khai</option>
-              <option value="submitted">Đã nộp</option>
-              <option value="pending">Đang xem xét</option>
-              <option value="under_review">Đang thẩm định</option>
-              <option value="approved">Đã phê duyệt</option>
-              <option value="verifying">Đang xác minh</option>
-              <option value="returned">Trả lại</option>
-              <option value="completed">Hoàn thiện</option>
-            </select>
-          </div>
         </div>
         <div class="profile-table-wrap">
           <table class="profile-table">
