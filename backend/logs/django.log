@@ -11341,3 +11341,158 @@ WARNING 2026-07-10 08:58:01,071 log 22424 27356 Not Found: /api/sale-projects/
 WARNING 2026-07-10 08:58:01,071 basehttp 22424 27356 "GET /api/sale-projects/ HTTP/1.1" 404 5376
 WARNING 2026-07-10 08:58:09,335 log 22424 27124 Not Found: /api/auth/me/
 WARNING 2026-07-10 08:58:09,336 basehttp 22424 27124 "GET /api/auth/me/ HTTP/1.1" 404 5358
+WARNING 2026-07-10 09:38:25,215 log 20548 23128 Unauthorized: /api/v1/profiles/my/
+WARNING 2026-07-10 09:38:25,216 basehttp 20548 23128 "PUT /api/v1/profiles/my/ HTTP/1.1" 401 291
+WARNING 2026-07-10 09:38:25,267 log 20548 23128 Forbidden: /api/v1/profiles/my/
+WARNING 2026-07-10 09:38:25,268 basehttp 20548 23128 "PUT /api/v1/profiles/my/ HTTP/1.1" 403 92
+WARNING 2026-07-10 09:58:14,091 log 20548 9072 Unauthorized: /api/v1/verification/stats/
+WARNING 2026-07-10 09:58:14,092 basehttp 20548 9072 "GET /api/v1/verification/stats/ HTTP/1.1" 401 291
+WARNING 2026-07-10 10:03:09,976 log 20548 21856 Not Found: /api/users/
+WARNING 2026-07-10 10:03:09,977 basehttp 20548 21856 "GET /api/users/?role=sale HTTP/1.1" 404 5362
+WARNING 2026-07-10 10:03:09,987 log 20548 21856 Not Found: /api/users/
+WARNING 2026-07-10 10:03:09,988 basehttp 20548 21856 "GET /api/users/?role=sale HTTP/1.1" 404 5362
+WARNING 2026-07-10 10:03:10,380 log 20548 21856 Not Found: /api/users/
+WARNING 2026-07-10 10:03:10,385 log 20548 13300 Not Found: /api/sale-videos/
+WARNING 2026-07-10 10:03:10,390 log 20548 11708 Not Found: /api/sale-videos/stats/
+WARNING 2026-07-10 10:03:10,392 basehttp 20548 21856 "GET /api/users/?role=sale HTTP/1.1" 404 5362
+WARNING 2026-07-10 10:03:10,396 log 20548 26996 Not Found: /api/sale-projects/
+WARNING 2026-07-10 10:03:10,397 basehttp 20548 13300 "GET /api/sale-videos/ HTTP/1.1" 404 5370
+WARNING 2026-07-10 10:03:10,398 basehttp 20548 11708 "GET /api/sale-videos/stats/ HTTP/1.1" 404 5388
+WARNING 2026-07-10 10:03:10,403 basehttp 20548 26996 "GET /api/sale-projects/ HTTP/1.1" 404 5376
+WARNING 2026-07-10 10:03:10,407 log 20548 21856 Not Found: /api/users/
+WARNING 2026-07-10 10:03:10,411 log 20548 26880 Not Found: /api/sale-videos/
+WARNING 2026-07-10 10:03:10,418 log 20548 11708 Not Found: /api/sale-videos/stats/
+WARNING 2026-07-10 10:03:10,423 log 20548 26996 Not Found: /api/sale-projects/
+WARNING 2026-07-10 10:03:10,424 basehttp 20548 21856 "GET /api/users/?role=sale HTTP/1.1" 404 5362
+WARNING 2026-07-10 10:03:10,424 basehttp 20548 11708 "GET /api/sale-videos/stats/ HTTP/1.1" 404 5388
+WARNING 2026-07-10 10:03:10,424 basehttp 20548 26880 "GET /api/sale-videos/ HTTP/1.1" 404 5370
+WARNING 2026-07-10 10:03:10,426 basehttp 20548 26996 "GET /api/sale-projects/ HTTP/1.1" 404 5376
+WARNING 2026-07-10 10:03:11,144 log 20548 21856 Not Found: /api/users/
+WARNING 2026-07-10 10:03:11,149 log 20548 11708 Not Found: /api/sale-projects/
+WARNING 2026-07-10 10:03:11,151 basehttp 20548 21856 "GET /api/users/?role=sale HTTP/1.1" 404 5362
+WARNING 2026-07-10 10:03:11,156 log 20548 26880 Not Found: /api/categories/
+WARNING 2026-07-10 10:03:11,156 basehttp 20548 11708 "GET /api/sale-projects/ HTTP/1.1" 404 5376
+WARNING 2026-07-10 10:03:11,160 log 20548 26996 Not Found: /api/users/
+WARNING 2026-07-10 10:03:11,163 basehttp 20548 26880 "GET /api/categories/?for_sale=true HTTP/1.1" 404 5381
+WARNING 2026-07-10 10:03:11,168 log 20548 21856 Not Found: /api/users/
+WARNING 2026-07-10 10:03:11,169 basehttp 20548 26996 "GET /api/users/?role=btv HTTP/1.1" 404 5361
+WARNING 2026-07-10 10:03:11,174 log 20548 11708 Not Found: /api/sale-projects/
+WARNING 2026-07-10 10:03:11,179 log 20548 26880 Not Found: /api/categories/
+WARNING 2026-07-10 10:03:11,180 basehttp 20548 21856 "GET /api/users/?role=sale HTTP/1.1" 404 5362
+WARNING 2026-07-10 10:03:11,182 basehttp 20548 11708 "GET /api/sale-projects/ HTTP/1.1" 404 5376
+WARNING 2026-07-10 10:03:11,186 log 20548 26996 Not Found: /api/users/
+WARNING 2026-07-10 10:03:11,186 basehttp 20548 26880 "GET /api/categories/?for_sale=true HTTP/1.1" 404 5381
+WARNING 2026-07-10 10:03:11,187 basehttp 20548 26996 "GET /api/users/?role=btv HTTP/1.1" 404 5361
+WARNING 2026-07-10 10:03:11,759 log 20548 26996 Not Found: /api/sale-videos/
+WARNING 2026-07-10 10:03:11,764 log 20548 11708 Not Found: /api/sale-projects/
+WARNING 2026-07-10 10:03:11,767 log 20548 26880 Not Found: /api/sale-videos/stats/
+WARNING 2026-07-10 10:03:11,772 log 20548 21856 Not Found: /api/users/
+WARNING 2026-07-10 10:03:11,773 basehttp 20548 26996 "GET /api/sale-videos/ HTTP/1.1" 404 5370
+WARNING 2026-07-10 10:03:11,773 basehttp 20548 11708 "GET /api/sale-projects/ HTTP/1.1" 404 5376
+WARNING 2026-07-10 10:03:11,773 basehttp 20548 26880 "GET /api/sale-videos/stats/ HTTP/1.1" 404 5388
+WARNING 2026-07-10 10:03:11,775 basehttp 20548 21856 "GET /api/users/?role=sale HTTP/1.1" 404 5362
+WARNING 2026-07-10 10:03:11,785 log 20548 13300 Not Found: /api/sale-videos/
+WARNING 2026-07-10 10:03:11,789 log 20548 12116 Not Found: /api/sale-projects/
+WARNING 2026-07-10 10:03:11,793 log 20548 11708 Not Found: /api/sale-videos/stats/
+WARNING 2026-07-10 10:03:11,798 log 20548 26880 Not Found: /api/users/
+WARNING 2026-07-10 10:03:11,798 basehttp 20548 13300 "GET /api/sale-videos/ HTTP/1.1" 404 5370
+WARNING 2026-07-10 10:03:11,800 basehttp 20548 12116 "GET /api/sale-projects/ HTTP/1.1" 404 5376
+WARNING 2026-07-10 10:03:11,800 basehttp 20548 11708 "GET /api/sale-videos/stats/ HTTP/1.1" 404 5388
+WARNING 2026-07-10 10:03:11,801 basehttp 20548 26880 "GET /api/users/?role=sale HTTP/1.1" 404 5362
+WARNING 2026-07-10 10:03:15,132 log 20548 26880 Not Found: /api/auth/me/
+WARNING 2026-07-10 10:03:15,133 basehttp 20548 26880 "GET /api/auth/me/ HTTP/1.1" 404 5358
+WARNING 2026-07-10 10:03:15,141 log 20548 26880 Not Found: /api/auth/me/
+WARNING 2026-07-10 10:03:15,142 basehttp 20548 26880 "GET /api/auth/me/ HTTP/1.1" 404 5358
+WARNING 2026-07-11 20:31:13,909 log 16312 19448 Unauthorized: /api/v1/auth/me/
+WARNING 2026-07-11 20:31:13,909 basehttp 16312 19448 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-07-11 20:31:58,497 log 16312 17420 Unauthorized: /api/v1/auth/me/
+WARNING 2026-07-11 20:31:58,498 basehttp 16312 17420 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-07-11 21:34:18,062 log 16312 6124 Unauthorized: /api/v1/auth/me/
+WARNING 2026-07-11 21:34:18,063 basehttp 16312 6124 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-07-11 21:34:18,276 log 16312 8320 Unauthorized: /api/v1/auth/me/
+WARNING 2026-07-11 21:34:18,277 basehttp 16312 8320 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-07-12 10:56:31,874 log 14292 8504 Unauthorized: /api/v1/auth/me/
+WARNING 2026-07-12 10:56:31,876 basehttp 14292 8504 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-07-12 11:24:50,591 log 14292 12596 Unauthorized: /api/v1/auth/me/
+WARNING 2026-07-12 11:24:50,592 basehttp 14292 12596 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-07-12 11:57:01,865 log 9960 6080 Unauthorized: /api/v1/profiles/my/
+WARNING 2026-07-12 11:57:01,866 basehttp 9960 6080 "PUT /api/v1/profiles/my/ HTTP/1.1" 401 291
+WARNING 2026-07-12 22:08:24,088 log 13656 16420 Unauthorized: /api/v1/auth/me/
+WARNING 2026-07-12 22:08:24,088 basehttp 13656 16420 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-07-12 22:08:36,888 log 13656 16332 Unauthorized: /api/v1/auth/me/
+WARNING 2026-07-12 22:08:36,889 basehttp 13656 16332 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-07-13 11:06:57,565 log 6712 14904 Unauthorized: /api/v1/auth/me/
+WARNING 2026-07-13 11:06:57,571 basehttp 6712 14904 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-07-13 11:07:13,751 log 6712 17628 Unauthorized: /api/v1/auth/me/
+WARNING 2026-07-13 11:07:13,758 basehttp 6712 17628 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-07-13 11:38:45,621 log 6712 7032 Bad Request: /api/v1/auth/account-requests/
+WARNING 2026-07-13 11:38:45,621 basehttp 6712 7032 "POST /api/v1/auth/account-requests/ HTTP/1.1" 400 261
+WARNING 2026-07-13 12:07:16,375 log 6712 10864 Unauthorized: /api/v1/auth/me/
+WARNING 2026-07-13 12:07:16,376 basehttp 6712 10864 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-07-13 20:45:34,165 log 11244 22580 Unauthorized: /api/v1/auth/me/
+WARNING 2026-07-13 20:45:34,168 basehttp 11244 22580 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-07-13 20:45:58,356 log 11244 11964 Unauthorized: /api/v1/auth/me/
+WARNING 2026-07-13 20:45:58,356 basehttp 11244 11964 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-07-16 09:04:51,635 log 16164 6300 Unauthorized: /api/v1/auth/me/
+WARNING 2026-07-16 09:04:51,636 basehttp 16164 6300 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-07-16 09:15:53,660 log 16164 20740 Unauthorized: /api/v1/auth/me/
+WARNING 2026-07-16 09:15:53,661 basehttp 16164 20740 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-07-27 10:27:24,755 log 21408 12860 Method Not Allowed: /api/v1/auth/login/
+WARNING 2026-07-28 14:01:20,475 log 22352 4680 Unauthorized: /api/v1/notifications/stats/
+WARNING 2026-07-28 14:01:20,478 basehttp 22352 4680 "GET /api/v1/notifications/stats/ HTTP/1.1" 401 291
+WARNING 2026-07-28 14:01:20,484 log 22352 4680 Unauthorized: /api/v1/notifications/stats/
+WARNING 2026-07-28 14:01:20,487 basehttp 22352 4680 "GET /api/v1/notifications/stats/ HTTP/1.1" 401 291
+WARNING 2026-07-28 14:01:20,492 log 22352 4680 Unauthorized: /api/v1/auth/token/refresh/
+WARNING 2026-07-28 14:01:20,493 basehttp 22352 4680 "POST /api/v1/auth/token/refresh/ HTTP/1.1" 401 160
+WARNING 2026-07-28 14:03:21,983 log 22352 21352 Not Found: /favicon.ico
+WARNING 2026-07-28 14:03:21,984 basehttp 22352 21352 "GET /favicon.ico HTTP/1.1" 404 5355
+WARNING 2026-07-28 14:06:40,036 log 22352 18632 Unauthorized: /api/v1/auth/login/
+WARNING 2026-07-28 14:06:40,037 basehttp 22352 18632 "POST /api/v1/auth/login/ HTTP/1.1" 401 107
+WARNING 2026-07-28 14:23:25,586 log 22352 848 Unauthorized: /api/v1/auth/login/
+WARNING 2026-07-28 14:23:25,586 basehttp 22352 848 "POST /api/v1/auth/login/ HTTP/1.1" 401 112
+WARNING 2026-07-28 14:24:24,934 log 22352 10912 Unauthorized: /api/v1/auth/login/
+WARNING 2026-07-28 14:24:24,935 basehttp 22352 10912 "POST /api/v1/auth/login/ HTTP/1.1" 401 107
+WARNING 2026-07-28 14:24:36,924 log 22352 10912 Unauthorized: /api/v1/auth/login/
+WARNING 2026-07-28 14:24:36,925 basehttp 22352 10912 "POST /api/v1/auth/login/ HTTP/1.1" 401 112
+WARNING 2026-07-28 14:24:40,086 log 22352 10912 Unauthorized: /api/v1/auth/login/
+WARNING 2026-07-28 14:24:40,087 basehttp 22352 10912 "POST /api/v1/auth/login/ HTTP/1.1" 401 112
+WARNING 2026-07-28 14:25:18,555 log 22352 10912 Unauthorized: /api/v1/auth/login/
+WARNING 2026-07-28 14:25:18,556 basehttp 22352 10912 "POST /api/v1/auth/login/ HTTP/1.1" 401 107
+WARNING 2026-07-28 14:25:22,955 log 22352 10912 Unauthorized: /api/v1/auth/login/
+WARNING 2026-07-28 14:25:22,956 basehttp 22352 10912 "POST /api/v1/auth/login/ HTTP/1.1" 401 107
+WARNING 2026-07-28 17:23:42,298 log 5956 17204 Not Found: /favicon.ico
+WARNING 2026-07-28 17:23:42,299 basehttp 5956 17204 "GET /favicon.ico HTTP/1.1" 404 5355
+WARNING 2026-07-28 17:38:16,850 log 5956 9624 Unauthorized: /api/v1/auth/me/
+WARNING 2026-07-28 17:38:16,850 basehttp 5956 9624 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-07-28 17:38:17,969 log 5956 6608 Unauthorized: /api/v1/auth/me/
+WARNING 2026-07-28 17:38:17,973 basehttp 5956 6608 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-08-13 13:41:14,797 log 23384 23172 Unauthorized: /api/v1/auth/me/
+WARNING 2026-08-13 13:41:14,798 basehttp 23384 23172 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-08-13 13:41:14,804 log 23384 23172 Unauthorized: /api/v1/auth/token/refresh/
+WARNING 2026-08-13 13:41:14,805 basehttp 23384 23172 "POST /api/v1/auth/token/refresh/ HTTP/1.1" 401 160
+WARNING 2026-08-13 13:44:55,377 log 15672 24668 Not Found: /favicon.ico
+WARNING 2026-08-13 13:44:55,378 basehttp 15672 24668 "GET /favicon.ico HTTP/1.1" 404 5355
+WARNING 2026-08-13 13:45:13,252 log 15672 21740 Unauthorized: /api/v1/auth/login/
+WARNING 2026-08-13 13:45:13,252 basehttp 15672 21740 "POST /api/v1/auth/login/ HTTP/1.1" 401 107
+WARNING 2026-08-13 13:45:20,926 log 15672 21740 Unauthorized: /api/v1/auth/login/
+WARNING 2026-08-13 13:45:20,927 basehttp 15672 21740 "POST /api/v1/auth/login/ HTTP/1.1" 401 107
+WARNING 2026-08-13 13:45:39,519 log 15672 21740 Unauthorized: /api/v1/auth/login/
+WARNING 2026-08-13 13:45:39,520 basehttp 15672 21740 "POST /api/v1/auth/login/ HTTP/1.1" 401 107
+WARNING 2026-08-13 13:45:41,259 log 15672 21740 Unauthorized: /api/v1/auth/login/
+WARNING 2026-08-13 13:45:41,259 basehttp 15672 21740 "POST /api/v1/auth/login/ HTTP/1.1" 401 107
+WARNING 2026-08-13 13:46:35,267 log 15672 21740 Unauthorized: /api/v1/auth/login/
+WARNING 2026-08-13 13:46:35,267 basehttp 15672 21740 "POST /api/v1/auth/login/ HTTP/1.1" 401 107
+WARNING 2026-08-13 13:46:47,521 log 15672 21740 Unauthorized: /api/v1/auth/login/
+WARNING 2026-08-13 13:46:47,522 basehttp 15672 21740 "POST /api/v1/auth/login/ HTTP/1.1" 401 107
+WARNING 2026-08-13 14:51:59,431 log 15648 13812 Unauthorized: /api/v1/auth/me/
+WARNING 2026-08-13 14:51:59,434 basehttp 15648 13812 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-08-13 14:52:29,585 log 15648 7508 Unauthorized: /api/v1/auth/login/
+WARNING 2026-08-13 14:52:29,585 basehttp 15648 7508 "POST /api/v1/auth/login/ HTTP/1.1" 401 112
+WARNING 2026-08-13 14:52:36,110 log 15648 7508 Unauthorized: /api/v1/auth/login/
+WARNING 2026-08-13 14:52:36,111 basehttp 15648 7508 "POST /api/v1/auth/login/ HTTP/1.1" 401 112
+WARNING 2026-08-13 14:55:29,409 log 15648 9624 Forbidden: /api/v1/profiles/68/
+WARNING 2026-08-13 14:55:29,410 basehttp 15648 9624 "GET /api/v1/profiles/68/ HTTP/1.1" 403 231
+WARNING 2026-08-13 14:57:04,052 log 15648 9624 Forbidden: /api/v1/verification/stats/
+WARNING 2026-08-13 14:57:04,052 basehttp 15648 9624 "GET /api/v1/verification/stats/ HTTP/1.1" 403 231
+WARNING 2026-08-13 14:57:29,463 log 15648 3432 Not Found: /favicon.ico
+WARNING 2026-08-13 14:57:29,463 basehttp 15648 3432 "GET /favicon.ico HTTP/1.1" 404 5355

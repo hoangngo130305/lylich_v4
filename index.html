@@ -18141,7 +18141,7 @@
           }
           // Production environment
           if (hostname === "14.224.210.210" || hostname === "lylich.gov.vn") {
-            return "http://14.224.210.210:8003/api/v1";
+            return "http://14.224.210.210:8006/api/v1";
           }
           // May PC lam server tam thoi (lylich.nhabe.vn) - Caddy reverse-proxy
           // /api/* ve Django tren cung origin HTTPS, nen dung duong dan tuong doi.
@@ -21409,7 +21409,7 @@
             location.port === "5501"
               ? "http://" + (location.hostname || "127.0.0.1") + ":8010/api/v1"
               : location.hostname === "14.224.210.210"
-                ? "http://14.224.210.210:8003/api/v1"
+                ? "http://14.224.210.210:8006/api/v1"
                 : "/api/v1");
           const tok = localStorage.getItem("access_token");
           const resp = await fetch(`${base}/exports/word/${profileId}/`, {
