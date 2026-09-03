@@ -152,6 +152,27 @@ class ResetPasswordConfirmSerializer(serializers.Serializer):
     new_password = serializers.CharField(required=True, min_length=8)
 
 
+class ForgotPasswordRequestSerializer(serializers.Serializer):
+    """Quên mật khẩu — quần chúng tự đặt lại bằng phone + CCCD (2 yếu tố định
+    danh), hệ thống sinh mật khẩu mới và gửi qua email đã đăng ký."""
+    phone = serializers.CharField(required=True)
+    cccd  = serializers.CharField(required=True)
+
+    def validate(self, data):
+        try:
+            self.user = User.objects.get(
+                phone=data['phone'].strip(),
+                cccd=data['cccd'].strip(),
+                is_superuser=False,
+                deleted_at__isnull=True,
+            )
+        except User.DoesNotExist:
+            raise serializers.ValidationError({
+                'phone': 'Không tìm thấy tài khoản khớp với số điện thoại và số CCCD đã nhập.'
+            })
+        return data
+
+
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     username_field = 'phone'
 

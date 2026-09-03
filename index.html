@@ -18476,11 +18476,14 @@
         onmouseover="this.style.background='#6B0000'" onmouseout="this.style.background='#8B0000'">
         Đăng nhập
       </button>
-      <div style="text-align:center;margin-top:14px;font-size:11px;color:#8A99B0">
-        Liên hệ cán bộ BXD Đảng nếu quên mật khẩu
-      </div>
-      <div style="text-align:center;margin-top:10px">
-        <span id="loginChangePassLink" style="cursor:pointer;color:#8B0000;font-weight:700;border-radius:6px;padding:6px 10px;display:inline-block"
+      <div style="text-align:center;margin-top:14px;display:flex;justify-content:center;gap:6px;flex-wrap:wrap">
+        <span style="cursor:pointer;color:#8B0000;font-weight:700;border-radius:6px;padding:6px 10px;display:inline-block;font-size:12px"
+          onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'"
+          onclick="_showForgotPasswordModal()">
+          Quên mật khẩu?
+        </span>
+        <span style="color:#CDD4E0;padding-top:6px">·</span>
+        <span id="loginChangePassLink" style="cursor:pointer;color:#8B0000;font-weight:700;border-radius:6px;padding:6px 10px;display:inline-block;font-size:12px"
           onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'"
           onclick="_showChangePasswordModalFromLogin()">
           Đổi mật khẩu
@@ -18759,6 +18762,116 @@
           if (submitBtn) {
             submitBtn.disabled = false;
             submitBtn.textContent = "Đổi mật khẩu";
+          }
+        }
+      }
+
+      /* ─────────────────────────────────────────────────────────────────────────
+   FORGOT PASSWORD MODAL — no login required; xác thực bằng phone + CCCD,
+   hệ thống sinh mật khẩu mới và gửi qua email đã đăng ký của tài khoản.
+───────────────────────────────────────────────────────────────────────── */
+      function _injectForgotPasswordModal() {
+        if (document.getElementById("forgotPasswordModal")) return;
+        const m = document.createElement("div");
+        m.id = "forgotPasswordModal";
+        m.style.cssText =
+          "position:fixed;inset:0;z-index:9999;background:rgba(12,27,46,.72);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)";
+        m.innerHTML = `
+    <div style="background:#fff;border-radius:14px;padding:26px 28px;width:380px;box-shadow:0 24px 64px rgba(12,27,46,.24);font-family:inherit">
+      <div style="font-size:18px;font-weight:800;color:#0C1B2E;margin-bottom:6px">Quên mật khẩu</div>
+      <div style="font-size:12px;color:#5C6B84;margin-bottom:16px">Nhập số điện thoại và số CCCD đã đăng ký. Hệ thống sẽ tạo mật khẩu mới và gửi vào email đã đăng ký của bạn.</div>
+      <div id="forgotPassErr" style="display:none;background:#FEF2F2;border:1px solid rgba(139,0,0,.2);color:#8B0000;padding:8px 12px;border-radius:7px;font-size:12px;margin-bottom:12px"></div>
+      <div id="forgotPassOk" style="display:none;background:#F0FDF4;border:1px solid rgba(22,101,52,.25);color:#166534;padding:8px 12px;border-radius:7px;font-size:12px;margin-bottom:12px"></div>
+      <label style="font-size:11.5px;font-weight:600;color:#243347;display:block;margin-bottom:4px">Số điện thoại</label>
+      <input id="forgotPassPhone" type="tel" placeholder="0912345678"
+        style="width:100%;padding:10px 12px;border:1.5px solid #CDD4E0;border-radius:8px;font-family:inherit;font-size:13px;margin-bottom:12px;outline:none">
+      <label style="font-size:11.5px;font-weight:600;color:#243347;display:block;margin-bottom:4px">Số CCCD</label>
+      <input id="forgotPassCccd" type="text" maxlength="12" placeholder="12 số trên CCCD"
+        style="width:100%;padding:10px 12px;border:1.5px solid #CDD4E0;border-radius:8px;font-family:inherit;font-size:13px;margin-bottom:16px;outline:none"
+        onkeydown="if(event.key==='Enter') _submitForgotPassword()">
+      <div style="display:flex;gap:8px">
+        <button id="forgotPassCancelBtn" onclick="_hideForgotPasswordModal()" style="flex:1;padding:10px;border:1px solid #CDD4E0;background:#fff;border-radius:8px;color:#243347;font-weight:700;cursor:pointer;font-family:inherit">Đóng</button>
+        <button id="forgotPassSubmitBtn" onclick="_submitForgotPassword()" style="flex:1;padding:10px;background:#8B0000;color:#fff;border:none;border-radius:8px;font-weight:700;cursor:pointer;font-family:inherit">Gửi mật khẩu mới</button>
+      </div>
+    </div>`;
+        document.body.appendChild(m);
+      }
+
+      function _showForgotPasswordModal() {
+        _injectForgotPasswordModal();
+        const modal = document.getElementById("forgotPasswordModal");
+        const err = document.getElementById("forgotPassErr");
+        const ok = document.getElementById("forgotPassOk");
+        if (err) {
+          err.style.display = "none";
+          err.textContent = "";
+        }
+        if (ok) {
+          ok.style.display = "none";
+          ok.textContent = "";
+        }
+        const phoneInput = document.getElementById("forgotPassPhone");
+        if (phoneInput)
+          phoneInput.value =
+            document.getElementById("loginPhone")?.value?.trim() || "";
+        const cccdInput = document.getElementById("forgotPassCccd");
+        if (cccdInput) cccdInput.value = "";
+        if (modal) modal.style.display = "flex";
+      }
+
+      function _hideForgotPasswordModal() {
+        const m = document.getElementById("forgotPasswordModal");
+        if (m) m.style.display = "none";
+      }
+
+      async function _submitForgotPassword() {
+        const phone = document.getElementById("forgotPassPhone")?.value?.trim() || "";
+        const cccd = document.getElementById("forgotPassCccd")?.value?.trim() || "";
+        const err = document.getElementById("forgotPassErr");
+        const ok = document.getElementById("forgotPassOk");
+        const btn = document.getElementById("forgotPassSubmitBtn");
+        if (err) {
+          err.style.display = "none";
+          err.textContent = "";
+        }
+        if (ok) {
+          ok.style.display = "none";
+          ok.textContent = "";
+        }
+        if (!phone || !cccd) {
+          if (err) {
+            err.textContent = "Vui lòng nhập đầy đủ số điện thoại và số CCCD.";
+            err.style.display = "block";
+          }
+          return;
+        }
+        if (btn) {
+          btn.disabled = true;
+          btn.textContent = "Đang xử lý…";
+        }
+        try {
+          const resp = await API.post(
+            "/auth/forgot-password/",
+            { phone, cccd },
+            { retry: false },
+          );
+          const data = resp.data || resp;
+          if (ok) {
+            ok.textContent =
+              data.message || "Đã gửi mật khẩu mới tới email đã đăng ký.";
+            ok.style.display = "block";
+          }
+          const cancelBtn = document.getElementById("forgotPassCancelBtn");
+          if (cancelBtn) cancelBtn.textContent = "Đóng";
+        } catch (e) {
+          if (err) {
+            err.textContent = e.message || "Yêu cầu thất bại.";
+            err.style.display = "block";
+          }
+        } finally {
+          if (btn) {
+            btn.disabled = false;
+            btn.textContent = "Gửi mật khẩu mới";
           }
         }
       }

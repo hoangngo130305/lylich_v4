@@ -20,7 +20,8 @@ from .serializers import (
     CustomTokenObtainPairSerializer, SuperAdminLoginSerializer,
     RegisterSerializer, UserDetailSerializer,
     ChangePasswordSerializer, ResetPasswordRequestSerializer,
-    ResetPasswordConfirmSerializer, AccountRequestSerializer,
+    ResetPasswordConfirmSerializer, ForgotPasswordRequestSerializer,
+    AccountRequestSerializer,
     AccountRequestCreateSerializer, LoginHistorySerializer, UserPublicSerializer,
     OfficerPermissionSerializer, OfficerCreateSerializer, OfficerUpdateSerializer,
 )
@@ -141,6 +142,69 @@ class PasswordResetConfirmView(generics.GenericAPIView):
         reset.used_at = timezone.now()
         reset.save(update_fields=['used_at'])
         return Response({'success': True, 'message': 'Đặt lại mật khẩu thành công.'})
+
+
+def _generate_random_password(length=12):
+    alphabet = string.ascii_letters + string.digits + '@#$%'
+    return ''.join(secrets.choice(alphabet) for _ in range(length))
+
+
+def _mask_email(email):
+    name, _, domain = email.partition('@')
+    if not domain:
+        return email
+    visible = name[:2] if len(name) > 2 else name[:1]
+    return f"{visible}{'*' * max(len(name) - len(visible), 1)}@{domain}"
+
+
+class ForgotPasswordView(generics.GenericAPIView):
+    """Quên mật khẩu (không cần đăng nhập): xác thực bằng phone + CCCD, sinh
+    mật khẩu mới và gửi qua email đã đăng ký của tài khoản. Mật khẩu trong DB
+    chỉ được cập nhật SAU KHI gửi email thành công — tránh trường hợp đổi
+    mật khẩu xong nhưng email gửi thất bại khiến người dùng bị khoá tài khoản
+    ngoài ý muốn."""
+    serializer_class = ForgotPasswordRequestSerializer
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.user
+
+        if not user.email:
+            raise ValidationError({
+                'email': 'Tài khoản chưa có email đăng ký. Vui lòng liên hệ cán bộ Ban Xây dựng Đảng để được hỗ trợ đặt lại mật khẩu.'
+            })
+        if not settings.EMAIL_HOST_USER or not settings.EMAIL_HOST_PASSWORD:
+            raise ValidationError({'email': 'Hệ thống chưa cấu hình gửi email. Vui lòng liên hệ cán bộ hỗ trợ.'})
+
+        new_password = _generate_random_password()
+        subject = 'Đặt lại mật khẩu hệ thống kê khai lý lịch'
+        body = (
+            f"Kính gửi {user.full_name},\n\n"
+            "Hệ thống vừa nhận được yêu cầu đặt lại mật khẩu cho tài khoản của bạn.\n"
+            f"Số điện thoại đăng nhập: {user.phone}\n"
+            f"Mật khẩu mới: {new_password}\n\n"
+            "Vui lòng đăng nhập và đổi mật khẩu ngay sau khi đăng nhập.\n"
+            "Nếu không phải bạn yêu cầu, vui lòng liên hệ ngay cán bộ Ban Xây dựng Đảng để được hỗ trợ.\n\n"
+            "Trân trọng."
+        )
+        from_email = settings.DEFAULT_FROM_EMAIL or settings.EMAIL_HOST_USER
+        try:
+            send_mail(subject, body, from_email, [user.email], fail_silently=False)
+        except Exception as e:
+            raise ValidationError({'email': f'Gửi email thất bại: {e}'})
+
+        # Only persist the new password once the email has actually gone out.
+        user.set_password(new_password)
+        user.save(update_fields=['password'])
+        log_activity(user, 'forgot_password_reset', target_model='User', target_id=user.id,
+                     description='Tự đặt lại mật khẩu qua chức năng Quên mật khẩu', request=request)
+
+        return Response({
+            'success': True,
+            'message': f'Đã gửi mật khẩu mới tới email {_mask_email(user.email)}.'
+        })
 
 
 # ── Officer: User management ─────────────────────────────────────────────────

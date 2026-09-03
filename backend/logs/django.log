@@ -11496,3 +11496,7 @@ WARNING 2026-08-13 14:57:04,052 log 15648 9624 Forbidden: /api/v1/verification/s
 WARNING 2026-08-13 14:57:04,052 basehttp 15648 9624 "GET /api/v1/verification/stats/ HTTP/1.1" 403 231
 WARNING 2026-08-13 14:57:29,463 log 15648 3432 Not Found: /favicon.ico
 WARNING 2026-08-13 14:57:29,463 basehttp 15648 3432 "GET /favicon.ico HTTP/1.1" 404 5355
+WARNING 2026-09-03 15:05:10,405 log 16916 21028 Bad Request: /api/v1/auth/forgot-password/
+WARNING 2026-09-03 15:05:23,607 log 7572 22772 Bad Request: /api/v1/auth/forgot-password/
+WARNING 2026-09-03 15:05:24,103 log 7572 22772 Bad Request: /api/v1/auth/forgot-password/
+WARNING 2026-09-03 15:05:24,601 log 7572 22772 Bad Request: /api/v1/auth/forgot-password/
