@@ -5971,6 +5971,7 @@
                         <input
                           type="text"
                           id="hoTen"
+                          autocomplete="off"
                           placeholder="VD: NGUYỄN VĂN ANH"
                           style="text-transform: uppercase"
                           onblur="this.value = this.value.toUpperCase(); validateField(this, 'required')"
@@ -5989,6 +5990,7 @@
                       <input
                         type="text"
                         id="hoTenKhac"
+                        autocomplete="off"
                         placeholder="(Để trống nếu không có)"
                       />
                     </div>
@@ -6003,6 +6005,7 @@
                         <input
                           type="text"
                           id="ngaySinh"
+                          autocomplete="off"
                           placeholder="DD/MM/YYYY"
                           maxlength="10"
                           onblur="validateDOB(this)"
@@ -6110,6 +6113,7 @@
                     <input
                       type="text"
                       id="birthPlaceDetail"
+                      autocomplete="off"
                       style="margin-top: 6px"
                       placeholder="Địa danh cũ (nếu đã thay đổi): VD: xã Nhà Bè, huyện Nhà Bè, tỉnh Gia Định cũ"
                     />
@@ -6143,6 +6147,7 @@
                     <input
                       type="text"
                       id="queQuan"
+                      autocomplete="off"
                       style="margin-top: 6px"
                       placeholder="Địa chỉ quê quán đầy đủ (xã/phường, huyện/quận, tỉnh/TP)"
                     />
@@ -6171,6 +6176,7 @@
                     <div class="loc-detail-row">
                       <textarea
                         id="soNhaTT"
+                        autocomplete="off"
                         rows="1"
                         placeholder="Số nhà / Lô"
                         style="resize: none; overflow: hidden; min-height: 38px"
@@ -6182,6 +6188,7 @@
                       ></textarea>
                       <textarea
                         id="tenDuongTT"
+                        autocomplete="off"
                         rows="1"
                         placeholder="Tên đường / ấp / thôn"
                         style="resize: none; overflow: hidden; min-height: 38px"
@@ -6194,6 +6201,7 @@
                     </div>
                     <textarea
                       id="noiO"
+                      autocomplete="off"
                       rows="1"
                       style="
                         margin-top: 6px;
@@ -6236,6 +6244,7 @@
                     <div class="loc-detail-row">
                       <textarea
                         id="soNhaTX"
+                        autocomplete="off"
                         rows="1"
                         placeholder="Số nhà / Lô"
                         style="resize: none; overflow: hidden; min-height: 38px"
@@ -6247,6 +6256,7 @@
                       ></textarea>
                       <textarea
                         id="tenDuongTX"
+                        autocomplete="off"
                         rows="1"
                         placeholder="Tên đường / ấp / thôn"
                         style="resize: none; overflow: hidden; min-height: 38px"
@@ -6259,6 +6269,7 @@
                     </div>
                     <textarea
                       id="tamTru"
+                      autocomplete="off"
                       rows="1"
                       style="
                         margin-top: 6px;
@@ -6383,6 +6394,7 @@
                   <input
                     type="text"
                     id="ngheNghiep"
+                    autocomplete="off"
                     placeholder="Công nhân / Viên chức / Giáo viên / Sinh viên …"
                   />
                 </div>
@@ -9958,6 +9970,17 @@
       // Split a previously-saved combined address into the sub-inputs on load,
       // so a later edit to just one of them doesn't wipe out the rest of it.
       function _seedAddrFromLoaded(fullText, numInput, streetInput, addrEl) {
+        // Always called right after freshly loading a profile/family member
+        // from the server (never while the user is actively typing), so the
+        // sub-fields must always be set from what was just loaded — never
+        // gated on "only if currently empty". That guard used to leave a
+        // previous account's leftover value in place even after the correct
+        // new value had loaded elsewhere on the same form (e.g. address
+        // number/street staying stale while the combined address field
+        // showed the right data) — clear them first so a genuinely blank
+        // fullText (no address on file) doesn't leave old text behind either.
+        if (numInput) numInput.value = "";
+        if (streetInput) streetInput.value = "";
         const text = (fullText || "").trim();
         if (!text || !addrEl) return;
         const segs = text
@@ -9965,11 +9988,11 @@
           .map((s) => s.trim())
           .filter(Boolean);
         if (segs.length >= 2) {
-          if (numInput && !numInput.value) numInput.value = segs[0];
-          if (streetInput && !streetInput.value) streetInput.value = segs[1];
+          if (numInput) numInput.value = segs[0];
+          if (streetInput) streetInput.value = segs[1];
           addrEl.dataset.legacyTail = segs.slice(2).join(", ");
         } else if (segs.length === 1) {
-          if (streetInput && !streetInput.value) streetInput.value = segs[0];
+          if (streetInput) streetInput.value = segs[0];
           addrEl.dataset.legacyTail = "";
         }
         _autoGrowAddrTa(numInput);
@@ -12117,7 +12140,11 @@
           ).toLowerCase();
           if (lbl.includes("nghề nghiệp")) {
             const i = row.querySelector("input[type=text],input:not([type])");
-            if (i && !i.value) i.value = m.occupation || "";
+            // Always overwrite from the just-loaded data (same reasoning as
+            // _seedAddrFromLoaded) — this runs on load, never while typing,
+            // so gating on "only if currently empty" can leave a previous
+            // account's leftover occupation text in place.
+            if (i) i.value = m.occupation || "";
           }
         });
         const childSchoolInp = body.querySelector("input.child-school-inp");
@@ -14745,6 +14772,10 @@
 
       // ===== DETAIL PANEL =====
       async function openDetailById(profileId) {
+        // Shares openProfileEdit's generation token — same "officer clicked
+        // into a different profile before this one's fetch finished" race,
+        // see that variable's comment.
+        const myGen = ++_openProfileEditGen;
         _currentDetailProfileId = profileId;
         document.getElementById("detailPanel").classList.add("open");
         document.getElementById("overlay").style.display = "block";
@@ -14754,6 +14785,7 @@
           '<span class="pill pill-draft">…</span>';
         try {
           const resp = await API.get(`/profiles/${profileId}/`);
+          if (myGen !== _openProfileEditGen) return; // a newer profile was opened meanwhile
           const p = resp.data || resp;
           _currentDetailUserId = p.user?.id || null;
           document.getElementById("detailName").textContent =
@@ -14796,6 +14828,7 @@
           // Load workflow review history for the mini-timeline
           try {
             const revResp = await API.get(`/profiles/${profileId}/reviews/`);
+            if (myGen !== _openProfileEditGen) return; // a newer profile was opened meanwhile
             const reviews = Array.isArray(revResp)
               ? revResp
               : revResp.results || revResp.data || [];
@@ -15166,8 +15199,7 @@
         }
       }
 
-      function resetAccForm() {
-        if (!confirm("Hủy điền mẫu? Tất cả dữ liệu sẽ bị xóa.")) return;
+      function _clearAccFormFields() {
         document.getElementById("accName").value = "";
         document.getElementById("accCCCD").value = "";
         document.getElementById("accDOB").value = "";
@@ -15177,6 +15209,11 @@
         document.getElementById("accDangBo").value = "";
         document.getElementById("chkEmail").checked = true;
         goToAccStep(1);
+      }
+
+      function resetAccForm() {
+        if (!confirm("Hủy điền mẫu? Tất cả dữ liệu sẽ bị xóa.")) return;
+        _clearAccFormFields();
       }
 
       function updateAccReview() {
@@ -15236,7 +15273,7 @@
           addActivity(
             `🔑 Cấp tài khoản mới cho <strong>${name}</strong> – CCCD ${cccd}`,
           );
-          resetAccForm();
+          _clearAccFormFields();
           _loadRecentAccounts();
         } catch (e) {
           console.error("[DEBUG] account creation error:", e);
@@ -15487,6 +15524,14 @@
       // ═══════════════════════════════════════════════════════
 
       let currentEditProfile = { name: "", score: 94 };
+      // Bumped on every openProfileEdit() call; lets that call recognize when
+      // a *newer* call has since started (officer clicked into another
+      // profile before this one's fetches finished) so it can stop short of
+      // painting its now-stale response over the newer profile — without
+      // this, a slow response for profile A that resolves after a fast
+      // response for profile B ends up overwriting B's freshly-loaded data
+      // with A's on screen, even though B is the one actually open.
+      let _openProfileEditGen = 0;
       let editHistoryLog = []; // [{field, oldVal, newVal, by, ts}]
       let flaggedSections = new Set();
       let _flagSectionNotes = {};
@@ -15546,6 +15591,11 @@
 
       // Open the edit page for a given profile (by ID preferred)
       async function openProfileEdit(nameOrId, score, status) {
+        // See _openProfileEditGen's comment: if a newer call starts while
+        // this one is still awaiting its fetches, this call's `myGen` will
+        // no longer match by the time those fetches resolve, and it bails
+        // out before writing anything to the DOM.
+        const myGen = ++_openProfileEditGen;
         showAdminPageByName("pgProfileEdit");
         const t = document.getElementById("editProfileTitle");
         if (t) t.textContent = "⏳";
@@ -15565,6 +15615,7 @@
         if (profileId) {
           try {
             const resp = await API.get(`/profiles/${profileId}/`);
+            if (myGen !== _openProfileEditGen) return; // a newer profile was opened meanwhile
             const p = resp.data || resp;
             currentEditProfile = {
               id: p.id,
@@ -15685,6 +15736,7 @@
               API.get(`/family/${profileId}/members/`),
               API.get(`/uploads/files/?profile_id=${profileId}`),
             ]);
+            if (myGen !== _openProfileEditGen) return; // a newer profile was opened meanwhile
 
             // Render Section B — personal history rows
             const tlBody = document.getElementById("timeline-esB");
@@ -15793,6 +15845,7 @@
                           r,
                         ) => `<div class="timeline-edit-row" data-id="${_esc(String(r.id || ""))}">
                     <textarea rows="1" placeholder="Trường" oninput="_autoResizeNote(this)" onfocus="_autoResizeNote(this)">${_esc(r.school || "")}</textarea>
+                    <textarea rows="1" placeholder="Ngành học / Hình thức học" oninput="_autoResizeNote(this)" onfocus="_autoResizeNote(this)">${_esc(r.major || "")}</textarea>
                     <input value="${_esc(r.period_text || "")}" placeholder="Thời gian">
                     <input value="${_esc(r.certificate || "")}" placeholder="Bằng cấp">
                     <button class="del-row-btn" onclick="this.closest('.timeline-edit-row').remove()">✕</button>
@@ -16359,6 +16412,10 @@
 
       // Enter review-only mode for can_bo_bxd — direct DOM manipulation for reliability
       async function _enterAdminReviewMode(profileId) {
+        // Captured (not incremented) — this function is always invoked as
+        // part of an in-progress openProfileEdit() call, so it shares that
+        // call's generation token; see _openProfileEditGen's comment.
+        const myGen = _openProfileEditGen;
         _reviewProfileId = profileId;
         const pg = document.getElementById("pgProfileEdit");
         if (!pg) return;
@@ -16444,7 +16501,13 @@
           container
             .querySelectorAll(".timeline-edit-row")
             .forEach((row, idx) => {
-              const key = `${keyPrefix}-row-${idx}`;
+              // Prefer a stable id-based key (survives the citizen adding/
+              // removing/reordering rows later) over the plain positional
+              // one — see _resolveNoteRow's comment for why this matters.
+              const stableId = row.dataset.id;
+              const key = stableId
+                ? `${keyPrefix}-id-${stableId}`
+                : `${keyPrefix}-row-${idx}`;
               const bar = document.createElement("div");
               bar.className = "tl-row-note-bar";
               bar.dataset.rowKey = key;
@@ -16537,6 +16600,7 @@
         // ── Load and populate existing notes ──
         try {
           const resp = await API.get(`/profiles/${profileId}/field-notes/`);
+          if (myGen !== _openProfileEditGen) return; // a newer profile was opened meanwhile
           const notes = Array.isArray(resp) ? resp : resp.data || [];
           _fieldNotes = {};
           notes.forEach((n) => {
@@ -16907,8 +16971,9 @@
             .map((r) => ({
               id: r.id,
               school: r._vals[0] || "",
-              period_text: r._vals[1] || null,
-              certificate: r._vals[2] || null,
+              major: r._vals[1] || null,
+              period_text: r._vals[2] || null,
+              certificate: r._vals[3] || null,
             }))
             .filter((r) => r.school);
           const travelRows = _collectAdminTimeline("timeline-esF")
@@ -18269,7 +18334,11 @@
             } catch (refreshErr) {
               log("Refresh failed, clearing session:", refreshErr.message);
               token.clear();
-              _showLoginModal();
+              // Full navigation, not just re-showing the modal — otherwise
+              // stale JS/DOM state from this account can bleed into the
+              // next account that logs in on this same tab (see
+              // _hardResetToLogin's comment for details).
+              _hardResetToLogin("Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại.");
               throw new Error("session_expired");
             }
           }
@@ -18278,7 +18347,7 @@
           if (res.status === 401) {
             log("Still 401 after retry — forcing re-login.");
             token.clear();
-            _showLoginModal();
+            _hardResetToLogin("Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại.");
             throw new Error("unauthorized");
           }
 
@@ -18717,7 +18786,6 @@
             "Đổi mật khẩu thành công. Bạn sẽ bị đăng xuất — tiếp tục?",
           );
           if (doLogout) {
-            showToast("✅ Đã đổi mật khẩu thành công — đang đăng xuất...");
             try {
               await API.logout();
             } catch (le) {
@@ -18726,7 +18794,11 @@
                 le.message || le,
               );
             }
-            _showLoginModal();
+            // Full navigation (not just re-showing the modal) — the user was
+            // actively logged in with their own data already loaded into the
+            // DOM, so this must wipe it clean before anyone logs in again on
+            // this same tab (see _hardResetToLogin's comment for details).
+            _hardResetToLogin("✅ Đã đổi mật khẩu thành công — đang đăng xuất...");
             return;
           } else {
             showToast("✅ Đổi mật khẩu thành công. Bạn vẫn đang đăng nhập.");
@@ -20021,7 +20093,12 @@
       /* ─────────────────────────────────────────────────────────────────────────
    USER INFO MODAL
 ───────────────────────────────────────────────────────────────────────── */
+      let _openUserInfoGen = 0;
       async function _openUserInfo(userId) {
+        // Same "clicked into another one before this fetch finished" race
+        // as openProfileEdit/openDetailById — own counter since this modal
+        // is opened independently of those.
+        const myGen = ++_openUserInfoGen;
         const modal = document.getElementById("userInfoModal");
         const body = document.getElementById("userInfoBody");
         if (!modal || !body) return;
@@ -20029,6 +20106,7 @@
         body.innerHTML = "⏳ Đang tải thông tin...";
         try {
           const resp = await API.get(`/auth/users/${userId}/`);
+          if (myGen !== _openUserInfoGen) return; // a newer user was opened meanwhile
           const u = resp.data || resp;
           const created = u.created_at ? _fmtDate(u.created_at) : "—";
           const lastLogin = u.last_login_at
@@ -20661,6 +20739,30 @@
         "fi-esK-date": "secK",
       };
 
+      // Resolve which citizen-side row a timeline note belongs to. Prefers
+      // a stable "<prefix>-id-<rowId>" key (matched by data-id, immune to
+      // rows being added/removed/reordered after the note was written);
+      // falls back to the legacy "<prefix>-row-<index>" positional key for
+      // notes saved before that stable form existed. Without the id-based
+      // form, editing the timeline at all (even unrelated rows) could shift
+      // every later row's index and leave old notes attached to the wrong
+      // period — see esD's per-member/per-history notes, which already used
+      // a stable id and never had this problem.
+      function _resolveNoteRow(tbodyId, key, prefix) {
+        const tbody = document.getElementById(tbodyId);
+        if (!tbody) return null;
+        const dataRows = [...tbody.querySelectorAll("tr:not(.fam-hist-note-row)")];
+        const idMatch = key.match(new RegExp(`^${prefix}-id-(\\d+)$`));
+        if (idMatch) {
+          return dataRows.find((tr) => tr.dataset.id === idMatch[1]) || null;
+        }
+        const rowMatch = key.match(new RegExp(`^${prefix}-row-(\\d+)$`));
+        if (rowMatch) {
+          return dataRows[parseInt(rowMatch[1], 10)] || null;
+        }
+        return null;
+      }
+
       async function _showCitizenFieldNotes(profileId) {
         // Remove old banners
         document
@@ -20694,14 +20796,9 @@
             }
 
             // Per-row: Part B timeline
-            if (key.startsWith("esB-tl-row-")) {
-              const idx = parseInt(key.replace("esB-tl-row-", ""), 10);
-              const tbody = document.getElementById("tbB-body");
-              if (tbody && !isNaN(idx)) {
-                const dataRows = [
-                  ...tbody.querySelectorAll("tr:not(.fam-hist-note-row)"),
-                ];
-                const targetTr = dataRows[idx];
+            if (key.startsWith("esB-tl-row-") || key.startsWith("esB-tl-id-")) {
+              {
+                const targetTr = _resolveNoteRow("tbB-body", key, "esB-tl");
                 if (targetTr) {
                   const descCellB = targetTr.cells[2];
                   if (descCellB) {
@@ -20719,14 +20816,9 @@
             }
 
             // Per-row: Part C work history
-            if (key.startsWith("esC-work-row-")) {
-              const idx = parseInt(key.replace("esC-work-row-", ""), 10);
-              const tbody = document.getElementById("tbC-body");
-              if (tbody && !isNaN(idx)) {
-                const dataRows = [
-                  ...tbody.querySelectorAll("tr:not(.fam-hist-note-row)"),
-                ];
-                const targetTr = dataRows[idx];
+            if (key.startsWith("esC-work-row-") || key.startsWith("esC-work-id-")) {
+              {
+                const targetTr = _resolveNoteRow("tbC-body", key, "esC-work");
                 if (targetTr) {
                   const descCellC = targetTr.cells[2];
                   if (descCellC) {
@@ -20744,14 +20836,9 @@
             }
 
             // Per-row: Đào tạo, bồi dưỡng — note shown inside column 2 (ngành học cell), like Phần C
-            if (key.startsWith("esEdu-row-")) {
-              const idx = parseInt(key.replace("esEdu-row-", ""), 10);
-              const tbody = document.getElementById("tbE-body");
-              if (tbody && !isNaN(idx)) {
-                const dataRows = [
-                  ...tbody.querySelectorAll("tr:not(.fam-hist-note-row)"),
-                ];
-                const targetTr = dataRows[idx];
+            if (key.startsWith("esEdu-row-") || key.startsWith("esEdu-id-")) {
+              {
+                const targetTr = _resolveNoteRow("tbE-body", key, "esEdu");
                 if (targetTr) {
                   const majorCellE = targetTr.cells[1];
                   if (majorCellE) {
@@ -20769,14 +20856,9 @@
             }
 
             // Per-row: E Khen thưởng — note shown inside column 2 (reason cell), like Phần C
-            if (key.startsWith("esE-row-")) {
-              const idx = parseInt(key.replace("esE-row-", ""), 10);
-              const tbody = document.getElementById("tbG-body");
-              if (tbody && !isNaN(idx)) {
-                const dataRows = [
-                  ...tbody.querySelectorAll("tr:not(.fam-hist-note-row)"),
-                ];
-                const targetTr = dataRows[idx];
+            if (key.startsWith("esE-row-") || key.startsWith("esE-id-")) {
+              {
+                const targetTr = _resolveNoteRow("tbG-body", key, "esE");
                 if (targetTr) {
                   const reasonCellG = targetTr.cells[1];
                   if (reasonCellG) {
@@ -20794,14 +20876,9 @@
             }
 
             // Per-row: F Đi nước ngoài — note shown inside column 2 (nội dung đi cell), like Phần C
-            if (key.startsWith("esFT-row-")) {
-              const idx = parseInt(key.replace("esFT-row-", ""), 10);
-              const tbody = document.getElementById("tbF-body");
-              if (tbody && !isNaN(idx)) {
-                const dataRows = [
-                  ...tbody.querySelectorAll("tr:not(.fam-hist-note-row)"),
-                ];
-                const targetTr = dataRows[idx];
+            if (key.startsWith("esFT-row-") || key.startsWith("esFT-id-")) {
+              {
+                const targetTr = _resolveNoteRow("tbF-body", key, "esFT");
                 if (targetTr) {
                   const contentCellF = targetTr.cells[1];
                   if (contentCellF) {
@@ -20819,14 +20896,9 @@
             }
 
             // Per-row: H Kỷ luật — note shown inside column 2 (lý do sai phạm cell), like Phần C
-            if (key.startsWith("esH-row-")) {
-              const idx = parseInt(key.replace("esH-row-", ""), 10);
-              const tbody = document.getElementById("tbH-body");
-              if (tbody && !isNaN(idx)) {
-                const dataRows = [
-                  ...tbody.querySelectorAll("tr:not(.fam-hist-note-row)"),
-                ];
-                const targetTr = dataRows[idx];
+            if (key.startsWith("esH-row-") || key.startsWith("esH-id-")) {
+              {
+                const targetTr = _resolveNoteRow("tbH-body", key, "esH");
                 if (targetTr) {
                   const reasonCellH = targetTr.cells[1];
                   if (reasonCellH) {
@@ -21874,17 +21946,32 @@
       /* ─────────────────────────────────────────────────────────────────────────
    LOGOUT
 ───────────────────────────────────────────────────────────────────────── */
+      // Full page NAVIGATION (not just re-showing the login modal, and not
+      // just location.reload()) so every in-memory JS value (profile id,
+      // cached family-member ids, address sub-fields, etc.) from the
+      // outgoing session is wiped clean before the next account logs in on
+      // this same tab. Without this, stale DOM/JS state from the previous
+      // account can bleed into the next account's form (e.g. an address
+      // sub-field left non-empty never gets overwritten by the new
+      // account's data — see _seedAddrFromLoaded).
+      //
+      // Deliberately navigates via location.href rather than
+      // location.reload(): some browsers try to "restore" the values that
+      // were sitting in form fields at the moment of a reload (matched by
+      // DOM position, not by name/id), which can re-leak the outgoing
+      // account's data right back in even though the page reloaded. A
+      // plain navigation to the same URL does not trigger that restore.
+      function _hardResetToLogin(message) {
+        if (message) showToast(message);
+        setTimeout(() => {
+          window.location.href =
+            window.location.pathname + window.location.search;
+        }, 600);
+      }
+
       async function apiLogout() {
         await API.logout();
-        showToast("Đã đăng xuất");
-        // Full page reload — not just re-showing the login modal — so every
-        // in-memory JS value (profile id, cached family-member ids, address
-        // sub-fields, etc.) from the outgoing session is wiped clean before
-        // the next account logs in on this same tab. Without this, stale
-        // DOM/JS state from the previous account can bleed into the next
-        // account's form (e.g. an address sub-field left non-empty never
-        // gets overwritten by the new account's data — see _seedAddrFromLoaded).
-        setTimeout(() => window.location.reload(), 600);
+        _hardResetToLogin("Đã đăng xuất");
       }
 
       /* ─────────────────────────────────────────────────────────────────────────

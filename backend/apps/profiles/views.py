@@ -144,12 +144,26 @@ class MyProfileView(generics.RetrieveUpdateAPIView):
         return ProfileDetailSerializer
 
     def get_object(self):
+        try:
+            return Profile.objects.get(user=self.request.user)
+        except Profile.DoesNotExist:
+            pass
+
+        # First access: carry over the DOB the officer entered when creating
+        # this account (stored on AccountRequest, since User has no dob field)
+        # instead of always defaulting to a placeholder date.
+        from apps.accounts.models import AccountRequest
+        req = AccountRequest.objects.filter(
+            created_user=self.request.user
+        ).order_by('-created_at').first()
+        dob = req.dob.isoformat() if req and req.dob else '1990-01-01'
+
         profile, _ = Profile.objects.get_or_create(
             user=self.request.user,
             defaults={
                 'full_name': self.request.user.full_name,
                 'gender': 'male',
-                'dob': '1990-01-01',
+                'dob': dob,
                 'status': Profile.Status.DRAFT,
                 'created_by': self.request.user,
             }

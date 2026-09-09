@@ -2,6 +2,15 @@
 import os
 import sys
 
+# On Windows, the console's default codepage (cp1252) can't encode many
+# Vietnamese characters (e.g. "Đ"), so any print() of Vietnamese text
+# crashes with UnicodeEncodeError instead of just printing — which turns
+# innocuous debug logging (e.g. in the DOCX export view) into a 500 error.
+# Force UTF-8 stdout/stderr so logging can never crash a request.
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+
 
 def main():
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings.development')
