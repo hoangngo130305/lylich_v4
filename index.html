@@ -5421,10 +5421,18 @@
         grid-template-columns: 128px 1fr 120px 28px;
         align-items: start;
       }
-      /* Đào tạo, bồi dưỡng: give school the wide column */
+      /* Đào tạo, bồi dưỡng: keep all four data columns balanced */
       #timeline-esE .timeline-edit-row {
-        grid-template-columns: 1fr 130px 160px 28px;
+        grid-template-columns: repeat(4, minmax(0, 1fr)) 28px;
         align-items: start;
+      }
+      #timeline-esE .timeline-edit-row textarea,
+      #timeline-esE .timeline-edit-row input {
+        min-width: 0;
+        overflow-wrap: anywhere;
+      }
+      #timeline-esE .timeline-edit-row .del-row-btn {
+        grid-column: 5;
       }
       /* Đi nước ngoài / Khen thưởng / Kỷ luật: give the content/description
          column (2nd) the wide column instead of falling back to the generic
@@ -5526,6 +5534,12 @@
         .edit-profile-actions .btn {
           flex: 1;
           justify-content: center;
+        }
+        #timeline-esE .timeline-edit-row {
+          grid-template-columns: repeat(2, minmax(0, 1fr)) 28px;
+        }
+        #timeline-esE .timeline-edit-row .del-row-btn {
+          grid-column: 3;
         }
       }
       @media (max-width: 480px) {
@@ -5758,7 +5772,11 @@
               <div class="sidebar-user-role">Quần chúng</div>
             </div>
           </div>
-          <div class="sidebar-user-party" id="sidebarUserParty" style="display:none">
+          <div
+            class="sidebar-user-party"
+            id="sidebarUserParty"
+            style="display: none"
+          >
             <div>Chi bộ: <b id="sidebarUserChiBo">—</b></div>
             <div>Đảng bộ: <b id="sidebarUserDangBo">—</b></div>
           </div>
@@ -5974,7 +5992,10 @@
                           autocomplete="off"
                           placeholder="VD: NGUYỄN VĂN ANH"
                           style="text-transform: uppercase"
-                          onblur="this.value = this.value.toUpperCase(); validateField(this, 'required')"
+                          onblur="
+                            this.value = this.value.toUpperCase();
+                            validateField(this, 'required');
+                          "
                         />
                         <div class="error-msg" id="err-hoTen">
                           Vui lòng nhập họ và tên khai sinh
@@ -7621,7 +7642,9 @@
                       <tr>
                         <th style="width: 18%">Tháng/Năm</th>
                         <th>Lý do và hình thức khen thưởng</th>
-                        <th style="width: 24%" data-expand="1">Cấp quyết định</th>
+                        <th style="width: 24%" data-expand="1">
+                          Cấp quyết định
+                        </th>
                         <th style="width: 40px"></th>
                       </tr>
                     </thead>
@@ -7680,7 +7703,9 @@
                       <tr>
                         <th style="width: 18%">Tháng/Năm</th>
                         <th>Lý do sai phạm và hình thức kỷ luật</th>
-                        <th style="width: 24%" data-expand="1">Cấp quyết định</th>
+                        <th style="width: 24%" data-expand="1">
+                          Cấp quyết định
+                        </th>
                         <th style="width: 40px"></th>
                       </tr>
                     </thead>
@@ -8578,7 +8603,11 @@
                   >
                     Zalo OA
                   </div>
-                  <div class="channel-tab" data-channel="sms" onclick="switchChannel('sms', this)">
+                  <div
+                    class="channel-tab"
+                    data-channel="sms"
+                    onclick="switchChannel('sms', this)"
+                  >
                     SMS
                   </div>
                   <div
@@ -11449,7 +11478,7 @@
         9: "me_chong_vo",
         10: "vo_chong",
         11: "con",
-        "10.1": "vo_ke",
+        10.1: "vo_ke",
         12: "con",
         14: "ong_noi_chong_vo",
         15: "ba_noi_chong_vo",
@@ -12048,7 +12077,12 @@
             // .fam-addr-street holds "Số nhà/Lô", .fam-addr-hamlet holds "Tên đường" —
             // split the saved address into them so editing one later only changes
             // that one piece instead of wiping the rest (see _seedAddrFromLoaded).
-            _seedAddrFromLoaded(combined, addrStreetFill, addrHamletFill, addrLocFill);
+            _seedAddrFromLoaded(
+              combined,
+              addrStreetFill,
+              addrHamletFill,
+              addrLocFill,
+            );
           } else {
             const lastComma = combined.lastIndexOf(", ");
             if (lastComma !== -1 && addrHamletFill) {
@@ -15596,6 +15630,16 @@
         // no longer match by the time those fetches resolve, and it bails
         // out before writing anything to the DOM.
         const myGen = ++_openProfileEditGen;
+        _reviewProfileId = null;
+        _fieldNotes = {};
+        _resetPgProfileEditMode();
+        ["timeline-esB", "timeline-esC"].forEach((id) => {
+          const body = document.getElementById(id);
+          if (body) {
+            body.innerHTML =
+              '<div style="text-align:center;padding:16px;color:var(--muted);font-size:12.5px">⏳ Đang tải dữ liệu…</div>';
+          }
+        });
         showAdminPageByName("pgProfileEdit");
         const t = document.getElementById("editProfileTitle");
         if (t) t.textContent = "⏳";
@@ -15847,7 +15891,7 @@
                     <textarea rows="1" placeholder="Trường" oninput="_autoResizeNote(this)" onfocus="_autoResizeNote(this)">${_esc(r.school || "")}</textarea>
                     <textarea rows="1" placeholder="Ngành học / Hình thức học" oninput="_autoResizeNote(this)" onfocus="_autoResizeNote(this)">${_esc(r.major || "")}</textarea>
                     <input value="${_esc(r.period_text || "")}" placeholder="Thời gian">
-                    <input value="${_esc(r.certificate || "")}" placeholder="Bằng cấp">
+                    <textarea rows="1" placeholder="Bằng cấp" oninput="_autoResizeNote(this)" onfocus="_autoResizeNote(this)">${_esc(r.certificate || "")}</textarea>
                     <button class="del-row-btn" onclick="this.closest('.timeline-edit-row').remove()">✕</button>
                   </div>`,
                       )
@@ -16397,8 +16441,17 @@
         if (sw) sw.style.display = "";
         // Hide review action bar
         document.getElementById("reviewActionBar")?.classList.remove("visible");
-        // Clean up injected note areas (but not the static per-section general
-        // note boxes — those are permanent HTML, not re-injected each time).
+        // Static section note boxes are reused between profiles.
+        pg.querySelectorAll(".fn-field-note-ta").forEach((ta) => {
+          ta.value = "";
+          ta.classList.remove("has-content");
+          ta.style.height = "";
+        });
+        pg.querySelectorAll(".fn-field-note.has-note").forEach((el) =>
+          el.classList.remove("has-note"),
+        );
+        // Clean up injected note areas; static section note boxes remain in the
+        // DOM but their values were cleared above.
         pg.querySelectorAll(".fn-field-note:not(.fn-general-note)").forEach(
           (el) => el.remove(),
         );
@@ -17282,7 +17335,7 @@
         if (!cont) return;
         const row = document.createElement("div");
         row.className = "timeline-edit-row";
-        row.innerHTML = `<textarea rows="1" placeholder="Trường" oninput="_autoResizeNote(this)" onfocus="_autoResizeNote(this)"></textarea><input placeholder="Thời gian"><input placeholder="Bằng cấp"><button class="del-row-btn" onclick="this.closest('.timeline-edit-row').remove()">✕</button>`;
+        row.innerHTML = `<textarea rows="1" placeholder="Trường" oninput="_autoResizeNote(this)" onfocus="_autoResizeNote(this)"></textarea><textarea rows="1" placeholder="Ngành học / Hình thức học" oninput="_autoResizeNote(this)" onfocus="_autoResizeNote(this)"></textarea><input placeholder="Thời gian"><textarea rows="1" placeholder="Bằng cấp" oninput="_autoResizeNote(this)" onfocus="_autoResizeNote(this)"></textarea><button class="del-row-btn" onclick="this.closest('.timeline-edit-row').remove()">✕</button>`;
         cont.appendChild(row);
         row.querySelector("input, textarea").focus();
       }
@@ -18203,7 +18256,7 @@
           }
           // Production environment
           if (hostname === "14.224.210.210" || hostname === "lylich.gov.vn") {
-            return "http://14.224.210.210:8006/api/v1";
+            return "http://14.224.210.210:8009/api/v1";
           }
           // May PC lam server tam thoi (lylich.nhabe.vn) - Caddy reverse-proxy
           // /api/* ve Django tren cung origin HTTPS, nen dung duong dan tuong doi.
@@ -18338,7 +18391,9 @@
               // stale JS/DOM state from this account can bleed into the
               // next account that logs in on this same tab (see
               // _hardResetToLogin's comment for details).
-              _hardResetToLogin("Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại.");
+              _hardResetToLogin(
+                "Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại.",
+              );
               throw new Error("session_expired");
             }
           }
@@ -18347,7 +18402,9 @@
           if (res.status === 401) {
             log("Still 401 after retry — forcing re-login.");
             token.clear();
-            _hardResetToLogin("Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại.");
+            _hardResetToLogin(
+              "Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại.",
+            );
             throw new Error("unauthorized");
           }
 
@@ -18798,7 +18855,9 @@
             // actively logged in with their own data already loaded into the
             // DOM, so this must wipe it clean before anyone logs in again on
             // this same tab (see _hardResetToLogin's comment for details).
-            _hardResetToLogin("✅ Đã đổi mật khẩu thành công — đang đăng xuất...");
+            _hardResetToLogin(
+              "✅ Đã đổi mật khẩu thành công — đang đăng xuất...",
+            );
             return;
           } else {
             showToast("✅ Đổi mật khẩu thành công. Bạn vẫn đang đăng nhập.");
@@ -18897,8 +18956,10 @@
       }
 
       async function _submitForgotPassword() {
-        const phone = document.getElementById("forgotPassPhone")?.value?.trim() || "";
-        const cccd = document.getElementById("forgotPassCccd")?.value?.trim() || "";
+        const phone =
+          document.getElementById("forgotPassPhone")?.value?.trim() || "";
+        const cccd =
+          document.getElementById("forgotPassCccd")?.value?.trim() || "";
         const err = document.getElementById("forgotPassErr");
         const ok = document.getElementById("forgotPassOk");
         const btn = document.getElementById("forgotPassSubmitBtn");
@@ -19664,7 +19725,8 @@
             .map((n) => {
               const ch = n.channel || "sms";
               const sent = n.sent_status === "sent" || n.is_read;
-              const who = n.recipient_name || n.profile_name || n.subject || "—";
+              const who =
+                n.recipient_name || n.profile_name || n.subject || "—";
               return `<div class="notif-log-item">
         <div class="notif-log-icon" style="background:var(--success-l)">✅</div>
         <div class="notif-log-body">
@@ -20142,11 +20204,7 @@
           )
         )
           return;
-        if (
-          !confirm(
-            `Xác nhận lần cuối: xóa hẳn "${fullName}" khỏi hệ thống?`,
-          )
-        )
+        if (!confirm(`Xác nhận lần cuối: xóa hẳn "${fullName}" khỏi hệ thống?`))
           return;
 
         try {
@@ -20751,7 +20809,9 @@
       function _resolveNoteRow(tbodyId, key, prefix) {
         const tbody = document.getElementById(tbodyId);
         if (!tbody) return null;
-        const dataRows = [...tbody.querySelectorAll("tr:not(.fam-hist-note-row)")];
+        const dataRows = [
+          ...tbody.querySelectorAll("tr:not(.fam-hist-note-row)"),
+        ];
         const idMatch = key.match(new RegExp(`^${prefix}-id-(\\d+)$`));
         if (idMatch) {
           return dataRows.find((tr) => tr.dataset.id === idMatch[1]) || null;
@@ -20803,7 +20863,8 @@
                   const descCellB = targetTr.cells[2];
                   if (descCellB) {
                     const badge = document.createElement("div");
-                    badge.className = "cell-note-badge citizen-field-note-banner visible";
+                    badge.className =
+                      "cell-note-badge citizen-field-note-banner visible";
                     badge.innerHTML = `<span class="cnb-label">💬 Góp ý BXĐ:</span>${_esc(n.note)}`;
                     descCellB.appendChild(badge);
                   }
@@ -20816,14 +20877,18 @@
             }
 
             // Per-row: Part C work history
-            if (key.startsWith("esC-work-row-") || key.startsWith("esC-work-id-")) {
+            if (
+              key.startsWith("esC-work-row-") ||
+              key.startsWith("esC-work-id-")
+            ) {
               {
                 const targetTr = _resolveNoteRow("tbC-body", key, "esC-work");
                 if (targetTr) {
                   const descCellC = targetTr.cells[2];
                   if (descCellC) {
                     const badge = document.createElement("div");
-                    badge.className = "cell-note-badge citizen-field-note-banner visible";
+                    badge.className =
+                      "cell-note-badge citizen-field-note-banner visible";
                     badge.innerHTML = `<span class="cnb-label">💬 Góp ý BXĐ:</span>${_esc(n.note)}`;
                     descCellC.appendChild(badge);
                   }
@@ -20843,7 +20908,8 @@
                   const majorCellE = targetTr.cells[1];
                   if (majorCellE) {
                     const badge = document.createElement("div");
-                    badge.className = "cell-note-badge citizen-field-note-banner visible";
+                    badge.className =
+                      "cell-note-badge citizen-field-note-banner visible";
                     badge.innerHTML = `<span class="cnb-label">💬 Góp ý BXĐ:</span>${_esc(n.note)}`;
                     majorCellE.appendChild(badge);
                   }
@@ -20863,7 +20929,8 @@
                   const reasonCellG = targetTr.cells[1];
                   if (reasonCellG) {
                     const badge = document.createElement("div");
-                    badge.className = "cell-note-badge citizen-field-note-banner visible";
+                    badge.className =
+                      "cell-note-badge citizen-field-note-banner visible";
                     badge.innerHTML = `<span class="cnb-label">💬 Góp ý BXĐ:</span>${_esc(n.note)}`;
                     reasonCellG.appendChild(badge);
                   }
@@ -20883,7 +20950,8 @@
                   const contentCellF = targetTr.cells[1];
                   if (contentCellF) {
                     const badge = document.createElement("div");
-                    badge.className = "cell-note-badge citizen-field-note-banner visible";
+                    badge.className =
+                      "cell-note-badge citizen-field-note-banner visible";
                     badge.innerHTML = `<span class="cnb-label">💬 Góp ý BXĐ:</span>${_esc(n.note)}`;
                     contentCellF.appendChild(badge);
                   }
@@ -20903,7 +20971,8 @@
                   const reasonCellH = targetTr.cells[1];
                   if (reasonCellH) {
                     const badge = document.createElement("div");
-                    badge.className = "cell-note-badge citizen-field-note-banner visible";
+                    badge.className =
+                      "cell-note-badge citizen-field-note-banner visible";
                     badge.innerHTML = `<span class="cnb-label">💬 Góp ý BXĐ:</span>${_esc(n.note)}`;
                     reasonCellH.appendChild(badge);
                   }
@@ -21007,7 +21076,8 @@
                 const descCell = targetTr.cells[2];
                 if (descCell) {
                   const badge = document.createElement("div");
-                  badge.className = "cell-note-badge citizen-field-note-banner visible";
+                  badge.className =
+                    "cell-note-badge citizen-field-note-banner visible";
                   badge.innerHTML = `<span class="cnb-label">💬 Góp ý BXĐ:</span>${_esc(n.note)}`;
                   descCell.appendChild(badge);
                 }
@@ -21591,7 +21661,7 @@
             location.port === "5501"
               ? "http://" + (location.hostname || "127.0.0.1") + ":8010/api/v1"
               : location.hostname === "14.224.210.210"
-                ? "http://14.224.210.210:8006/api/v1"
+                ? "http://14.224.210.210:8009/api/v1"
                 : "/api/v1");
           const tok = localStorage.getItem("access_token");
           const resp = await fetch(`${base}/exports/word/${profileId}/`, {

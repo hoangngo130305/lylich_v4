@@ -11500,3 +11500,48 @@ WARNING 2026-09-03 15:05:10,405 log 16916 21028 Bad Request: /api/v1/auth/forgot
 WARNING 2026-09-03 15:05:23,607 log 7572 22772 Bad Request: /api/v1/auth/forgot-password/
 WARNING 2026-09-03 15:05:24,103 log 7572 22772 Bad Request: /api/v1/auth/forgot-password/
 WARNING 2026-09-03 15:05:24,601 log 7572 22772 Bad Request: /api/v1/auth/forgot-password/
+WARNING 2026-09-05 14:51:12,360 log 16580 16952 Unauthorized: /api/v1/auth/me/
+WARNING 2026-09-05 14:51:12,361 basehttp 16580 16952 "GET /api/v1/auth/me/ HTTP/1.1" 401 171
+ERROR 2026-09-05 15:29:28,568 basehttp 16580 3052 "POST /api/v1/exports/word/73/ HTTP/1.1" 500 152500
+ERROR 2026-09-05 15:30:19,364 basehttp 16580 22976 "POST /api/v1/exports/word/73/ HTTP/1.1" 500 152500
+ERROR 2026-09-05 15:32:17,979 basehttp 16580 8572 "POST /api/v1/exports/word/73/ HTTP/1.1" 500 185462
+ERROR 2026-09-05 15:33:40,059 basehttp 16580 3552 "POST /api/v1/exports/word/73/ HTTP/1.1" 500 185462
+ERROR 2026-09-05 15:35:18,429 log 8240 15368 Internal Server Error: /api/v1/exports/word/73/
+ERROR 2026-09-05 15:35:18,429 basehttp 8240 15368 "POST /api/v1/exports/word/73/ HTTP/1.1" 500 203
+WARNING 2026-09-19 19:39:04,738 log 20900 608 Unauthorized: /api/v1/auth/login/
+WARNING 2026-09-19 19:39:04,739 basehttp 20900 608 "POST /api/v1/auth/login/ HTTP/1.1" 401 107
+WARNING 2026-09-19 19:39:29,734 log 20900 608 Unauthorized: /api/v1/auth/login/
+WARNING 2026-09-19 19:39:29,734 basehttp 20900 608 "POST /api/v1/auth/login/ HTTP/1.1" 401 107
+WARNING 2026-09-19 19:42:07,049 log 20900 9048 Unauthorized: /api/v1/auth/me/
+WARNING 2026-09-19 19:42:07,050 basehttp 20900 9048 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-09-19 19:42:07,058 log 20900 9048 Unauthorized: /api/v1/auth/token/refresh/
+WARNING 2026-09-19 19:42:07,059 basehttp 20900 9048 "POST /api/v1/auth/token/refresh/ HTTP/1.1" 401 160
+WARNING 2026-09-19 19:42:23,266 log 20900 2760 Not Found: /favicon.ico
+WARNING 2026-09-19 19:42:23,267 basehttp 20900 2760 "GET /favicon.ico HTTP/1.1" 404 5355
+WARNING 2026-09-19 19:43:03,471 log 20900 4360 Unauthorized: /api/v1/auth/login/
+WARNING 2026-09-19 19:43:03,472 basehttp 20900 4360 "POST /api/v1/auth/login/ HTTP/1.1" 401 107
+WARNING 2026-09-19 19:43:18,088 log 20900 4360 Unauthorized: /api/v1/auth/login/
+WARNING 2026-09-19 19:43:18,089 basehttp 20900 4360 "POST /api/v1/auth/login/ HTTP/1.1" 401 107
+WARNING 2026-09-19 19:46:17,304 log 20900 11492 Unauthorized: /api/v1/auth/me/
+WARNING 2026-09-19 19:46:17,305 basehttp 20900 11492 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-09-19 19:46:17,314 log 20900 11492 Unauthorized: /api/v1/auth/token/refresh/
+WARNING 2026-09-19 19:46:17,315 basehttp 20900 11492 "POST /api/v1/auth/token/refresh/ HTTP/1.1" 401 160
+WARNING 2026-09-20 18:18:25,267 log 27424 22140 Unauthorized: /api/v1/auth/me/
+WARNING 2026-09-20 18:18:25,269 basehttp 27424 22140 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-09-21 08:58:51,788 log 13060 26068 Unauthorized: /api/v1/auth/me/
+WARNING 2026-09-21 08:58:51,791 basehttp 13060 26068 "GET /api/v1/auth/me/ HTTP/1.1" 401 291
+WARNING 2026-09-21 15:51:55,492 log 23884 3240 Not Found: /
+WARNING 2026-09-21 15:51:55,494 basehttp 23884 3240 "GET / HTTP/1.1" 404 5304
+WARNING 2026-09-21 15:51:55,675 log 23884 3240 Not Found: /favicon.ico
+WARNING 2026-09-21 15:51:55,675 basehttp 23884 3240 "GET /favicon.ico HTTP/1.1" 404 5355
+WARNING 2026-09-21 15:52:54,848 log 23884 12496 Unauthorized: /api/v1/auth/logout/
+WARNING 2026-09-21 15:52:54,849 basehttp 23884 12496 "POST /api/v1/auth/logout/ HTTP/1.1" 401 291
+WARNING 2026-09-21 15:53:04,145 log 23884 12496 Unauthorized: /api/v1/auth/login/
+WARNING 2026-09-21 15:53:04,146 basehttp 23884 12496 "POST /api/v1/auth/login/ HTTP/1.1" 401 107
+WARNING 2026-09-21 15:53:31,590 log 23884 11972 Not Found: /.well-known/appspecific/com.chrome.devtools.json
+WARNING 2026-09-21 15:53:31,596 basehttp 23884 11972 "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 5466
+WARNING 2026-09-21 15:53:31,894 log 23884 14004 Not Found: /favicon.ico
+WARNING 2026-09-21 15:53:31,895 basehttp 23884 14004 "GET /favicon.ico HTTP/1.1" 404 5355
+ERROR 2026-09-21 18:51:10,715 basehttp 19692 20724 "POST /admin/accounts/officer/107/reset-password/ HTTP/1.1" 500 122833
+WARNING 2026-09-21 18:55:17,837 log 12516 14676 Unauthorized: /api/v1/auth/logout/
+WARNING 2026-09-21 18:55:17,838 basehttp 12516 14676 "POST /api/v1/auth/logout/ HTTP/1.1" 401 291

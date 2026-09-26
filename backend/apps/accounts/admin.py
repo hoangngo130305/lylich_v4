@@ -1,10 +1,18 @@
 from django.contrib import admin
+from django.contrib import messages
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from django.contrib.auth.forms import UserCreationForm, UserChangeForm
+from django.contrib.auth.forms import SetPasswordForm, UserCreationForm, UserChangeForm
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError
+from django.core.exceptions import PermissionDenied
+from django.http import HttpResponseRedirect
+from django.template.response import TemplateResponse
+from django.urls import path, reverse
+import secrets
+import string
 from django.utils.html import format_html
 from unfold.admin import ModelAdmin, StackedInline
+from unfold.widgets import UnfoldAdminPasswordInput
 from .models import User, Role, LoginHistory, PasswordReset, AccountRequest, OfficerPermission, Officer
 
 
@@ -92,7 +100,6 @@ class UserAdmin(ModelAdmin, BaseUserAdmin):
         try:
             super().save_model(request, obj, form, change)
         except IntegrityError:
-            from django.contrib import messages
             messages.error(request, f'Số điện thoại "{obj.phone}" đã được đăng ký trong hệ thống. Vui lòng dùng số khác.')
 
 # ── Officer proxy model ───────────────────────────────────────────────────────
@@ -126,6 +133,8 @@ def _bool_icon(val):
 
 @admin.register(Officer)
 class OfficerAdmin(ModelAdmin, BaseUserAdmin):
+    actions = ['reset_selected_passwords']
+    change_form_template = 'admin/accounts/officer/change_form.html'
     add_form      = OfficerAddForm
     list_display  = [
         'id', 'full_name', 'phone', 'role', 'status',
@@ -210,6 +219,92 @@ class OfficerAdmin(ModelAdmin, BaseUserAdmin):
         if obj.role and obj.role.code == 'admin':
             obj.is_staff = True
         super().save_model(request, obj, form, change)
+
+    def get_urls(self):
+        custom_urls = [
+            path(
+                '<path:object_id>/reset-password/',
+                self.admin_site.admin_view(self.reset_password_view),
+                name='accounts_officer_reset_password',
+            ),
+        ]
+        return custom_urls + super().get_urls()
+
+    def reset_password_view(self, request, object_id):
+        if not request.user.is_superuser:
+            raise PermissionDenied
+
+        officer = self.get_object(request, object_id)
+        if officer is None:
+            messages.error(request, 'Không tìm thấy cán bộ.')
+            return HttpResponseRedirect(reverse('admin:accounts_officer_changelist'))
+
+        if request.method == 'POST':
+            form = SetPasswordForm(officer, request.POST)
+            if form.is_valid():
+                form.save()
+                self.log_change(request, officer, 'Cấp lại mật khẩu cho cán bộ.')
+                messages.success(request, f'Đã cấp lại mật khẩu cho {officer.full_name}.')
+                return HttpResponseRedirect(
+                    reverse('admin:accounts_officer_change', args=[officer.pk])
+                )
+        else:
+            form = SetPasswordForm(officer)
+
+        # Plain Django forms (unlike ModelAdmin forms) aren't auto-styled by
+        # Unfold, so the password inputs render with no CSS class at all and
+        # are effectively invisible — swap in Unfold's own password widget.
+        form.fields['new_password1'].widget = UnfoldAdminPasswordInput()
+        form.fields['new_password2'].widget = UnfoldAdminPasswordInput()
+
+        context = {
+            **self.admin_site.each_context(request),
+            'title': f'Cấp lại mật khẩu: {officer.full_name}',
+            'opts': self.model._meta,
+            'original': officer,
+            'form': form,
+            'media': self.media + form.media,
+        }
+        return TemplateResponse(
+            request,
+            'admin/accounts/officer/reset_password.html',
+            context,
+        )
+
+    @admin.action(description='Cấp lại mật khẩu cho cán bộ đã chọn')
+    def reset_selected_passwords(self, request, queryset):
+        if not request.user.is_superuser:
+            self.message_user(
+                request,
+                'Chỉ Super Admin mới được cấp lại mật khẩu.',
+                level=messages.ERROR,
+            )
+            return
+
+        alphabet = string.ascii_letters + string.digits + '@#$%'
+        reset_items = []
+        for officer in queryset.filter(
+            role__code__in=['admin', 'can_bo_bxd'],
+            deleted_at__isnull=True,
+        ):
+            new_password = ''.join(secrets.choice(alphabet) for _ in range(12))
+            officer.set_password(new_password)
+            officer.save(update_fields=['password'])
+            reset_items.append(f'{officer.full_name}: {new_password}')
+
+        if reset_items:
+            self.message_user(
+                request,
+                'Đã cấp lại mật khẩu. Ghi lại và gửi riêng cho từng cán bộ: '
+                + ' | '.join(reset_items),
+                level=messages.SUCCESS,
+            )
+        else:
+            self.message_user(
+                request,
+                'Không có cán bộ hợp lệ được chọn.',
+                level=messages.WARNING,
+            )
 
 
 @admin.register(LoginHistory)
