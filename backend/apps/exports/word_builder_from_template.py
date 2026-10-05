@@ -10,6 +10,7 @@ Render loop   : per-section start/done log; placeholder on any failure;
 import io
 import json
 import os
+import re
 import traceback
 from datetime import date, datetime
 
@@ -635,7 +636,14 @@ def _r_family_block(doc, sec, sm, fr):
 
     # Prefer the name the citizen renamed this member to ("Click để đổi tên"
     # on the form) over the static template title, same as _r_family_list_block.
-    label = member.custom_label or title
+    # The template title carries the section's numeric prefix (e.g. "10. Cha
+    # chồng/vợ") — keep that prefix even when a custom_label replaces the text,
+    # otherwise renamed sections (e.g. "Cha vợ") silently lose their numbering.
+    if member.custom_label:
+        prefix_match = re.match(r'^(\d+(?:\.\d+)*\.\s*)', title)
+        label = (prefix_match.group(1) if prefix_match else '') + member.custom_label
+    else:
+        label = title
 
     tbl = doc.add_table(rows=0, cols=2)
     _safe_table_style(tbl, sm.t())

@@ -12538,6 +12538,13 @@
         const errors = [];
         let prevToKey = null;
         let dataRowIdx = 0;
+        // A row with no "Đến"/"Đến nay"/"Đã mất" is left open-ended. It must
+        // be closed before another period starts, otherwise the gap after it
+        // is invisible to the continuity check below (see the loop's end,
+        // where such a row used to fall back to using its own "Từ" as a
+        // stand-in "Đến" — masking the very gap it should have flagged).
+        let prevOpenEndedRowNum = null;
+        let prevOpenEndedTr = null;
 
         rows.forEach((tr) => {
           tr.classList.remove("fhd-row-invalid");
@@ -12561,6 +12568,15 @@
           const fromParsed = _parseMY(fromVal);
           const toParsed = isPresent ? null : _parseMY(toVal);
           let rowInvalid = false;
+
+          if (prevOpenEndedRowNum !== null) {
+            errors.push(
+              `Dòng ${prevOpenEndedRowNum}: chưa nhập "Đến" — hoàn tất giai đoạn này (hoặc chọn "Đến nay"/"Đã mất") trước khi khai giai đoạn tiếp theo`,
+            );
+            prevOpenEndedTr?.classList.add("fhd-row-invalid");
+            prevOpenEndedRowNum = null;
+            prevOpenEndedTr = null;
+          }
 
           if (fromVal && !fromParsed) {
             errors.push(
@@ -12607,8 +12623,13 @@
             prevToKey = null;
           } else if (toParsed) {
             prevToKey = _myKey(toParsed.month, toParsed.year);
-          } else if (fromParsed) {
-            prevToKey = _myKey(fromParsed.month, fromParsed.year);
+          } else {
+            // No "Đến" and not Present/Deceased: leave this row open: the
+            // next iteration (if any) will flag it instead of silently
+            // treating this row's own "Từ" as a fake end date.
+            prevToKey = null;
+            prevOpenEndedRowNum = rowNum;
+            prevOpenEndedTr = tr;
           }
         });
 
@@ -12616,7 +12637,14 @@
         // skipPresentCheck=true → chỉ hiển thị, không block thêm/chèn dòng
         // skipPresentCheck=false/undefined → đưa vào errors, block submit
         let presentWarn = null;
-        if (dataRowIdx > 0 && prevToKey !== null) {
+        if (prevOpenEndedRowNum !== null) {
+          const msg = `Dòng ${prevOpenEndedRowNum}: chưa nhập "Đến" — hoặc chọn "Đến nay"/"Đã mất"`;
+          if (skipPresentCheck) {
+            presentWarn = msg;
+          } else {
+            errors.push(msg);
+          }
+        } else if (dataRowIdx > 0 && prevToKey !== null) {
           const _nowYear = new Date().getFullYear();
           const _lastYear = Math.floor(prevToKey / 100);
           if (_lastYear < _nowYear) {
@@ -15632,6 +15660,13 @@
         const myGen = ++_openProfileEditGen;
         _reviewProfileId = null;
         _fieldNotes = {};
+        // "Lịch sử chỉnh sửa" is session-only (never persisted/fetched from
+        // the backend) and was never cleared between profiles — without this,
+        // an officer's direct edits to profile A kept showing up under
+        // profile B's edit-history panel after switching profiles.
+        editHistoryLog = [];
+        const editHistoryBodyEl = document.getElementById("editHistoryBody");
+        if (editHistoryBodyEl) editHistoryBodyEl.innerHTML = "";
         _resetPgProfileEditMode();
         ["timeline-esB", "timeline-esC"].forEach((id) => {
           const body = document.getElementById(id);
