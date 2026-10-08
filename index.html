@@ -13227,12 +13227,17 @@
 
       // ── Save all sections ────────────────────────────────────────────
       function _validateSiblings() {
-        const sibRels = [
-          "anh_chi_em_ruot",
-          "anh_chi_em_chong_vo",
-          "cha_chong_vo",
-          "me_chong_vo",
-        ];
+        // Only relation types whose form template actually renders a
+        // ".sib-deceased-chk" checkbox belong here (anh/chị/em — see the
+        // `m.sibling` branch of buildFamilyForm). cha_chong_vo/me_chong_vo
+        // use the plain "default" template (like cha_ruot/me_ruot), which
+        // has no such checkbox and no required-field asterisk on Nơi cư
+        // trú/Nghề nghiệp — those fields are optional by design ("Để trống
+        // nếu đã mất"). Including them here made it impossible to ever
+        // satisfy this check for a deceased cha/mẹ chồng/vợ: there was no
+        // checkbox to tick, so `decChk` was always null and the fields
+        // stayed "required" forever.
+        const sibRels = ["anh_chi_em_ruot", "anh_chi_em_chong_vo"];
         const warnings = [];
         document
           .querySelectorAll(".family-accordion[data-relationship]")
