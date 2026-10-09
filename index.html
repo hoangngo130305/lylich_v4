@@ -12533,6 +12533,20 @@
       function validateFamHistory(acc, skipPresentCheck) {
         const body = acc.querySelector(".family-body");
         if (!body) return true;
+        // "Con" dưới 18 tuổi có bảng "Quá trình lịch sử" nằm ẩn bên trong
+        // #childOver18_<num> (xem checkChildAge()) — giao diện quần chúng
+        // không bao giờ hiện hay cho sửa bảng này cho tới khi đủ 18 tuổi,
+        // nên không được validate/chặn nộp hồ sơ vì dữ liệu mà quần chúng
+        // không có cách nào xem hay sửa được.
+        const over18Box = body.querySelector('[id^="childOver18_"]');
+        if (over18Box && over18Box.style.display === "none") {
+          const errBarSkip = body.querySelector(".fhd-error-bar");
+          if (errBarSkip) {
+            errBarSkip.innerHTML = "";
+            errBarSkip.classList.remove("visible");
+          }
+          return true;
+        }
         const rows = body.querySelectorAll(".timeline-table tbody tr");
         const errBar = body.querySelector(".fhd-error-bar");
         const errors = [];
