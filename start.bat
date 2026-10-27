@@ -25,10 +25,10 @@ if errorlevel 1 (
     exit /b 1
 )
 
-echo [0/3] Don cache Python cu ^(tranh chay nham code cu^)...
+echo [0/5] Don cache Python cu ^(tranh chay nham code cu^)...
 for /f "delims=" %%D in ('dir /s /b /ad "%ROOT%__pycache__" 2^>nul') do rd /s /q "%%D"
 
-echo [1/3] Khoi dong MySQL ^(XAMPP^)...
+echo [1/5] Khoi dong MySQL ^(XAMPP^)...
 if exist "C:\xampp\mysql_start.bat" (
     start "" /min "C:\xampp\mysql_start.bat"
     timeout /t 4 >nul
@@ -38,13 +38,13 @@ if exist "C:\xampp\mysql_start.bat" (
     pause
 )
 
-echo [2/3] Khoi dong Django server...
+echo [2/5] Khoi dong Django server...
 call "%VENV%\Scripts\activate.bat"
 pushd "%BACKEND%"
 start "Django Server - DUNG TAT CUA SO NAY" cmd /k "python manage.py runserver 0.0.0.0:8010"
 popd
 
-echo [3/4] Khoi dong web server cho giao dien LAN, mo trinh duyet...
+echo [3/5] Khoi dong web server cho giao dien LAN, mo trinh duyet...
 REM Khong duoc mo index.html bang cach double-click / file:// vi trinh duyet
 REM se chan CORS (Origin: null). Phai phuc vu qua http://
 REM Dung dung cong 5500 vi index.html chi tu nhan API server (127.0.0.1:8010)
@@ -53,7 +53,7 @@ pushd "%ROOT%"
 start "Frontend Server - DUNG TAT CUA SO NAY" cmd /k "python -m http.server 5500"
 popd
 
-echo [4/4] Khoi dong Caddy ^(HTTPS cho domain lylich.nhabe.vn^)...
+echo [4/5] Khoi dong Caddy ^(HTTPS cho domain lylich.nhabe.vn^)...
 if exist "C:\caddy\caddy.exe" (
     pushd "C:\caddy"
     start "Caddy HTTPS Server - DUNG TAT CUA SO NAY" cmd /k "caddy.exe run"
@@ -63,14 +63,24 @@ if exist "C:\caddy\caddy.exe" (
     echo            Truy cap qua domain se khong hoat dong.
 )
 
+echo [5/5] Khoi dong File Browser ^(quan ly file qua web, /files/^)...
+if exist "C:\filebrowser\filebrowser.exe" (
+    pushd "C:\filebrowser"
+    start "File Browser - DUNG TAT CUA SO NAY" cmd /k "filebrowser.exe -p 8082"
+    popd
+) else (
+    echo [CANH BAO] Khong tim thay C:\filebrowser\filebrowser.exe - bo qua File Browser.
+    echo            Truy cap /files/ se tra ve loi 502.
+)
+
 timeout /t 4 >nul
 start "" "http://127.0.0.1:5500/index.html"
 
 echo.
 echo ============================================
 echo   DA KHOI DONG XONG.
-echo   Ung dung dang chay o 3 cua so: "Django Server", "Frontend Server"
-echo   va "Caddy HTTPS Server".
+echo   Ung dung dang chay o 4 cua so: "Django Server", "Frontend Server",
+echo   "Caddy HTTPS Server" va "File Browser".
 echo   DUNG DONG cac cua so do khi con dang dung ung dung.
 echo ============================================
 pause
